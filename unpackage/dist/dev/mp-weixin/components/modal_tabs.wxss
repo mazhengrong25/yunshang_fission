@@ -1,0 +1,49 @@
+.modal_tabs .swiper-tab.data-v-f3a59d12 {
+  text-align: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  margin-bottom: 68rpx;
+}
+.modal_tabs .swiper-tab .swiper-tab-item.data-v-f3a59d12 {
+  width: 160rpx;
+  height: 50rpx;
+  border: 2rpx solid #0070e2;
+  opacity: 0.51;
+  border-radius: 20px;
+  color: #434343;
+  font-size: 28rpx;
+  font-weight: 400;
+  color: #0070e2;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+}
+.modal_tabs .swiper-tab .swiper-tab-item.data-v-f3a59d12:not(:last-child) {
+  margin-right: 50rpx;
+}
+.modal_tabs .swiper-tab .swiper-tab-item.active.data-v-f3a59d12 {
+  background: #0070e2;
+  border: 2rpx solid #0070e2;
+  color: #fff;
+  opacity: 1;
+}
+.modal_tabs swiper.data-v-f3a59d12 {
+  height: 328rpx;
+}
+.modal_tabs .tabs_main .tabs_center.data-v-f3a59d12 {
+  padding: 0 30rpx;
+}
+

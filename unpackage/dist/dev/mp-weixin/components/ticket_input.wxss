@@ -1,0 +1,246 @@
+.ticket_input.data-v-fee93584 {
+  padding-bottom: 50rpx;
+}
+.ticket_input .ticket_address.data-v-fee93584 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+          align-items: flex-start;
+}
+.ticket_input .ticket_address .address_input.data-v-fee93584 {
+  height: 65rpx;
+  line-height: 50rpx;
+  border-bottom: 1px solid #E0E0E0;
+  font-size: 42rpx;
+  font-weight: bold;
+  color: #2a2a2a;
+  width: 100%;
+}
+.ticket_input .ticket_address .address_input.from_input.data-v-fee93584 {
+  text-align: right;
+}
+.ticket_input .ticket_address .check_toform_btn.data-v-fee93584 {
+  -webkit-flex-shrink: 0;
+          flex-shrink: 0;
+  margin: 0 40rpx;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+}
+.ticket_input .ticket_address .check_toform_btn .ticket_image.data-v-fee93584 {
+  width: 70rpx;
+  height: 70rpx;
+  object-fit: cover;
+}
+.ticket_input .ticket_time.data-v-fee93584 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  height: 70rpx;
+  margin-top: 20rpx;
+  border-bottom: 2rpx solid #DFDFDF;
+}
+.ticket_input .ticket_time .time_box .time_true.data-v-fee93584 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+}
+.ticket_input .ticket_time .time_box .time_true .close_from_btn.data-v-fee93584 {
+  width: 30rpx;
+  height: 30rpx;
+  object-fit: contain;
+  margin-right: 16rpx;
+}
+.ticket_input .ticket_time .time_box .time_true .time.data-v-fee93584 {
+  font-size: 32rpx;
+  font-weight: 400;
+  line-height: 38rpx;
+  color: #2a2a2a;
+}
+.ticket_input .ticket_time .time_box .time_true .time_day.data-v-fee93584 {
+  height: 36rpx;
+  font-size: 24rpx;
+  font-weight: 400;
+  line-height: 28rpx;
+  color: #2a2a2a;
+  margin-left: 12rpx;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: end;
+  -webkit-align-items: flex-end;
+          align-items: flex-end;
+}
+.ticket_input .ticket_time .time_box .time_false .time_icon.data-v-fee93584 {
+  width: 30rpx;
+  height: 30rpx;
+  margin-right: 12rpx;
+}
+.ticket_input .ticket_time .time_box .time_false .time_text.data-v-fee93584 {
+  font-size: 32rpx;
+  font-weight: 400;
+  line-height: 38rpx;
+  color: #afb9c4;
+}
+.ticket_input .child_box.data-v-fee93584 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  margin-top: 50rpx;
+  /**
+		.child_setting {
+			display: inline-flex;
+			align-items: center;
+			.child_main{
+				display: inline-flex;
+				align-items: center;
+				&:not(:last-child){
+					margin-right: 40upx;
+				}
+				.number_name {
+					font-size: 28upx;
+					font-weight: 500;
+					color: rgba(42, 42, 42, 1);
+					margin-right: 16upx;
+				}
+				
+				.number_box {
+					display: inline-flex;
+					align-items: center;
+					
+					.number{
+						font-size: 28upx;
+						font-weight:500;
+						color:rgba(42,42,42,1);
+						margin: 0 16upx;
+					}
+				
+					.number_icon {
+						width: 36upx;
+						height: 36upx;
+				
+						&.remove_number {
+							background: url(../static/number_remove_btn.png) no-repeat;
+							background-size: contain;
+							&.active{
+								background: url(../static/number_remove_btn_active.png) no-repeat;
+								background-size: contain;
+							}
+						}
+						&.add_number{
+							background: url(../static/number_add_btn.png);
+							background-size: contain;
+						}
+					}
+				}		
+			}
+		}
+		*/
+}
+.ticket_input .child_box .child_message.data-v-fee93584 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  font-size: 22rpx;
+  font-weight: 400;
+  color: #afb9c4;
+}
+.ticket_input .child_box .child_message .child_message_more.data-v-fee93584 {
+  width: 10rpx;
+  height: 16rpx;
+  object-fit: contain;
+  margin-left: 10rpx;
+}
+.ticket_input .child_box .passenger_message.data-v-fee93584 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+}
+.ticket_input .child_box .passenger_message .passenger_list.data-v-fee93584 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #999999;
+}
+.ticket_input .child_box .passenger_message .passenger_list.data-v-fee93584:not(:first-child) {
+  margin-left: 26rpx;
+}
+.ticket_input .child_box .passenger_message .passenger_list .number.data-v-fee93584 {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2a2a2a;
+  margin-left: 8rpx;
+}
+.ticket_input .child_box .passenger_message .open_number_more.data-v-fee93584 {
+  margin-left: 12rpx;
+  width: 16rpx;
+  height: 12rpx;
+  object-fit: contain;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+}
+.ticket_input .submit_btn.data-v-fee93584 {
+  width: 650rpx;
+  height: 90rpx;
+  background: #0070e2;
+  -webkit-box-shadow: 0 6rpx 12rpx rgba(0, 112, 226, 0.3);
+          box-shadow: 0 6rpx 12rpx rgba(0, 112, 226, 0.3);
+  border-radius: 80rpx;
+  margin: 50rpx auto 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  font-size: 32rpx;
+  font-weight: 400;
+  line-height: 38rpx;
+  color: #ffffff;
+  letter-spacing: 10rpx;
+}
+

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ticket-input": "/components/ticket_input"
+  }
+}
