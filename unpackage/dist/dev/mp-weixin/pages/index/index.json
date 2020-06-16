@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "云上航空",
-  "usingComponents": {
-    "uni-popup": "/components/uni-popup/uni-popup",
-    "model-swiper": "/components/model_swiper",
-    "model-tabs": "/components/modal_tabs",
-    "model-notice": "/components/modal_notice"
-  }
-}
