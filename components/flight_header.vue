@@ -26,9 +26,9 @@
 			{{flightData.airline}} | {{flightData.model}} | {{flightData.food}}
 		</view>
 		
-		<view class="" v-if="!flightInfo">
-			
-			
+		<view class="flight_reservation_box" v-if="!flightInfo">
+			W经济舱 | 退改签规则 | 每人托运2件,每件23KG
+			<view class="message_more_btn"></view>
 		</view>
 
 	</view>
@@ -59,7 +59,7 @@
 		border-radius: 20upx;
 		background: rgba(255, 255, 255, 1);
 		box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
-		padding: 30upx 20upx 20upx;
+		padding: 30upx 20upx 22upx;
 		margin: 0 20upx 20upx;
 
 		.header_message {
@@ -143,5 +143,29 @@
 				margin-right: 8upx;
 			}
 		}
+		
+		
+		.flight_reservation_box{
+			border-top:1px dashed rgba(217,225,234,1);
+			margin-top: 24upx;
+			padding-top: 22upx;
+			font-size: 24upx;
+			font-weight:400;
+			color:rgba(175,185,196,1);
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			.message_more_btn {
+				background: url(../static/arrow.png) no-repeat;
+				background-size: contain;
+				width: 8upx;
+				height: 14upx;
+				margin-left: 18upx;
+				display: inline-flex;
+			}
+		}
+		
+		
 	}
 </style>

@@ -11,7 +11,7 @@
 				<view class="left_reward" v-if="flightData.reward > 0">奖励金 &yen;{{flightData.reward}}</view>
 			</view>
 			<view class="box_header_right">
-				<view class="header_right_btn">预 定</view>
+				<view class="header_right_btn" @click="jumpReservation">预 定</view>
 				<view class="header_right_voteNumber" v-if="flightData.voteNumber < 10">{{flightData.voteNumber}}张</view>
 			</view>
 		</view>
@@ -43,8 +43,16 @@
 			};
 		},
 		methods: {
-			openFlightPopop(){
+			// 打开说明弹窗
+			openFlightPopop(){  
 				this.$parent.$refs.flightExplanation.open()
+			},
+			
+			// 跳转预定页面
+			jumpReservation(){
+				uni.navigateTo({
+					url: '/pages/flightReservation/flightReservation'
+				})
 			},
 		},
 	}
