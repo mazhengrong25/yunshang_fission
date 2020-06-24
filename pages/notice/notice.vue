@@ -15,14 +15,9 @@
 				
 			}; 
 		},
-		onLoad() {
-			uni.setNavigationBarTitle({
-			   title: '公告'
-			});
-		}
 	}
 </script>
 
-<style lang="less">
+<style scoped lang="less">
 
 </style>

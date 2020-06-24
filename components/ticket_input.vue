@@ -92,7 +92,7 @@
 		props: {
 			ticketType: {
 				type: String,
-				default: () => ''
+				default: () => '国内'
 			}
 		},
 		data() {
@@ -115,6 +115,9 @@
 			// 出发按钮
 			tocketToBtn() {
 				console.log('选择出发地')
+				uni.navigateTo({
+					url: '/pages/citySelect/citySelect'
+				})
 			},
 			// 切换出发返程地
 			checkTickedBtn() {
@@ -179,6 +182,9 @@
 			// 提交按钮
 			submitTicket() {
 				console.log('提交')
+				uni.navigateTo({
+				   url: '/pages/ticketInquiry/ticketInquiry?type='+this.ticketType
+				});
 			},
 		},
 		

@@ -32,7 +32,7 @@
 		},
 		data() {
 			return {
-				currentTab: 1,
+				currentTab: 0,
 				tabsList: ['国内', '国际', '多程'],
 				swiperHeight: 0,
 			};
@@ -110,7 +110,7 @@
 		}
 
 		.tabs_main {
-
+			transition: all .3s;
 			// min-height: 75upx;
 			// height: 328upx !important;
 			.tabs_center {

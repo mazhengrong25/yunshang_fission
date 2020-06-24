@@ -46,6 +46,14 @@
 		</uni-popup>
 		
 		
+		
+		<uni-popup ref="ticketExplanation" type="bottom" class="ticket_explanation" @change="childPopupStatus">
+			<view class="title">
+				
+				
+				
+			</view>
+		</uni-popup>
 
 		
 		
@@ -101,7 +109,7 @@
 						uni.showTabBar({
 							animation: true
 						})
-					},300)
+					},200)
 				}
 			},
 			// 关闭乘机人数弹窗
