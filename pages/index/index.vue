@@ -3,13 +3,70 @@
 		<view class="header">
 			<model-swiper :swiperList="swiperList"></model-swiper>
 			<view class="index_interval" style="margin-top: 50upx;"></view>
-			<model-tabs></model-tabs>
+			
+			<view class="modal_tabs">
+				<view class="swiper-tab">
+					<view v-for="(item, index) in tabsList" :key="index" :class="['swiper-tab-item',{'active': currentTab === index}]"
+					 @click="clickTab(index)">
+						{{item}}
+					</view>
+				</view>
+			
+				<swiper class="tabs_main" :current="currentTab" duration="300" :style="{'height':swiperHeight+'px'}" @change="swiperTab">
+					<swiper-item v-for="(item, index) in tabsList" :key="index">
+						<view class="tabs_center">
+							<ticket-input 
+							:ticketType="item" 
+							:addressForm="addressForm" 
+							@checkTicked="checkTicked"
+							@closeFromBtn="closeFromBtn"></ticket-input>
+						</view>
+					</swiper-item>
+				</swiper>
+			
+			</view>
+			<view class="child_box" v-if="currentTab !== 0">
+				<view class="cabin">经济舱</view>
+				
+				
+				<view class="passenger_message">
+					<view class="child_message" @click="openChildMessageBtn"></view>
+					<view class="passenger_message_main" @click="openPassengerNumber">
+						<view class="passenger_list">
+						<text>成人</text>
+						<text class="number">{{passengerForm.adultNumber}}</text>
+					</view>
+					<view class="passenger_list">
+						<text>儿童</text>
+						<text class="number">{{passengerForm.childNumber}}</text>
+					</view>
+					<view class="passenger_list">
+						<text>婴儿</text>
+						<text class="number">{{passengerForm.babyNumber}}</text>
+					</view>
+					<image class="open_number_more" src="../../static/number_more_btn.png" mode=""></image>
+					</view>
+				</view>
+			</view>
+
+			<view 
+				class="multi_pass_message"
+			 	v-if="currentTab === 2" 
+			 	@click="openMultiPassProblem">
+			 	至少选择一个国际城市
+			</view>
+			
+			
+			<view class="submit_btn" @click="submitTicket">飞机票查询</view>
+			
 		</view>
 
+		<!-- 公告版块 -->
 		<view class="notice">
 			<model-notice :modelType="true"></model-notice>
 		</view>
 
+		<!-- 乘客数量选择弹窗 -->
 		<uni-popup ref="childPopup" type="bottom" class="child_dialog" @change="childPopupStatus">
 			<view class="child_dialog_mian">
 				<view class="title">
@@ -20,24 +77,24 @@
 					<view class="child_main">
 						<view class="number_name">成人</view>
 						<view class="number_box">
-							<view :class="['remove_number number_icon',{active: chilidForm.adultNumber > 0}]" @click="editTicketNumber('remove','adult')"></view>
-							<view class="number">{{chilidForm.adultNumber}}</view>
+							<view :class="['remove_number number_icon',{active: passengerFormBack.adultNumber > 0}]" @click="editTicketNumber('remove','adult')"></view>
+							<view class="number">{{passengerFormBack.adultNumber}}</view>
 							<view class="add_number number_icon" @click="editTicketNumber('add','adult')"></view>
 						</view>
 					</view>
 					<view class="child_main">
 						<view class="number_name">儿童<text class="number_name_message">（2-12岁）</text></view>
 						<view class="number_box">
-							<view :class="['remove_number number_icon',{active: chilidForm.childNumber > 0}]" @click="editTicketNumber('remove','child')"></view>
-							<view class="number">{{chilidForm.childNumber}}</view>
+							<view :class="['remove_number number_icon',{active: passengerFormBack.childNumber > 0}]" @click="editTicketNumber('remove','child')"></view>
+							<view class="number">{{passengerFormBack.childNumber}}</view>
 							<view class="add_number number_icon" @click="editTicketNumber('add','child')"></view>
 						</view>
 					</view>
 					<view class="child_main">
 						<view class="number_name">婴儿<text class="number_name_message">（小于2岁）</text></view>
 						<view class="number_box">
-							<view :class="['remove_number number_icon',{active: chilidForm.babyNumber > 0}]" @click="editTicketNumber('remove','baby')"></view>
-							<view class="number">{{chilidForm.babyNumber}}</view>
+							<view :class="['remove_number number_icon',{active: passengerFormBack.babyNumber > 0}]" @click="editTicketNumber('remove','baby')"></view>
+							<view class="number">{{passengerFormBack.babyNumber}}</view>
 							<view class="add_number number_icon" @click="editTicketNumber('add','baby')"></view>
 						</view>
 					</view>
@@ -45,32 +102,59 @@
 			</view>
 		</uni-popup>
 		
-		
-		
+
+
+		<!-- 儿婴票说明弹窗 -->
 		<uni-popup ref="ticketExplanation" type="bottom" class="ticket_explanation" @change="childPopupStatus">
 			<view class="title">
-				
-				
-				
+				<view class="close_btn" @click="closePopup"></view>
+				<view class="explanation_header">
+					<view @click="checkedExplanationBtn(0)" :class="['header_btn',{'is_active': popupCurrent === 0}]">儿童票</view>
+					<view @click="checkedExplanationBtn(1)" :class="['header_btn',{'is_active': popupCurrent === 1}]">婴儿票</view>
+					<view @click="checkedExplanationBtn(2)" :class="['header_btn',{'is_active': popupCurrent === 2}]">常见问题</view>
+				</view>
+			</view>
+			<view class="flight_explanation_main">
+				<swiper class="explanation_content" @change="popupChange" :current="popupCurrent">
+					<swiper-item>
+						<view class="popup_content_item">
+							儿童票
+						</view>
+					</swiper-item>
+					<swiper-item>
+						<view class="popup_content_item">婴儿票</view>
+					</swiper-item>
+					<swiper-item>
+						<view class="popup_content_item">常见问题</view>
+					</swiper-item>
+				</swiper>
 			</view>
 		</uni-popup>
 
-		
-		
-		
-		
+
+		<!-- 国际城市说明弹窗 -->
+		<uni-popup 
+			ref="messageDialog" 
+			type="center" 
+			:maskClick="false"
+			@change="childPopupStatus">
+			 <messageDialog @closeDialog="closeMessageDialog"></messageDialog>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
 	import modelSwiper from '@/components/model_swiper.vue' // 轮播图
-	import modelTabs from '@/components/modal_tabs.vue' // 标签页
 	import modelNotice from '@/components/modal_notice.vue' // 公告版块
+	import ticketInput from '@/components/ticket_input.vue'  // 航程选择
+
+	import messageDialog from '@/components/message_dialog.vue'  // 信息弹窗内容
 	export default {
 		components: {
 			modelSwiper,
-			modelTabs,
-			modelNotice
+			modelNotice,
+			ticketInput,
+			messageDialog
 		},
 		data() {
 			return {
@@ -88,12 +172,30 @@
 					},
 				],
 				
-				chilidForm: {
-					adultNumber: 0,
-					childNumber: 0,
-					babyNumber: 0,
+				currentTab: 2,  // tab默认值
+				tabsList: ['国内', '国际', '多程'],  // tab切换内容
+				swiperHeight: 0,  // tab切换swiper高度
+
+				addressForm: {  // 航程信息
+					to: '重庆',  // 出发地
+					from: '北京',  // 到达地
+					multi_pass_to: '西安',  // 多程出发地
+					multi_pass_from: '武汉',  // 多程到达地
+					toTime: '04月15日',  // 出发时间
+					fromTime: '04月22日',  // 到达时间
+					fromDay: '周三',  // 到达日期
 				},
-				chilidFormBack: {}
+				
+				passengerForm: {
+					adultNumber: 0, // 成年人数量
+					childNumber: 0,  // 儿童数量
+					babyNumber: 0,  // 婴儿数量
+				},
+				
+				passengerFormBack: {}, // 乘客信息
+
+				
+				popupCurrent: 0, // 弹窗轮播下标
 			}
 		},
 		onLoad() {},
@@ -112,37 +214,119 @@
 					},200)
 				}
 			},
+			
+			//滑动切换
+			swiperTab(e) {
+				this.currentTab = e.detail.current
+				this.setSwiperHeight()
+			},
+			
+			//点击切换
+			clickTab(index) {
+				if (this.currentTab === index) {
+					return false;
+				} else {
+					this.currentTab = index
+				}
+			},
+
+			// 切换往返地址
+			checkTicked(data){
+				let toAddress = data.to
+				let fromAddress = data.rorm
+				if(data.type){
+					this.addressForm.multi_pass_to = fromAddress
+					this.addressForm.multi_pass_from = toAddress
+				}else{
+					this.addressForm.to = fromAddress
+					this.addressForm.from = toAddress
+				}
+			},
+			// 清除返程信息
+			closeFromBtn(){
+				this.addressForm.fromTime = ''
+				this.addressForm.fromDay = ''
+			},
+			
+			// 获取当前swiper-item高度
+			setSwiperHeight() {
+				let query = uni.createSelectorQuery().in(this);
+				query.selectAll(".tabs_center").boundingClientRect();
+				query.exec((res) => {
+					this.swiperHeight = res[0][this.currentTab].height;
+				})
+			},
+			
+			// 儿婴票说明
+			openChildMessageBtn(){
+				this.$refs.ticketExplanation.open()
+			},
+
+			// 关闭儿婴票说明
+			closePopup(){
+				this.$refs.ticketExplanation.close()
+			},
+			// 弹窗轮播标题切换
+			checkedExplanationBtn(index){
+				this.popupCurrent = index
+			},
+			// 弹窗轮播切换
+			popupChange(e){
+				this.popupCurrent = e.detail.current
+			},
+
+			
+			
+			// 打开乘客数量弹窗
+			openPassengerNumber(){
+				console.log('打开乘机人数选择')
+				this.$refs.childPopup.open()
+				this.passengerFormBack = JSON.parse(JSON.stringify(this.passengerForm))
+			},
+			
+			
 			// 关闭乘机人数弹窗
 			closeChildDialog(){
 				this.$refs.childPopup.close()
-				this.chilidForm = this.chilidFormBack
 			},
 			// 修改乘机人数
 			editTicketNumber(status,type){
 				if(status === 'add'){
-					this.chilidForm[type + 'Number'] = this.chilidForm[type + 'Number'] + 1
+					this.passengerFormBack[type + 'Number'] = this.passengerFormBack[type + 'Number'] + 1
 				}else{
-					if(this.chilidForm[type + 'Number'] > 0){
-						this.chilidForm[type + 'Number'] = this.chilidForm[type + 'Number'] - 1
+					if(this.passengerFormBack[type + 'Number'] > 0){
+						this.passengerFormBack[type + 'Number'] = this.passengerFormBack[type + 'Number'] - 1
 					}
 				}
 			},
 			// 提交乘机人数数据
 			submitChildDialog(){
-				uni.$emit('saveChild', this.chilidForm)
-				this.closeChildDialog()
+				this.passengerForm = this.passengerFormBack
+				this.$refs.childPopup.close()
+			},
+
+
+			// 打开选择国际城市提示
+			openMultiPassProblem(){
+				this.$refs.messageDialog.open()
+			},
+			// 关闭选择国际城市提示
+			closeMessageDialog(){
+				this.$refs.messageDialog.close()
 			},
 			
 			
+			// 提交按钮
+			submitTicket() {
+				console.log('提交')
+				uni.navigateTo({
+				   url: '/pages/ticketInquiry/ticketInquiry?type='+this.ticketType
+				});
+			},
+			
 		},
-		mounted() {
-			// 打开乘机人数选择弹窗
-			uni.$on('openChild', (e) => {
-				this.chilidForm = JSON.parse(JSON.stringify(e))
-				this.chilidFormBack = JSON.parse(JSON.stringify(e))
-				this.$refs.childPopup.open()
-			})
-
+		created() {
+			this.setSwiperHeight()
 		}
 	}
 </script>
@@ -154,6 +338,152 @@
 		.header {
 			padding: 20upx;
 			background: #fff;
+			.modal_tabs {
+				.swiper-tab {
+					text-align: center;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					margin-bottom: 68upx;
+			
+					.swiper-tab-item {
+						width: 160upx;
+						height: 50upx;
+						border: 2upx solid rgba(0, 112, 226, 1);
+						opacity: 0.51;
+						border-radius: 20px;
+						color: #434343;
+						font-size: 28upx;
+						font-weight: 400;
+						color: rgba(0, 112, 226, 1);
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+			
+						&:not(:last-child) {
+							margin-right: 50upx;
+						}
+			
+						&.active {
+							background: rgba(0, 112, 226, 1);
+							border: 2upx solid rgba(0, 112, 226, 1);
+							color: #fff;
+							opacity: 1;
+						}
+					}
+				}
+			
+				swiper {
+					height: 328upx
+				}
+			
+				.tabs_main {
+					transition: all .3s;
+					// min-height: 75upx;
+					// height: 328upx !important;
+					.tabs_center {
+						padding: 0 30upx;
+			
+					}
+				}
+			
+			
+			}
+		
+		.child_box {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-top: 50upx;
+			padding: 0 30upx;
+		
+			.cabin {
+				font-size:28upx;
+				font-weight:500;
+				color:rgba(51,51,51,1);
+			}
+			
+			.passenger_message{
+				display: inline-flex;
+				align-items: center;
+				.child_message{
+					background: url('../../static/waring_icon.png') no-repeat center center;
+					background-size: contain;
+					width: 30upx;
+					height: 30upx;
+					margin-right: 14upx;
+				}
+				.passenger_message_main{
+					display: inline-flex;
+					align-items: center;
+					.passenger_list{
+						display: inline-flex;
+						align-items: center;
+						font-size: 28upx;
+						font-weight:500;
+						color:rgba(153,153,153,1);
+						&:not(:first-child){
+							margin-left: 26upx;
+						}
+						.number{
+							font-size: 30upx;
+							font-weight:bold;
+							color:rgba(42,42,42,1);
+							margin-left: 8upx;
+						}
+					}
+					.open_number_more{
+						margin-left: 12upx;
+						width: 16upx;
+						height: 12upx;
+						object-fit: contain;
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+					}
+				}
+				
+			}
+		}
+
+		.multi_pass_message{
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			font-size:12px;
+			font-weight:400;
+			color:rgba(0,112,226,.6);
+			margin-top: 34upx;
+			text-align: right;
+			padding: 0 30upx;
+			&::after{
+				content: '';
+				background: url(../../static/problem_icon.png) no-repeat center center;
+				display: block;
+				background-size: contain;
+				width: 30upx;
+				height: 30upx;
+				margin-left: 12upx;
+			}
+		}
+		
+		.submit_btn {
+			width: 650upx;
+			height: 90upx;
+			background: rgba(0, 112, 226, 1);
+			box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
+			border-radius: 80upx;
+			margin: 50upx auto 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 32upx;
+			font-weight: 400;
+			line-height: 38upx;
+			color: rgba(255, 255, 255, 1);
+			letter-spacing: 10upx;
+		}
+		
 		}
 
 		.notice {
@@ -162,6 +492,63 @@
 		}
 		
 		
+			.ticket_explanation{
+			.title{
+				height: 140upx;
+				background:rgba(255,255,255,1);
+				border-radius: 80upx 80upx 0 0;
+				position: relative;
+				border-bottom: 2upx solid rgba(217,225,234,1);
+				display: flex;
+				align-items: flex-end;
+				.explanation_header{
+					display: flex;
+					justify-content: space-between;
+					width: 100%;
+					padding: 0 120upx 0 90upx;
+					
+					.header_btn{
+						font-size: 30upx;
+						font-weight:bold;
+						color:rgba(51,51,51,1);
+						display: inline-flex;
+						flex-direction: column;
+						align-items: center;
+						&::after{
+							content: '';
+							width: 60upx;
+							height: 8upx;
+							background:rgba(0,112,226,1);
+							opacity: 0;
+							border-radius: 4upx;
+							margin-top: 32upx;
+							transition: opacity .3s;
+						}
+						&.is_active{
+							&::after{
+								opacity: 1;
+							}
+							color:rgba(0,112,226,1);
+						}
+					}
+					
+				}
+				
+				.close_btn{
+					position: absolute;
+					background: url(../../static/popup_close.png) no-repeat;
+					background-size: contain;
+					width: 30upx;
+					height: 30upx;
+					top: 54upx;
+					right: 44upx;
+				}
+			}
+			.flight_explanation_main{
+				background:rgba(255,255,255,1);
+				padding: 20upx 20upx 60upx;
+			}
+			}
 		
 		
 		.child_dialog{
@@ -219,8 +606,8 @@
 							}
 						
 							.number_icon {
-								width: 36upx;
-								height: 36upx;
+								width: 40upx;
+								height: 40upx;
 						
 								&.remove_number {
 									background: url(../../static/number_remove_btn.png) no-repeat;

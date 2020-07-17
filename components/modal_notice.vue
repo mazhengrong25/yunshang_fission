@@ -133,7 +133,7 @@
 							color:rgba(42,42,42,1);
 						}
 						.time{
-							padding: 4upx 8upx;
+							padding: 2upx 8upx;
 							background:rgba(175,185,196,1);
 							opacity:0.61;
 							font-size: 20upx;

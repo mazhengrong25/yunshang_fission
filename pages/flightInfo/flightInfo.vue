@@ -1,5 +1,6 @@
 <template>
-	<view class="flight_info">
+	<scroll-view class="flight_info">
+		<voyage-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></voyage-header>
 		<flight-header :flightData="flightData"></flight-header>
 
 
@@ -59,19 +60,22 @@
 			</view>
 		</uni-popup>
 
-	</view>
+	</scroll-view>
 </template>
 
 <script>
+	import voyageHeader from "@/components/voyage_header.vue"  // 自定义状态栏
 	import flightHeader from '@/components/flight_header.vue'
 	import flightItem from '@/components/flight_item.vue'
 	export default {
 		components: {
+			voyageHeader,
 			flightHeader,
 			flightItem
 		},
 		data() {
 			return {
+				iStatusBarHeight: 0, // 导航栏高度
 				flightData: { // 航班头部信息
 					flightType: '单程', // 航程类型
 					time: '2020-4-18 周六', // 航程日期
@@ -149,16 +153,18 @@
 				this.popupCurrent = e.detail.current
 			},
 		},
+		onLoad() {
+			this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight
+		}
 	}
 </script>
 
 <style scoped lang="less">
 	.flight_info {
 		background: rgba(243, 245, 247, 1);
-		padding: 20upx 0;
-		height: calc(100vh - 40upx);
 		display: flex;
 		flex-direction: column;
+		height: 100vh;
 
 
 		.flight_cabin {
@@ -218,22 +224,20 @@
 					.cabin_header_line {
 						opacity: 0;
 						transition: opacity .3s;
-					}
+					} 
 				}
 			}
 
 			.cabin_content {
 				flex: 1;
+				height: calc(100vh - 555upx);
 
 				.cabin_content_item {
 					overflow-y: auto;
 					height: 100%;
 					padding: 0 20upx;
-
+					flex: 1;
 				}
-
-
-
 			}
 
 		}

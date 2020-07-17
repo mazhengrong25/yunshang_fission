@@ -26,10 +26,18 @@
 		box-shadow: 0 12upx 18upx rgba(0,0,0,0.04);
 		border-radius: 20upx;
 		margin: 0 20upx;
+		padding: 30upx 20upx;
 		.title_text{
 			font-size: 28upx;
 			font-weight:bold;
 			color:rgba(42,42,42,1);
+			display: inline-flex;
+			align-items: center;
+			.title_icon{
+				width: 30upx;
+				height: 34upx;
+				margin-right: 12upx;
+			}
 		}
 		.title_required::after{
 			content: '*';

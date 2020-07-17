@@ -10,7 +10,7 @@
 			<view 
 			:class="['swiper_dot_list',{'is_active': current === index}]"
 			 v-for="(item, index) in swiperList"
-			 :key="index"></view>
+			 :key="index"></view> 
 		</view>
 	</view>
 </template>

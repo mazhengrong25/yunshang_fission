@@ -1,13 +1,6 @@
 <template>
 	<view class="ticket_inquiry">
-<!-- 		<view class="header_topbar" :style="{height: statusBarHeight + 'px'}">
-			<image class="go_back" @click="goBack" src="../../static/back.png" mode=""></image>
-			<view class="title">
-				<text>重庆</text>
-				<image class="title_icon" src="../../static/ticket_header_path.png" mode=""></image>
-				<text>北京</text>
-			</view>
-		</view> -->
+		<voyage-header :statusHeight="iStatusBarHeight"></voyage-header>
 		
 		<view class="ticket_header">
 			<view class="ticket_time_list">
@@ -18,7 +11,7 @@
 				</view>
 			</view>
 			<view class="calendar_btn" @click="backCalendar">
-				<image class="calendar_btn_icon" src="../../static/from_time.png" mode=""></image>
+				<image class="calendar_btn_icon" src="../../static/flight_time.png" mode=""></image>
 				日历
 			</view>
 		</view>
@@ -130,9 +123,14 @@
 </template>
 
 <script>
+	import voyageHeader from "@/components/voyage_header.vue"  // 自定义状态栏
 	export default {
+		components:{
+			voyageHeader
+		},
 		data() {
 			return {
+				iStatusBarHeight: 0, // 导航栏高度
 				ticketType: '国内',  // 机票查询默认值
 				footerBtnActive: 'time', // 底部排序默认值
 				
@@ -313,11 +311,8 @@
 			
 			
 		},
-		onReady() {
-			uni.setNavigationBarTitle({
-					fontSrc: "https://at.alicdn.com/t/font_1899917_i7jq18twklr.ttf",
-			    title: '重庆 \ue702 北京', 
-			});
+		onLoad() {
+			this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 		}
 	}
 </script>
@@ -554,8 +549,10 @@
 			align-items: center;
 			justify-content: center;
 			height: 100upx;
+			width: 100vw;
 			border-top: 2upx solid rgba(229,229,229,1);
 			background-color: #fff;
+			padding-bottom: var(--status-bar-height);
 			.footer_line{
 				width: 2upx;
 				height: 60upx;

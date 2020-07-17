@@ -1,84 +1,74 @@
 <template>
-	<view class="ticket_input">
-		<view class="ticket_address">
-			<view class="to_input address_input" @click="tocketToBtn">{{addressForm.to}}</view>
-			<view class="check_toform_btn" @click="checkTickedBtn">
-				<image class="ticket_image" src="../static/ticket_btn.png"></image>
+	<view :class="['ticket_input',{'multi_pass':ticketType === '多程'}]">
+		<view class="ticket_item">
+			<text class="multi_pass_number">1</text>
+			<view class="ticket_address">
+				<view class="to_input address_input" @click="tocketToBtn">{{addressForm.to}}</view>
+				<view class="check_toform_btn" @click="checkTickedBtn(false,addressForm.to,addressForm.from)">
+					<image class="ticket_image" src="../static/ticket_btn.png"></image>
+				</view>
+				<view class="from_input address_input" @click="tocketFromBtn">{{addressForm.from}}</view>
 			</view>
-			<view class="from_input address_input" @click="tocketFromBtn">{{addressForm.from}}</view>
-		</view>
-
-		<view class="ticket_time">
-			<view class="ticket_to_time time_box">
-				<view class="time_true" v-if="addressForm.toTime">
-					<view class="time">{{addressForm.toTime}}</view>
-					<view class="time_day">明天出发</view>
+			
+			<view class="ticket_time">
+				<view class="ticket_to_time time_box">
+					<view class="time_true" v-if="addressForm.toTime">
+						<view class="time">{{addressForm.toTime}}</view>
+						<view class="time_day">明天出发</view>
+					</view>
+					<view v-else class="time_false">
+						<image class="time_icon" src="../static/from_time.png"></image>
+						<text class="time_text">出发日期</text>
+					</view>
 				</view>
-				<view v-else class="time_false">
-					<image class="time_icon" src="../static/from_time.png"></image>
-					<text class="time_text">出发日期</text>
-				</view>
-			</view>
-			<view class="ticket_from_time time_box">
-				<view class="time_true" v-if="addressForm.fromTime">
-					<image class="close_from_btn" src="../static/close.png" @click="closeFromBtn" />
-					<view class="time">{{addressForm.fromTime}}</view>
-					<view class="time_day">{{addressForm.fromDay}}返回</view>
-				</view>
-				<view v-else class="time_false">
-					<image class="time_icon" src="../static/from_time.png"></image>
-					<text class="time_text">返程日期</text>
+				<view class="ticket_from_time time_box">
+					<view class="time_true" v-if="addressForm.fromTime">
+						<image class="close_from_btn" src="../static/close.png" @click="closeFromBtn" />
+						<view class="time">{{addressForm.fromTime}}</view>
+						<view class="time_day">{{addressForm.fromDay}}返回</view>
+					</view>
+					<view v-else class="time_false">
+						<image class="time_icon" src="../static/from_time.png"></image>
+						<text class="time_text">返程日期</text>
+					</view>
 				</view>
 			</view>
 		</view>
 		
-
-		<view class="child_box" v-if="ticketType !== '国内'">
-			<view class="child_message" @click="openChildMessageBtn">儿婴票说明<image class="child_message_more" src="../static/arrow.png" mode=""></image>
+		
+		<view class="ticket_item" v-if="ticketType === '多程'">
+			<text class="multi_pass_number">2</text>
+			<view class="ticket_address">
+				<view class="to_input address_input" @click="tocketToBtn">{{addressForm.multi_pass_to}}</view>
+				<view class="check_toform_btn" @click="checkTickedBtn(true,addressForm.multi_pass_to,addressForm.multi_pass_from)">
+					<image class="ticket_image" src="../static/ticket_btn.png"></image>
+				</view>
+				<view class="from_input address_input" @click="tocketFromBtn">{{addressForm.multi_pass_from}}</view>
 			</view>
-			
-			
-			<view class="passenger_message" @click="openPassengerNumber">
-				<view class="passenger_list">
-					<text>成人</text>
-					<text class="number">{{passengerForm.adultNumber}}</text>
-				</view>
-				<view class="passenger_list">
-					<text>儿童</text>
-					<text class="number">{{passengerForm.childNumber}}</text>
-				</view>
-				<view class="passenger_list">
-					<text>婴儿</text>
-					<text class="number">{{passengerForm.babyNumber}}</text>
-				</view>
-				<image class="open_number_more" src="../static/number_more_btn.png" mode=""></image>
-			</view>
-			
-			<!--
-			<view class="child_setting">
-				<view class="child_main">
-					<text class="number_name">儿童</text>
-					<view class="number_box">
-						<view :class="['remove_number number_icon',{active: addressForm.childNumber > 0}]" @click="removeChildNumber"></view>
-						<view class="number">{{addressForm.childNumber}}</view>
-						<view class="add_number number_icon" @click="addChildNumber"></view>
+			<view class="ticket_time">
+				<view class="ticket_to_time time_box">
+					<view class="time_true" v-if="addressForm.toTime">
+						<view class="time">{{addressForm.toTime}}</view>
+						<view class="time_day">明天出发</view>
+					</view>
+					<view v-else class="time_false">
+						<image class="time_icon" src="../static/from_time.png"></image>
+						<text class="time_text">出发日期</text>
 					</view>
 				</view>
-				
-				<view class="child_main">
-					<text class="number_name">婴儿</text>
-					<view class="number_box">
-						<view :class="['remove_number number_icon',{active: addressForm.babyNumber > 0}]" @click="removeBabyNumber"></view>
-						<view class="number">{{addressForm.babyNumber}}</view>
-						<view class="add_number number_icon" @click="addBabyNumber"></view>
+				<view class="ticket_from_time time_box">
+					<view class="time_true" v-if="addressForm.fromTime">
+						<image class="close_from_btn" src="../static/close.png" @click="closeFromBtn" />
+						<view class="time">{{addressForm.fromTime}}</view>
+						<view class="time_day">{{addressForm.fromDay}}返回</view>
+					</view>
+					<view v-else class="time_false">
+						<image class="time_icon" src="../static/from_time.png"></image>
+						<text class="time_text">返程日期</text>
 					</view>
 				</view>
 			</view>
-			-->
 		</view>
-
-
-		<view class="submit_btn" @click="submitTicket">飞机票查询</view>
 		
 		<uni-popup ref="popup" type="message">
 		    <uni-popup-message type="success" message="成功消息" :duration="0"></uni-popup-message>
@@ -90,25 +80,18 @@
 <script>
 	export default {
 		props: {
-			ticketType: {
+			ticketType: {  // 航程类型
 				type: String,
 				default: () => '国内'
+			},
+			addressForm: { // 航程数据
+				type: Object,
+				default: () => {}
 			}
 		},
 		data() {
 			return {
-				addressForm: {
-					to: '重庆',  // 出发地
-					from: '北京',  // 到达地
-					toTime: '04月15日',  // 出发时间
-					fromTime: '04月22日',  // 到达时间
-					fromDay: '周三',  // 到达日期
-				},
-				passengerForm: {
-					adultNumber: 0, // 成年人数量
-					childNumber: 0,  // 儿童数量
-					babyNumber: 0,  // 婴儿数量
-				},
+				
 			};
 		},
 		methods: {
@@ -120,11 +103,13 @@
 				})
 			},
 			// 切换出发返程地
-			checkTickedBtn() {
-				let toAddress = this.addressForm.to
-				let fromAddress = this.addressForm.from
-				this.addressForm.to = fromAddress
-				this.addressForm.from = toAddress
+			checkTickedBtn(type,to,form) {
+				let data = {
+					type: type,
+					to: to,
+					rorm: form
+				}
+				this.$emit('checkTicked', data)
 				console.log('交换出发返程地')
 			},
 			// 返程按钮
@@ -134,78 +119,54 @@
 			// 清除返程按钮
 			closeFromBtn() {
 				console.log('清除返程')
-				this.addressForm.fromTime = ''
-				this.addressForm.fromDay = ''
+				this.$emit('closeFromBtn', true)
 			},
 			
-			// 儿婴票说明 
-			openChildMessageBtn(){
-				
-			},
-			
-			
-			// 打开乘客数量弹窗
-			openPassengerNumber(){
-				console.log('打开乘机人数选择')
-				 uni.$emit('openChild', this.passengerForm)
-			},
-			
-			/**
-			// 增加儿童数量
-			addChildNumber(){
-				console.log('增加儿童数量')
-				this.addressForm.childNumber = this.addressForm.childNumber + 1
-			},
-			// 减少儿童数量
-			removeChildNumber(){
-				console.log('减少儿童数量')
-				if(this.addressForm.childNumber > 0){
-					this.addressForm.childNumber = this.addressForm.childNumber - 1
-				}
-			},
-			
-			// 增加婴儿数量
-			addBabyNumber(){
-				console.log('增加婴儿数量')
-				this.addressForm.babyNumber = this.addressForm.babyNumber + 1
-			},
-			// 减少婴儿数量
-			removeBabyNumber(){
-				console.log('减少婴儿数量')
-				if(this.addressForm.babyNumber > 0){
-					this.addressForm.babyNumber = this.addressForm.babyNumber - 1
-				}
-			},
-			*/
-			
-			
-			// 提交按钮
-			submitTicket() {
-				console.log('提交')
-				uni.navigateTo({
-				   url: '/pages/ticketInquiry/ticketInquiry?type='+this.ticketType
-				});
-			},
 		},
-		
-		mounted() {
-			uni.$on('saveChild', (e) => {
-				if(e){
-					this.passengerForm = e
-				}
-			})
-		}
 		
 	}
 </script>
 
 <style scoped lang="less">
 	.ticket_input {
-		padding-bottom: 50upx;
+		&.multi_pass{
+			.ticket_item{
+				position: relative;
+				&:nth-child(2){
+					margin-top: 40upx;
+				}
+				.multi_pass_number{
+					width:20upx;
+					height:20upx;
+					background:rgba(0,112,226,.6);
+					font-size:18upx;
+					font-weight:500;
+					color:rgba(255,255,255,1);
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					flex-shrink: 0;
+					left: -30upx;
+					margin-right: 12upx;
+					margin-top: 17upx;
+					position: absolute;
+				}
+				.ticket_address{
+					.address_input{
+						border-bottom-color: transparent;
+					}
+				}
+				.ticket_from_time{
+					display: none;
+				}
+			}
+		}
+		.multi_pass_number{
+			display: none;
+		}
 		.ticket_address {
 			display: flex;
 			align-items: flex-start;
-
 			.address_input {
 				height: 65upx;
 				line-height: 50upx;
@@ -291,128 +252,6 @@
 				}
 			}
 		}
-
-
-		.child_box {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-top: 50upx;
-
-			.child_message {
-				display: inline-flex;
-				align-items: center;
-				font-size: 22upx;
-				font-weight: 400;
-				color: rgba(175, 185, 196, 1);
-
-				.child_message_more {
-					width: 10upx;
-					height: 16upx;
-					object-fit: contain;
-					margin-left: 10upx;
-				}
-			}
-			
-			.passenger_message{
-				display: inline-flex;
-				align-items: center;
-				.passenger_list{
-					display: inline-flex;
-					align-items: center;
-					font-size: 28upx;
-					font-weight:500;
-					color:rgba(153,153,153,1);
-					&:not(:first-child){
-						margin-left: 26upx;
-					}
-					.number{
-						font-size: 30upx;
-						font-weight:bold;
-						color:rgba(42,42,42,1);
-						margin-left: 8upx;
-					}
-				}
-				.open_number_more{
-					margin-left: 12upx;
-					width: 16upx;
-					height: 12upx;
-					object-fit: contain;
-					display: inline-flex;
-					align-items: center;
-					justify-content: center;
-				}
-			}
-
-			/**
-			.child_setting {
-				display: inline-flex;
-				align-items: center;
-				.child_main{
-					display: inline-flex;
-					align-items: center;
-					&:not(:last-child){
-						margin-right: 40upx;
-					}
-					.number_name {
-						font-size: 28upx;
-						font-weight: 500;
-						color: rgba(42, 42, 42, 1);
-						margin-right: 16upx;
-					}
-					
-					.number_box {
-						display: inline-flex;
-						align-items: center;
-						
-						.number{
-							font-size: 28upx;
-							font-weight:500;
-							color:rgba(42,42,42,1);
-							margin: 0 16upx;
-						}
-					
-						.number_icon {
-							width: 36upx;
-							height: 36upx;
-					
-							&.remove_number {
-								background: url(../static/number_remove_btn.png) no-repeat;
-								background-size: contain;
-								&.active{
-									background: url(../static/number_remove_btn_active.png) no-repeat;
-									background-size: contain;
-								}
-							}
-							&.add_number{
-								background: url(../static/number_add_btn.png);
-								background-size: contain;
-							}
-						}
-					}		
-				}
-			}
-			*/
-
-		}
-
-		.submit_btn {
-			width: 650upx;
-			height: 90upx;
-			background: rgba(0, 112, 226, 1);
-			box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
-			border-radius: 80upx;
-			margin: 50upx auto 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 32upx;
-			font-weight: 400;
-			line-height: 38upx;
-			color: rgba(255, 255, 255, 1);
-			letter-spacing: 10upx;
-		}
-
 		
 	}
 </style>
