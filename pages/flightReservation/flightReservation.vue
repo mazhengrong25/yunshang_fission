@@ -1,3 +1,8 @@
+/**
+ * @Description: 机票预订信息
+ * @Date: 2020-07-20 16:21:53
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view class="flight_reservation">
 		<voyage-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></voyage-header>

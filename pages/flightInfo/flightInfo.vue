@@ -1,3 +1,8 @@
+/**
+ * @Description: 机票信息
+ * @Date: 2020-07-20 16:21:31
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<scroll-view class="flight_info">
 		<voyage-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></voyage-header>

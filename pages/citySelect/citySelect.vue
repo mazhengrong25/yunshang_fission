@@ -1,3 +1,8 @@
+/**
+ * @Description: 城市选择
+ * @Date: 2020-07-20 16:23:01
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view class="city_select">
 		<view class="city_search">

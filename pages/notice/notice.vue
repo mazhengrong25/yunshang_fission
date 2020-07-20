@@ -1,3 +1,8 @@
+/**
+ * @Description: 公告列表
+ * @Date: 2020-07-20 16:22:16
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view class="notice">
 		<model-notice></model-notice>

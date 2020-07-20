@@ -1,6 +1,11 @@
+/**
+ * @Description: 机票查询
+ * @Date: 2020-07-20 16:20:54
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view class="ticket_inquiry">
-		<voyage-header :statusHeight="iStatusBarHeight"></voyage-header>
+		<voyage-header :statusHeight="iStatusBarHeight" :headerAddress="ticketAddress"></voyage-header>
 		
 		<view class="ticket_header">
 			<view class="ticket_time_list">
@@ -133,6 +138,10 @@
 				iStatusBarHeight: 0, // 导航栏高度
 				ticketType: '国内',  // 机票查询默认值
 				footerBtnActive: 'time', // 底部排序默认值
+				ticketAddress: {  // 导航栏地址
+					to: '重庆',
+					from: '北京'
+				},
 				
 				ticketTimeList: [{ // 日期选择列表
 					day: '今天',

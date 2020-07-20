@@ -172,7 +172,7 @@
 					},
 				],
 				
-				currentTab: 2,  // tab默认值
+				currentTab: 0,  // tab默认值
 				tabsList: ['国内', '国际', '多程'],  // tab切换内容
 				swiperHeight: 0,  // tab切换swiper高度
 

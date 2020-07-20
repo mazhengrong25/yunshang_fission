@@ -1,10 +1,18 @@
+<!--
+ * @Description: 自定义状态栏 - 单程往返
+ * @Author: wish.WuJunLong
+ * @Date: 2020-06-29 10:06:00
+ * @LastEditTime: 2020-07-20 16:50:50
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="voyage_header" :style="{paddingTop: statusHeight + 'px',marginBottom: headerBottom + 'px'}">
 		<view class="go_back" @click.native="goBack"></view>
 		<view class="title">
-			<view class="title_left">重庆</view>
-			<view class="title_icon"></view>
-			<view class="title_right">北京</view>
+			<view class="title_left">{{headerAddress.to}}</view>
+			<view class="title_icon" v-if="!statusType"></view>
+			<view class="title_icon roundTripIcon" v-else></view>
+			<view class="title_right">{{headerAddress.from}}</view>
 		</view>
 	</view>
 </template>
@@ -12,11 +20,19 @@
 <script>
 	export default {
 		props: {
-			statusHeight: {
+			statusType: {  // 导航栏状态 flase单程 true往返
+				type: Boolean,
+				default: () => false
+			},
+			headerAddress: {
+				type: Object,
+				default: () => {}
+			},
+			statusHeight: {  // 导航栏默认高度
 				type: Number,
 				default: () => 25
 			},
-			headerBottom: {
+			headerBottom: {  // 导航栏下边距
 				type: Number,
 				default: () => 0
 			}
@@ -66,11 +82,15 @@
 			justify-content: center;
 			width: 100%;
 			.title_icon{
-				background: url(../static/ticket_header_path.png) no-repeat;
+				background: url(../static/ticket_header_path.png) no-repeat center center;
 				background-size: contain;
 				width: 35upx;
-				height: 8upx;
+				height: 20upx;
 				margin: 0 25upx;
+				&.roundTripIcon{
+					background: url(../static/ticket_header_roundTripIcon.png) no-repeat center center;
+					background-size: contain;
+				}
 			}
 		}
 	}

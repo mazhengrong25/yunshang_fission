@@ -1,3 +1,8 @@
+/**
+ * @Description: 首页公告版块组件
+ * @Date: 2020-07-20 16:24:41
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view class="modal_notice">
 		<view class="notice_header" v-if="modelType">

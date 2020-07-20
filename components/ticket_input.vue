@@ -1,3 +1,8 @@
+/**
+ * @Description: 乘机地址选组件
+ * @Date: 2020-07-20 16:23:53
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view :class="['ticket_input',{'multi_pass':ticketType === '多程'}]">
 		<view class="ticket_item">

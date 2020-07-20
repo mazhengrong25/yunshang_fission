@@ -1,5 +1,11 @@
 {
 	"pages": [ 
+		{
+			"path" : "pages/ticketInquiry/ticketRoundTrip",
+			"style" : {
+				"navigationStyle":"custom"
+			}
+		},
 		 {
 			"path": "pages/index/index",
 			"style": {
@@ -42,7 +48,8 @@
 					"navigationStyle":"custom"
 				}
 		  }
-	],
+	    
+    ],
 	"tabBar": {
 		"color": "#cdcdcd",
 		"selectedColor": "#0070E2",

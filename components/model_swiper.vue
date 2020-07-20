@@ -1,3 +1,8 @@
+/**
+ * @Description: 首页轮播图组件
+ * @Date: 2020-07-20 16:24:27
+ * @Author: wish.WuJunLong
+ */
 <template>
 	<view class="model_swiper">
 		<swiper autoplay circular class="model_swiper_box" @change="change">
