@@ -1,8 +1,10 @@
-/**
+<!--
  * @Description: 公告详情
- * @Date: 2020-07-20 16:22:34
  * @Author: wish.WuJunLong
- */
+ * @Date: 2020-06-16 17:53:13
+ * @LastEditTime: 2020-07-22 11:48:57
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="notice_details">
 		<view class="title">

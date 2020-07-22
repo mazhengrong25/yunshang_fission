@@ -1,83 +1,98 @@
 {
-	"pages": [ 
-		{
-			"path" : "pages/ticketInquiry/ticketRoundTrip",
-			"style" : {
-				"navigationStyle":"custom"
-			}
-		},
-		 {
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "云上航空"
-			}
-		}, {
-			"path": "pages/order/order",
-			"style": {}
-		}, {
-			"path": "pages/userInfo/userInfo",
-			"style": {}
-		}, {
-			"path": "pages/notice/notice",
-			"style": {
-				"navigationBarTitleText": "公告"
-			}
-		}, {
-			"path": "pages/notice/noticeDetails",
-			"style": {
-				"navigationBarTitleText": "公告"
-			}
-		}, {
-			"path": "pages/citySelect/citySelect",
-			"style": {
-				"navigationBarTitleText": "城市选择"
-			}
-		}, {
-			"path": "pages/ticketInquiry/ticketInquiry",
-			"style": {
-				"navigationStyle":"custom"
-			}
-		}, {
-			"path": "pages/flightInfo/flightInfo",
-			"style": {
-				"navigationStyle":"custom"
-			}
-		},{
-		  	"path": "pages/flightReservation/flightReservation",
-		  	"style": {
-					"navigationStyle":"custom"
-				}
-		  }
-	    
-    ],
-	"tabBar": {
-		"color": "#cdcdcd",
-		"selectedColor": "#0070E2",
-		"borderStyle": "black",
-		"backgroundColor": "#ffffff",
-		"list": [{
-				"pagePath": "pages/index/index",
-				"iconPath": "static/nav_home.png",
-				"selectedIconPath": "static/nav_home_active.png",
-				"text": "首页"
-			}, {
-				"pagePath": "pages/order/order",
-				"iconPath": "static/nav_order.png",
-				"selectedIconPath": "static/nav_order_active.png",
-				"text": "订单"
-			},
-			{
-				"pagePath": "pages/userInfo/userInfo",
-				"iconPath": "static/nav_user.png",
-				"selectedIconPath": "static/nav_user_active.png",
-				"text": "我的"
-			}
-		]
-	},
-	"globalStyle": {
-		"navigationBarTextStyle": "#fff",
-		"navigationBarTitleText": "云上航空",
-		"navigationBarBackgroundColor": "#0070E2",
-		"backgroundColor": "#F3F5F7"
-	}
+  "pages": [
+    {
+      "path": "pages/ticketInquiry/ticketForeign",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/ticketInquiry/ticketRoundTrip",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "云上航空"
+      }
+    },
+    {
+      "path": "pages/order/order",
+      "style": {}
+    },
+    {
+      "path": "pages/userInfo/userInfo",
+      "style": {}
+    },
+    {
+      "path": "pages/notice/notice",
+      "style": {
+        "navigationBarTitleText": "公告"
+      }
+    },
+    {
+      "path": "pages/notice/noticeDetails",
+      "style": {
+        "navigationBarTitleText": "公告"
+      }
+    },
+    {
+      "path": "pages/citySelect/citySelect",
+      "style": {
+        "navigationBarTitleText": "城市选择"
+      }
+    },
+    {
+      "path": "pages/ticketInquiry/ticketInquiry",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightInfo/flightInfo",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/flightReservation",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#cdcdcd",
+    "selectedColor": "#0070E2",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "static/nav_home.png",
+        "selectedIconPath": "static/nav_home_active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/order/order",
+        "iconPath": "static/nav_order.png",
+        "selectedIconPath": "static/nav_order_active.png",
+        "text": "订单"
+      },
+      {
+        "pagePath": "pages/userInfo/userInfo",
+        "iconPath": "static/nav_user.png",
+        "selectedIconPath": "static/nav_user_active.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "#fff",
+    "navigationBarTitleText": "云上航空",
+    "navigationBarBackgroundColor": "#0070E2",
+    "backgroundColor": "#F3F5F7"
+  }
 }

@@ -2,7 +2,7 @@
 	<view v-if="showPopup" class="uni-popup" :class="[popupstyle]" @touchmove.stop.prevent="clear">
 		<uni-transition v-if="maskShow" :mode-class="['fade']" :styles="maskClass" :duration="duration" :show="showTrans"
 		 @click="onTap" />
-		<uni-transition :mode-class="ani" :styles="transClass" :duration="duration" :show="showTrans" @click="onTap">
+		<uni-transition :mode-class="ani" :styles="transClass" v-bind:style="[{'z-index': zIndex}]" :duration="duration" :show="showTrans" @click="onTap">
 			<view class="uni-popup__wrapper-box" @click.stop="clear">
 				<slot />
 			</view>
@@ -42,6 +42,10 @@
 			},
 			// 弹出层类型，可选值，top: 顶部弹出层；bottom：底部弹出层；center：全屏弹出层
 			// message: 消息提示 ; dialog : 对话框
+			zIndex: {
+				type: Number,
+				default: 99
+			},
 			type: {
 				type: String,
 				default: 'center'
@@ -179,7 +183,8 @@
 					'position': 'fixed',
 					'left': 0,
 					'right': 0,
-					'bottom': 0
+					'bottom': 0,
+					'zIndex': 99
 				}
 			},
 			/**

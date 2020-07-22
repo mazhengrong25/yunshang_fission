@@ -80,7 +80,7 @@ export default {
       }
     }
     .close_btn{
-      background: url('../static/dialog_close_btn.png') no-repeat center center;
+      background: url('@/static/dialog_close_btn.png') no-repeat center center;
       background-size: contain;
       width: 80upx;
       height: 80upx;

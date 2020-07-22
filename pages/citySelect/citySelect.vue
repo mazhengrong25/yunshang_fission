@@ -1,8 +1,10 @@
-/**
+<!--
  * @Description: 城市选择
- * @Date: 2020-07-20 16:23:01
  * @Author: wish.WuJunLong
- */
+ * @Date: 2020-06-17 11:05:11
+ * @LastEditTime: 2020-07-22 11:48:22
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="city_select">
 		<view class="city_search">
@@ -143,7 +145,7 @@
 				position: absolute;
 				display: inline-flex;
 				left: 40upx;
-				background: url(../../static/search.png) no-repeat;
+				background: url(@/static/search.png) no-repeat;
 				background-size: contain;
 				width: 26upx;
 				height: 26upx;
@@ -230,7 +232,7 @@
 								&.address_tag_icon{
 									&::before{
 										content: '';
-										background: url(../../static/address.png) no-repeat;
+										background: url(@/static/address.png) no-repeat;
 										background-size: contain;
 										width: 24upx;
 										height: 28upx;

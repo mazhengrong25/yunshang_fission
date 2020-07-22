@@ -1,4 +1,10 @@
-<!-- 航班信息 - 航班价格 -->
+<!--
+ * @Description: 航班信息 - 航班价格
+ * @Author: wish.WuJunLong
+ * @Date: 2020-06-24 16:32:24
+ * @LastEditTime: 2020-07-22 11:47:13
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="item_box">
 		<view class="item_box_header">
@@ -145,7 +151,7 @@
 				margin-bottom: 12upx;
 
 				.message_more_btn {
-					background: url(../static/arrow_more.png) no-repeat;
+					background: url(@/static/arrow_more.png) no-repeat;
 					background-size: contain;
 					width: 8upx;
 					height: 14upx;

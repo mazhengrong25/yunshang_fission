@@ -1,8 +1,10 @@
-/**
+<!--
  * @Description: 乘机地址选组件
- * @Date: 2020-07-20 16:23:53
  * @Author: wish.WuJunLong
- */
+ * @Date: 2020-06-15 17:02:50
+ * @LastEditTime: 2020-07-22 11:48:15
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view :class="['ticket_input',{'multi_pass':ticketType === '多程'}]">
 		<view class="ticket_item">
@@ -10,7 +12,7 @@
 			<view class="ticket_address">
 				<view class="to_input address_input" @click="tocketToBtn">{{addressForm.to}}</view>
 				<view class="check_toform_btn" @click="checkTickedBtn(false,addressForm.to,addressForm.from)">
-					<image class="ticket_image" src="../static/ticket_btn.png"></image>
+					<image class="ticket_image" src="@/static/ticket_btn.png" mode="contain"/>
 				</view>
 				<view class="from_input address_input" @click="tocketFromBtn">{{addressForm.from}}</view>
 			</view>
@@ -22,18 +24,18 @@
 						<view class="time_day">明天出发</view>
 					</view>
 					<view v-else class="time_false">
-						<image class="time_icon" src="../static/from_time.png"></image>
+						<image class="time_icon" src="@/static/from_time.png" mode="contain"/>
 						<text class="time_text">出发日期</text>
 					</view>
 				</view>
 				<view class="ticket_from_time time_box">
 					<view class="time_true" v-if="addressForm.fromTime">
-						<image class="close_from_btn" src="../static/close.png" @click="closeFromBtn" />
+						<image class="close_from_btn" src="@/static/close.png" @click="closeFromBtn" />
 						<view class="time">{{addressForm.fromTime}}</view>
 						<view class="time_day">{{addressForm.fromDay}}返回</view>
 					</view>
 					<view v-else class="time_false">
-						<image class="time_icon" src="../static/from_time.png"></image>
+						<image class="time_icon" src="@/static/from_time.png" mode="contain"/>
 						<text class="time_text">返程日期</text>
 					</view>
 				</view>
@@ -46,7 +48,7 @@
 			<view class="ticket_address">
 				<view class="to_input address_input" @click="tocketToBtn">{{addressForm.multi_pass_to}}</view>
 				<view class="check_toform_btn" @click="checkTickedBtn(true,addressForm.multi_pass_to,addressForm.multi_pass_from)">
-					<image class="ticket_image" src="../static/ticket_btn.png"></image>
+					<image class="ticket_image" src="@/static/ticket_btn.png" mode="contain"/>
 				</view>
 				<view class="from_input address_input" @click="tocketFromBtn">{{addressForm.multi_pass_from}}</view>
 			</view>
@@ -57,18 +59,18 @@
 						<view class="time_day">明天出发</view>
 					</view>
 					<view v-else class="time_false">
-						<image class="time_icon" src="../static/from_time.png"></image>
+						<image class="time_icon" src="@/static/from_time.png" mode="contain"/>
 						<text class="time_text">出发日期</text>
 					</view>
 				</view>
 				<view class="ticket_from_time time_box">
 					<view class="time_true" v-if="addressForm.fromTime">
-						<image class="close_from_btn" src="../static/close.png" @click="closeFromBtn" />
+						<image class="close_from_btn" src="@/static/close.png" @click="closeFromBtn" />
 						<view class="time">{{addressForm.fromTime}}</view>
 						<view class="time_day">{{addressForm.fromDay}}返回</view>
 					</view>
 					<view v-else class="time_false">
-						<image class="time_icon" src="../static/from_time.png"></image>
+						<image class="time_icon" src="@/static/from_time.png" mode="contain"/>
 						<text class="time_text">返程日期</text>
 					</view>
 				</view>

@@ -32,7 +32,7 @@
 	}
 </script>
 
-<style lang="less">
+<style scoped lang="less">
 	.roundTrip_header{
 		border-radius: 52upx;
 		background:rgba(30,139,249,.9);
@@ -78,7 +78,7 @@
 			height: 30upx;
 			position: absolute;
 			right: 20upx;
-			background: url(../static/jump_time_btn.png) no-repeat center center;
+			background: url(@/static/jump_time_btn.png) no-repeat center center;
 			background-size: contain;
 		}
 	}

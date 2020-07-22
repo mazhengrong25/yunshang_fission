@@ -1,3 +1,10 @@
+<!--
+ * @Description: 
+ * @Author: wish.WuJunLong
+ * @Date: 2020-06-16 13:42:30
+ * @LastEditTime: 2020-07-22 11:53:22
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view>
 		
@@ -14,6 +21,6 @@
 	}
 </script>
 
-<style lang="less">
+<style scoped lang="less">
 
 </style>

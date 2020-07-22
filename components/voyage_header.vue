@@ -65,7 +65,7 @@
 		z-index: 999;
 		
 		.go_back{
-			background: url(../static/go_back.png) no-repeat;
+			background: url(@/static/go_back.png) no-repeat;
 			background-size: contain;
 			width: 50upx;
 			height: 50upx;
@@ -82,13 +82,13 @@
 			justify-content: center;
 			width: 100%;
 			.title_icon{
-				background: url(../static/ticket_header_path.png) no-repeat center center;
+				background: url(@/static/ticket_header_path.png) no-repeat center center;
 				background-size: contain;
 				width: 35upx;
 				height: 20upx;
 				margin: 0 25upx;
 				&.roundTripIcon{
-					background: url(../static/ticket_header_roundTripIcon.png) no-repeat center center;
+					background: url(@/static/ticket_header_roundTripIcon.png) no-repeat center center;
 					background-size: contain;
 				}
 			}

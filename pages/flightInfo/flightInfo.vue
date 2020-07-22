@@ -1,8 +1,10 @@
-/**
+<!--
  * @Description: 机票信息
- * @Date: 2020-07-20 16:21:31
  * @Author: wish.WuJunLong
- */
+ * @Date: 2020-06-23 10:58:46
+ * @LastEditTime: 2020-07-22 11:48:31
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<scroll-view class="flight_info">
 		<voyage-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></voyage-header>
@@ -291,7 +293,7 @@
 				
 				.close_btn{
 					position: absolute;
-					background: url(../../static/popup_close.png) no-repeat;
+					background: url(@/static/popup_close.png) no-repeat;
 					background-size: contain;
 					width: 30upx;
 					height: 30upx;

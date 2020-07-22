@@ -1,13 +1,15 @@
-/**
+<!--
  * @Description: 首页轮播图组件
- * @Date: 2020-07-20 16:24:27
  * @Author: wish.WuJunLong
- */
+ * @Date: 2020-06-15 13:57:57
+ * @LastEditTime: 2020-07-22 17:25:20
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="model_swiper">
 		<swiper autoplay circular class="model_swiper_box" @change="change">
 			<swiper-item v-for="(item, index) in swiperList" :key="index" class="swiper_item">
-				<image :src="item.url" class="swiper_image"></image>
+				<image :src="item.url" class="swiper_image" mode="contain" />
 			</swiper-item>
 		</swiper>
 

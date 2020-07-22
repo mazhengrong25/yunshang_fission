@@ -1,8 +1,10 @@
-/**
+<!--
  * @Description: 机票预订信息
- * @Date: 2020-07-20 16:21:53
  * @Author: wish.WuJunLong
- */
+ * @Date: 2020-06-24 17:19:07
+ * @LastEditTime: 2020-07-22 11:48:39
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="flight_reservation">
 		<voyage-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></voyage-header>
@@ -38,7 +40,7 @@
 
 			<view class="insurance_list box-shadow-style">
 				<view class="title_text">
-					<image class="title_icon" src="../../static/insurance.png" mode="aspectFill"></image>购买保险
+					<image class="title_icon" src="@/static/insurance.png" mode="aspectFill" />购买保险
 				</view>
 				<view class="insurance_box">
 					<view class="insurance_box_item" v-for="(item, index) in insuranceList" :key="index" @click="changeInsurance(item)">
@@ -53,7 +55,7 @@
 
 			<view class="reward_list box-shadow-style">
 				<view class="title_text">
-					<image class="title_icon" src="../../static/reward.png" mode="aspectFill"></image>本单奖励
+					<image class="title_icon" src="@/static/reward.png" mode="aspectFill" />本单奖励
 				</view>
 				<view class="reward_box">
 					<view class="reward_list">
@@ -266,14 +268,14 @@
 						}
 
 						.item_icon {
-							background: url(../../static/selected.png) no-repeat;
+							background: url(@/static/selected.png) no-repeat;
 							background-size: contain;
 							width: 40upx;
 							height: 40upx;
 							margin-left: 12upx;
 
 							&.is_active {
-								background: url(../../static/selected_active.png) no-repeat;
+								background: url(@/static/selected_active.png) no-repeat;
 								background-size: contain;
 							}
 						}

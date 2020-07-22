@@ -1,4 +1,10 @@
-<!-- 航班信息 - 头部信息 -->
+<!--
+ * @Description: 航班信息 - 头部信息
+ * @Author: wish.WuJunLong
+ * @Date: 2020-06-24 16:18:02
+ * @LastEditTime: 2020-07-22 11:47:02
+ * @LastEditors: wish.WuJunLong
+--> 
 <template>
 	<view class="fight_header">
 		<view class="header_message">
@@ -22,7 +28,7 @@
 		</view>
 
 		<view class="bottom_message">
-			<image class="bottom_message_icon" src="../static/dhlogo@2x.png" mode=""></image>
+			<image class="bottom_message_icon" src="@/static/dhlogo@2x.png" mode="contain" />
 			{{flightData.airline}} | {{flightData.model}} | {{flightData.food}}
 		</view>
 		
@@ -116,7 +122,7 @@
 				position: relative;
 
 				.arrow_icon {
-					background: url(../static/ticket_path.png) no-repeat;
+					background: url(@/static/ticket_path.png) no-repeat;
 					background-size: contain;
 					width: 113upx;
 					height: 21upx;
@@ -157,7 +163,7 @@
 			align-items: center;
 			justify-content: center;
 			.message_more_btn {
-				background: url(../static/arrow.png) no-repeat;
+				background: url(@/static/arrow.png) no-repeat;
 				background-size: contain;
 				width: 8upx;
 				height: 14upx;
