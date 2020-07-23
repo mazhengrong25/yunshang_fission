@@ -2,12 +2,12 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-07-22 11:48:31
+ * @LastEditTime: 2020-07-23 14:49:25
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
 	<scroll-view class="flight_info">
-		<voyage-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></voyage-header>
+		<yun-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)"></yun-header>
 		<flight-header :flightData="flightData"></flight-header>
 
 
@@ -71,12 +71,10 @@
 </template>
 
 <script>
-	import voyageHeader from "@/components/voyage_header.vue"  // 自定义状态栏
 	import flightHeader from '@/components/flight_header.vue'
 	import flightItem from '@/components/flight_item.vue'
 	export default {
 		components: {
-			voyageHeader,
 			flightHeader,
 			flightItem
 		},

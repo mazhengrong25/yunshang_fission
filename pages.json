@@ -1,11 +1,36 @@
 {
   "pages": [
     {
-      "path": "pages/ticketInquiry/ticketForeign",
+      "path": "pages/flightReservation/addPassenger",
       "style": {
         "navigationStyle": "custom"
       }
     },
+    {
+      "path": "pages/flightReservation/passengerManage",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/passengerList",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/flightReservation",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+
     {
       "path": "pages/ticketInquiry/ticketRoundTrip",
       "style": {
@@ -57,9 +82,15 @@
       }
     },
     {
-      "path": "pages/flightReservation/flightReservation",
+      "path": "pages/ticketInquiry/ticketForeign",
       "style": {
         "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/mailAddress",
+      "style": {
+        "navigationBarTitleText": "报销凭证"
       }
     }
   ],

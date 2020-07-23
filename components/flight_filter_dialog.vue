@@ -2,7 +2,7 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-07-22 18:35:38
+ * @LastEditTime: 2020-07-23 13:35:06
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -14,9 +14,10 @@
         <view class="submit_filter">确定</view>
       </view>
 
-      <view v-if="directFlight" class="direct_flight" @click="directFlightSwitch">
+      <view v-if="directFlight" class="direct_flight">
         <text>只看直飞</text>
-        <switch class="direct_flight_switch" :checked="directFlightStatus" />
+        <yun-switch :value="directFlightStatus" @switchStauts="directFlightSwitch"></yun-switch>
+        
       </view>
 
       <view class="filter_content">
@@ -90,8 +91,8 @@ export default {
     },
 
     // 只看直飞开关
-    directFlightSwitch(){
-      this.directFlightStatus = !this.directFlightStatus
+    directFlightSwitch(e){
+      this.directFlightStatus = e
     },
 
     // 清空筛选

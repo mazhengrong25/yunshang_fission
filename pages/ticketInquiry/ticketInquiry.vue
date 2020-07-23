@@ -8,7 +8,7 @@
 
 <template>
   <view class="ticket_inquiry">
-    <voyage-header :statusHeight="iStatusBarHeight" :headerAddress="ticketAddress"></voyage-header>
+    <yun-header :statusHeight="iStatusBarHeight" :headerAddress="ticketAddress"></yun-header>
 
     <view class="ticket_header">
       <view class="ticket_time_list">
@@ -84,12 +84,10 @@
 </template>
 
 <script>
-import voyageHeader from "@/components/voyage_header.vue"; // 自定义状态栏
 import flightFilter from "@/components/flight_filter.vue"; // 航班筛选
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
 export default {
   components: {
-		voyageHeader,
 		flightFilter,
 		flightFilterDialog
   },

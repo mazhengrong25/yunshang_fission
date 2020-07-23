@@ -2,17 +2,17 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-07-22 14:59:38
+ * @LastEditTime: 2020-07-23 14:51:38
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="ticketRoundTrip">
     <!-- 导航栏 -->
-    <voyage-header
+    <yun-header
       :statusHeight="iStatusBarHeight"
       :statusType="true"
       :headerAddress="ticketAddress"
-    ></voyage-header>
+    ></yun-header>
     <!-- 往返时间 -->
     <view class="header_time">
       <round-trip-header></round-trip-header>
@@ -63,7 +63,7 @@
 		</view>
 
     
-		<flight-filter-dialog ref="filterDialog"></flight-filter-dialog>
+		<flight-filter-dialog ref="filterDialog" :directFlight="true"></flight-filter-dialog>
 
     <view class="bottom_bar">
       <view class="left_message">
@@ -78,13 +78,11 @@
 </template>
 
 <script>
-import voyageHeader from "@/components/voyage_header.vue"; // 自定义状态栏
 import roundTripHeader from "@/components/roundTrip_header.vue"; // 往返日期状态栏
 import flightFilter from "@/components/flight_filter.vue"; // 航班筛选
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
 export default {
   components: {
-    voyageHeader,
     roundTripHeader,
     flightFilter,
     flightFilterDialog

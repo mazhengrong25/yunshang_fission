@@ -8,11 +8,11 @@
 <template>
   <view class="ticketForeign">
     <!-- 导航栏 -->
-    <voyage-header
+    <yun-header
       :statusHeight="iStatusBarHeight"
       :statusType="true"
       :headerAddress="ticketAddress"
-    ></voyage-header>
+    ></yun-header>
     <!-- 往返时间 -->
     <view class="header_time">
       <round-trip-header></round-trip-header>
@@ -320,13 +320,11 @@
 </template>
 
 <script>
-import voyageHeader from "@/components/voyage_header.vue"; // 自定义状态栏
 import roundTripHeader from "@/components/roundTrip_header.vue"; // 往返日期状态栏
 import flightFilter from "@/components/flight_filter.vue"; // 航班筛选
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
 export default {
   components: {
-    voyageHeader,
     roundTripHeader,
     flightFilter,
     flightFilterDialog
