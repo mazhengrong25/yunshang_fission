@@ -2,7 +2,7 @@
  * @Description: 机票查询
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-07-22 17:25:12
+ * @LastEditTime: 2020-07-29 15:23:18
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -243,7 +243,7 @@ export default {
     // 跳转航程信息
     jumpFlightInfo(data) {
       uni.navigateTo({
-        url: "@/flightInfo/flightInfo"
+        url: "/pages/flightInfo/flightInfo"
       });
     }
   },

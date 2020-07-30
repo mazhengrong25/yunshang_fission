@@ -2,7 +2,7 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-07-23 13:35:06
+ * @LastEditTime: 2020-07-30 11:20:46
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -17,7 +17,6 @@
       <view v-if="directFlight" class="direct_flight">
         <text>只看直飞</text>
         <yun-switch :value="directFlightStatus" @switchStauts="directFlightSwitch"></yun-switch>
-        
       </view>
 
       <view class="filter_content">
@@ -49,9 +48,10 @@
 <script>
 export default {
   props: {
-    directFlight:{  // 只看直飞
+    directFlight: {
+      // 只看直飞
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
   },
   data() {
@@ -62,7 +62,7 @@ export default {
 
       filterList: {
         // 筛选列表名称
-        listName: ["起飞时间段", "航空公司", "舱位", "机场"]
+        listName: ["起飞时间段", "航空公司", "舱位", "机场"],
       },
 
       activeFilterIndex: 0, // 默认筛选列表名称下标
@@ -73,11 +73,10 @@ export default {
         "上午00:00-12:00",
         "中午12:00-14:00",
         "下午14:00-18:00",
-        "晚上18:00-24:00"
+        "晚上18:00-24:00",
       ],
 
-			takeoffTimeName: 0, // 起飞时间段默认选择
-			      
+      takeoffTimeName: 0, // 起飞时间段默认选择
     };
   },
   methods: {
@@ -87,12 +86,12 @@ export default {
     },
     // 关闭弹出框
     closeFilterDialog() {
-			this.$refs.filterPopup.close();
+      this.$refs.filterPopup.close();
     },
 
     // 只看直飞开关
-    directFlightSwitch(e){
-      this.directFlightStatus = e
+    directFlightSwitch(e) {
+      this.directFlightStatus = e;
     },
 
     // 清空筛选
@@ -110,8 +109,8 @@ export default {
     takeoffTimeActive(val, index) {
       this.takeoffTimeName = index;
       this.filterDataList[this.activeFilterIndex] = val;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -120,19 +119,28 @@ export default {
   .filter_main {
     background: rgba(255, 255, 255, 1);
     border-radius: 80upx 80upx 0 0;
-    .direct_flight{
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
+    .direct_flight {
       display: flex;
       align-items: center;
       justify-content: space-between;
       height: 110upx;
-      border-bottom: 2upx solid rgba(217,225,234,1);
+      border-bottom: 2upx solid rgba(217, 225, 234, 1);
       margin: 0 20upx;
       padding: 0 0 0 20upx;
       font-size: 28upx;
-      font-weight:400;
-      color:rgba(51,51,51,1);
-      .direct_flight_switch{
-        transform:scale(0.7)
+      font-weight: 400;
+      color: rgba(51, 51, 51, 1);
+      .direct_flight_switch {
+        transform: scale(0.7);
       }
     }
     .filter_title {

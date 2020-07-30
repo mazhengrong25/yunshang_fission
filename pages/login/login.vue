@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2020-07-23 16:15:04
+ * @LastEditTime: 2020-07-29 15:41:46
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -25,14 +25,16 @@
 						<image class="form_title_icon" src="@/static/login_username.png" mode="contain" />
 						<text>用户名</text>
 					</view>
-          <input class="form_input" type="text" placeholder="请输入用户名" v-model="userName" />
+          <input class="form_input" type="text" placeholder="请输入用户名" v-model="userName" 
+            placeholder-class="input_placeholder"/>
         </view>
         <view class="form_list">
           <view class="form_title">
 						<image class="form_title_icon" src="@/static/login_password.png" mode="contain" />
 						<text>密码</text>
 						</view>
-          <input class="form_input" type="password" placeholder="请输入密码" v-model="password" />
+          <input class="form_input" type="password" placeholder="请输入密码" v-model="password" 
+            placeholder-class="input_placeholder"/>
         </view>
       </view>
       <view class="login_submit" @click="loginBtn">登录</view>

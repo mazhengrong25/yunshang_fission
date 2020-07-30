@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-07-23 16:05:31
+ * @LastEditTime: 2020-07-30 14:11:04
  * @LastEditors: wish.WuJunLong
  */ 
 const request = (config) => {
@@ -19,7 +19,7 @@ const request = (config) => {
 			if (responses[0]) {
 				reject({message : "网络超时"});
 			} else {
-				let response = responses[1].data; // 如果返回的结果是data.data的，嫌麻烦可以用这个，return res,这样只返回一个data
+				let response = responses[1].data;
 				resolve(response);
 			}
 		}).catch(error => {

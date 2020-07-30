@@ -2,13 +2,13 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-07-23 18:53:14
+ * @LastEditTime: 2020-07-30 11:48:06
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="add_passenger">
     <yun-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)" centerTitle="新增乘机人"></yun-header>
-    <view class="pssenger_main">
+    <scroll-view :scroll-y="true" class="pssenger_main">
       <view class="box-shadow-style">
         <view class="user_message_btn">
           <image class="user_message_btn_icon" src="@/static/add_passenger_icon.png" mode="contain" />
@@ -19,14 +19,20 @@
             <text>中文姓名</text>
           </view>
 
-          <input class="item_input" type="text" placeholder="与证件姓名一致" v-model="passenger.userName" />
+          <input
+            class="item_input"
+            type="text"
+            placeholder="与证件姓名一致"
+            placeholder-class="input_placeholder"
+            v-model="passenger.userName"
+          />
         </view>
         <view class="list_item">
           <view class="item_title">
             <text>手机号码</text>
             <picker
               class="phone_numbering"
-              @change="bindPickerChange"
+              @change="bindAreaCodeChange()"
               :value="areaCodeIndex"
               :range="areaCode"
               mode="selector"
@@ -39,18 +45,25 @@
             class="item_input"
             type="number"
             placeholder="用于接收航变信息"
-            v-model="passenger.userName"
+            v-model="passenger.telPhone"
+            placeholder-class="input_placeholder"
           />
         </view>
       </view>
 
-      <view class="box-shadow-style">
+      <view
+        class="box-shadow-style certificate"
+        v-for="(item, index) in passenger.certificateList"
+        :key="index"
+      >
+        <view class="certificate_number" v-if="passenger.certificateList.length > 1">{{index + 1}}</view>
         <view class="list_item">
           <view class="item_title">
             <text>证件类型</text>
           </view>
-
-          <input class="item_input" type="text" placeholder="与证件姓名一致" v-model="passenger.userName" />
+          <view class="id_card_type">
+            <text>{{item.idCardType}}</text>
+          </view>
         </view>
 
         <view class="list_item">
@@ -62,25 +75,33 @@
             class="item_input"
             type="number"
             placeholder="请保持与证件一致"
-            v-model="passenger.userName"
+            v-model="item.cardId"
+            placeholder-class="input_placeholder"
           />
         </view>
 
-        <view class="add_card">+ 添加证件</view>
+        <view 
+        class="add_card" 
+        v-if="passenger.certificateList.length === (index + 1)"
+        @click="addCertificate()"
+        >+ 添加证件</view>
       </view>
 
       <view class="box-shadow-style">
         <view class="list_item">
           <view class="item_title">
-            <text>证件类型</text>
+            <text>乘机人分组</text>
           </view>
-          <view>请选择分组</view>
+          <view class="openGroup">
+            <text class="not_message">请选择分组</text>
+          </view>
         </view>
       </view>
-    </view>
+    </scroll-view>
     <view class="submit_box">
       <button class="submit_btn" @click="returnBtn">保存</button>
     </view>
+
   </view>
 </template>
 
@@ -90,21 +111,46 @@ export default {
     return {
       iStatusBarHeight: 0, // 状态栏高度
 
+      passenger: {
+        // 乘机人信息
+        userName: "", // 用户名
+        telPhone: "", // 手机号
+        certificateList: [
+          // 证件类型列表
+          {
+            idCardType: "身份证", // 证件类型
+            cardId: "", // 证件号码
+          },
+          {
+            idCardType: "港澳通行证", // 证件类型
+            cardId: "", // 证件号码
+          },
+        ],
+      },
+
       areaCode: ["+86", "+01", "+02", "+03"], // 手机区号
-      areaCodeIndex: 0 // 手机区号下标
+      areaCodeIndex: 0, // 手机区号下标
     };
   },
   methods: {
     // 选择手机区号
-    bindPickerChange: function(e) {
+    bindAreaCodeChange (e) {
       console.log("picker发送选择改变，携带值为", e.target.value);
       this.areaCodeIndex = e.target.value;
-    }
+    },
+
+    // 添加证件
+    addCertificate(){
+      this.passenger.certificateList.push({
+        idCardType: "身份证", // 证件类型
+        cardId: "", // 证件号码
+      })
+    },
   },
 
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-  }
+  },
 };
 </script>
 
@@ -116,6 +162,8 @@ export default {
   background: rgba(243, 245, 247, 1);
   .pssenger_main {
     flex: 1;
+    overflow-y: auto;
+    padding-bottom: 20upx;
     .box-shadow-style {
       &:not(:last-child) {
         margin-bottom: 20upx;
@@ -143,7 +191,7 @@ export default {
       &:not(:last-child) {
         padding-bottom: 12upx;
         margin-bottom: 28upx;
-        border-bottom: 2upx solid #d9e1ea;
+        border-bottom: 2upx solid #F1F3F5;
       }
       .item_title {
         font-size: 28upx;
@@ -174,22 +222,74 @@ export default {
           }
         }
       }
+      .id_card_type {
+        font-size: 28upx;
+        font-weight: 400;
+        color: rgba(42, 42, 42, 1);
+        display: inline-flex;
+        align-items: center;
+        &::after {
+          content: "";
+          background: url("@/static/arrow.png") no-repeat center center;
+          background-size: contain;
+          width: 12upx;
+          height: 20upx;
+          display: block;
+          margin-left: 14upx;
+        }
+      }
       .item_input {
         flex: 1;
         font-size: 28upx;
         font-weight: 400;
         text-align: right;
-        &::placeholder {
+      }
+ 
+      .openGroup {
+        font-size: 28upx;
+        font-weight: 400;
+        color: #333;
+        display: inline-flex;
+        align-items: center;
+        .not_message{
           color: rgba(175, 185, 196, 1);
+        }
+        &::after {
+          content: "";
+          background: url("@/static/arrow.png") no-repeat center center;
+          background-size: contain;
+          width: 12upx;
+          height: 20upx;
+          display: block;
+          margin-left: 14upx;
         }
       }
     }
 
-    .add_card {
-      text-align: center;
-      font-size: 30upx;
-      font-weight: bold;
-      color: rgba(0, 112, 226, 1);
+    .certificate {
+      position: relative;
+      padding-top: 54upx;
+      .certificate_number {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 50upx;
+        height: 36upx;
+        background: rgba(0, 112, 226, 0.2);
+        border-radius: 20upx 0 20upx 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24upx;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 1);
+      }
+      .add_card {
+        text-align: center;
+        font-size: 30upx;
+        font-weight: bold;
+        color: rgba(0, 112, 226, 1);
+      }
     }
   }
 

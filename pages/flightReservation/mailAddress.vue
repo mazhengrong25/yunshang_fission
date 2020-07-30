@@ -11,7 +11,8 @@
       <view class="mail_address_box box-shadow-style">
         <view class="list_item">
           <view class="item_title">收货人</view>
-          <input class="item_input" type="text" placeholder="请输入姓名" :value="mailAddress.userName" />
+          <input class="item_input" type="text" placeholder="请输入姓名" 
+            placeholder-class="input_placeholder" :value="mailAddress.userName" />
         </view>
         <view class="list_item">
           <view class="item_title">
@@ -27,6 +28,7 @@
             </picker>
           </view>
           <input
+            placeholder-class="input_placeholder"
             class="item_input"
             type="number"
             placeholder="请输入手机号码"
@@ -35,11 +37,13 @@
         </view>
         <view class="list_item">
           <view class="item_title">邮政编码</view>
-          <input class="item_input" type="number" placeholder="请输入邮政编码" :value="mailAddress.code" />
+          <input class="item_input" type="number" 
+            placeholder-class="input_placeholder" placeholder="请输入邮政编码" :value="mailAddress.code" />
         </view>
         <view class="list_item">
           <view class="item_title">所在地区</view>
           <input
+            placeholder-class="input_placeholder"
             class="item_input"
             type="number"
             placeholder="请选择所在地区"

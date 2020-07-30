@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-07-22 16:02:22
+ * @LastEditTime: 2020-07-30 11:38:20
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -131,8 +131,8 @@
     <!-- 儿婴票说明弹窗 -->
     <uni-popup
       ref="ticketExplanation"
-      type="bottom"
       class="ticket_explanation"
+      type="bottom"
       @change="childPopupStatus"
     >
       <view class="title">
@@ -185,24 +185,24 @@ export default {
     modelSwiper,
     modelNotice,
     ticketInput,
-    messageDialog
+    messageDialog,
   },
   data() {
     return {
       swiperList: [
         {
           // 轮播图数据
-          url: require("@/static/header_swiper.png")
+          url: require("@/static/header_swiper.png"),
         },
         {
-          url: require("@/static/header_swiper.png")
+          url: require("@/static/header_swiper.png"),
         },
         {
-          url: require("@/static/header_swiper.png")
+          url: require("@/static/header_swiper.png"),
         },
         {
-          url: require("@/static/header_swiper.png")
-        }
+          url: require("@/static/header_swiper.png"),
+        },
       ],
 
       currentTab: 0, // tab默认值
@@ -217,18 +217,18 @@ export default {
         multi_pass_from: "武汉", // 多程到达地
         toTime: "04月15日", // 出发时间
         fromTime: "04月22日", // 到达时间
-        fromDay: "周三" // 到达日期
+        fromDay: "周三", // 到达日期
       },
 
       passengerForm: {
         adultNumber: 0, // 成年人数量
         childNumber: 0, // 儿童数量
-        babyNumber: 0 // 婴儿数量
+        babyNumber: 0, // 婴儿数量
       },
 
       passengerFormBack: {}, // 乘客信息
 
-      popupCurrent: 0 // 弹窗轮播下标
+      popupCurrent: 0, // 弹窗轮播下标
     };
   },
   onLoad() {},
@@ -237,12 +237,12 @@ export default {
     childPopupStatus(e) {
       if (e.show) {
         uni.hideTabBar({
-          animation: true
+          animation: true,
         });
       } else {
         setTimeout(() => {
           uni.showTabBar({
-            animation: true
+            animation: true,
           });
         }, 200);
       }
@@ -285,7 +285,7 @@ export default {
     setSwiperHeight() {
       let query = uni.createSelectorQuery().in(this);
       query.selectAll(".tabs_center").boundingClientRect();
-      query.exec(res => {
+      query.exec((res) => {
         this.swiperHeight = res[0][this.currentTab].height;
       });
     },
@@ -350,13 +350,13 @@ export default {
     submitTicket() {
       console.log("提交");
       uni.navigateTo({
-        url: "/pages/ticketInquiry/ticketInquiry?type=" + this.ticketType
+        url: "/pages/ticketInquiry/ticketInquiry?type=" + this.ticketType,
       });
-    }
+    },
   },
   created() {
     this.setSwiperHeight();
-  }
+  },
 };
 </script>
 
@@ -576,6 +576,16 @@ export default {
     .child_dialog_mian {
       background: #fff;
       border-radius: 80upx 80upx 0 0;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        bottom: -120upx;
+        width: 100%;
+        height: 120upx;
+        background-color: #fff;
+        display: block;
+      }
       .title {
         display: flex;
         align-items: center;

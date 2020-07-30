@@ -2,14 +2,14 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-07-23 18:22:17
+ * @LastEditTime: 2020-07-29 15:24:50
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="passenger">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="选择乘机人"></yun-header>
     <view class="header_box">
-      <view class="add_passenger_btn">
+      <view class="add_passenger_btn" @click="jumpAddPassenger()">
         <image class="add_icon" src="@/static/add_passenger_btn.png" mode />
         <text>新增乘机人</text>
       </view>
@@ -88,6 +88,12 @@ export default {
     };
 	},
 	methods: {
+    // 跳转新增乘机人
+    jumpAddPassenger(){
+       uni.navigateTo({
+        url: "/pages/flightReservation/addPassenger"
+      });
+    },
 		// 选中乘机人
 		checkedPassenger(data, index){
 			this.passengerList[index].checked = !this.passengerList[index].checked

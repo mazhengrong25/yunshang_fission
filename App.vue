@@ -2,13 +2,13 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-07-23 18:20:43
+ * @LastEditTime: 2020-07-29 15:40:13
  * @LastEditors: wish.WuJunLong
 --> 
 <script>
 // import Vue from 'vue'
 export default {
-  onLaunch: function() {
+  onLaunch: function () {
     // var that = this;
     //     wx.getSystemInfo({
     //       success(res) {
@@ -17,12 +17,12 @@ export default {
     //       }
     //     })
   },
-  onShow: function() {
+  onShow: function () {
     console.log("App Show");
   },
-  onHide: function() {
+  onHide: function () {
     console.log("App Hide");
-  }
+  },
 };
 </script>
 
@@ -56,11 +56,17 @@ export default {
     top: 4upx;
   }
 }
+// input框placeholder样式
+.input_placeholder {
+  color: rgba(175, 185, 196, 1);
+  font-size: 28upx;
+  font-weight: 400;
+}
 // 样式清除
-button{
+button {
   padding: 0;
   border: none;
-  &::after{
+  &::after {
     display: none;
   }
 }

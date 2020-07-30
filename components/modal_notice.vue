@@ -2,14 +2,14 @@
  * @Description: 首页公告版块组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 18:03:52
- * @LastEditTime: 2020-07-22 14:59:50
+ * @LastEditTime: 2020-07-30 11:26:53
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
 	<view class="modal_notice">
 		<view class="notice_header" v-if="modelType">
 			<view class="title"><image class="title_icon" src="@/static/notice.png" mode="contain" />最新公告</view>
-			<view class="notice_more" @click="jumpNotice()">查看更多@.</view>
+			<view class="notice_more" @click="jumpNotice()">查看更多...</view>
 		</view>
 		
 		
