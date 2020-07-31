@@ -1,42 +1,6 @@
 {
   "pages": [ 
-    {
-      "path": "pages/flightReservation/addPassenger",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/passengerManage",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/passengerList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/flightReservation",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/login/login",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-
-    {
-      "path": "pages/ticketInquiry/ticketRoundTrip",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
+    
     {
       "path": "pages/index/index",
       "style": {
@@ -47,10 +11,7 @@
       "path": "pages/order/order",
       "style": {}
     },
-    {
-      "path": "pages/userInfo/userInfo",
-      "style": {}
-    },
+   
     {
       "path": "pages/notice/notice",
       "style": {
@@ -91,6 +52,48 @@
       "path": "pages/flightReservation/mailAddress",
       "style": {
         "navigationBarTitleText": "报销凭证"
+      }
+    },{
+      "path": "pages/flightReservation/passengerList",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/addPassenger",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/passengerManage",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/flightReservation",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+
+    {
+      "path": "pages/ticketInquiry/ticketRoundTrip",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/userInfo",
+      "style": {
+        "navigationBarTitleText": "我的"
       }
     }
   ],

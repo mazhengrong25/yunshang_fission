@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-07-29 15:24:50
+ * @LastEditTime: 2020-07-31 13:39:39
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -18,14 +18,19 @@
     <view class="passenger_main">
       <view class="mian_header">
         <view class="title">常用乘机人</view>
-        <view class="filter">
-          <text>筛选</text>
+        <view class="filter" @click="openGroupSelect">
+          <text>{{group?group + '分组': '筛选'}}</text>
           <image class="filter_icon" src="@/static/arrow_bule.png" mode="contain" />
         </view>
       </view>
 
       <scroll-view :scroll-y="true" class="mian_list">
-        <view class="list_item" v-for="(item, index) in passengerList" :key="index" @click="checkedPassenger(item, index)">
+        <view
+          class="list_item"
+          v-for="(item, index) in passengerList"
+          :key="index"
+          @click="checkedPassenger(item, index)"
+        >
           <view class="checked">
             <radio :checked="item.checked" color="#0070E2" />
           </view>
@@ -46,6 +51,13 @@
       </scroll-view>
     </view>
 
+    <!-- 筛选弹窗 -->
+    <yun-selector
+      ref="groupPopup"
+      :dataList="groupList"
+      @submitDialog="groupPopupSelecctBtn()"
+    ></yun-selector>
+
     <view class="submit_box">
       <button class="submit_btn" @click="returnBtn">确认</button>
     </view>
@@ -56,57 +68,68 @@
 export default {
   data() {
     return {
-			iStatusBarHeight: 0, // 状态栏高度
-			
-			passengerList: [
+      iStatusBarHeight: 0, // 状态栏高度
+
+      group: "", // 分组筛选
+      groupList: ["人事部", "产品部", "市场营销部", "IT部", "未分组"], // 分组列表
+
+      passengerList: [
         // 乘机人列表
         {
-					id: 1,
+          id: 1,
           type: "成人",
           userName: "白大飞",
           position: "销售部",
           idCard: "500123123412341234",
-          checked: false
+          checked: false,
         },
         {
-					id: 2,
+          id: 2,
           type: "儿童",
           userName: "白小飞",
           position: "",
           idCard: "500123123412341234",
-          checked: false
+          checked: false,
         },
         {
-					id: 3,
+          id: 3,
           type: "婴儿",
           userName: "白飞飞",
           position: "",
           idCard: "500123123412341234",
-          checked: false
-        }
+          checked: false,
+        },
       ],
     };
-	},
-	methods: {
+  },
+  methods: {
     // 跳转新增乘机人
-    jumpAddPassenger(){
-       uni.navigateTo({
-        url: "/pages/flightReservation/addPassenger"
+    jumpAddPassenger() {
+      uni.navigateTo({
+        url: "/pages/flightReservation/addPassenger",
       });
     },
-		// 选中乘机人
-		checkedPassenger(data, index){
-			this.passengerList[index].checked = !this.passengerList[index].checked
-		},
 
-		// 确认乘机人
-		returnBtn(){
+    // 打开分组弹窗
+    openGroupSelect() {
+      this.$refs.groupPopup.openDialog();
+    },
+    // 确认分组
+    groupPopupSelecctBtn(e) {
+      this.group = e;
+    },
 
-		},
-	},
+    // 选中乘机人
+    checkedPassenger(data, index) {
+      this.passengerList[index].checked = !this.passengerList[index].checked;
+    },
+
+    // 确认乘机人
+    returnBtn() {},
+  },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-  }
+  },
 };
 </script>
 
@@ -182,10 +205,10 @@ export default {
         align-items: center;
 
         .checked {
-					margin-right: 26upx;
-					radio{
-						transform: scale(0.7);
-					}
+          margin-right: 26upx;
+          radio {
+            transform: scale(0.7);
+          }
         }
 
         .item_info {
@@ -248,7 +271,7 @@ export default {
     justify-content: center;
     padding-top: 24upx;
     padding-bottom: var(--status-bar-height);
-		border-top: 2upx solid rgba(229, 229, 229, 1);
+    border-top: 2upx solid rgba(229, 229, 229, 1);
     .submit_btn {
       flex: 1;
       height: 90upx;

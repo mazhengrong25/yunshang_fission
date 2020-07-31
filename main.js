@@ -11,8 +11,11 @@ import uniPopupDialog from '@/components/uni-popup/uni-popup-dialog.vue'
 import yunSwitch from "@/components/global/yun_switch.vue"; // switch组件
 Vue.component('yunSwitch', yunSwitch);
 
-import yunHeader from "@/components/global/yun_header.vue"; // switch组件
+import yunHeader from "@/components/global/yun_header.vue"; // 头部组件
 Vue.component('yunHeader', yunHeader);
+
+import yunSelector from "@/components/global/yun_selector.vue"; // 弹窗选择器组件
+Vue.component('yunSelector', yunSelector);
 
 // import GL_Component from '@/utils/globalComponents.js'
 // Vue.use(GL_Component);
