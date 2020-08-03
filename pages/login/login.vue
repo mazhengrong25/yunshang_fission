@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2020-07-29 15:41:46
+ * @LastEditTime: 2020-08-03 15:52:57
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -22,52 +22,109 @@
       <view class="login_form">
         <view class="form_list">
           <view class="form_title">
-						<image class="form_title_icon" src="@/static/login_username.png" mode="contain" />
-						<text>用户名</text>
-					</view>
-          <input class="form_input" type="text" placeholder="请输入用户名" v-model="userName" 
-            placeholder-class="input_placeholder"/>
+            <image class="form_title_icon" src="@/static/login_username.png" mode="contain" />
+            <text>用户名</text>
+          </view>
+          <input
+            class="form_input"
+            type="text"
+            placeholder="请输入用户名"
+            v-model="userName"
+            placeholder-class="input_placeholder"
+          />
         </view>
         <view class="form_list">
           <view class="form_title">
-						<image class="form_title_icon" src="@/static/login_password.png" mode="contain" />
-						<text>密码</text>
-						</view>
-          <input class="form_input" type="password" placeholder="请输入密码" v-model="password" 
-            placeholder-class="input_placeholder"/>
+            <image class="form_title_icon" src="@/static/login_password.png" mode="contain" />
+            <text>密码</text>
+          </view>
+          <input
+            class="form_input"
+            type="password"
+            placeholder="请输入密码"
+            v-model="password"
+            placeholder-class="input_placeholder"
+          />
         </view>
       </view>
       <view class="login_submit" @click="loginBtn">登录</view>
     </view>
-
   </view>
 </template>
 
 <script>
-import login from '@/api/login.js';
+import login from "@/api/login.js";
 export default {
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度
       userName: "",
-      password: ""
+      password: "",
     };
-	},
-	methods: {
-		loginBtn(){
-			let data = {
-				login_name: this.userName,
-				password: this.password
-			}
-			login.pwdLogin(data).then(res => {
-				console.log(res)
-					
-				})
-		}
-	},
+  },
+  methods: {
+    loginBtn() {
+      console.log('点击登录')
+      if (this.userName && this.password) {
+        let data = {
+          login_name: this.userName,
+          password: this.password,
+        };
+        login.pwdLogin(data).then((res) => {
+          console.log(res);
+          if (res.errorcode === 10000) {
+            wx.showToast({
+              title: "登录成功",
+              icon: "succes",
+              mask: true,
+            });
+
+            let loginInfo = {
+              account: this.userName,
+              password: this.password,
+              token: res.data.access_token,
+              loginTime: new Date(
+                new Date().getTime() + (res.data.expires_in * 1000)
+              ),
+            };
+
+            uni.setStorageSync("loginInfo", loginInfo);
+
+            setTimeout(() => {
+              uni.switchTab({
+                url: "/pages/index/index",
+              });
+            }, 500);
+          } else {
+            wx.showToast({
+              title: res.msg,
+              icon: "none",
+              duration: 2000,
+              mask: true,
+            });
+          }
+        });
+      } else {
+        wx.showToast({
+          title: "请填写完整登录信息",
+          icon: "none",
+          mask: true,
+        });
+      }
+    },
+  },
   onLoad() {
-    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-  }
+    let that = this;
+    uni.getStorageSync({
+      key: "loginInfo",
+      success(e) {
+        if (e.data) {
+          (that.userName = e.data.account), (that.password = e.data.password);
+        }
+      },
+    });
+    that.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+  },
 };
 </script>
 
@@ -138,22 +195,22 @@ export default {
           font-size: 30upx;
           font-weight: bold;
           color: rgba(51, 51, 51, 1);
-					margin-bottom: 24upx;
-					display: flex;
-					align-items: center;
-					.form_title_icon{
-						width: 32upx;
-						height: 32upx;
-						margin-right: 16upx;
-					}
-				}
-				.form_input{
-					font-size: 34upx;
-					font-weight:400;
-					&::placeholder{
-						color:rgba(175,185,196,1);
-					}
-				}
+          margin-bottom: 24upx;
+          display: flex;
+          align-items: center;
+          .form_title_icon {
+            width: 32upx;
+            height: 32upx;
+            margin-right: 16upx;
+          }
+        }
+        .form_input {
+          font-size: 34upx;
+          font-weight: 400;
+          &::placeholder {
+            color: rgba(175, 185, 196, 1);
+          }
+        }
       }
     }
     .login_submit {
@@ -168,10 +225,10 @@ export default {
       font-size: 32upx;
       font-weight: 400;
       color: rgba(255, 255, 255, 1);
-			letter-spacing: 8upx;
-			display: flex;
-			align-items: center;
-			justify-content: center;
+      letter-spacing: 8upx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }

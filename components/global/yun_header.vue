@@ -2,12 +2,12 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-07-23 14:48:51
+ * @LastEditTime: 2020-08-03 16:23:48
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view
-    class="yun_header"
+    :class="['yun_header',{'white': headerColor}]"
     :style="{paddingTop: statusHeight + 'px',marginBottom: headerBottom + 'px'}"
   >
     <view v-if="showReturn" class="go_back" @click.native="goBack"></view>
@@ -51,7 +51,11 @@ export default {
       // 导航栏下边距
       type: Number,
       default: () => 0
-    }
+    },
+    headerColor: {
+      type: Boolean,
+      default: () => false
+    },
   },
   data() {
     return {
@@ -79,10 +83,21 @@ export default {
   align-items: center;
   padding-top: var(--status-bar-height);
   z-index: 999;
+  &.white{
+    background: #fff;
+    .go_back{
+      background: url(@/static/go_back_white.png) no-repeat center center;
+      background-size: 23upx 31upx;
+    }
+    .title,
+    .center_title{
+      color: #000;
+    }
+  }
 
   .go_back {
-    background: url(@/static/go_back.png) no-repeat;
-    background-size: contain;
+    background: url(@/static/go_back.png) no-repeat center center;
+    background-size: 23upx 31upx;
     width: 50upx;
     height: 50upx;
     position: absolute;

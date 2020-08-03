@@ -1,6 +1,35 @@
 {
-  "pages": [ 
-    
+  "pages": [
+    {
+      "path": "pages/userInfo/wallet",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/editPassword",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/userDetails",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/userInfo",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/index/index",
       "style": {
@@ -11,7 +40,7 @@
       "path": "pages/order/order",
       "style": {}
     },
-   
+
     {
       "path": "pages/notice/notice",
       "style": {
@@ -53,7 +82,8 @@
       "style": {
         "navigationBarTitleText": "报销凭证"
       }
-    },{
+    },
+    {
       "path": "pages/flightReservation/passengerList",
       "style": {
         "navigationStyle": "custom"
@@ -77,23 +107,11 @@
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/login/login",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
 
     {
       "path": "pages/ticketInquiry/ticketRoundTrip",
       "style": {
         "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/userInfo/userInfo",
-      "style": {
-        "navigationBarTitleText": "我的"
       }
     }
   ],

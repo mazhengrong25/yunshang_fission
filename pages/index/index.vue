@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-07-30 11:38:20
+ * @LastEditTime: 2020-08-03 10:56:10
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -215,8 +215,8 @@ export default {
         from: "北京", // 到达地
         multi_pass_to: "西安", // 多程出发地
         multi_pass_from: "武汉", // 多程到达地
-        toTime: "04月15日", // 出发时间
-        fromTime: "04月22日", // 到达时间
+        toTime: '', // 出发时间
+        fromTime: "", // 到达时间
         fromDay: "周三", // 到达日期
       },
 
@@ -357,6 +357,11 @@ export default {
   created() {
     this.setSwiperHeight();
   },
+  mounted () {
+    let date = new Date();
+    date.setTime(date.getTime()+24*60*60*1000);
+    this.addressForm['toTime'] = (date.getMonth()+1) + '月' + date.getDate() + '日'
+  }
 };
 </script>
 

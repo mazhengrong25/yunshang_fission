@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-07-29 15:40:13
+ * @LastEditTime: 2020-08-03 15:23:29
  * @LastEditors: wish.WuJunLong
 --> 
 <script>
@@ -61,6 +61,23 @@ export default {
   color: rgba(175, 185, 196, 1);
   font-size: 28upx;
   font-weight: 400;
+}
+// input right arrow
+.input-right-arrow {
+  position: relative;
+  padding-right: 32upx;
+  &::after {
+    content: "";
+    display: inline-block;
+    background: url(@/static/arrow.png) no-repeat center center;
+    background-size: contain;
+    width: 12upx;
+    height: 20upx;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -10upx;
+  }
 }
 // 样式清除
 button {
