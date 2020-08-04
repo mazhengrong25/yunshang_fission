@@ -1,8 +1,15 @@
 <!--
+ * @Description: 
+ * @Author: wish.WuJunLong
+ * @Date: 2020-08-03 17:22:34
+ * @LastEditTime: 2020-08-04 18:36:38
+ * @LastEditors: wish.WuJunLong
+-->
+<!--
  * @Description: 钱包流水
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-03 18:48:27
+ * @LastEditTime: 2020-08-04 09:38:11
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -19,7 +26,7 @@
 
     <view class="filter_box">
       <view class="box_title">日期筛选</view>
-      <view class="filter_message">打开筛选菜单</view>
+      <view class="filter_message" @click="filterDialogBtn()">{{filterDate}}</view>
     </view>
 
     <view class="wallet_box">
@@ -32,49 +39,69 @@
         >{{item}}</view>
       </view>
       <swiper class="wallet_swiper" :current="walletPageIndex" @change="changeSwiper">
-        <swiper-item>
+        <swiper-item 
+          v-for="(v ,i) in walletHeaderList"
+          :key="i">
           <scroll-view scroll-y="true" class="swiper-item" @scrolltolower="nextPageData()">
-            <view class="item_list" v-for="(item, index) in walletTotal" :key="index">
+            <view class="item_list" 
+            v-for="(item, index) in (i === 0?walletTotal:i === 1?walletIncome:i === 2?walletExpenditure:[])" 
+            :key="index"
+            @click="jumpDetails(JSON.stringify(item))">
               <view class="list_left">
                 <view class="list_icon">
-                  <image v-if="item.after_balance < item.before_balance" src="@/static/wallet_type_1.png" mode="contain" />
+                  <image
+                    v-if="item.after_balance < item.before_balance"
+                    src="@/static/wallet_type_1.png"
+                    mode="contain"
+                  />
                   <image v-if="false" src="@/static/wallet_type_2.png" mode="contain" />
-                  <image v-if="item.trans_type === 1" src="@/static/wallet_type_3.png" mode="contain" />
-                  <image v-if="item.trans_type === 8 || item.trans_type === 9" src="@/static/wallet_type_4.png" mode="contain" />
+                  <image
+                    v-if="item.trans_type === 1 || item.trans_type === 3 || item.trans_type === 11"
+                    src="@/static/wallet_type_3.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-if="item.trans_type === 8 || item.trans_type === 9"
+                    src="@/static/wallet_type_4.png"
+                    mode="contain"
+                  />
                 </view>
                 <view class="list_message">
                   <view class="message_title">
-										{{item.trans_type === 1? '钱包充值':
-											item.trans_type === 2? '钱包消费':
-											item.trans_type === 3? '短信充值':
-											item.trans_type === 4? '短信消费':
-											item.trans_type === 5? '信用额度调整':
-											item.trans_type === 6? '冻结金额调整':
-											item.trans_type === 7? '三方支付':
-											item.trans_type === 8? '三方支付全退':
-											item.trans_type === 9? '三方支付部分退':
-											item.trans_type === 10? '提现':
-											item.trans_type === 11? '流量充值':
-											item.trans_type === 12? '预付款调整': ""}}
-										</view>
+                    {{item.trans_type === 1? '钱包充值':
+                    item.trans_type === 2? '钱包消费':
+                    item.trans_type === 3? '短信充值':
+                    item.trans_type === 4? '短信消费':
+                    item.trans_type === 5? '信用额度调整':
+                    item.trans_type === 6? '冻结金额调整':
+                    item.trans_type === 7? '三方支付':
+                    item.trans_type === 8? '三方支付全退':
+                    item.trans_type === 9? '三方支付部分退':
+                    item.trans_type === 10? '提现':
+                    item.trans_type === 11? '流量充值':
+                    item.trans_type === 12? '预付款调整': ""}}
+                  </view>
                   <view class="message_item">{{item.updated_at}}</view>
                 </view>
               </view>
               <view class="list_right">
-								{{item.after_balance > item.before_balance? '+': '-'}}
-								{{item.amount}}
-								</view>
+                {{item.after_balance > item.before_balance? '+': item.after_balance < item.before_balance? '-': ''}}
+                {{item.amount.toFixed(2)}}
+              </view>
             </view>
           </scroll-view>
         </swiper-item>
-        <swiper-item>
-          <scroll-view scroll-y="true" class="swiper-item">B</scroll-view>
-        </swiper-item>
-        <swiper-item>
-          <scroll-view scroll-y="true" class="swiper-item">C</scroll-view>
-        </swiper-item>
       </swiper>
     </view>
+
+    <!-- 筛选弹窗 -->
+    <yun-selector
+      ref="filterPopup"
+      :dataList="groupList"
+      :selectType="selectType"
+      :dateType="dateType"
+      @submitDialog="submitFilterBtn()"
+    ></yun-selector>
   </view>
 </template>
 
@@ -88,17 +115,62 @@ export default {
       headerActive: 0, // 流水选择
 
       walletHeaderList: ["全部", "收入", "支出"], // 流水类型标题
-			walletPageIndex: 0, // 流水类型
-			
-			walletTotal: [], // 全部流水列表
-			currentPage: 1, // 当前列表页数
+      walletPageIndex: 0, // 流水类型
+
+      walletTotal: [], // 全部流水列表
+      walletIncome: [], // 收入流水列表
+      walletExpenditure: [], // 支出流水列表
+      currentPage: 1, // 当前列表页数
+
+      isFilter: false,
+      startTime: "", // 筛选开始时间
+      endTime: "", // 筛选结束时间
+      filterDate: "", // 筛选日期
+      selectType: "date", // 筛选类型
+      dateType: 3, // 筛选 3年月日 2年月 1年
+      groupList: [], // 分组列表
     };
   },
   methods: {
     // 流水切换
     checkedWallet(val, index) {
-      console.log(val);
       this.headerActive = index;
+      if (this.headerActive === 0) {
+        this.isFilter = false;
+        this.startTime = "";
+        this.endTime = "";
+        this.filterDate = $dateTool(new Date(), "YYYY年MM月DD日");
+        this.selectType = "date";
+        this.dateType = 3;
+        this.getWalletData()
+      } else if (this.headerActive === 1) {
+        this.filterDate = $dateTool(new Date(),"YYYY年MM月");
+        this.selectType = "date";
+        this.dateType = 2;
+        let data = {
+          year: $dateTool(new Date(),"YYYY"),
+          month: $dateTool(new Date(),"MM")
+        }
+        this.submitFilterBtn(data)
+      } else if (this.headerActive === 2) {
+        this.filterDate = $dateTool(new Date(),"第Q季度");
+        this.selectType = "text";
+        this.groupList = ["第1季度", "第2季度", "第3季度", "第4季度"];
+        this.submitFilterBtn(this.filterDate)
+      } else if (this.headerActive === 3) {
+        this.filterDate = $dateTool(new Date(),"Q") > 2 ? "下半年" : "上半年";
+        this.selectType = "text";
+        this.groupList = ["上半年", "下半年"];
+        this.submitFilterBtn(this.filterDate)
+      } else if (this.headerActive === 4) {
+        this.filterDate = $dateTool(new Date(),"YYYY年");
+        this.selectType = "date";
+        this.dateType = 1;
+        let data = {
+          year: $dateTool(new Date(),"YYYY")
+        }
+        this.submitFilterBtn(data)
+      }
     },
 
     // 流水类型切换
@@ -107,45 +179,123 @@ export default {
     },
     changeSwiper(e) {
       this.walletPageIndex = e.detail.current;
-		},
-		
-		// 获取流水数据
-		getWalletData(){
-			let data = {
-				dis_id: uni.getStorageSync('userInfo').dis_id,
-				page:	this.currentPage
-			}
-			userInfo.getWalletList(data).then((res) => {
-				if(res.result === 10000){
-					if(this.walletTotal.length > 0){
-						this.walletTotal.push.apply(this.walletTotal,res.data.data);
-					}else{
-						this.walletTotal = res.data.data
-					}
-					if(res.data.per_page <= this.currentPage){
-						uni.showToast({
-							title: '到底啦',
-							icon: 'none'
-						});
-					}
+    },
 
-					console.log(this.walletTotal)
-					
-					this.currentPage = res.data.current_page
-				}
-        console.log(res);
-        
+    // 打开筛选弹窗
+    filterDialogBtn() {
+      this.$refs.filterPopup.openDialog();
+    },
+    // 确认筛选类型
+    submitFilterBtn(e) {
+      this.isFilter = true;
+      let time;
+      this.currentPage = 1;
+      if (this.headerActive === 0) {
+        time = e.year + "-" + e.month + "-" + e.day;
+        this.filterDate = e.year + "年" + e.month + "月" + e.day + "日";
+        this.startTime = time;
+        this.endTime = time;
+      } else if (this.headerActive === 1) {
+        time = e.year + "-" + e.month;
+        this.filterDate = e.year + "年" + e.month + "月";
+        this.startTime = time + "-1";
+        this.endTime = time + "-" + $dateTool(time, "YYYY-MM").daysInMonth();
+      } else if (this.headerActive === 2) {
+        if(e === '第1季度'){
+          this.startTime = $dateTool().format('YYYY') + "-1-1";
+          this.endTime = $dateTool().format('YYYY') + "-3-" + $dateTool($dateTool().format('YYYY')+'-3', "YYYY-MM").daysInMonth();
+        }else if(e === '第2季度'){
+          this.startTime = $dateTool().format('YYYY') + "-4-1";
+          this.endTime = $dateTool().format('YYYY') + "-6-" + $dateTool($dateTool().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
+        }else if(e === '第3季度'){
+          this.startTime = $dateTool().format('YYYY') + "-7-1";
+          this.endTime = $dateTool().format('YYYY') + "-9-" + $dateTool($dateTool().format('YYYY')+'-9', "YYYY-MM").daysInMonth();
+        }else if(e === '第4季度'){
+          this.startTime = $dateTool().format('YYYY') + "-8-1";
+          this.endTime = $dateTool().format('YYYY') + "-12-" + $dateTool($dateTool().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
+        }
+        this.filterDate = e;
+      }else if(this.headerActive === 3){
+        if(e === '上半年'){
+          this.startTime = $dateTool().format('YYYY') + "-1-1";
+          this.endTime = $dateTool().format('YYYY') + "-6-" + $dateTool($dateTool().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
+        }else if(e === '上半年'){
+          this.startTime = $dateTool().format('YYYY') + "-7-1";
+          this.endTime = $dateTool().format('YYYY') + "-12-" + $dateTool($dateTool().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
+        }
+        this.filterDate = e;
+      }else if(this.headerActive === 4){
+
+          this.startTime = e.year + "-1-1";
+          this.endTime = e.year + "-12-" + $dateTool(e.year+'-12', "YYYY-MM").daysInMonth();
+       
+          this.filterDate = e.year+ '年';
+      }
+      this.walletTotal = []
+      this.getWalletData(this.startTime, this.endTime);
+      console.log(e);
+    },
+
+    // 获取流水数据
+    getWalletData() {
+      let data = {
+        dis_id: uni.getStorageSync("userInfo").dis_id,
+        page: this.currentPage,
+        start_time: this.startTime || "",
+        end_time: this.endTime || "",
+      };
+      userInfo.getWalletList(data).then((res) => {
+        if (res.result === 10000) {
+          if (res.data.data.length > 0) {
+            if (this.walletTotal.length > 0) {
+              this.walletTotal.push.apply(this.walletTotal, res.data.data);
+            } else {
+              this.walletTotal = res.data.data;
+            }
+            this.currentPage = res.data.current_page + 1;
+
+            if (this.currentPage < 3) {
+              this.getWalletData();
+            }
+            this.walletIncome = [];
+            this.walletExpenditure = [];
+            this.walletTotal.forEach((item) => {
+              if (item.after_balance > item.before_balance) {
+                this.walletIncome.push(item);
+              }
+              if (item.after_balance < item.before_balance) {
+                this.walletExpenditure.push(item);
+              }
+            });
+          } else {
+            uni.showToast({
+              title: "到底啦",
+              icon: "none",
+            });
+          }
+        }
       });
-		},
-		// 加载下一页数据
-		nextPageData(){
-			this.currentPage += 1
-			this.getWalletData()
-		},
-	},
-	created () {
-		this.getWalletData()
-	},
+    },
+    // 加载下一页数据
+    nextPageData() {
+      this.getWalletData();
+    },
+
+    // 跳转钱包流水详情
+    jumpDetails(val){
+      console.log(JSON.parse(val))
+      // let data = {
+      //   data: JSON.parse(val)
+      // }
+      uni.navigateTo({
+        url: '/pages/userInfo/walletDetails?data= '+ val
+    });
+    },
+  },
+  created() {
+    this.getWalletData();
+    this.filterDate = $dateTool().format("YYYY年MM月DD日");
+  },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
   },
@@ -214,6 +364,17 @@ export default {
       font-size: 32upx;
       font-weight: 400;
       color: rgba(51, 51, 51, 1);
+      display: inline-flex;
+      align-items: center;
+      &::after {
+        content: "";
+        background: url(@/static/filter_arrow.png) no-repeat center center;
+        background-size: contain;
+        height: 12upx;
+        width: 21upx;
+        display: inline-block;
+        margin-left: 16upx;
+      }
     }
   }
   .wallet_box {
@@ -241,8 +402,8 @@ export default {
           height: 10upx;
           background: rgba(30, 139, 249, 1);
           border-radius: 6upx;
-					opacity: 0;
-        	margin-top: 4upx;
+          opacity: 0;
+          margin-top: 4upx;
         }
         &.active {
           font-size: 40upx;
@@ -264,9 +425,9 @@ export default {
           height: 160upx;
           background: rgba(255, 255, 255, 1);
           box-shadow: 0 4upx 20upx rgba(217, 225, 234, 0.6);
-					border-radius: 20upx;
-					margin: 0 20upx 20upx;
-					padding: 0 20upx 0 6upx;
+          border-radius: 20upx;
+          margin: 0 20upx 20upx;
+          padding: 0 20upx 0 6upx;
           .list_left {
             display: inline-flex;
             align-items: center;

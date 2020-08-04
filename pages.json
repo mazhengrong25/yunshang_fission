@@ -1,7 +1,38 @@
 {
   "pages": [
     {
+      "path" : "pages/order/orderList",
+      "style" : {
+        "navigationStyle": "custom"
+      }
+  },
+    {
+      "path": "pages/order/order",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/userInfo",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/service",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+  
+    {
       "path": "pages/userInfo/wallet",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/userInfo/walletDetails",
       "style": {
         "navigationStyle": "custom"
       }
@@ -18,12 +49,7 @@
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/userInfo/userInfo",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
+
     {
       "path": "pages/login/login",
       "style": {
@@ -36,11 +62,6 @@
         "navigationBarTitleText": "云上航空"
       }
     },
-    {
-      "path": "pages/order/order",
-      "style": {}
-    },
-
     {
       "path": "pages/notice/notice",
       "style": {
@@ -114,7 +135,8 @@
         "navigationStyle": "custom"
       }
     }
-  ],
+    
+    ],
   "tabBar": {
     "color": "#cdcdcd",
     "selectedColor": "#0070E2",

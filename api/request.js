@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-03 15:46:15
+ * @LastEditTime: 2020-08-04 17:33:52
  * @LastEditors: wish.WuJunLong
  */
 
@@ -60,7 +60,10 @@ const request = (config, type) => {
       .then((responses) => {
         // 异常
         if (responses[0]) {
-          reject({ message: "网络超时" });
+          uni.showToast({
+            title: '网络超时',
+            icon: "none",
+          });
         } else {
           let response = responses[1].data;
           resolve(response);

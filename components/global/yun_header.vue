@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-08-03 16:23:48
+ * @LastEditTime: 2020-08-04 15:43:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -10,7 +10,7 @@
     :class="['yun_header',{'white': headerColor}]"
     :style="{paddingTop: statusHeight + 'px',marginBottom: headerBottom + 'px'}"
   >
-    <view v-if="showReturn" class="go_back" @click.native="goBack"></view>
+    <view v-if="showReturn" class="go_back" @click="goBack"></view>
     <view class="center_title" v-if="centerTitle">{{centerTitle}}</view>
     <view class="title" v-else>
       <view class="title_left">{{headerAddress.to}}</view>

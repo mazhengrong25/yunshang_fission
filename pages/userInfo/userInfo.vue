@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-08-03 17:24:03
+ * @LastEditTime: 2020-08-04 15:58:38
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -85,17 +85,17 @@
           </view>
         </view>
 
-        <view class="option_list">
+        <view class="option_list" @click="jumpWallet()">
           <view class="list_icon">
             <image src="@/static/user_wallet.png" mode="contain" />
           </view>
-          <view class="list_message" @click="jumpWallet()">
+          <view class="list_message">
             <view class="message_title">钱包流水</view>
             <view class="message">资金动态一手掌握</view>
           </view>
         </view>
 
-        <view class="option_list">
+        <view class="option_list" @click="jumpPassengerManage()">
           <view class="list_icon">
             <image src="@/static/user_wallet.png" mode="contain" />
           </view>
@@ -105,7 +105,7 @@
           </view>
         </view>
 
-        <view class="option_list">
+        <view class="option_list" @click="jumpService()">
           <view class="list_icon">
             <image src="@/static/user_service.png" mode="contain" />
           </view>
@@ -116,8 +116,9 @@
         </view>
       </view>
 
-      <view class="sign_out">退出登录</view>
+      <view class="sign_out" @click="signOut()">退出登录</view>
     </scroll-view>
+
   </view>
 </template>
 
@@ -163,7 +164,6 @@ export default {
           uni.showToast({
             title: res.msg,
             icon: "none",
-            mask: true,
           });
         }
       });
@@ -175,6 +175,30 @@ export default {
         url: "/pages/userInfo/wallet",
       });
     },
+
+    // 跳转旅客管理
+    jumpPassengerManage() {
+      uni.navigateTo({
+        url: "/pages/flightReservation/passengerList",
+      });
+    },
+
+
+    // 跳转客服服务
+    jumpService(){
+       uni.navigateTo({
+        url: "/pages/userInfo/service",
+      });
+    },
+
+
+    // 退出登录
+    signOut(){
+        
+    },
+
+
+
   },
   created() {
     this.getUserInfo();
@@ -323,7 +347,7 @@ export default {
     }
 
     .option_box {
-      padding: 52upx 60upx 62upx;
+      padding: 52upx 20upx 62upx 60upx;
       background: #fff;
       display: flex;
       flex-wrap: wrap;
