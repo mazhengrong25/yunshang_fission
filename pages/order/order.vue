@@ -2,7 +2,7 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2020-08-04 16:23:20
+ * @LastEditTime: 2020-08-05 10:55:30
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -46,6 +46,13 @@ export default {
     return {
       iStatusBarHeight: 0,
     };
+  },
+  methods: {
+    jumpOrderList() {
+      uni.navigateTo({
+        url: "/pages/order/orderList",
+      });
+    },
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -105,8 +112,8 @@ export default {
           color: rgba(51, 51, 51, 1);
           padding: 50upx 30upx 50upx 0;
           display: flex;
-					align-items: center;
-					justify-content: space-between;
+          align-items: center;
+          justify-content: space-between;
           &::after {
             content: "";
             display: inline-block;

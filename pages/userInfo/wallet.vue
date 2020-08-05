@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-04 18:36:38
+ * @LastEditTime: 2020-08-05 10:54:14
  * @LastEditors: wish.WuJunLong
 -->
 <!--
@@ -107,6 +107,7 @@
 
 <script>
 import userInfo from "@/api/getUserInfo.js";
+import moment from "moment";
 export default {
   data() {
     return {
@@ -139,35 +140,35 @@ export default {
         this.isFilter = false;
         this.startTime = "";
         this.endTime = "";
-        this.filterDate = $dateTool(new Date(), "YYYY年MM月DD日");
+        this.filterDate = moment().format('YYYY年MM月DD日');
         this.selectType = "date";
         this.dateType = 3;
         this.getWalletData()
       } else if (this.headerActive === 1) {
-        this.filterDate = $dateTool(new Date(),"YYYY年MM月");
+        this.filterDate = moment().format('YYYY年MM月');
         this.selectType = "date";
         this.dateType = 2;
         let data = {
-          year: $dateTool(new Date(),"YYYY"),
-          month: $dateTool(new Date(),"MM")
+          year: moment().format('YYYY'),
+          month: moment().format('MM')
         }
         this.submitFilterBtn(data)
       } else if (this.headerActive === 2) {
-        this.filterDate = $dateTool(new Date(),"第Q季度");
+        this.filterDate = moment().format('第Q季度');
         this.selectType = "text";
         this.groupList = ["第1季度", "第2季度", "第3季度", "第4季度"];
         this.submitFilterBtn(this.filterDate)
       } else if (this.headerActive === 3) {
-        this.filterDate = $dateTool(new Date(),"Q") > 2 ? "下半年" : "上半年";
+        this.filterDate = moment().format('Q') > 2 ? "下半年" : "上半年";
         this.selectType = "text";
         this.groupList = ["上半年", "下半年"];
         this.submitFilterBtn(this.filterDate)
       } else if (this.headerActive === 4) {
-        this.filterDate = $dateTool(new Date(),"YYYY年");
+        this.filterDate = moment().format('YYYY年');
         this.selectType = "date";
         this.dateType = 1;
         let data = {
-          year: $dateTool(new Date(),"YYYY")
+          year: moment().format('YYYY')
         }
         this.submitFilterBtn(data)
       }
@@ -199,35 +200,35 @@ export default {
         time = e.year + "-" + e.month;
         this.filterDate = e.year + "年" + e.month + "月";
         this.startTime = time + "-1";
-        this.endTime = time + "-" + $dateTool(time, "YYYY-MM").daysInMonth();
+        this.endTime = time + "-" + moment(time).format('YYYY-MM').daysInMonth();
       } else if (this.headerActive === 2) {
         if(e === '第1季度'){
-          this.startTime = $dateTool().format('YYYY') + "-1-1";
-          this.endTime = $dateTool().format('YYYY') + "-3-" + $dateTool($dateTool().format('YYYY')+'-3', "YYYY-MM").daysInMonth();
+          this.startTime = moment().format('YYYY') + "-1-1";
+          this.endTime = moment().format('YYYY') + "-3-" + moment(moment().format('YYYY')+'-3', "YYYY-MM").daysInMonth();
         }else if(e === '第2季度'){
-          this.startTime = $dateTool().format('YYYY') + "-4-1";
-          this.endTime = $dateTool().format('YYYY') + "-6-" + $dateTool($dateTool().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
+          this.startTime = moment().format('YYYY') + "-4-1";
+          this.endTime = moment().format('YYYY') + "-6-" + moment(moment().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
         }else if(e === '第3季度'){
-          this.startTime = $dateTool().format('YYYY') + "-7-1";
-          this.endTime = $dateTool().format('YYYY') + "-9-" + $dateTool($dateTool().format('YYYY')+'-9', "YYYY-MM").daysInMonth();
+          this.startTime = moment().format('YYYY') + "-7-1";
+          this.endTime = moment().format('YYYY') + "-9-" + moment(moment().format('YYYY')+'-9', "YYYY-MM").daysInMonth();
         }else if(e === '第4季度'){
-          this.startTime = $dateTool().format('YYYY') + "-8-1";
-          this.endTime = $dateTool().format('YYYY') + "-12-" + $dateTool($dateTool().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
+          this.startTime = moment().format('YYYY') + "-8-1";
+          this.endTime = moment().format('YYYY') + "-12-" + moment(moment().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
         }
         this.filterDate = e;
       }else if(this.headerActive === 3){
         if(e === '上半年'){
-          this.startTime = $dateTool().format('YYYY') + "-1-1";
-          this.endTime = $dateTool().format('YYYY') + "-6-" + $dateTool($dateTool().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
+          this.startTime = moment().format('YYYY') + "-1-1";
+          this.endTime = moment().format('YYYY') + "-6-" + moment(moment().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
         }else if(e === '上半年'){
-          this.startTime = $dateTool().format('YYYY') + "-7-1";
-          this.endTime = $dateTool().format('YYYY') + "-12-" + $dateTool($dateTool().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
+          this.startTime = moment().format('YYYY') + "-7-1";
+          this.endTime = moment().format('YYYY') + "-12-" + moment(moment().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
         }
         this.filterDate = e;
       }else if(this.headerActive === 4){
 
           this.startTime = e.year + "-1-1";
-          this.endTime = e.year + "-12-" + $dateTool(e.year+'-12', "YYYY-MM").daysInMonth();
+          this.endTime = e.year + "-12-" + moment(e.year+'-12').format("YYYY-MM").daysInMonth();
        
           this.filterDate = e.year+ '年';
       }
@@ -294,7 +295,7 @@ export default {
   },
   created() {
     this.getWalletData();
-    this.filterDate = $dateTool().format("YYYY年MM月DD日");
+    this.filterDate = moment().format("YYYY年MM月DD日");
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;

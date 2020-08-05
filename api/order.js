@@ -2,7 +2,7 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-08-04 17:34:23
+ * @LastEditTime: 2020-08-05 14:36:24
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -24,9 +24,20 @@ function orderInterList(data) {
     url: '/api/inter/OrderList',
     data: data
   })
-} 
+};
+
+
+// 国际订单详情
+function orderInterDetails(data) {
+  return request({
+    method: 'POST',
+    url: '/api/inter/orderDetail',
+    data: data
+  })
+};
 
 export default{
   orderList,
-  orderInterList
+  orderInterList,
+  orderInterDetails
 }

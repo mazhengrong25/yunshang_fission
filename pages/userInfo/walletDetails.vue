@@ -2,7 +2,7 @@
  * @Description: 流水详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 13:48:46
- * @LastEditTime: 2020-08-04 15:41:48
+ * @LastEditTime: 2020-08-05 16:12:53
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -162,6 +162,7 @@ export default {
   .details_view {
     flex: 1;
     height: calc(100vh - (88upx + var(--status-bar-height)));
+    overflow-y: auto;
   }
   .details_header {
     display: flex;

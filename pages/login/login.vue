@@ -84,7 +84,7 @@ export default {
               password: this.password,
               token: res.data.access_token,
               loginTime: new Date(
-                new Date().getTime() + (res.data.expires_in * 1000)
+                new Date().getTime() + (3600 * 1000)
               ),
             };
 

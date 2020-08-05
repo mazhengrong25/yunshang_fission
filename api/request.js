@@ -2,40 +2,43 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-04 17:33:52
+ * @LastEditTime: 2020-08-05 14:03:06
  * @LastEditors: wish.WuJunLong
  */
 
 let loginInfo = uni.getStorageSync("loginInfo");
 if (loginInfo) {
-	let currentTime = new Date();
-	let loginTime = new Date(loginInfo.loginTime);
-	if (currentTime.getTime() > loginTime.getTime()) {
-		uni.request({
-			method: "POST",
-			url: "http://192.168.0.187:8092/api/login",
-			data: {
-				login_name: loginInfo.account,
-				password: loginInfo.password,
-			},
-			success: (res) => {
-				if (res.data.errorcode === 10000) {
-					let loginInfo = {
-						'account': uni.getStorageSync("loginInfo").account,
-						'password': uni.getStorageSync("loginInfo").password,
-						'token': res.data.data.access_token,
-						'loginTime': new Date(
-							new Date().getTime() + res.data.data.expires_in * 1000
-						),
-					};
-					uni.setStorageSync("loginInfo", loginInfo);
-				}
-			},
-		});
-	}
+  let currentTime = new Date();
+  let loginTime = new Date(loginInfo.loginTime);
+  if (new Date(currentTime).getTime() > new Date(loginTime).getTime()) {
+    uni.request({
+      method: "POST",
+      url: "http://192.168.0.187:8092/api/login",
+      data: {
+        login_name: loginInfo.account,
+        password: loginInfo.password,
+      },
+      success: (res) => {
+        if (res.data.errorcode === 10000) {
+          let loginInfo = {
+            account: uni.getStorageSync("loginInfo").account,
+            password: uni.getStorageSync("loginInfo").password,
+            token: res.data.data.access_token,
+            loginTime: new Date(
+              new Date().getTime() + (3600 * 1000)
+            ),
+          };
+          uni.setStorageSync("loginInfo", loginInfo);
+        }
+      },
+    });
+  }
 }
 
 const request = (config, type) => {
+  uni.showLoading({
+    title: "加载中",
+  });
   // 处理 apiUrl
   let baseUrl;
   if (type === "user") {
@@ -58,10 +61,11 @@ const request = (config, type) => {
     uni
       .request(config)
       .then((responses) => {
+        uni.hideLoading();
         // 异常
         if (responses[0]) {
           uni.showToast({
-            title: '网络超时',
+            title: "网络超时",
             icon: "none",
           });
         } else {
@@ -70,6 +74,7 @@ const request = (config, type) => {
         }
       })
       .catch((error) => {
+        uni.hideLoading();
         reject(error);
       });
   });

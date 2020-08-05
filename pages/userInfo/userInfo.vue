@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-08-04 15:58:38
+ * @LastEditTime: 2020-08-05 16:13:22
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -296,6 +296,8 @@ export default {
   }
   .content {
     height: calc(100% - 200upx - (88upx + var(--status-bar-height)));
+    flex: 1;
+    overflow-y: auto;
     .header_box {
       box-shadow: none;
       padding: 40upx 20upx 8upx 60upx;

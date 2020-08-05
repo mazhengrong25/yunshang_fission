@@ -1,11 +1,17 @@
 {
   "pages": [
     {
-      "path" : "pages/order/orderList",
-      "style" : {
+      "path": "pages/order/orderList",
+      "style": {
         "navigationStyle": "custom"
       }
-  },
+    },
+    {
+      "path": "pages/order/orderDetails",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/order/order",
       "style": {
@@ -24,7 +30,7 @@
         "navigationStyle": "custom"
       }
     },
-  
+
     {
       "path": "pages/userInfo/wallet",
       "style": {
@@ -135,8 +141,7 @@
         "navigationStyle": "custom"
       }
     }
-    
-    ],
+  ],
   "tabBar": {
     "color": "#cdcdcd",
     "selectedColor": "#0070E2",

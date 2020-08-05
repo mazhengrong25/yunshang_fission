@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-04 18:41:19
+ * @LastEditTime: 2020-08-05 17:03:09
  * @LastEditors: wish.WuJunLong
 -->
 <!--
@@ -14,7 +14,7 @@
 -->
 <template>
   <view class="order_list">
-    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="国内订单"></yun-header>
+    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="国际订单"></yun-header>
     <view class="order_header">
       <view
         :class="['header_list',{'active': headerActive === index}]"
@@ -47,7 +47,12 @@
       </view>
     </view>
 
-    <scroll-view :scroll-y="true" class="content">
+    <scroll-view
+      :scroll-y="true"
+      :enable-back-to-top="true"
+      class="content"
+      @scrolltolower="nextPageData()"
+    >
       <!-- 国内机票盒子 -->
       <!-- <view class="content_list">
         <view class="list_tyle">{{item.routing_type === 1? '单程机票': item.routing_type === 2? '往返机票': item.routing_type === 3? '多程机票': ''}}</view>
@@ -57,7 +62,7 @@
               <view class="title_type" v-if="item.routes.length > 1">{{item.direction_type === 1?'去程':item.direction_type === 2?'回程':item.direction_type === 3?'第'+(oindex + 1)+'程':''}}</view>
               <view class="title">{{oitem.departure}} - {{otem.arrive}}</view>
             </view>
-            <view class="item_perice">
+            <view class="item_price">
               <text>&yen;</text>{{item.need_pay_amount}}
             </view>
           </view>
@@ -86,51 +91,87 @@
       </view>-->
 
       <!-- 国际机票盒子 -->
-      <view class="content_list" v-for="(item, index) in orderList" :key="index">
+      <view
+        class="content_list"
+        v-for="(item, index) in orderList"
+        :key="index"
+        @click="jumpOrderDetails(item)"
+      >
         <view
           class="list_tyle"
         >{{item.routing_type === 1? '单程机票': item.routing_type === 2? '往返机票': item.routing_type === 3? '多程机票': ''}}</view>
-        <view class="list_item" v-for="(oitem, oindex) in item.routes" :key="oindex">
+        <view class="multiple_trips_header" v-if="item.routing_type !== 1">
+          <view
+            class="header_title"
+          >{{item.routing_type === 2? '往返总价': item.routing_type === 3? '多程总价': ''}}</view>
+          <view class="header_price">
+            <text>&yen;</text>
+            {{item.need_pay_amount || '金额错误'}}
+          </view>
+        </view>
+        <view
+          :class="['list_item',{'multiple_trips_item': item.routing_type !== 1}]"
+          v-for="(oitem, oindex) in item.routes"
+          :key="oindex"
+        >
           <view class="item_header">
             <view class="item_title">
               <view
-                class="title_type"
+                :class="['title_type',{'return_trip' :oitem.direction_type === 2}]"
                 v-if="item.routes.length > 1"
               >{{oitem.direction_type === 1?'去程':oitem.direction_type === 2?'回程':item.direction_type === 3?'第'+(oindex + 1)+'程':''}}</view>
               <view class="title">{{oitem.departure}} - {{oitem.arrive}}</view>
             </view>
-            <view class="item_perice">
+            <view class="item_price" v-if="item.routing_type === 1">
               <text>&yen;</text>
-              {{item.need_pay_amount}}
+              {{item.need_pay_amount || '金额错误'}}
+            </view>
+            <view class="info_right" v-if="item.routing_type !== 1">
+              {{item.status === 1? '已预订':
+              item.status === 2? '待出票':
+              item.status === 3? '已出票':
+              item.status === 5? '已取消': ''}}
             </view>
           </view>
           <view class="item_info">
             <view class="info_left">
-              <text>{{oindex === 0? oitem.inter_segments[0].flight_no: oindex === item.routes.length? oitem.inter_segments[item.routes.length].flight_no: ''}}</text>
+              <text>{{oitem.inter_segments[0].flight_no}}</text>
               <text>{{$dateTool(oitem.departure_time,"MM月DD日")}}</text>
               <text>{{$dateTool(oitem.departure_time,"hh:mm")}}起飞</text>
             </view>
-            <view class="info_right">
-							{{item.status === 1? '已预订':
-							item.status === 2? '待出票':
-							item.status === 3? '已出票':
-							item.status === 5? '已取消': ''}}
-						</view>
+            <view class="info_right" v-if="item.routing_type === 1">
+              {{item.status === 1? '已预订':
+              item.status === 2? '待出票':
+              item.status === 3? '已出票':
+              item.status === 5? '已取消': ''}}
+            </view>
           </view>
 
-          <view class="item_time">
+          <view
+            class="item_time"
+            v-if="item.pay_status === 1 && $timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes') >= 0"
+          >
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
-            <view class="time_text">剩余时间：</view>
-            <view class="time_number">15分钟</view>
+            <view class="time_text">剩余支付时间：</view>
+            <view
+              class="time_number"
+            >{{$timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</view>
           </view>
 
-          <view class="item_btn_box">
+          <view
+            class="item_btn_box"
+            v-if="item.pay_status === 1 && $timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes') >= 0"
+          >
             <view class="item_btn close_btn">取消订单</view>
             <view class="item_btn submit_btn">去支付</view>
           </view>
         </view>
+      </view>
+
+      <view class="no_data" v-if="!orderPageStatus">
+        <text>到底啦</text>
       </view>
     </scroll-view>
   </view>
@@ -145,15 +186,20 @@ export default {
       headerList: ["全部", "已预订", "待出票", "已出票", "已取消"], // 订单列表类别
       headerActive: 0, // 订单类别默认值 全部
       orderPageNumber: 1, // 当前订单页数
+      orderPageStatus: true, // 是否允许加载下一页数据
       orderList: [], // 订单列表数据
     };
   },
   methods: {
     checkedHeaderActive(index) {
       this.headerActive = index;
+      this.orderPageNumber = 1;
+      this.orderList = [];
+      this.getOrderList();
     },
 
     getOrderList() {
+      this.orderPageStatus = true;
       let data = {
         status:
           this.headerActive === 0
@@ -163,16 +209,41 @@ export default {
             : this.headerActive,
         page: this.orderPageNumber,
       };
-      orderApi.orderInterList().then((res) => {
+      orderApi.orderInterList(data).then((res) => {
         if (res.errorcode === 10000) {
-          this.orderList = res.data.data;
-          console.log(this.orderList);
+          if (this.orderList.length > 0) {
+            this.orderList.push.apply(this.orderList, res.data.data);
+          } else {
+            this.orderList = res.data.data;
+          }
+          if (this.orderPageNumber >= res.data.last_page) {
+            this.orderPageStatus = false;
+          }
         } else {
           uni.showToast({
             title: res.msg,
             icon: "none",
           });
         }
+      });
+    },
+    // 下一页数据
+    nextPageData() {
+      if (this.orderPageStatus) {
+        this.orderPageNumber = this.orderPageNumber + 1;
+        this.getOrderList();
+      } else {
+        uni.showToast({
+          title: "到底啦",
+          icon: "none",
+        });
+      }
+    },
+
+    // 跳转订单详情
+    jumpOrderDetails(data) {
+      uni.navigateTo({
+        url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data),
       });
     },
   },
@@ -259,8 +330,8 @@ export default {
 
   .content {
     flex: 1;
-		box-sizing: border-box;
-		overflow-y: auto;
+    box-sizing: border-box;
+    overflow-y: auto;
 
     .content_list {
       margin: 0 20upx 40upx;
@@ -279,11 +350,52 @@ export default {
         color: rgba(255, 255, 255, 1);
         margin-bottom: 20upx;
       }
+      .multiple_trips_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 92upx;
+        padding: 0 20upx;
+        border-bottom: 2upx solid rgba(241, 243, 245, 1);
+        background: #fff;
+        border-radius: 20upx 20upx 0 0;
+        .header_title {
+          font-size: 28upx;
+          font-weight: 400;
+          color: rgba(153, 153, 153, 1);
+        }
+        .header_price {
+          font-size: 42upx;
+          font-weight: bold;
+          color: rgba(255, 0, 0, 1);
+          text {
+            font-size: 24upx;
+            margin-right: 4upx;
+          }
+        }
+      }
       .list_item {
         background: rgba(255, 255, 255, 1);
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
         border-radius: 20upx;
         padding: 20upx 20upx 40upx;
+        &.multiple_trips_item {
+          border-radius: 0;
+          &:last-child {
+            border-radius: 0 0 20upx 20upx;
+            .item_header {
+              .info_right {
+                display: none;
+              }
+            }
+          }
+          &:not(:last-child) {
+            .item_time,
+            .item_btn_box {
+              display: none;
+            }
+          }
+        }
         .item_header {
           display: flex;
           align-items: center;
@@ -307,6 +419,13 @@ export default {
               font-weight: 400;
               color: rgba(255, 255, 255, 1);
               margin-right: 12upx;
+              &.return_trip {
+                background: linear-gradient(
+                  90deg,
+                  rgba(155, 236, 153, 1) 0%,
+                  rgba(133, 205, 131, 1) 100%
+                );
+              }
             }
             .title {
               font-size: 34upx;
@@ -314,7 +433,7 @@ export default {
               color: rgba(42, 42, 42, 1);
             }
           }
-          .item_perice {
+          .item_price {
             font-size: 42upx;
             font-weight: bold;
             color: rgba(255, 0, 0, 1);
@@ -322,6 +441,11 @@ export default {
               font-size: 24upx;
               margin-right: 4upx;
             }
+          }
+          .info_right {
+            font-size: 24upx;
+            font-weight: 400;
+            color: rgba(42, 42, 42, 1);
           }
         }
         .item_info {
@@ -404,6 +528,28 @@ export default {
             }
           }
         }
+      }
+    }
+
+    .no_data {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20upx;
+      font-size: 28upx;
+      font-weight: 400;
+      color: rgba(175, 185, 196, 1);
+      margin-bottom: 60upx;
+      text {
+        flex-shrink: 0;
+        margin: 0 10upx;
+      }
+      &::after,
+      &::before {
+        content: "";
+        display: block;
+        border-bottom: 2upx dashed #d9e1ea;
+        flex: 1;
       }
     }
   }
