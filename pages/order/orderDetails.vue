@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-08-05 18:31:00
+ * @LastEditTime: 2020-08-06 14:55:35
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -11,11 +11,16 @@
 
     <view class="details_header">
       <view class="header_top">
-        <view class="order_type">已预订</view>
+        <view class="order_type">
+          {{orderDetails.status === 1? '已预订':
+          orderDetails.status === 2? '待出票':
+          orderDetails.status === 3? '已出票':
+          orderDetails.status === 5? '已取消': ''}}
+          </view>
 
         <view class="order_price">
           <text class="price_text">总价 &yen;</text>
-          <text>1920</text>
+          <text>{{orderDetails.need_pay_amount || '金额数据错误'}}</text>
         </view>
       </view>
 
@@ -31,30 +36,134 @@
       </view>
     </view>
 
-		<view class="details_main">
-			<scroll-view :scroll-y="true" class="content">
-				<flight-info :flightInfo="false" :flightData="flightData"></flight-info>
+    <view class="details_main">
+      <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
+        <view class="main_list filght_info">
+          <view class="info_header">
+            <view class="header_type">单程</view>
+            <view class="header_time">
+              2020-04-18
+              <text>周六</text>
+            </view>
+          </view>
+          <view class="info_message">
+            <view class="message_box">
+              <view class="date">08:00</view>
+              <view class="address">重庆江北机场T3</view>
+            </view>
 
+            <view class="message_center">
+              <view class="date">2h30m</view>
+              <view class="center_icon"></view>
+              <view class="type">直飞</view>
+            </view>
 
-			</scroll-view>
-		</view>
+            <view class="message_box">
+              <view class="date">10:00</view>
+              <view class="address">首尔仁川机场T2</view>
+            </view>
+          </view>
 
+          <view class="filght_message">
+            <view class="message_icon"></view>
+            <view class="message_list">南航CZ2801</view>
+            <view class="message_list">空客A320</view>
+            <view class="message_list">有早餐</view>
+          </view>
 
+          <view class="filght_bottom">
+            <view class="bottom_list">W经济舱</view>
+            <view class="bottom_list">退改签规则</view>
+            <view class="bottom_list">每人托运2件，每件23KG</view>
+          </view>
+        </view>
+
+        <view class="main_list passenger">
+          <view class="main_list_title">出行信息</view>
+          <view class="passenger_list">
+            <view class="list_item" v-for="(item, index) in orderDetails.passengers" :key="index">
+              <view class="list_info">
+                <view class="info_type">{{item.passenger_type === 'ADT'?'成人':item.passenger_type === 'CNN'?'儿童':item.passenger_type === 'INF'?'婴儿':''}}票</view>
+                <view class="info_name">{{item.en_first_name}} {{item.en_last_name}}</view>
+                <view class="is_insurance" v-if="item.insure_count > 0"></view>
+                <view class="group_type">员工</view>
+              </view>
+
+              <view class="list_message">
+                <view class="message_title">{{item.credential === 0? '身份证': ''}}</view>
+                <view class="message_number">50000000000000</view>
+              </view>
+            </view>
+          </view>
+
+          <view class="contact">
+            <view class="contact_list">
+              <view class="list_title">联系人</view>
+              <view class="list_message">马冬梅</view>
+            </view>
+            <view class="contact_list">
+              <view class="list_title">联系电话</view>
+              <view class="list_message">13212341234</view>
+            </view>
+            <view class="contact_list">
+              <view class="list_title">已购保险</view>
+              <view class="list_message">保险</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="main_list certificate">
+          <view class="main_list_title">报销凭证</view>
+          <view class="certificate_message">
+            <view class="message_title">邮寄地址</view>
+            <view class="message_text">
+              <view>
+                <text>马冬梅</text>
+                <text>13212341234</text>
+              </view>
+              <view>重庆市渝中区长江一路</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="main_list order_message">
+          <view class="main_list_title">订单信息</view>
+          <view class="message_list">
+            <view class="list_item">
+              <view class="item_title">订单编号</view>
+              <view class="item_message">{{orderDetails.order_no}}</view>
+            </view>
+            <view class="list_item">
+              <view class="item_title">PNR</view>
+              <view class="item_message">{{orderDetails.pnr_code}}</view>
+            </view>
+            <view class="list_item">
+              <view class="item_title">订票员</view>
+              <view class="item_message">{{orderDetails.book_user}}</view>
+            </view>
+            <view class="list_item">
+              <view class="item_title">预定时间</view>
+              <view class="item_message">2020年8月6日14:41:19</view>
+            </view>
+            <view class="list_item">
+              <view class="item_title">备注</view>
+              <view class="item_message input-right-arrow"></view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 </template>
 
 <script>
 import orderApi from "@/api/order.js";
-import flightInfo from '@/components/flight_header.vue';  // 航班信息组件
 export default {
-	components: {
-		flightInfo
-	},
   data() {
     return {
-			iStatusBarHeight: 0,
-			orderDetails: {}, // 订单详情
-			flightData: {}, // 航班信息
+      iStatusBarHeight: 0,
+      orderDetails: {}, // 订单详情
+      flightData: {}, // 航班信息
     };
   },
   methods: {
@@ -66,35 +175,13 @@ export default {
       orderApi.orderInterDetails(data).then((res) => {
         console.log(res);
       });
-		},
-		
-		// 航班信息处理
-		getFlightData(){
-			this.flightData = {
-				flightType: this.orderDetails.routing_type,  // 行程类型
-				routes: [], // 行程数据
-				airline: '',
-				model: '',
-				food: ''
-			}
-			this.orderDetails.routes.forEach(item =>{
-				this.flightData.routes.push({
-					type: item.direction_type,  // 飞行方向
-					departure_time: item.departure_time,  // 起飞时间
-					arrive_time: item.arrive_time,  // 到达时间
-					fromTime: '',
-					fromAddress: '',
-					duration: item.duration,  // 飞行时长
-					toTime: '',
-					toAddress:'',
-				})
-			})
-		},
+    },
+
   },
   onLoad(data) {
-		this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-		console.log(JSON.parse(data.orderData))
-		this.orderDetails = JSON.parse(data.orderData)
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    console.log(JSON.parse(data.orderData));
+    this.orderDetails = JSON.parse(data.orderData);
     // this.getOrderDetails(data.orderNo);
   },
 };
@@ -169,11 +256,11 @@ export default {
         border-radius: 50upx;
         font-size: 24upx;
         font-weight: 400;
-				color: rgba(255, 255, 255, 1);
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-left: 32upx;
+        color: rgba(255, 255, 255, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 32upx;
         &.important_btn {
           border-color: #fff;
           background: #fff;
@@ -181,27 +268,301 @@ export default {
         }
       }
     }
-	}
-	.details_main{
-		position: relative;
-		flex: 1;
-		&::after{
-			content: '';
-			display: block;
-			background: #0070E2;
-			width: 100%;
-			height: 90upx;
-			position: absolute;
-			top: 0;
-			left: 0;
-			z-index: 0;
-		}
-		.content{
-			height: 100%;
-			overflow-y: auto;
-			position: relative;
-			z-index: 1;
-		}
-	}
+  }
+  .details_main {
+    position: relative;
+    flex: 1;
+    display: flex;
+    &::after {
+      content: "";
+      display: block;
+      background: #0070e2;
+      width: 100%;
+      height: 90upx;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .content {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      position: relative;
+      z-index: 1;
+      .main_list {
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
+        border-radius: 20upx;
+        margin: 0 20upx 20upx;
+        padding: 24upx 20upx 20upx;
+        .main_list_title {
+          font-size: 32upx;
+          font-weight: bold;
+          color: rgba(42, 42, 42, 1);
+        }
+        &.filght_info {
+          .info_header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20upx;
+            .header_type {
+              width: 80upx;
+              height: 30upx;
+              background: linear-gradient(
+                270deg,
+                rgba(0, 112, 226, 1) 0%,
+                rgba(86, 197, 255, 1) 100%
+              );
+              border-radius: 10upx;
+              font-size: 20upx;
+              font-weight: 400;
+              color: rgba(255, 255, 255, 1);
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12upx;
+            }
+            .header_time {
+              font-size: 24upx;
+              font-weight: 400;
+              color: rgba(42, 42, 42, 1);
+              text {
+                margin-left: 12upx;
+              }
+            }
+          }
+          .info_message {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 26upx;
+            .message_box {
+              .date {
+                font-size: 36upx;
+                font-weight: bold;
+                color: rgba(42, 42, 42, 1);
+                margin-bottom: 4upx;
+              }
+              .address {
+                font-size: 24upx;
+                font-weight: 400;
+                color: rgba(42, 42, 42, 1);
+              }
+            }
+            .message_center {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: column;
+              .date {
+                font-size: 22upx;
+                font-weight: 400;
+                color: rgba(175, 185, 196, 1);
+              }
+              .center_icon {
+                width: 112upx;
+                height: 20upx;
+                background: url(@/static/ticket_path.png) no-repeat center
+                  center;
+                background-size: contain;
+                display: block;
+              }
+              .type {
+                font-size: 22upx;
+                font-weight: 400;
+                color: rgba(175, 185, 196, 1);
+              }
+            }
+          }
+          .filght_message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .message_icon {
+              width: 24upx;
+              height: 24upx;
+              object-fit: contain;
+              margin-right: 6upx;
+            }
+            .message_list {
+              font-size: 22upx;
+              font-weight: 400;
+              color: rgba(175, 185, 196, 1);
+              display: inline-flex;
+              align-items: center;
+              &:not(:last-child) {
+                &::after {
+                  content: "";
+                  display: block;
+                  width: 2upx;
+                  height: 20upx;
+                  background: rgba(217, 225, 234, 1);
+                  margin: 0 8upx;
+                }
+              }
+            }
+          }
+          .filght_bottom {
+            display: flex;
+            align-items: center;
+            border-top: 2upx dashed rgba(217, 225, 234, 1);
+            margin-top: 20upx;
+            padding-top: 20upx;
+            justify-content: center;
+            .bottom_list {
+              font-size: 24upx;
+              font-weight: 400;
+              color: rgba(175, 185, 196, 1);
+              display: inline-flex;
+              align-items: center;
+              &:not(:last-child) {
+                &::after {
+                  content: "";
+                  display: block;
+                  width: 2upx;
+                  height: 20upx;
+                  background: rgba(217, 225, 234, 1);
+                  margin: 0 8upx;
+                }
+              }
+            }
+          }
+        }
+        &.passenger {
+          .passenger_list {
+            margin-top: 46upx;
+            .list_item {
+              &:not(:last-child) {
+                margin-bottom: 60upx;
+              }
+              &:last-child {
+                padding-bottom: 32upx;
+                border-bottom: 2upx solid rgba(241, 243, 245, 1);
+                margin-bottom: 30upx;
+              }
+              .list_info {
+                display: flex;
+                align-items: center;
+                margin-bottom: 34upx;
+                .info_type {
+                  width: 100upx;
+                  height: 30upx;
+                  border: 2upx solid rgba(127, 183, 240, 1);
+                  border-radius: 20upx;
+                  margin-right: 12upx;
+                  font-size: 20upx;
+                  font-weight: 400;
+                  color: rgba(127, 183, 240, 1);
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .info_name {
+                  font-size: 28upx;
+                  font-weight: bold;
+                  color: rgba(42, 42, 42, 1);
+                  margin-right: 8upx;
+                }
+                .is_insurance {
+                  background: url(@/static/insurance_icon.png) no-repeat center
+                    center;
+                  background-size: contain;
+                  width: 25upx;
+                  height: 30upx;
+                }
+                .group_type {
+                  margin-left: 28upx;
+                  font-size: 22upx;
+                  font-weight: 400;
+                  color: rgba(153, 153, 153, 1);
+                }
+              }
+              .list_message {
+                display: flex;
+                align-items: center;
+                .message_title {
+                  font-size: 28upx;
+                  font-weight: 400;
+                  color: rgba(42, 42, 42, 1);
+                  margin-right: 32upx;
+                }
+                .message_number {
+                  font-size: 28upx;
+                  font-weight: bold;
+                  color: rgba(42, 42, 42, 1);
+                }
+              }
+            }
+          }
+          .contact {
+            .contact_list {
+              display: flex;
+              align-items: center;
+              &:not(:last-child) {
+                margin-bottom: 36upx;
+              }
+              .list_title {
+                font-size: 28upx;
+                font-weight: 400;
+                color: rgba(102, 102, 102, 1);
+                width: 132upx;
+              }
+              .list_message {
+                font-size: 28upx;
+                font-weight: bold;
+                color: rgba(42, 42, 42, 1);
+              }
+            }
+          }
+        }
+        &.certificate {
+          .certificate_message {
+            margin-top: 32upx;
+            border-top: 2upx solid #f1f3f5;
+            padding-top: 34upx;
+            display: flex;
+            align-items: center;
+            .message_title {
+              font-size: 28upx;
+              font-weight: 400;
+              color: rgba(153, 153, 153, 1);
+              margin-right: 40upx;
+            }
+            .message_text {
+              font-size: 28upx;
+              font-weight: 400;
+              color: rgba(51, 51, 51, 1);
+            }
+          }
+        }
+        &.order_message {
+          .message_list {
+            margin-top: 40upx;
+            .list_item {
+              display: flex;
+              align-items: center; 
+              &:not(:last-child){
+                margin-bottom: 30upx;
+              }
+              .item_title {
+                font-size: 24upx;
+                font-weight: 400;
+                color: rgba(153, 153, 153, 1);
+                width: 100upx;
+              }
+              .item_message {
+                flex: 1;
+                text-align: right;
+                font-size: 24upx;
+                font-weight: 400;
+                color: rgba(42, 42, 42, 1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 </style>

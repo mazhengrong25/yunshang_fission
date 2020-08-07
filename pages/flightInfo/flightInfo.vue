@@ -6,7 +6,7 @@
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
-  <scroll-view class="flight_info">
+  <scroll-view :enable-back-to-top="true" class="flight_info">
     <yun-header
       :statusHeight="iStatusBarHeight"
       :headerAddress="ticketAddress"

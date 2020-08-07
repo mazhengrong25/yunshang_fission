@@ -9,7 +9,7 @@
   <view class="user_details">
     <yun-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)" centerTitle="用户信息"></yun-header>
 
-    <scroll-view :scroll-y="true" class="user_details_main">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="user_details_main">
       <view class="user_info box-shadow-style">
         <view class="detail_list">
           <view class="list_title">头像</view>

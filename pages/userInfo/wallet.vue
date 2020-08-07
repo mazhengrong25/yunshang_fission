@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-05 10:54:14
+ * @LastEditTime: 2020-08-07 16:28:39
  * @LastEditors: wish.WuJunLong
 -->
 <!--
@@ -42,7 +42,7 @@
         <swiper-item 
           v-for="(v ,i) in walletHeaderList"
           :key="i">
-          <scroll-view scroll-y="true" class="swiper-item" @scrolltolower="nextPageData()">
+          <scroll-view :enable-back-to-top="true" scroll-y="true" class="swiper-item" @scrolltolower="nextPageData()">
             <view class="item_list" 
             v-for="(item, index) in (i === 0?walletTotal:i === 1?walletIncome:i === 2?walletExpenditure:[])" 
             :key="index"

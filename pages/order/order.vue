@@ -9,7 +9,7 @@
   <view class="order">
     <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="订单"></yun-header>
 
-    <scroll-view :scroll-y="true" class="content">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
       <view class="order_list">
         <view class="order_left">
           <view class="order_icon">

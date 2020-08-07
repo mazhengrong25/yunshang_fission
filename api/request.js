@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-05 14:03:06
+ * @LastEditTime: 2020-08-06 09:50:38
  * @LastEditors: wish.WuJunLong
  */
 

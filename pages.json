@@ -1,6 +1,19 @@
 {
   "pages": [
     {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "云上航空"
+      }
+    },
+    {
+      "path": "pages/citySelect/citySelect",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    
+    {
       "path": "pages/order/orderList",
       "style": {
         "navigationStyle": "custom"
@@ -63,12 +76,6 @@
       }
     },
     {
-      "path": "pages/index/index",
-      "style": {
-        "navigationBarTitleText": "云上航空"
-      }
-    },
-    {
       "path": "pages/notice/notice",
       "style": {
         "navigationBarTitleText": "公告"
@@ -78,12 +85,6 @@
       "path": "pages/notice/noticeDetails",
       "style": {
         "navigationBarTitleText": "公告"
-      }
-    },
-    {
-      "path": "pages/citySelect/citySelect",
-      "style": {
-        "navigationBarTitleText": "城市选择"
       }
     },
     {

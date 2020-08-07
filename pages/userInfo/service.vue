@@ -11,7 +11,7 @@
     <view class="service_banner">
       <image src="@/static/service_banner.png" mode="aspectFit" />
     </view>
-    <scroll-view :scroll-y="true" class="serive_center">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="serive_center">
       <view class="serive_list">
         <view class="list_item">
           <view class="item_icon">

@@ -18,7 +18,7 @@
       <round-trip-header></round-trip-header>
     </view>
 
-    <scroll-view class="flight_list" :scroll-y="true">
+    <scroll-view :enable-back-to-top="true" class="flight_list" :scroll-y="true">
       <view
         @click="checkedFlight(item,index)"
         v-for="(item, index) in flightList"
@@ -106,7 +106,7 @@
         <text class="title_text">已选航班</text>
         <view class="close_btn" @click="closeVoyageInfo"></view>
       </view>
-      <scroll-view class="voyage_info_main" :scroll-y="true">
+      <scroll-view :enable-back-to-top="true" class="voyage_info_main" :scroll-y="true">
         <view class="info_item">
           <view class="item_title">
             <view class="type">去程</view>

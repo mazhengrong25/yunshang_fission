@@ -18,7 +18,7 @@
       <round-trip-header></round-trip-header>
     </view>
     <!-- 航班列表 -->
-    <scroll-view class="flight_list" :scroll-y="true">
+    <scroll-view :enable-back-to-top="true" class="flight_list" :scroll-y="true">
       <view
         v-for="(item, index) in flightList"
         :key="index"

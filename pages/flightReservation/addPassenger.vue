@@ -8,7 +8,7 @@
 <template>
   <view class="add_passenger">
     <yun-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)" centerTitle="新增乘机人"></yun-header>
-    <scroll-view :scroll-y="true" class="pssenger_main">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="pssenger_main">
       <view class="box-shadow-style">
         <view class="user_message_btn">
           <image class="user_message_btn_icon" src="@/static/add_passenger_icon.png" mode="contain" />

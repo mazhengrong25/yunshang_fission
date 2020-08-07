@@ -24,7 +24,7 @@
         </view>
       </view>
 
-      <scroll-view :scroll-y="true" class="mian_list">
+      <scroll-view :enable-back-to-top="true" :scroll-y="true" class="mian_list">
         <view
           class="list_item"
           v-for="(item, index) in passengerList"

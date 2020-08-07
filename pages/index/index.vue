@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-03 10:56:10
+ * @LastEditTime: 2020-08-07 18:14:53
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -180,6 +180,8 @@ import modelNotice from "@/components/modal_notice.vue"; // 公告版块
 import ticketInput from "@/components/ticket_input.vue"; // 航程选择
 
 import messageDialog from "@/components/message_dialog.vue"; // 信息弹窗内容
+
+import moment from "moment";
 export default {
   components: {
     modelSwiper,
@@ -215,7 +217,7 @@ export default {
         from: "北京", // 到达地
         multi_pass_to: "西安", // 多程出发地
         multi_pass_from: "武汉", // 多程到达地
-        toTime: '', // 出发时间
+        toTime: "", // 出发时间
         fromTime: "", // 到达时间
         fromDay: "周三", // 到达日期
       },
@@ -354,14 +356,28 @@ export default {
       });
     },
   },
-  created() {
+  onLoad() {
     this.setSwiperHeight();
   },
-  mounted () {
+  onShow() {
+    // 获取城市信息
+    if (uni.getStorageSync("city")) {
+      let cityData = JSON.parse(uni.getStorageSync("city"));
+      if(cityData.status === 'to'){
+        this.addressForm.to = cityData.data[cityData.data.length - 1];
+      }else if(cityData.status === 'from'){
+        this.addressForm.from = cityData.data[cityData.data.length - 1];
+      }
+      console.log(cityData);
+      uni.removeStorageSync("city");
+    }
+  },
+  mounted() {
     let date = new Date();
-    date.setTime(date.getTime()+24*60*60*1000);
-    this.addressForm['toTime'] = (date.getMonth()+1) + '月' + date.getDate() + '日'
-  }
+    date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
+    this.addressForm["toTime"] =
+      date.getMonth() + 1 + "月" + date.getDate() + "日";
+  },
 };
 </script>
 

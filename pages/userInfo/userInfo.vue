@@ -25,7 +25,7 @@
         </view>
       </view>
     </view>
-    <scroll-view :scroll-y="true" class="content">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
       <view class="header_box box-shadow-style">
         <view class="wallet_box">
           <view class="wallet_info">

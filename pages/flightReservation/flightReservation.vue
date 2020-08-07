@@ -12,7 +12,7 @@
       :headerBottom="Number(10)"
       :headerAddress="headerAddress"
     ></yun-header>
-    <scroll-view :scroll-y="true" class="flight_reservation_main">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="flight_reservation_main">
       <flight-header :flightInfo="false" :flightData="flightData"></flight-header>
 
       <view class="passenger_box box-shadow-style">

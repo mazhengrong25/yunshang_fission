@@ -8,7 +8,7 @@
 <template>
   <view class="wallet_details">
     <yun-header :statusHeight="iStatusBarHeight" :headerColor="true" centerTitle="详情"></yun-header>
-    <scroll-view :scroll-y="true" class="details_view">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="details_view">
       <view class="details_header">
         <view class="header_icon">
           <image
