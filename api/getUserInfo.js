@@ -2,7 +2,7 @@
  * @Description: 获取用户信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 10:34:01
- * @LastEditTime: 2020-08-04 15:33:56
+ * @LastEditTime: 2020-08-10 13:52:46
  * @LastEditors: wish.WuJunLong
  */ 
 import request from '@/api/request';
@@ -59,11 +59,21 @@ function getOrderInterPay (data) {
 	})
 }
 
+
+// 退出登录
+function signOut(){
+	return request({
+		method: 'POST',
+		url: '/api/logout'
+	})
+}
+
 export default{
 	getUserInfo,
 	getWallet,
 	editPassword,
 	getWalletList,
 	getOrderPay,
-	getOrderInterPay
+	getOrderInterPay,
+	signOut
 }

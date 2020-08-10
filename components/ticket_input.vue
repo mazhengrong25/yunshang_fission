@@ -1,8 +1,8 @@
 <!--
- * @Description: 乘机地址选组件
+ * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-08-07 18:32:14
+ * @LastEditTime: 2020-08-10 14:06:29
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -186,10 +186,13 @@ export default {
       height: 65upx;
       line-height: 50upx;
       border-bottom: 1px solid #e0e0e0;
-      font-size: 42upx;
+      font-size: 40upx;
       font-weight: bold;
       color: rgba(42, 42, 42, 1);
       width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       &.from_input {
         text-align: right;

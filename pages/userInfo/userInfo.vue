@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-08-05 16:13:22
+ * @LastEditTime: 2020-08-10 13:55:20
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -118,7 +118,6 @@
 
       <view class="sign_out" @click="signOut()">退出登录</view>
     </scroll-view>
-
   </view>
 </template>
 
@@ -183,22 +182,29 @@ export default {
       });
     },
 
-
     // 跳转客服服务
-    jumpService(){
-       uni.navigateTo({
+    jumpService() {
+      uni.navigateTo({
         url: "/pages/userInfo/service",
       });
     },
 
-
     // 退出登录
-    signOut(){
-        
+    signOut() {
+      userInfo.signOut().then((res) => {
+        if (res.errorcode === 10000) {
+          uni.clearStorageSync();
+          uni.reLaunch({
+            url: "/pages/login/login",
+          });
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
     },
-
-
-
   },
   created() {
     this.getUserInfo();

@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-08-07 18:11:07
+ * @LastEditTime: 2020-08-10 14:54:04
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -15,11 +15,12 @@
         placeholder-style="font-size: 24rpx;font-weight:500;color:rgba(206,206,208,1);"
         v-model="searchCity"
         placeholder="输入城市名称或者字母"
+        v-on:input="openSearchStauts()"
       />
       <view class="close_input" v-if="searchCity !== ''" @click="closeSearch">取消</view>
     </view>
 
-    <view class="city_swiper_header">
+    <view class="city_swiper_header" v-if="!searchCity">
       <view :class="['header_btn',{'acive': isCityActive}]" @click="checkedCityBtn(true)">国内</view>
       <view :class="['header_btn',{'acive': !isCityActive}]" @click="checkedCityBtn(false)">国际/中国港澳台</view>
     </view>
@@ -32,8 +33,8 @@
       @scroll="anchorFixed"
       class="city_main"
     >
-      <view class="show_anchor_info" v-if="showAnchorBox">{{intoindex}}</view>
-      <view class="address_list_main">
+      <view class="show_anchor_info" v-if="showAnchorBox && !searchCity">{{intoindex}}</view>
+      <view class="address_list_main" v-if="!searchCity">
         <view class="gps_address address_tag_list" v-if="isCityActive">
           <view class="address_title">当前定位</view>
           <view class="address_list_box">
@@ -53,7 +54,7 @@
         </view>
       </view>
 
-      <view class="city_list">
+      <view class="city_list" v-if="!searchCity">
         <view :class="['city_anchor',{'anchor_fixed':anchorFixedStyle}]">
           <view class="anchor" @click="jumpAnchor('#')">#</view>
           <view
@@ -77,6 +78,21 @@
         </view>
       </view>
 
+      <view class="city_list">
+        <view class="list_item">
+          <view
+            class="item_city"
+            v-for="(item, index) in searchList"
+            :key="index"
+            @click="getCityData(item)"
+          >
+            <view class="city_info">{{item[item.length - 1]}} </view>
+            <view class="city_info"> {{item[1]}}</view>
+            <view class="city_code">{{item[item.length - 2]}}</view>
+          </view>
+        </view>
+      </view>
+
       <view class="not_city" v-if="notCity">
         <view>抱歉，找不到相关信息</view>
         <view>请核实城市/国家名称是否有误</view>
@@ -92,9 +108,11 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
-			searchCity: "", // 城市搜索
-			
-			cityType: '',  // 选择城市类型 to 去程、form 返程
+      searchCity: "", // 城市搜索
+
+      searchList: [], // 城市搜索列表
+
+      cityType: "", // 选择城市类型 to 去程、form 返程
 
       HotCityHight: 0, // 热门城市高度
       anchorFixedStyle: false, // 锚点定位样式 true - fixed固定
@@ -210,32 +228,50 @@ export default {
 
     // 获取城市信息 填入地址信息
     getCityData(val) {
-			let data = {
-				type: 'city',
-				status: this.cityType,
-				data: val
-			}
-			uni.setStorageSync('city', JSON.stringify(data));
+      let data = {
+        type: "city",
+        status: this.cityType,
+        data: val,
+      };
+      uni.setStorageSync("city", JSON.stringify(data));
       uni.switchTab({
         url: "/pages/index/index",
       });
     },
+
+    // 筛选输入框状态
+    openSearchStauts() {
+      this.searchList = [];
+      if (this.searchCity) {
+        city.domesticCity.filter((item) => {
+          if (
+            String(item)
+              .toLowerCase()
+              .indexOf(this.searchCity.toLowerCase()) !== -1
+          ) {
+            this.searchList.push(item);
+          }
+        });
+      }
+    },
   },
 
   updated() {
-    let view = uni.createSelectorQuery().select(".address_list_main");
-    view
-      .boundingClientRect((data) => {
-        this.HotCityHight = data.height;
-      })
-      .exec();
+    if (!this.searchCity) {
+      let view = uni.createSelectorQuery().select(".address_list_main");
+      view
+        .boundingClientRect((data) => {
+          this.HotCityHight = data.height;
+        })
+        .exec();
+    }
   },
 
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.getUserAddress();
-		this.getAirportData();
-		this.cityType = data.type
+    this.getAirportData();
+    this.cityType = data.type;
   },
 };
 </script>
