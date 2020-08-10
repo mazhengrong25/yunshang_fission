@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-08-10 14:54:04
+ * @LastEditTime: 2020-08-10 17:27:00
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -72,28 +72,32 @@
             :key="oindex"
             @click="getCityData(oitem)"
           >
-            <view class="city_info">{{oitem[oitem.length - 1]}}</view>
-            <view class="city_code">{{oitem[oitem.length - 2]}}</view>
+            <view class="city_info">{{oitem.city_name}}</view>
+            <view class="city_code">{{oitem.air_port}}</view>
           </view>
         </view>
       </view>
 
       <view class="city_list">
-        <view class="list_item">
+        <view class="list_item" v-for="(item, index) in searchList" :key="index">
+          <view class="city_province">
+            <view class="city_type">{{item.type}}</view>
+            <view class="city_text">{{item.unit}}</view>
+          </view>
           <view
             class="item_city"
-            v-for="(item, index) in searchList"
-            :key="index"
-            @click="getCityData(item)"
+            @click="getCityData(oitem)"
+            v-for="(oitem, oindex) in item.data"
+            :key="oindex"
           >
-            <view class="city_info">{{item[item.length - 1]}} </view>
-            <view class="city_info"> {{item[1]}}</view>
-            <view class="city_code">{{item[item.length - 2]}}</view>
+            <view class="city_airport">{{oitem.air_port_name}}</view>
+            <view class="city_code">{{oitem.air_port}}</view>
+            <view class="city_name">{{oitem.city_name}}</view>
           </view>
         </view>
       </view>
 
-      <view class="not_city" v-if="notCity">
+      <view class="not_city" v-if="searchList.length <= 0 && searchCity">
         <view>抱歉，找不到相关信息</view>
         <view>请核实城市/国家名称是否有误</view>
       </view>
@@ -102,14 +106,14 @@
 </template>
 
 <script>
-import airport from "@/api/airport.js";
 import city from "@/api/city.js";
 export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      searchCity: "", // 城市搜索
+      cityAirList: [], // 城市机场原始数据
 
+      searchCity: "", // 城市搜索
       searchList: [], // 城市搜索列表
 
       cityType: "", // 选择城市类型 to 去程、form 返程
@@ -173,27 +177,27 @@ export default {
       });
     },
 
-    // 处理城市列表
-    getAirportData() {
-      city.domesticCity.forEach((item) => {
-        this.cityUnitList.push(item[3][0].toUpperCase());
-      });
-      this.cityUnitList = [...new Set(this.cityUnitList)].sort();
-      this.cityUnitList.forEach((oitem, oindex) => {
-        this.cityList.push({
-          unit: "",
-          data: [],
+    // 获取城市机场列表
+    getAirData() {
+      let data = {
+        range: "CN",
+      };
+      city.getAir(data).then((res) => {
+        this.cityAirList = res;
+        this.cityUnitList.forEach((item, index) => {
+          this.cityList.push({
+            unit: "",
+            data: [],
+          });
+          res.forEach((oitem) => {
+            if (String(oitem.city_ename[0]).toUpperCase() === item) {
+              this.cityList[index]["unit"] = item;
+              this.cityList[index]["data"].push(oitem);
+            }
+          });
         });
-        city.domesticCity.forEach((item, index) => {
-          if (item[3][0].toUpperCase() === oitem) {
-            this.cityList[oindex]["unit"] = oitem;
-            this.cityList[oindex]["data"].push(item);
-          }
-        });
-      });
 
-      this.cityList.sort((a, b) => {
-        return a.unit.localeCompare(b.unit);
+        console.log(this.cityList);
       });
     },
 
@@ -242,17 +246,50 @@ export default {
     // 筛选输入框状态
     openSearchStauts() {
       this.searchList = [];
+      let provinceList = [];
       if (this.searchCity) {
-        city.domesticCity.filter((item) => {
+        this.cityAirList.forEach((item) => {
           if (
-            String(item)
+            JSON.stringify(item)
               .toLowerCase()
               .indexOf(this.searchCity.toLowerCase()) !== -1
           ) {
-            this.searchList.push(item);
+            provinceList.push(item.province);
           }
         });
+        [...new Set(provinceList)].forEach((item, index) => {
+          console.log(item);
+          this.searchList.push({
+            unit: item,
+            type:
+              item === "北京"
+                ? "首都"
+                : item === "上海" || item === "天津" || item === "重庆"
+                ? "直辖市"
+                : item === "内蒙古" ||
+                  item === "广西" ||
+                  item === "西藏" ||
+                  item === "宁夏" ||
+                  item === "新疆"
+                ? "自治区"
+                : item === "香港" || item === "澳门"
+                ? "特别行政区"
+                : "省份",
+            data: [],
+          });
+          this.cityAirList.forEach((oitem) => {
+            if (
+              JSON.stringify(oitem)
+                .toLowerCase()
+                .indexOf(this.searchCity.toLowerCase()) !== -1 &&
+              this.searchList[index].unit === oitem.province
+            ) {
+              this.searchList[index].data.push(oitem);
+            }
+          });
+        });
       }
+      console.log(this.searchList);
     },
   },
 
@@ -270,7 +307,11 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.getUserAddress();
-    this.getAirportData();
+
+    this.cityUnitList = [...Array(26).keys()].map((i) =>
+      String.fromCharCode(i + 65)
+    ); // 生成A-Z数组
+    this.getAirData();
     this.cityType = data.type;
   },
 };
@@ -425,10 +466,10 @@ export default {
         font-size: 24upx;
         font-weight: 300;
         color: rgba(0, 112, 226, 1);
-        line-height: 40upx;
+        line-height: 36upx;
         &.anchor_fixed {
           position: fixed;
-          top: 25vh;
+          top: 20vh;
         }
         .anchor {
           width: 100upx;
@@ -438,6 +479,47 @@ export default {
         }
       }
       .list_item {
+        .city_province {
+          display: flex;
+          align-items: center;
+          position: relative;
+          border-bottom: 2rpx solid rgba(214, 214, 214, 0.5);
+          padding: 50upx 0 24upx;
+          font-size: 24upx;
+          font-weight: 500;
+          color: rgba(51, 51, 51, 1);
+          .city_type {
+            padding: 0 6upx;
+            height: 30upx;
+            background: rgba(226, 121, 0, 1, 0.6);
+            border-radius: 6upx;
+            margin-right: 20upx;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20upx;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 1);
+          }
+
+          & ~ .item_city {
+            margin-left: 58upx;
+            &::before {
+              content: "";
+              width: 12upx;
+              height: 12upx;
+              border: 2upx solid rgba(175, 185, 196, 0.3);
+              border-top: none;
+              border-right: none;
+            }
+            .city_name {
+              margin-left: auto;
+              font-size: 24upx;
+              font-weight: 500;
+              color: rgba(175, 185, 196, 1);
+            }
+          }
+        }
         .item_unit {
           font-size: 28upx;
           font-weight: 500;
@@ -446,10 +528,16 @@ export default {
         }
         .item_city {
           border-bottom: 2upx solid rgba(214, 214, 214, 0.5);
-          padding: 24upx 0 18upx;
+          padding: 32upx 0 28upx;
           display: flex;
           align-items: center;
           .city_info {
+            font-size: 28upx;
+            font-weight: 500;
+            color: rgba(42, 42, 42, 1);
+          }
+          .city_airport {
+            margin-left: 16rpx;
             font-size: 28upx;
             font-weight: 500;
             color: rgba(42, 42, 42, 1);

@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-07 18:14:53
+ * @LastEditTime: 2020-08-10 17:26:18
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -364,9 +364,9 @@ export default {
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
       if(cityData.status === 'to'){
-        this.addressForm.to = cityData.data[cityData.data.length - 1];
+        this.addressForm.to = cityData.data.city_name;
       }else if(cityData.status === 'from'){
-        this.addressForm.from = cityData.data[cityData.data.length - 1];
+        this.addressForm.from = cityData.data.city_name;
       }
       console.log(cityData);
       uni.removeStorageSync("city");

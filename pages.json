@@ -1,6 +1,12 @@
 {
   "pages": [
     {
+      "path": "pages/dateSelect/dateSelect",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "云上航空"
@@ -12,7 +18,7 @@
         "navigationStyle": "custom"
       }
     },
-    
+
     {
       "path": "pages/order/orderList",
       "style": {

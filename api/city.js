@@ -1,5 +1,19 @@
+import request from '@/api/request';
 
+// 获取城市机场列表
+function getAir (data) {
+	return request({
+		method: "GET",
+    url: '/api/getAirList',
+    data: data
+	})
+}
 
+export default{
+	getAir,
+}
+
+/** 
 const domesticCity = [
     ["SHF", "石河子花园机场", "石河子花园机场", "SHZ ", "ShiHeZi", "SHF", "石河子"],
     ["PKX", "大兴国际机场", "大兴国际机场", "BJ", "BeiJing", "BJS", "北京"],
@@ -231,3 +245,4 @@ const domesticCity = [
 module.exports = {
   domesticCity: domesticCity
 }
+*/
