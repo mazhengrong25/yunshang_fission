@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-10 17:26:18
+ * @LastEditTime: 2020-08-11 11:06:34
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -218,6 +218,7 @@ export default {
         multi_pass_to: "西安", // 多程出发地
         multi_pass_from: "武汉", // 多程到达地
         toTime: "", // 出发时间
+        toDay: "明天",
         fromTime: "", // 到达时间
         fromDay: "周三", // 到达日期
       },
@@ -370,6 +371,20 @@ export default {
       }
       console.log(cityData);
       uni.removeStorageSync("city");
+    }
+    // 获取时间日期
+    if (uni.getStorageSync("time")) {
+      let timeData = JSON.parse(uni.getStorageSync("time"));
+       if(timeData.status === 'start'){
+        this.addressForm.toTime = timeData.month;
+        this.addressForm.toDay = timeData.week;
+      }else if(timeData.status === 'end'){
+        this.addressForm.fromTime = timeData.month;
+        this.addressForm.fromDay = timeData.week;
+      }
+      
+      console.log(this.addressForm);
+      uni.removeStorageSync("time");
     }
   },
   mounted() {

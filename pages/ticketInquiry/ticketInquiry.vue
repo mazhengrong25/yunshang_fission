@@ -2,7 +2,7 @@
  * @Description: 机票查询
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-07-29 15:23:18
+ * @LastEditTime: 2020-08-11 11:20:09
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -74,22 +74,22 @@
       </view>
     </view>
 
-		<view class="footer_box">
-			<flight-filter @openFilter="openFilter"></flight-filter>
-		</view>
+    <view class="footer_box">
+      <flight-filter @openFilter="openFilter"></flight-filter>
+    </view>
 
-		<flight-filter-dialog ref="filterDialog"></flight-filter-dialog>
-    
+    <flight-filter-dialog ref="filterDialog"></flight-filter-dialog>
   </view>
 </template>
 
 <script>
+import ticket from "@/api/ticketInquiry.js";
 import flightFilter from "@/components/flight_filter.vue"; // 航班筛选
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
 export default {
   components: {
-		flightFilter,
-		flightFilterDialog
+    flightFilter,
+    flightFilterDialog,
   },
   data() {
     return {
@@ -98,7 +98,7 @@ export default {
       ticketAddress: {
         // 导航栏地址
         to: "重庆",
-        from: "北京"
+        from: "北京",
       },
 
       ticketTimeList: [
@@ -106,33 +106,33 @@ export default {
           // 日期选择列表
           day: "今天",
           number: "17",
-          price: 475
+          price: 475,
         },
         {
           day: "明天",
           number: "04-18",
-          price: 475
+          price: 475,
         },
         {
           day: "后天",
           number: "19",
-          price: 475
+          price: 475,
         },
         {
           day: "周一",
           number: "20",
-          price: 475
+          price: 475,
         },
         {
           day: "周二",
           number: "21",
-          price: 475
+          price: 475,
         },
         {
           day: "周三",
           number: "22",
-          price: 475
-        }
+          price: 475,
+        },
       ],
       activeTimeNumber: "04-18", // 日期选择
 
@@ -147,7 +147,7 @@ export default {
           cabin: "经济舱",
           reward: "20",
           airline: "南航CZ2801",
-          model: "空客A320(中)"
+          model: "空客A320(中)",
         },
         {
           startTime: "08:00",
@@ -162,7 +162,7 @@ export default {
           cabin: "经济舱4.8折",
           reward: "",
           airline: "南航CZ2801",
-          model: "空客A320(中)"
+          model: "空客A320(中)",
         },
         {
           startTime: "09:00",
@@ -174,7 +174,7 @@ export default {
           cabin: "经济舱",
           reward: "",
           airline: "南航CZ2801",
-          model: "空客A320(中)"
+          model: "空客A320(中)",
         },
         {
           startTime: "08:00",
@@ -186,7 +186,7 @@ export default {
           cabin: "经济舱",
           reward: "",
           airline: "南航CZ2801",
-          model: "空客A320(中)"
+          model: "空客A320(中)",
         },
         {
           startTime: "08:00",
@@ -198,7 +198,7 @@ export default {
           cabin: "经济舱",
           reward: "20",
           airline: "南航CZ2801",
-          model: "空客A320(中)"
+          model: "空客A320(中)",
         },
         {
           startTime: "08:00",
@@ -210,17 +210,34 @@ export default {
           cabin: "经济舱",
           reward: "",
           airline: "南航CZ2801",
-          model: "空客A320(中)"
-        }
+          model: "空客A320(中)",
+        },
       ],
-
     };
   },
-  onLoad: function(data) {
-    this.ticketType = data.type;
-    console.log(data);
-  },
   methods: {
+    // 获取航班信息
+    getTicketData() {
+      let data = {
+        departure: "PEK", // 起飞机场三字码
+        arrival: "CKG", // 到达机场三字码
+        departureTime: "2020-09-06", // 起飞时间
+        airline: "", // 航司二字码
+      };
+      ticket.getTicket(data).then((res) => {
+        console.log(res);
+        if(res.errorcode === 10000){
+          this.ticketList = res.data.IBE
+        }else{
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
+      console.log(this.ticketList)
+    },
+
     // 选择日期
     clickBtn(val) {
       console.log(val);
@@ -230,26 +247,28 @@ export default {
     // 返回日历选择
     backCalendar() {},
 
-
     // 打开筛选
     openFilter() {
-      this.$refs.filterDialog.openFilterDialog()
+      this.$refs.filterDialog.openFilterDialog();
     },
     // 关闭弹出框
     closeFilterDialog() {
-      this.$refs.filterDialog.closeFilterDialog()
+      this.$refs.filterDialog.closeFilterDialog();
     },
 
     // 跳转航程信息
     jumpFlightInfo(data) {
       uni.navigateTo({
-        url: "/pages/flightInfo/flightInfo"
+        url: "/pages/flightInfo/flightInfo",
       });
-    }
+    },
   },
-  onLoad() {
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-  }
+    this.ticketType = data.type;
+    console.log(data);
+    this.getTicketData();
+  },
 };
 </script>
 
@@ -474,18 +493,17 @@ export default {
         }
       }
     }
-	}
-	
-	.footer_box{
-		height: 100upx;
+  }
+
+  .footer_box {
+    height: 100upx;
     width: 100vw;
     border-top: 2upx solid rgba(229, 229, 229, 1);
     background-color: #fff;
-		padding-bottom: var(--status-bar-height);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
+    padding-bottom: var(--status-bar-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>

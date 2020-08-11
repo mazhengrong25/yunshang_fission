@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-08-10 14:06:29
+ * @LastEditTime: 2020-08-11 11:05:47
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -21,17 +21,17 @@
       </view>
 
       <view class="ticket_time">
-        <view class="ticket_to_time time_box">
+        <view class="ticket_to_time time_box" @click="jumpDate('start')">
           <view class="time_true" v-if="addressForm.toTime">
             <view class="time">{{addressForm.toTime}}</view>
-            <view class="time_day">明天出发</view>
+            <view class="time_day">{{addressForm.toDay}}出发</view>
           </view>
           <view v-else class="time_false">
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />
             <text class="time_text">出发日期</text>
           </view>
         </view>
-        <view class="ticket_from_time time_box">
+        <view class="ticket_from_time time_box" @click="jumpDate('end')">
           <view class="time_true" v-if="addressForm.fromTime">
             <image class="close_from_btn" src="@/static/close.png" @click="closeFromBtn" />
             <view class="time">{{addressForm.fromTime}}</view>
@@ -64,7 +64,7 @@
         <view class="ticket_to_time time_box">
           <view class="time_true" v-if="addressForm.toTime">
             <view class="time">{{addressForm.toTime}}</view>
-            <view class="time_day">明天出发</view>
+            <view class="time_day">{{addressForm.toDay}}出发</view>
           </view>
           <view v-else class="time_false">
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />
@@ -138,6 +138,12 @@ export default {
       console.log("清除返程");
       this.$emit("closeFromBtn", true);
     },
+    // 跳转日历
+    jumpDate(val){
+      uni.navigateTo({
+        url: "/pages/dateSelect/dateSelect?type="+val,
+      });
+    }
   },
 };
 </script>

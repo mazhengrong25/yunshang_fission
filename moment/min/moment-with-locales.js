@@ -17750,7 +17750,7 @@
         },
     });
 
-    hooks.locale('en');
+    hooks.locale('zh-cn');
 
     return hooks;
 
