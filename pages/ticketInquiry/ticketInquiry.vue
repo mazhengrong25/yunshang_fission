@@ -2,7 +2,7 @@
  * @Description: 机票查询
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-11 11:20:09
+ * @LastEditTime: 2020-08-11 18:32:05
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -32,10 +32,9 @@
       <view class="ticket_box">
         <view
           class="ticket_list"
-          v-for="(item, index) in ticketList"
+          v-for="(item, index) in ticketListData"
           :key="index"
-          @click="jumpFlightInfo(item)"
-        >
+          @click="jumpFlightInfo(item)">
           <view class="ticket_left">
             <view class="ticket_message">
               <view class="ticket_start ticket_time">
@@ -70,7 +69,50 @@
             <view class="ticket_cabin">{{item.cabin}}</view>
             <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
           </view>
-        </view>
+        </view> 
+
+        <view
+          class="ticket_list"
+          v-for="(item, index) in ticketList"
+          :key="index"
+          @click="jumpFlightInfo(item)">
+          <view class="ticket_left">
+            <view class="ticket_message">
+              <view class="ticket_start ticket_time">
+                <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'hh:mm')}}</view>
+                <view class="ticket_address">{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal}}</view>
+              </view>
+              <view class="ticket_arrow">
+                <view>{{item.segments[0].duration}}</view>
+                <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
+              </view>
+              <view class="ticket_end ticket_time">
+                <view class="ticket_date">
+                  {{$dateTool(item.segments[0].arrTime,'hh:mm')}}
+                  <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
+                </view>
+                <view class="ticket_address">{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal}}</view>
+              </view>
+            </view>
+
+            <view class="ticket_details">
+              <image class="ticket_details_icon" :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image" mode="contain" />
+              {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode !== '--'?item.segments[0].aircraftCode: ''}}
+            </view>
+          </view>
+
+          <view class="ticket_right">
+            <view class="ticket_price">
+              <text class="currency">&yen;</text>
+              {{item.price || '加载中'}}
+            </view>
+            <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
+            <view class="ticket_cabin">{{item.cabin}}</view>
+            <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
+          </view>
+        </view> 
+
+
       </view>
     </view>
 
@@ -135,8 +177,8 @@ export default {
         },
       ],
       activeTimeNumber: "04-18", // 日期选择
-
-      ticketList: [
+      ticketList: [],
+      ticketListData: [
         {
           startTime: "08:00",
           startAddress: "江北T3",
@@ -148,82 +190,13 @@ export default {
           reward: "20",
           airline: "南航CZ2801",
           model: "空客A320(中)",
-        },
-        {
-          startTime: "08:00",
-          startAddress: "江北T3",
-          voyageTime: "2h30m",
-          voyageType: "转 香港",
-          moreTime: 1,
-          overseas: 4088,
-          endTime: "10:30",
-          endAddress: "大兴",
-          price: "280",
-          cabin: "经济舱4.8折",
-          reward: "",
-          airline: "南航CZ2801",
-          model: "空客A320(中)",
-        },
-        {
-          startTime: "09:00",
-          startAddress: "江北T3",
-          voyageTime: "2h45m",
-          endTime: "11:45",
-          endAddress: "首都T3",
-          price: "300",
-          cabin: "经济舱",
-          reward: "",
-          airline: "南航CZ2801",
-          model: "空客A320(中)",
-        },
-        {
-          startTime: "08:00",
-          startAddress: "江北T3",
-          voyageTime: "2h30m",
-          endTime: "10:30",
-          endAddress: "大兴",
-          price: "390",
-          cabin: "经济舱",
-          reward: "",
-          airline: "南航CZ2801",
-          model: "空客A320(中)",
-        },
-        {
-          startTime: "08:00",
-          startAddress: "江北T3",
-          voyageTime: "2h30m",
-          endTime: "10:30",
-          endAddress: "大兴",
-          price: "390",
-          cabin: "经济舱",
-          reward: "20",
-          airline: "南航CZ2801",
-          model: "空客A320(中)",
-        },
-        {
-          startTime: "08:00",
-          startAddress: "江北T3",
-          voyageTime: "2h30m",
-          endTime: "10:30",
-          endAddress: "大兴",
-          price: "390",
-          cabin: "经济舱",
-          reward: "",
-          airline: "南航CZ2801",
-          model: "空客A320(中)",
-        },
+        }
       ],
     };
   },
   methods: {
     // 获取航班信息
-    getTicketData() {
-      let data = {
-        departure: "PEK", // 起飞机场三字码
-        arrival: "CKG", // 到达机场三字码
-        departureTime: "2020-09-06", // 起飞时间
-        airline: "", // 航司二字码
-      };
+    getTicketData(data) {
       ticket.getTicket(data).then((res) => {
         console.log(res);
         if(res.errorcode === 10000){
@@ -265,9 +238,20 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.ticketType = data.type;
-    console.log(data);
-    this.getTicketData();
+    this.ticketData = JSON.parse(data.data);
+    console.log(this.ticketData);
+    // 组装数据
+    this.ticketAddress = {
+      to: this.ticketData.to.city_name,
+      from: this.ticketData.from.city_name
+    }
+    let airMessage = {
+        departure: this.ticketData.to.city_code, // 起飞机场三字码
+        arrival: this.ticketData.from.city_code, // 到达机场三字码
+        departureTime: this.ticketData.toTime.date, // 起飞时间
+        airline: "", // 航司二字码
+      };
+    this.getTicketData(airMessage);
   },
 };
 </script>

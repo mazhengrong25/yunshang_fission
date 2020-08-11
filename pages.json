@@ -1,9 +1,16 @@
 {
   "pages": [
+   
     {
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "云上航空"
+      }
+    },
+    {
+      "path": "pages/ticketInquiry/ticketInquiry",
+      "style": {
+        "navigationStyle": "custom"
       }
     },
     {
@@ -94,12 +101,7 @@
         "navigationBarTitleText": "公告"
       }
     },
-    {
-      "path": "pages/ticketInquiry/ticketInquiry",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
+    
     {
       "path": "pages/flightInfo/flightInfo",
       "style": {

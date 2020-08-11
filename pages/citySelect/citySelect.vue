@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-08-10 17:27:00
+ * @LastEditTime: 2020-08-11 15:25:09
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -190,7 +190,7 @@ export default {
             data: [],
           });
           res.forEach((oitem) => {
-            if (String(oitem.city_ename[0]).toUpperCase() === item) {
+            if (String(oitem.city_ename[0]).toUpperCase() === item && oitem.air_port !== 'MY2') {
               this.cityList[index]["unit"] = item;
               this.cityList[index]["data"].push(oitem);
             }

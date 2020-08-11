@@ -2,12 +2,12 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-11 13:46:40
+ * @LastEditTime: 2020-08-11 14:26:00
  * @LastEditors: wish.WuJunLong
  */
 
-let loginInfo = uni.getStorageSync("loginInfo");
 function getToken() {
+  let loginInfo = uni.getStorageSync("loginInfo");
   if (loginInfo) {
     let currentTime = new Date();
     let loginTime = new Date(loginInfo.loginTime);
@@ -25,9 +25,7 @@ function getToken() {
               account: uni.getStorageSync("loginInfo").account,
               password: uni.getStorageSync("loginInfo").password,
               token: res.data.data.access_token,
-              loginTime: new Date(
-                new Date().getTime() + (3600 * 1000)
-              ),
+              loginTime: new Date(new Date().getTime() + 3600 * 1000),
             };
             uni.setStorageSync("loginInfo", loginInfo);
           }
@@ -37,7 +35,7 @@ function getToken() {
   }
 }
 
-const request = async (config, type) => {
+const request = (config, type) => {
   uni.showLoading({
     title: "加载中",
   });
@@ -60,9 +58,9 @@ const request = async (config, type) => {
     config.data = {};
   }
 
-  await getToken()
+  getToken();
 
-  let promise = await new Promise(function (resolve, reject) {
+  let promise = new Promise(function (resolve, reject) {
     uni
       .request(config)
       .then((responses) => {

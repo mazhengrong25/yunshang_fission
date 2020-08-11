@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-11 11:06:34
+ * @LastEditTime: 2020-08-11 15:11:33
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -232,6 +232,8 @@ export default {
       passengerFormBack: {}, // 乘客信息
 
       popupCurrent: 0, // 弹窗轮播下标
+
+      airMessage: {},
     };
   },
   onLoad() {},
@@ -352,8 +354,10 @@ export default {
     // 提交按钮
     submitTicket() {
       console.log("提交");
+      this.airMessage['type'] = this.ticketType
+      console.log(this.airMessage)
       uni.navigateTo({
-        url: "/pages/ticketInquiry/ticketInquiry?type=" + this.ticketType,
+        url: "/pages/ticketInquiry/ticketInquiry?data=" + JSON.stringify(this.airMessage),
       });
     },
   },
@@ -366,8 +370,10 @@ export default {
       let cityData = JSON.parse(uni.getStorageSync("city"));
       if(cityData.status === 'to'){
         this.addressForm.to = cityData.data.city_name;
+        this.airMessage['to'] = cityData.data
       }else if(cityData.status === 'from'){
         this.addressForm.from = cityData.data.city_name;
+        this.airMessage['from'] = cityData.data
       }
       console.log(cityData);
       uni.removeStorageSync("city");
@@ -378,9 +384,11 @@ export default {
        if(timeData.status === 'start'){
         this.addressForm.toTime = timeData.month;
         this.addressForm.toDay = timeData.week;
+        this.airMessage['toTime'] = timeData
       }else if(timeData.status === 'end'){
         this.addressForm.fromTime = timeData.month;
         this.addressForm.fromDay = timeData.week;
+        this.airMessage['fromTime'] = timeData
       }
       
       console.log(this.addressForm);
