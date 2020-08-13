@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-07-30 11:39:34
+ * @LastEditTime: 2020-08-13 16:18:58
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -28,16 +28,10 @@
       </view>
 
       <swiper class="cabin_content" @change="change" :current="current">
-        <swiper-item>
+        <swiper-item v-for="header in cabinHeader" :key="header">
           <view class="cabin_content_item">
             <flight-item v-for="(item, index) in cabinList" :key="index" :flightData="item"></flight-item>
           </view>
-        </swiper-item>
-        <swiper-item>
-          <view class="cabin_content_item">经济舱</view>
-        </swiper-item>
-        <swiper-item>
-          <view class="cabin_content_item">公务头等舱</view>
         </swiper-item>
       </swiper>
     </view>
@@ -80,6 +74,8 @@
 </template>
 
 <script>
+import moment from "moment";
+moment.locale("zh-cn");
 import flightHeader from "@/components/flight_header.vue";
 import flightItem from "@/components/flight_item.vue";
 export default {
@@ -108,60 +104,10 @@ export default {
         model: "空客A320(中)", // 机型
         food: "有早餐", // 餐饮
       },
-      cabinHeader: ["特价", "经济舱", "公务/头等舱"], // 舱位选择列表
+      cabinHeader: [], // 舱位选择列表
       current: 0, // 轮播图下标
-      cabinList: [
-        {
-          // 舱位列表
-          price: 695, // 价格
-          priceMessage: true, // 是否包含燃油
-          reward: 15, // 奖励金
-          voteNumber: 8, // 剩余票数
-        },
-        {
-          // 舱位列表
-          price: 732, // 价格
-          priceMessage: false, // 是否包含燃油
-          reward: 0, // 奖励金
-          voteNumber: 12, // 剩余票数
-        },
-        {
-          // 舱位列表
-          price: 732, // 价格
-          priceMessage: false, // 是否包含燃油
-          reward: 0, // 奖励金
-          voteNumber: 12, // 剩余票数
-        },
-        {
-          // 舱位列表
-          price: 732, // 价格
-          priceMessage: false, // 是否包含燃油
-          reward: 0, // 奖励金
-          voteNumber: 12, // 剩余票数
-        },
-        {
-          // 舱位列表
-          price: 732, // 价格
-          priceMessage: false, // 是否包含燃油
-          reward: 0, // 奖励金
-          voteNumber: 12, // 剩余票数
-        },
-        {
-          // 舱位列表
-          price: 732, // 价格
-          priceMessage: false, // 是否包含燃油
-          reward: 0, // 奖励金
-          voteNumber: 12, // 剩余票数
-        },
-        {
-          // 舱位列表
-          price: 732, // 价格
-          priceMessage: false, // 是否包含燃油
-          reward: 0, // 奖励金
-          voteNumber: 12, // 剩余票数
-        },
-      ],
-
+      cabinList: [],
+ 
       popupCurrent: 0, // 弹窗轮播下标
     };
   },
@@ -188,8 +134,48 @@ export default {
       this.popupCurrent = e.detail.current;
     },
   },
-  onLoad() {
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    console.log(JSON.parse(data.airData));
+
+    // 组装航程头部信息
+    let airData = JSON.parse(data.airData);
+    this.ticketAddress = {
+      to: airData.to,
+      from: airData.from,
+    };
+    this.flightData = {
+      flightType: "单程", // 航程类型
+      time: moment(airData.QueryDate).format('YYYY-MM-DD'), // 航程日期
+      week: moment(airData.QueryDate).format('ddd'),
+      fromTime: moment(airData.segments[0].depTime).format('hh:mm'), // 出发时间
+      fromAddress: airData.to + airData.segments[0].depAirportName+'机场' + airData.segments[0].depTerminal, // 出发机场
+      duration: airData.segments[0].duration, // 飞行时长
+      toTime: moment(airData.segments[0].arrTime).format('hh:mm'), // 到达时间
+      toAddress: airData.from + airData.segments[0].arrAirportName +'机场'+ airData.segments[0].arrTerminal, // 到达机场
+      airIcon: 'http://192.168.0.187:8092/'+ airData.segments[0][airData.segments[0].flightNumber.slice(0,2)].image,
+      airline: airData.segments[0][airData.segments[0].flightNumber.slice(0,2)].air_name + airData.segments[0].flightNumber, // 航司
+      model: airData.segments[0].aircraftCode, // 机型
+      food: airData.segments[0].hasMeal, // 餐饮
+    };
+
+    // 组装航班列表信息
+    // this.cabinHeader
+    if(airData.nfd.ItineraryInfos.length> 0){
+      this.cabinHeader.push('特价')
+      airData.nfd.ItineraryInfos.forEach(item =>{
+        this.cabinList.push( {
+          // 舱位列表
+          price: item.cabinPrices.ADT.price + item.cabinPrices.ADT.build + item.cabinPrices.ADT.tax, // 价格
+          priceMessage: true, // 是否包含燃油
+          reward: item.cabinPrices.ADT.rulePrice.reward, // 奖励金
+          voteNumber: item.cabinInfo.cabinNum, // 剩余票数
+          cabin: item.cabinInfo.cabinCode+item.cabinInfo.cabinDesc, // 舱位
+          baggage: item.cabinInfo.baggage, // 行李额
+        })
+      })
+      
+    }
   },
 };
 </script>

@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-07-22 11:47:13
+ * @LastEditTime: 2020-08-13 16:18:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -18,13 +18,13 @@
 			</view>
 			<view class="box_header_right">
 				<view class="header_right_btn" @click="jumpReservation">预 定</view>
-				<view class="header_right_voteNumber" v-if="flightData.voteNumber < 10">{{flightData.voteNumber}}张</view>
+				<view class="header_right_voteNumber" v-if="flightData.voteNumber !== 'A'">{{flightData.voteNumber}}张</view>
 			</view>
 		</view>
 
 		<view class="item_box_bottom">
 			<view class="bottom_message" @click="openFlightPopop">
-				W经济舱 | 退改签规则 | 每人托运2件,每件23KG
+				{{flightData.cabin}} | 退改签规则 {{flightData.baggage?' | ' + flightData.baggage: ''}}
 				<view class="message_more_btn"></view>
 			</view>
 			<view class="bottom_ticket_info">

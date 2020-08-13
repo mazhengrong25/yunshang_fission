@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-08-11 11:07:15
+ * @LastEditTime: 2020-08-13 09:49:05
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -191,7 +191,7 @@ export default {
           border-radius: 20upx;
           // margin-right: 20upx;
           margin-bottom: 28upx;
-          font-size: 22upx;
+          font-size: 28upx;
           font-weight: 500;
           color: rgba(42, 42, 42, 1);
           border: 4upx solid transparent;

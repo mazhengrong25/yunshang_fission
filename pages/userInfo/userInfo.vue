@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-08-10 13:55:20
+ * @LastEditTime: 2020-08-13 09:31:20
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -156,7 +156,6 @@ export default {
         dis_id: this.userInfo.dis_id,
       };
       userInfo.getWallet(data).then((res) => {
-        console.log(res);
         if (res.result === 10000) {
           this.walletInfo = res.data;
         } else {
@@ -191,18 +190,10 @@ export default {
 
     // 退出登录
     signOut() {
-      userInfo.signOut().then((res) => {
-        if (res.errorcode === 10000) {
-          uni.clearStorageSync();
-          uni.reLaunch({
-            url: "/pages/login/login",
-          });
-        } else {
-          uni.showToast({
-            title: res.msg,
-            icon: "none",
-          });
-        }
+      userInfo.signOut().then((res) => {});
+      uni.clearStorageSync();
+      uni.reLaunch({
+        url: "/pages/login/login",
       });
     },
   },

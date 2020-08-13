@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-08-11 11:05:47
+ * @LastEditTime: 2020-08-12 10:27:54
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -91,7 +91,7 @@
   </view>
 </template>
 
-<script>
+<script> 
 export default {
   props: {
     ticketType: {

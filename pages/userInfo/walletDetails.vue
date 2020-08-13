@@ -2,7 +2,7 @@
  * @Description: 流水详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 13:48:46
- * @LastEditTime: 2020-08-05 16:12:53
+ * @LastEditTime: 2020-08-13 09:39:49
  * @LastEditors: wish.WuJunLong
 -->
 <template>

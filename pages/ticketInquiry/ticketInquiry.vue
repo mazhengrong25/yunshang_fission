@@ -1,8 +1,8 @@
 <!--
- * @Description: 机票查询
+ * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-11 18:32:05
+ * @LastEditTime: 2020-08-13 14:55:00
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -28,93 +28,60 @@
       </view>
     </view>
 
-    <view class="ticket_content">
-      <view class="ticket_box">
-        <view
-          class="ticket_list"
-          v-for="(item, index) in ticketListData"
-          :key="index"
-          @click="jumpFlightInfo(item)">
-          <view class="ticket_left">
-            <view class="ticket_message">
-              <view class="ticket_start ticket_time">
-                <view class="ticket_date">{{item.startTime}}</view>
-                <view class="ticket_address">{{item.startAddress}}</view>
-              </view>
-              <view class="ticket_arrow">
-                <view>{{item.voyageTime}}</view>
-                <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
-              </view>
-              <view class="ticket_end ticket_time">
-                <view class="ticket_date">
-                  {{item.endTime}}
-                  <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
-                </view>
-                <view class="ticket_address">{{item.endAddress}}</view>
-              </view>
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="ticket_content">
+      <view
+        class="ticket_list"
+        v-for="(item, index) in ticketList"
+        :key="index"
+        @click="jumpFlightInfo(item)"
+      >
+        <view class="ticket_left">
+          <view class="ticket_message">
+            <view class="ticket_start ticket_time">
+              <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'hh:mm')}}</view>
+              <view
+                class="ticket_address"
+              >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal}}</view>
             </view>
-
-            <view class="ticket_details">
-              <image class="ticket_details_icon" src="@/static/dhlogo@2x.png" mode="contain" />
-              {{item.airline}} | {{item.model}}
+            <view class="ticket_arrow">
+              <view>{{item.segments[0].duration}}</view>
+              <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
+            </view>
+            <view class="ticket_end ticket_time">
+              <view class="ticket_date">
+                {{$dateTool(item.segments[0].arrTime,'hh:mm')}}
+                <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
+              </view>
+              <view
+                class="ticket_address"
+              >{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
             </view>
           </view>
 
-          <view class="ticket_right">
-            <view class="ticket_price">
-              <text class="currency">&yen;</text>
-              {{item.price}}
-            </view>
-            <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
-            <view class="ticket_cabin">{{item.cabin}}</view>
-            <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
+          <view class="ticket_details">
+            <image
+              class="ticket_details_icon"
+              :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+              mode="contain"
+            />
+            {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode}}
           </view>
-        </view> 
+        </view>
 
-        <view
-          class="ticket_list"
-          v-for="(item, index) in ticketList"
-          :key="index"
-          @click="jumpFlightInfo(item)">
-          <view class="ticket_left">
-            <view class="ticket_message">
-              <view class="ticket_start ticket_time">
-                <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'hh:mm')}}</view>
-                <view class="ticket_address">{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal}}</view>
-              </view>
-              <view class="ticket_arrow">
-                <view>{{item.segments[0].duration}}</view>
-                <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
-              </view>
-              <view class="ticket_end ticket_time">
-                <view class="ticket_date">
-                  {{$dateTool(item.segments[0].arrTime,'hh:mm')}}
-                  <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
-                </view>
-                <view class="ticket_address">{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal}}</view>
-              </view>
-            </view>
-
-            <view class="ticket_details">
-              <image class="ticket_details_icon" :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image" mode="contain" />
-              {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode !== '--'?item.segments[0].aircraftCode: ''}}
-            </view>
+        <view class="ticket_right">
+          <view class="ticket_price">
+            <text class="currency">&yen;</text>
+            <view
+              v-if="item.nfd.ItineraryInfos[0].cabinPrices.ADT.rulePrice.price"
+            >{{item.nfd.ItineraryInfos[0].cabinPrices.ADT.rulePrice.price}}</view>
+            <view v-else class="not_price"></view>
           </view>
-
-          <view class="ticket_right">
-            <view class="ticket_price">
-              <text class="currency">&yen;</text>
-              {{item.price || '加载中'}}
-            </view>
-            <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
-            <view class="ticket_cabin">{{item.cabin}}</view>
-            <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
-          </view>
-        </view> 
-
-
+          <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
+          <view class="ticket_cabin">{{item.nfd.ItineraryInfos[0].cabinInfo.cabinDesc}}</view>
+          <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
+        </view>
       </view>
-    </view>
+    </scroll-view>
 
     <view class="footer_box">
       <flight-filter @openFilter="openFilter"></flight-filter>
@@ -125,6 +92,8 @@
 </template>
 
 <script>
+import moment from "moment";
+moment.locale("zh-cn");
 import ticket from "@/api/ticketInquiry.js";
 import flightFilter from "@/components/flight_filter.vue"; // 航班筛选
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
@@ -143,39 +112,7 @@ export default {
         from: "北京",
       },
 
-      ticketTimeList: [
-        {
-          // 日期选择列表
-          day: "今天",
-          number: "17",
-          price: 475,
-        },
-        {
-          day: "明天",
-          number: "04-18",
-          price: 475,
-        },
-        {
-          day: "后天",
-          number: "19",
-          price: 475,
-        },
-        {
-          day: "周一",
-          number: "20",
-          price: 475,
-        },
-        {
-          day: "周二",
-          number: "21",
-          price: 475,
-        },
-        {
-          day: "周三",
-          number: "22",
-          price: 475,
-        },
-      ],
+      ticketTimeList: [],
       activeTimeNumber: "04-18", // 日期选择
       ticketList: [],
       ticketListData: [
@@ -190,7 +127,7 @@ export default {
           reward: "20",
           airline: "南航CZ2801",
           model: "空客A320(中)",
-        }
+        },
       ],
     };
   },
@@ -199,16 +136,42 @@ export default {
     getTicketData(data) {
       ticket.getTicket(data).then((res) => {
         console.log(res);
-        if(res.errorcode === 10000){
-          this.ticketList = res.data.IBE
-        }else{
+        if (res.errorcode === 10000) {
+          res.data.IBE.forEach((item) => {
+            item["nfd"] = {};
+          });
+          this.ticketList = res.data.IBE;
+          this.getNfdData();
+        } else {
           uni.showToast({
             title: res.msg,
             icon: "none",
           });
         }
       });
-      console.log(this.ticketList)
+      console.log(this.ticketList);
+    },
+
+    // 获取票价舱位信息
+    getNfdData() {
+      this.ticketList.forEach((item, index) => {
+        let dataList = {
+          // sourceCode: 'IBE',
+          QueryDate: item.QueryDate,
+          Departure: item.Departure,
+          Destination: item.Destination,
+          SystemMsg: item.SystemMsg,
+          segments: item.segments,
+          // relatedKey: '',
+          cabins: item.ItineraryInfos.NFD.cabinInfo,
+        };
+        ticket.getNfd(dataList).then((res) => {
+          this.$nextTick(() => {
+            item["nfd"] = res;
+            res.ItineraryInfos[0].cabinPrices.ADT.rulePrice.price;
+          });
+        });
+      });
     },
 
     // 选择日期
@@ -216,9 +179,30 @@ export default {
       console.log(val);
       this.activeTimeNumber = val.number;
     },
+    // 时间列表处理
+    getDateList() {
+      let day = moment().format("YYYY-MM-DD");
+      let dayNumber = 0;
+      for (let index = 0; index < 7; index++) {
+        this.ticketTimeList.push({
+          day: moment(day).add(dayNumber, "d").calendar(null, {
+            sameDay: "今天",
+            nextDay: "明天",
+            nextWeek: "ddd",
+            sameElse: "dddd",
+          }),
+          number: moment(day).add(dayNumber, "d").format("DD"),
+        });
+        dayNumber += 1;
+      }
+    },
 
     // 返回日历选择
-    backCalendar() {},
+    backCalendar() {
+      uni.navigateTo({
+        url: "/pages/dateSelect/dateSelect",
+      });
+    },
 
     // 打开筛选
     openFilter() {
@@ -231,27 +215,76 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
+      data["to"] = this.ticketData.to.city_name;
+      data["from"] = this.ticketData.from.city_name;
       uni.navigateTo({
-        url: "/pages/flightInfo/flightInfo",
+        url: "/pages/flightInfo/flightInfo?airData=" + JSON.stringify(data),
       });
     },
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.ticketData = JSON.parse(data.data);
+    // this.ticketData = JSON.parse(data.data);
+    this.ticketData = {
+      from: {
+        air_port: "SYX",
+        air_port_ename: "Phoenix International Airport",
+        air_port_name: "凤凰国际机场",
+        chan_chird: "东亚",
+        chau: "亚洲",
+        city_code: "SYX",
+        city_ename: "SANYA",
+        city_name: "三亚",
+        city_pinyin: "sanya",
+        country: "中国",
+        country_code: "CN",
+        id: 1963,
+        province: "海南",
+        province_pinyin: "hainan",
+        province_py: "hn",
+      },
+
+      to: {
+        air_port: "CKG",
+        air_port_ename: "Jiangbei International Airport",
+        air_port_name: "江北国际机场",
+        chan_chird: "东亚",
+        chau: "亚洲",
+        city_code: "CKG",
+        city_ename: "CHONGQING",
+        city_name: "重庆",
+        city_pinyin: "",
+        country: "中国",
+        country_code: "CN",
+        id: 1353,
+        province: "重庆",
+        province_pinyin: "chongqing",
+        province_py: "cq",
+      },
+
+      toTime: {
+        date: "2020-08-31",
+        month: "8月31日",
+        status: "start",
+        type: "time",
+        week: "周一",
+      },
+    };
     console.log(this.ticketData);
     // 组装数据
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
-      from: this.ticketData.from.city_name
-    }
+      from: this.ticketData.from.city_name,
+    };
     let airMessage = {
-        departure: this.ticketData.to.city_code, // 起飞机场三字码
-        arrival: this.ticketData.from.city_code, // 到达机场三字码
-        departureTime: this.ticketData.toTime.date, // 起飞时间
-        airline: "", // 航司二字码
-      };
+      departure: this.ticketData.to.city_code, // 起飞机场三字码
+      arrival: this.ticketData.from.city_code, // 到达机场三字码
+      departureTime: this.ticketData.toTime.date, // 起飞时间
+      airline: "", // 航司二字码
+    };
     this.getTicketData(airMessage);
+
+    this.getDateList(); // 时间处理
   },
 };
 </script>
@@ -365,115 +398,146 @@ export default {
 
   .ticket_content {
     background: rgba(242, 244, 246, 1);
-    padding: 20upx;
     flex: 1;
     overflow-y: auto;
-    .ticket_box {
-      .ticket_list {
-        display: flex;
-        justify-content: space-between;
-        background: rgba(255, 255, 255, 1);
-        box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
-        border-radius: 20upx;
-        padding: 26upx 20upx;
-        &:not(:last-child) {
-          margin-bottom: 20upx;
-        }
-        .ticket_left {
-          width: 60%;
-          .ticket_message {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 34upx;
-            .ticket_time {
-              .ticket_date {
-                font-size: 36upx;
-                font-weight: bold;
-                color: rgba(42, 42, 42, 1);
-                margin-bottom: 6upx;
-                position: relative;
-                .more_time {
-                  position: absolute;
-                  font-size: 18upx;
-                  font-weight: 400;
-                  color: rgba(42, 42, 42, 1);
-                  top: 0;
-                  right: -1;
-                  width: 60upx;
-                }
-              }
-              .ticket_address {
-                font-size: 22upx;
+    box-sizing: border-box;
+    padding: 20upx 0;
+    .ticket_list {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
+      border-radius: 20upx;
+      padding: 26upx 20upx;
+      margin: 0 20upx;
+      &:not(:last-child) {
+        margin-bottom: 20upx;
+      }
+      .ticket_left {
+        width: 60%;
+        .ticket_message {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 34upx;
+          .ticket_time {
+            .ticket_date {
+              font-size: 36upx;
+              font-weight: bold;
+              color: rgba(42, 42, 42, 1);
+              margin-bottom: 6upx;
+              position: relative;
+              .more_time {
+                position: absolute;
+                font-size: 18upx;
                 font-weight: 400;
                 color: rgba(42, 42, 42, 1);
+                top: 0;
+                right: -1;
+                width: 60upx;
               }
             }
-            .ticket_arrow {
+            .ticket_address {
               font-size: 22upx;
               font-weight: 400;
-              color: rgba(175, 185, 196, 1);
-              position: relative;
-              padding-top: 10upx;
-              .ticket_type {
-                margin-top: 14upx;
-              }
-
-              &::before {
-                content: "";
-                position: absolute;
-                background: url(@/static/ticket_path.png) no-repeat;
-                background-size: contain;
-                width: 113upx;
-                height: 21upx;
-                top: 32upx;
-                left: -6upx;
-              }
+              color: rgba(42, 42, 42, 1);
             }
           }
-
-          .ticket_details {
-            font-size: 20upx;
+          .ticket_arrow {
+            font-size: 22upx;
             font-weight: 400;
             color: rgba(175, 185, 196, 1);
-            .ticket_details_icon {
-              width: 22upx;
-              height: 16upx;
-              margin-right: 8upx;
+            position: relative;
+            padding-top: 10upx;
+            .ticket_type {
+              margin-top: 14upx;
+            }
+
+            &::before {
+              content: "";
+              position: absolute;
+              background: url(@/static/ticket_path.png) no-repeat;
+              background-size: contain;
+              width: 113upx;
+              height: 21upx;
+              top: 32upx;
+              left: -6upx;
             }
           }
         }
 
-        .ticket_right {
-          text-align: right;
-          .ticket_price {
-            font-size: 42upx;
-            font-weight: bold;
-            color: rgba(255, 0, 0, 1);
-            margin-bottom: 2upx;
-            .currency {
-              font-size: 24upx;
+        .ticket_details {
+          font-size: 20upx;
+          font-weight: 400;
+          color: rgba(175, 185, 196, 1);
+          .ticket_details_icon {
+            width: 22upx;
+            height: 16upx;
+            margin-right: 8upx;
+          }
+        }
+      }
+
+      .ticket_right {
+        text-align: right;
+        .ticket_price {
+          font-size: 42upx;
+          font-weight: bold;
+          color: rgba(255, 0, 0, 1);
+          margin-bottom: 2upx;
+          display: flex;
+          align-items: baseline;
+          .currency {
+            font-size: 24upx;
+            margin-right: 6upx;
+          }
+        }
+        .not_price {
+          height: 40upx;
+          width: 120upx;
+          background-color: #f1f3f5;
+          display: inline-block;
+          position: relative;
+          overflow: hidden;
+          &::before {
+            width: 20upx;
+            height: 200%;
+            content: "";
+            display: block;
+            background-color: #fff;
+            position: absolute;
+            top: -50%;
+            left: 60upx;
+            transform: rotate(30deg);
+            animation: skeleton 1.5s infinite;
+          }
+          @keyframes skeleton {
+            from {
+              left: -50upx;
+            }
+            to {
+              left: 120%;
             }
           }
-          .overseas {
-            font-size: 20upx;
-            font-weight: 400;
-            color: rgba(0, 112, 226, 1);
-          }
-          .ticket_cabin {
-            font-size: 22upx;
-            font-weight: 400;
-            color: rgba(153, 153, 153, 1);
-            margin-bottom: 2upx;
-          }
-          .ticket_reward {
-            background: rgba(255, 0, 0, 0.1);
-            font-size: 18upx;
-            font-weight: 400;
-            color: rgba(255, 0, 0, 1);
-            padding: 2upx 12upx;
-            display: inline-flex;
-            align-items: center;
-          }
+        }
+        .overseas {
+          font-size: 20upx;
+          font-weight: 400;
+          color: rgba(0, 112, 226, 1);
+        }
+        .ticket_cabin {
+          font-size: 22upx;
+          font-weight: 400;
+          color: rgba(153, 153, 153, 1);
+          margin-bottom: 2upx;
+        }
+        .ticket_reward {
+          background: rgba(255, 0, 0, 0.1);
+          font-size: 18upx;
+          font-weight: 400;
+          color: rgba(255, 0, 0, 1);
+          padding: 2upx 12upx;
+          display: inline-flex;
+          align-items: center;
         }
       }
     }

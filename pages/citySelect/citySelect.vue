@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-08-11 15:25:09
+ * @LastEditTime: 2020-08-12 09:57:11
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -73,7 +73,7 @@
             @click="getCityData(oitem)"
           >
             <view class="city_info">{{oitem.city_name}}</view>
-            <view class="city_code">{{oitem.air_port}}</view>
+            <view class="city_code">{{oitem.city_code}}</view>
           </view>
         </view>
       </view>
@@ -91,7 +91,7 @@
             :key="oindex"
           >
             <view class="city_airport">{{oitem.air_port_name}}</view>
-            <view class="city_code">{{oitem.air_port}}</view>
+            <view class="city_code">{{oitem.city_code}}</view>
             <view class="city_name">{{oitem.city_name}}</view>
           </view>
         </view>

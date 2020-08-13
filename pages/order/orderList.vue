@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-05 17:03:09
+ * @LastEditTime: 2020-08-13 09:42:56
  * @LastEditors: wish.WuJunLong
 -->
 <!--
@@ -14,7 +14,7 @@
 -->
 <template>
   <view class="order_list">
-    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="国际订单"></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="国际订单"></yun-header>
     <view class="order_header">
       <view
         :class="['header_list',{'active': headerActive === index}]"

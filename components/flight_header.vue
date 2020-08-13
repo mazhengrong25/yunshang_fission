@@ -2,14 +2,14 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-07-22 11:47:02
+ * @LastEditTime: 2020-08-13 15:37:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
 	<view class="fight_header">
 		<view class="header_message">
 			<view class="header_type">{{flightData.flightType}}</view>
-			<view class="header_time">{{flightData.time}}</view>
+			<view class="header_time">{{flightData.time}} {{flightData.week}}</view>
 		</view>
 
 		<view class="content_message">
@@ -28,8 +28,8 @@
 		</view>
 
 		<view class="bottom_message">
-			<image class="bottom_message_icon" src="@/static/dhlogo@2x.png" mode="contain" />
-			{{flightData.airline}} | {{flightData.model}} | {{flightData.food}}
+			<image class="bottom_message_icon" :src="flightData.airIcon" mode="contain" />
+			{{flightData.airline}}{{flightData.model?' | '+ flightData.model: ''}} {{flightData.food? ' | 有餐食': ''}}
 		</view>
 		
 		<view class="flight_reservation_box" v-if="!flightInfo">
