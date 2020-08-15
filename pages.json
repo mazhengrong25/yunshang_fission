@@ -1,6 +1,18 @@
 {
   "pages": [
-   
+    
+    {
+      "path": "pages/flightReservation/passengerList",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/flightReservation/addPassenger",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/index/index",
       "style": {
@@ -120,18 +132,8 @@
         "navigationBarTitleText": "报销凭证"
       }
     },
-    {
-      "path": "pages/flightReservation/passengerList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/addPassenger",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
+
+  
     {
       "path": "pages/flightReservation/passengerManage",
       "style": {

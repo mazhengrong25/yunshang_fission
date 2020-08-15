@@ -2,7 +2,7 @@
  * @Description: 弹窗选择器
  * @Author: wish.WuJunLong
  * @Date: 2020-07-29 17:14:32
- * @LastEditTime: 2020-08-04 10:52:19
+ * @LastEditTime: 2020-08-14 17:49:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -25,7 +25,7 @@
           @change="bindChange"
         >
           <picker-view-column>
-            <view class="item" v-for="(item,index) in dataList" :key="index">{{item}}</view>
+            <view class="item" v-for="(item,index) in dataList" :key="index">{{dataItem?item[dataItem]:item}}</view>
           </picker-view-column>
         </picker-view>
 
@@ -61,6 +61,10 @@ export default {
     dateType: {
       type: Number,
       default: () => 3
+    },
+    dataItem: {  // 列表展示参数名称
+      type: String,
+      dafault: () => ''
     },
     dataList: {
       // 选择器数组
@@ -121,9 +125,12 @@ export default {
     // 打开弹窗
     openDialog() {
       this.$refs.selectorPopup.open();
+      console.log(this.dataList)
     },
     // 打开新增分组
-    addGroupBtn() {},
+    addGroupBtn() {
+      this.$emit('openAddGroup',true)
+    },
     // 关闭弹出框
     closeDialog() {
       this.$refs.selectorPopup.close();

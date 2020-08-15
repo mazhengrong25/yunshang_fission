@@ -2,16 +2,16 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-07-31 13:39:39
+ * @LastEditTime: 2020-08-15 14:58:40
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="passenger">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="选择乘机人"></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" :centerTitle="passengerType?'旅客管理': '选择乘机人'"></yun-header>
     <view class="header_box">
       <view class="add_passenger_btn" @click="jumpAddPassenger()">
-        <image class="add_icon" src="@/static/add_passenger_btn.png" mode />
-        <text>新增乘机人</text>
+        <image class="add_icon" src="@/static/add_passenger_btn.png" mode="contain" />
+        <text>{{ passengerType?'新增旅客':'新增乘机人' }}</text>
       </view>
     </view>
 
@@ -19,87 +19,69 @@
       <view class="mian_header">
         <view class="title">常用乘机人</view>
         <view class="filter" @click="openGroupSelect">
-          <text>{{group?group + '分组': '筛选'}}</text>
+          <text>{{group.group_name?group.group_name: '筛选'}}</text>
           <image class="filter_icon" src="@/static/arrow_bule.png" mode="contain" />
         </view>
       </view>
 
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="mian_list">
-        <view
-          class="list_item"
-          v-for="(item, index) in passengerList"
-          :key="index"
-          @click="checkedPassenger(item, index)"
-        >
-          <view class="checked">
-            <radio :checked="item.checked" color="#0070E2" />
-          </view>
-          <view class="item_info">
-            <view class="info_top">
-              <view class="type">{{item.type}}</view>
-              <view class="user_name">{{item.userName}}</view>
-              <view class="position">{{item.position?item.position:'未分组'}}</view>
-            </view>
-            <view class="info_bottom">
-              <view class="bottom_title">{{item.type === '成人'? '身份证': '出生证明'}}</view>
-              <view class="card">{{item.idCard}}</view>
-            </view>
-          </view>
+        <uni-swipe-action>
+          <uni-swipe-action-item v-for="(item, index) in passengerList" :key="index">
+            <view class="list_item" @click="checkedPassenger(item, index)">
+              <view class="checked" v-if="!passengerType">
+                <radio :checked="item.checked" color="#0070E2" />
+              </view>
+              <view class="item_info">
+                <view class="info_top">
+                  <view class="type">{{item.type}}</view>
+                  <view class="user_name">{{item.name}}</view>
+                  <view class="position">{{item.group?item.group:'未分组'}}</view>
+                </view>
+                <view class="info_bottom">
+                  <view class="bottom_title">{{item.cert_type}}</view>
+                  <view class="card">{{item.cert_no}}</view>
+                </view>
+              </view>
 
-          <view class="edit_btn"></view>
-        </view>
+              <view class="edit_btn" @click="jumpEditUserInfo(item)"></view>
+            </view>
+            <template v-slot:right>
+              <view class="option_box">
+                <view class="delete_btn" @click="removePassenger(item, index)">
+                  <image class="delete_btn_icon" src="@/static/delete_btn.png" mode="contain" />
+                  <text>删除</text>
+                </view>
+              </view>
+            </template>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
       </scroll-view>
     </view>
 
     <!-- 筛选弹窗 -->
-    <yun-selector
-      ref="groupPopup"
-      :dataList="groupList"
-      @submitDialog="groupPopupSelecctBtn()"
-    ></yun-selector>
+    <yun-selector ref="groupPopup" :dataItem="'group_name'" :dataList="groupList" @submitDialog="groupPopupSelecctBtn()"></yun-selector>
 
-    <view class="submit_box">
+    <view class="submit_box" v-if="!passengerType">
       <button class="submit_btn" @click="returnBtn">确认</button>
     </view>
   </view>
 </template>
 
 <script>
+import passenger from "@/api/passenger.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度
 
-      group: "", // 分组筛选
-      groupList: ["人事部", "产品部", "市场营销部", "IT部", "未分组"], // 分组列表
+      passengerType: true, // true个人中心跳入 false添加联系人跳入
 
-      passengerList: [
-        // 乘机人列表
-        {
-          id: 1,
-          type: "成人",
-          userName: "白大飞",
-          position: "销售部",
-          idCard: "500123123412341234",
-          checked: false,
-        },
-        {
-          id: 2,
-          type: "儿童",
-          userName: "白小飞",
-          position: "",
-          idCard: "500123123412341234",
-          checked: false,
-        },
-        {
-          id: 3,
-          type: "婴儿",
-          userName: "白飞飞",
-          position: "",
-          idCard: "500123123412341234",
-          checked: false,
-        },
-      ],
+      group: "", // 分组筛选
+      groupList: [], // 分组列表
+
+      passengerList: [], // 乘机人列表
     };
   },
   methods: {
@@ -107,6 +89,76 @@ export default {
     jumpAddPassenger() {
       uni.navigateTo({
         url: "/pages/flightReservation/addPassenger",
+      });
+    },
+
+    /**
+     * @Description: 获取旅客列表信息
+     * @author Wish
+     * @date 2020/8/14
+     */
+    getPassengerData() {
+      passenger.getPassenger().then((res) => {
+        console.log(res);
+        if (res.errorcode === 10000) {
+          this.passengerList = res.data.data;
+          this.passengerList.forEach((item) => {
+            item["type"] =
+              moment().diff(item.birthday, "years") < 12 &&
+              moment().diff(item.birthday, "years") > 2
+                ? "儿童"
+                : moment().diff(item.birthday, "years") < 2
+                ? "婴儿"
+                : "成人";
+          });
+          this.getGroupList()
+        }
+      });
+    },
+
+    // 跳转修改乘机人列表
+    jumpEditUserInfo(val) {
+      console.log(val);
+    },
+
+    // 删除乘机人
+    removePassenger(val,i){
+      console.log(val)
+      passenger.removePassenger(val.id)
+        .then(res =>{
+          if(res.errorcode === 10000){
+            this.getPassengerData()
+            uni.showToast({
+              title: '删除成功',
+              icon: "success",
+            });
+          }else{
+            uni.showToast({
+              title: res.msg,
+              icon: "none",
+            });
+          }
+        })
+    },
+
+    // 获取分组列表
+    getGroupList() {
+      passenger.getGroup().then((res) => {
+        if (res.errorcode === 10000) {
+          this.groupList = res.data.data;
+          this.groupList.forEach(item =>{
+            this.passengerList.forEach(oitem =>{
+              if(oitem.group_id === item.id){
+                oitem['group'] = item.group_name
+              }
+            })
+          })
+        } else {
+          uni.showToast({
+            title: "分组列表获取失败，" + res.msg,
+            icon: "none",
+          });
+        }
       });
     },
 
@@ -127,8 +179,12 @@ export default {
     // 确认乘机人
     returnBtn() {},
   },
-  onLoad() {
+  onShow(){
+    this.getPassengerData();
+  },
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.passengerType = data.type === "userInfo";
   },
 };
 </script>
@@ -200,9 +256,10 @@ export default {
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
         border-radius: 20upx;
         padding: 28upx 40upx 40upx 20upx;
-        margin: 20upx 20upx 0;
+        margin: 0 20upx 20upx;
         display: flex;
         align-items: center;
+        width: 100%;
 
         .checked {
           margin-right: 26upx;
@@ -258,6 +315,28 @@ export default {
           width: 30upx;
           height: 30upx;
           margin-left: auto;
+        }
+      }
+      .option_box {
+        width: 180upx;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .delete_btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          font-size: 26upx;
+          font-weight: 400;
+          color: rgba(255, 0, 0, 1);
+          .delete_btn_icon {
+            width: 45upx;
+            height: 45upx;
+            object-fit: contain;
+            margin-bottom: 8upx;
+          }
         }
       }
     }

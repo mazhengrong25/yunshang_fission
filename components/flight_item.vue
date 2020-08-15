@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-08-13 16:18:19
+ * @LastEditTime: 2020-08-13 18:14:14
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -75,8 +75,6 @@
 		&:first-child {
 			border-radius: 0 0 20upx 20upx;
 		}
-
-		&:not(:last-child) {}
 
 		.item_box_header {
 			display: flex;

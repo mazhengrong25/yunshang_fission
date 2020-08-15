@@ -123,6 +123,8 @@
 
 <script>
 import userInfo from "@/api/getUserInfo.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
@@ -177,7 +179,7 @@ export default {
     // 跳转旅客管理
     jumpPassengerManage() {
       uni.navigateTo({
-        url: "/pages/flightReservation/passengerList",
+        url: "/pages/flightReservation/passengerList?type=userInfo",
       });
     },
 

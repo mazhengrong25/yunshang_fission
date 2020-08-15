@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-13 14:55:00
+ * @LastEditTime: 2020-08-13 18:17:50
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -224,52 +224,52 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    // this.ticketData = JSON.parse(data.data);
-    this.ticketData = {
-      from: {
-        air_port: "SYX",
-        air_port_ename: "Phoenix International Airport",
-        air_port_name: "凤凰国际机场",
-        chan_chird: "东亚",
-        chau: "亚洲",
-        city_code: "SYX",
-        city_ename: "SANYA",
-        city_name: "三亚",
-        city_pinyin: "sanya",
-        country: "中国",
-        country_code: "CN",
-        id: 1963,
-        province: "海南",
-        province_pinyin: "hainan",
-        province_py: "hn",
-      },
+    this.ticketData = JSON.parse(data.data);
+    // this.ticketData = {
+    //   from: {
+    //     air_port: "SYX",
+    //     air_port_ename: "Phoenix International Airport",
+    //     air_port_name: "凤凰国际机场",
+    //     chan_chird: "东亚",
+    //     chau: "亚洲",
+    //     city_code: "BJS",
+    //     city_ename: "SANYA",
+    //     city_name: "三亚",
+    //     city_pinyin: "sanya",
+    //     country: "中国",
+    //     country_code: "CN",
+    //     id: 1963,
+    //     province: "海南",
+    //     province_pinyin: "hainan",
+    //     province_py: "hn",
+    //   },
 
-      to: {
-        air_port: "CKG",
-        air_port_ename: "Jiangbei International Airport",
-        air_port_name: "江北国际机场",
-        chan_chird: "东亚",
-        chau: "亚洲",
-        city_code: "CKG",
-        city_ename: "CHONGQING",
-        city_name: "重庆",
-        city_pinyin: "",
-        country: "中国",
-        country_code: "CN",
-        id: 1353,
-        province: "重庆",
-        province_pinyin: "chongqing",
-        province_py: "cq",
-      },
+    //   to: {
+    //     air_port: "CKG",
+    //     air_port_ename: "Jiangbei International Airport",
+    //     air_port_name: "江北国际机场",
+    //     chan_chird: "东亚",
+    //     chau: "亚洲",
+    //     city_code: "CKG",
+    //     city_ename: "CHONGQING",
+    //     city_name: "重庆",
+    //     city_pinyin: "",
+    //     country: "中国",
+    //     country_code: "CN",
+    //     id: 1353,
+    //     province: "重庆",
+    //     province_pinyin: "chongqing",
+    //     province_py: "cq",
+    //   },
 
-      toTime: {
-        date: "2020-08-31",
-        month: "8月31日",
-        status: "start",
-        type: "time",
-        week: "周一",
-      },
-    };
+    //   toTime: {
+    //     date: "2020-08-31",
+    //     month: "8月31日",
+    //     status: "start",
+    //     type: "time",
+    //     week: "周一",
+    //   },
+    // };
     console.log(this.ticketData);
     // 组装数据
     this.ticketAddress = {

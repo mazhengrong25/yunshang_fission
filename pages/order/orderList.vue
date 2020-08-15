@@ -1,11 +1,4 @@
 <!--
- * @Description: 
- * @Author: wish.WuJunLong
- * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-13 09:42:56
- * @LastEditors: wish.WuJunLong
--->
-<!--
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
@@ -43,7 +36,7 @@
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="aspectFit" />
         </view>
-        <view class="list_title">筛选(早-晚)</view>
+        <view class="list_title">筛选</view>
       </view>
     </view>
 
@@ -149,20 +142,20 @@
 
           <view
             class="item_time"
-            v-if="item.pay_status === 1 && $timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes') >= 0"
+            v-if="item.pay_status === 1"
           >
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
             <view class="time_text">剩余支付时间：</view>
-            <view
-              class="time_number"
-            >{{$timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</view>
+<!--            <view-->
+<!--              class="time_number"-->
+<!--            >{{$timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</view>-->
           </view>
 
           <view
             class="item_btn_box"
-            v-if="item.pay_status === 1 && $timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes') >= 0"
+            v-if="item.pay_status === 1"
           >
             <view class="item_btn close_btn">取消订单</view>
             <view class="item_btn submit_btn">去支付</view>

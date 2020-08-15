@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-08-12 10:27:54
+ * @LastEditTime: 2020-08-13 18:29:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -157,10 +157,10 @@ export default {
         margin-top: 40upx;
       }
       .multi_pass_number {
-        width: 20upx;
-        height: 20upx;
+        width: 25upx;
+        height: 25upx;
         background: rgba(0, 112, 226, 0.6);
-        font-size: 18upx;
+        font-size: 20upx;
         font-weight: 500;
         color: rgba(255, 255, 255, 1);
         display: inline-flex;
