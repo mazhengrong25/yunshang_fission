@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-08-15 14:58:40
+ * @LastEditTime: 2020-08-17 09:36:04
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -119,6 +119,9 @@ export default {
     // 跳转修改乘机人列表
     jumpEditUserInfo(val) {
       console.log(val);
+      uni.navigateTo({
+        url: "/pages/flightReservation/addPassenger?type=edit&data="+JSON.stringify(val),
+      });
     },
 
     // 删除乘机人

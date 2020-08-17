@@ -1,6 +1,23 @@
 {
   "pages": [
-    
+    {
+      "path": "pages/order/filter",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/order/orderList",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/order/order",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
     {
       "path": "pages/flightReservation/passengerList",
       "style": {
@@ -31,16 +48,9 @@
         "navigationStyle": "custom"
       }
     },
-   
-    {
-      "path": "pages/citySelect/citySelect",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
 
     {
-      "path": "pages/order/orderList",
+      "path": "pages/citySelect/citySelect",
       "style": {
         "navigationStyle": "custom"
       }
@@ -51,12 +61,7 @@
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/order/order",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
+
     {
       "path": "pages/userInfo/userInfo",
       "style": {
@@ -67,7 +72,7 @@
       "path": "pages/userInfo/service",
       "style": {
         "navigationStyle": "custom"
-      } 
+      }
     },
 
     {
@@ -113,7 +118,7 @@
         "navigationBarTitleText": "公告"
       }
     },
-    
+
     {
       "path": "pages/flightInfo/flightInfo",
       "style": {
@@ -133,7 +138,6 @@
       }
     },
 
-  
     {
       "path": "pages/flightReservation/passengerManage",
       "style": {

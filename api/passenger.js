@@ -2,7 +2,7 @@
  * @Description: 乘机人数据
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-08-14 15:57:40
+ * @LastEditTime: 2020-08-17 09:47:47
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -56,10 +56,20 @@ function addPassenger(data){
   })
 }
 
+// 编辑乘机人
+function editPassenger(data,id){
+  return request({
+    method :'POST',
+    url: '/api/passenger/edit/'+id,
+    data:data
+  })
+}
+
 export default{
   getPassenger,
   removePassenger,
   getGroup,
   addGroup,
-  addPassenger
+  addPassenger,
+  editPassenger
 }

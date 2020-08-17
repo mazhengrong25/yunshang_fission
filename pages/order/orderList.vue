@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-04 18:27:23
+ * @LastEditTime: 2020-08-17 10:00:14
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -299,6 +299,8 @@ export default {
     .filter_list {
       display: flex;
       align-items: center;
+      justify-content: center;
+      flex: 1;
       padding: 10upx 40upx;
       &:not(:last-child) {
         border-right: 2upx solid #eaeaea;

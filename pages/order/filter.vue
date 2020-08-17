@@ -1,0 +1,327 @@
+<!--
+ * @Description: 订单筛选页面
+ * @Author: wish.WuJunLong
+ * @Date: 2020-08-17 10:31:20
+ * @LastEditTime: 2020-08-17 18:10:12
+ * @LastEditors: wish.WuJunLong
+-->
+<template>
+  <view class="filter">
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="筛选"></yun-header>
+
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="filter_main">
+      <view class="list_item">
+        <view class="item_title">日期条件</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in dateFilter"
+            :key="item"
+            @click="activeDate(item)"
+          >{{item.name}}</view>
+        </view>
+      </view>
+      <view class="list_item">
+        <view class="item_title">订单状态</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in orderStatus"
+            :key="item"
+            @click="activeOrderStatus(item)"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="list_item">
+        <view class="item_title">时间范围</view>
+        <view class="item_content item_dialog">
+          <view
+            :class="['dialog_view',{input_placeholder: !timeLimit.start}]"
+          >{{timeLimit.start?timeLimit.start:'预定日始'}}</view>
+          <view class="dialog_line">—</view>
+          <view
+            :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
+          >{{timeLimit.end?timeLimit.end:'预定日止'}}</view>
+        </view>
+      </view>
+
+      <view class="list_item">
+        <view class="item_title">城市选择</view>
+        <view class="item_content item_dialog">
+          <view
+            :class="['dialog_view',{input_placeholder: !citySelect.start}]"
+          >{{citySelect.start?citySelect.start:'出发城市'}}</view>
+          <view class="dialog_line">—</view>
+          <view
+            :class="['dialog_view',{input_placeholder: !citySelect.end}]"
+          >{{citySelect.end?citySelect.end:'到达城市'}}</view>
+        </view>
+      </view>
+
+      <view class="list_item list_input">
+        <view class="item_title">PNR</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="pnr"
+          placeholder="请填写PNR"
+          placeholder-class="input_placeholder"
+        />
+      </view>
+      <view class="list_item list_input">
+        <view class="item_title">订单号</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="orderNumber"
+          placeholder="请填写订单号"
+          placeholder-class="input_placeholder"
+        />
+      </view>
+      <view class="list_item list_input">
+        <view class="item_title">航班号</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="flightNumber"
+          placeholder="请填写航班号"
+          placeholder-class="input_placeholder"
+        />
+      </view>
+      <view class="list_item list_input">
+        <view class="item_title">订票员</view>
+        <view class="item_input">{{booker}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="filter_bottom">
+      <view class="bottom_btn reset_btn" @click="resetBtn">重置</view>
+
+      <view class="bottom_btn submit_btn">确定</view>
+    </view>
+  </view>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      iStatusBarHeight: 0,
+
+      dateFilter: [
+        // 日期条件筛选列表
+        {
+          name: "预定日期",
+          active: false,
+        },
+        {
+          name: "起飞时间",
+          active: false,
+        },
+        {
+          name: "出票日期",
+          active: false,
+        },
+      ],
+      orderStatus: [
+        // 订单状态筛选列表
+        {
+          name: "已预订",
+          active: false,
+        },
+        {
+          name: "待出票",
+          active: false,
+        },
+        {
+          name: "已出票",
+          active: false,
+        },
+        {
+          name: "已取消",
+          active: false,
+        },
+      ],
+      timeLimit: {
+        // 时间范围
+        start: "2020-08-17",
+        end: "2020-08-18",
+      },
+      citySelect: {
+        start: "重庆",
+        end: "",
+      },
+      pnr: "", // pnr
+      orderNumber: "", // 订单号
+      flightNumber: "", // 航班号
+      booker: "", // 订票员
+    };
+  },
+  methods: {
+    // 日期条件选择
+    activeDate(val) {
+      this.dateFilter.forEach((item) => {
+        if (item.name === val.name) {
+          item.active = !val.active;
+        } else {
+          item.active = false;
+        }
+      });
+    },
+    // 订单状态选择
+    activeOrderStatus(val) {
+      this.orderStatus.forEach((item) => {
+        if (item.name === val.name) {
+          item.active = !val.active;
+        } else {
+          item.active = false;
+        }
+      });
+    },
+
+    // 重置筛选
+    resetBtn() {
+      this.dateFilter.forEach((item) => (item.active = false));
+      this.orderStatus.forEach((item) => (item.active = false));
+      this.timeLimit.start = "";
+      this.timeLimit.end = "";
+      this.citySelect.start = "";
+      this.citySelect.end = "";
+      this.pnr = "";
+      this.orderNumber = "";
+      this.flightNumber = "";
+      this.booker = "";
+    },
+  },
+  onLoad() {
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+  },
+};
+</script>
+
+<style lang="less" scoped>
+.filter {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  .filter_main {
+    height: calc(100% - (270upx + var(--status-bar-height)));
+    overflow-y: auto;
+    box-sizing: border-box;
+    .list_item {
+      margin: 0 20upx 50upx;
+      &:first-child {
+        margin-top: 50upx;
+      }
+      &.list_input {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 26upx;
+        border-bottom: 2upx solid rgba(241, 243, 245, 1);
+        margin-bottom: 34upx;
+        .item_input {
+          text-align: right;
+          margin-left: 50upx;
+          flex: 1;
+        }
+      }
+    }
+    .item_title {
+      font-size: 28upx;
+      font-weight: bold;
+      color: rgba(51, 51, 51, 1);
+    }
+    .item_checkbox {
+      display: flex;
+      align-items: center;
+      margin-top: 30upx;
+      .checkbox_item {
+        width: 156upx;
+        height: 70upx;
+        background: rgba(241, 243, 245, 1);
+        border-radius: 10upx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24upx;
+        font-weight: 400;
+        color: rgba(102, 102, 102, 1);
+        &.active {
+          background: rgba(0, 112, 226, 0.6);
+          color: rgba(255, 255, 255, 1);
+        }
+        &:not(:last-child) {
+          margin-right: 28upx;
+        }
+      }
+    }
+    .item_dialog {
+      display: flex;
+      align-items: center;
+      margin-top: 30upx;
+      .dialog_view {
+        width: 280upx;
+        height: 70upx;
+        background: rgba(241, 243, 245, 1);
+        border-radius: 36upx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20upx;
+        box-sizing: border-box;
+        font-size: 28upx;
+        font-weight: 400;
+      }
+      .dialog_line {
+        font-size: 28upx;
+        font-weight: 400;
+        color: rgba(51, 51, 51, 1);
+        margin: 0 40upx;
+      }
+    }
+  }
+
+  .filter_bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    border-top: 2upx solid rgba(229, 229, 229, 1);
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: calc(144upx + var(--status-bar-height));
+    padding: 26upx 20upx;
+    padding-bottom: calc(26upx + var(--status-bar-height));
+    box-sizing: border-box;
+    background: #fff;
+    z-index: 1;
+    .bottom_btn {
+      width: 320upx;
+      height: 90upx;
+      border: 2upx solid transparent;
+      border-radius: 80upx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32upx;
+      font-weight: 400;
+      &.reset_btn {
+        border-color: rgba(0, 112, 226, 1);
+        color: rgba(0, 112, 226, 1);
+      }
+      &.submit_btn {
+        background: linear-gradient(
+          90deg,
+          rgba(0, 112, 226, 1) 0%,
+          rgba(86, 197, 255, 1) 100%
+        );
+        box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+  }
+}
+</style>

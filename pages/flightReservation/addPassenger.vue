@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-08-15 15:04:29
+ * @LastEditTime: 2020-08-17 16:23:54
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -115,16 +115,38 @@
 
               <input
                 class="item_input"
-                type="number"
+                type="idcard"
                 placeholder="请保持与证件一致"
                 v-model="item.cert_no"
                 placeholder-class="input_placeholder"
               />
             </view>
 
+            <view class="list_item input-right-arrow" v-if="item.cert_type === '护照'">
+              <view class="item_title">
+                <text>证件有效期</text>
+              </view>
+
+              <view class="item_input" @click="openBirthdaySelector(passenger.birthday)">
+                <text v-if="passenger.birthday">{{passenger.birthday}}</text>
+                <text class="input_placeholder" v-else>请选择证件有效截至日期</text>
+              </view>
+            </view>
+
+            <view class="list_item input-right-arrow" v-if="item.cert_type === '护照'">
+              <view class="item_title">
+                <text>证件签发国</text>
+              </view>
+
+              <view class="item_input" @click="openBirthdaySelector(passenger.birthday)">
+                <text v-if="passenger.birthday">{{passenger.birthday}}</text>
+                <text class="input_placeholder" v-else>请选择证件签发国家</text>
+              </view>
+            </view>
+
             <view
               class="add_card"
-              v-if="certificateList.length === (index + 1)"
+              v-if="certificateList.length === (index + 1) && !pageType"
               @click="addCertificate()"
             >+ 添加证件</view>
           </view>
@@ -201,7 +223,7 @@
       <view class="return_submit">
         <view class="title">
           信息确认
-          <view class="close_btn" @click="closePopup"></view>
+          <view class="close_btn" @click="editUserinfo"></view>
         </view>
 
         <view class="retuen_content">
@@ -240,6 +262,9 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度
+
+      pageType: false, // 页面状态 false新增，true编辑
+      pageData: {}, // 修改数据
 
       addPassengerType: false, // 旅客状态 true国际， false国内
 
@@ -324,6 +349,10 @@ export default {
       this.certificateList.forEach((item) => {
         if (item.cert_type === "护照") {
           this.addPassengerType = true; // 添加国际旅客状态
+        } else {
+          this.addPassengerType = false;
+          this.passenger.en_first_name = "";
+          this.passenger.en_last_name = "";
         }
       });
     },
@@ -402,6 +431,15 @@ export default {
     removeCertificate(val, i) {
       console.log(val, i);
       this.certificateList.splice(i, 1);
+      this.certificateList.forEach((item) => {
+        if (item.cert_type === "护照") {
+          this.addPassengerType = true; // 添加国际旅客状态
+        } else {
+          this.addPassengerType = false;
+          this.passenger.en_first_name = "";
+          this.passenger.en_last_name = "";
+        }
+      });
     },
 
     // 保存按钮 输入验证
@@ -446,26 +484,72 @@ export default {
         data["group_id"] = this.group.id;
         data["nationality"] = "CN";
 
-        passenger.addPassenger(data).then((res) => {
-          if (res.errorcode === 10000) {
-            uni.showToast({
-              title: "添加成功",
-              icon: "success",
-            });
-            uni.navigateBack();
-          } else {
-            uni.showToast({
-              title: res.msg,
-              icon: "none",
-            });
-          }
-        });
+        if (this.pageType) {
+          // 编辑乘机人
+          passenger.editPassenger(data, this.pageData.id).then((res) => {
+            if (res.errorcode === 10000) {
+              uni.showToast({
+                title: "修改成功",
+                icon: "success",
+              });
+              setTimeout(() => {
+                uni.navigateBack();
+              }, 500);
+            } else {
+              uni.showToast({
+                title: res.msg,
+                icon: "none",
+              });
+            }
+          });
+        } else {
+          // 新增乘机人
+          passenger.addPassenger(data).then((res) => {
+            if (res.errorcode === 10000) {
+              uni.showToast({
+                title: "添加成功",
+                icon: "success",
+              });
+              setTimeout(() => {
+                uni.navigateBack();
+              }, 500);
+            } else {
+              uni.showToast({
+                title: res.msg,
+                icon: "none",
+              });
+            }
+          });
+        }
       });
     },
   },
 
-  onLoad() {
+  onLoad(val) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+
+    console.log(val.type);
+    if (val.type === "edit") {
+      this.pageType = val.type === "edit";
+      this.pageData = JSON.parse(val.data);
+      this.passenger = {
+        name: this.pageData.name, // 用户名
+        en_first_name: this.pageData.en_first_name, // 拼音姓
+        en_last_name: this.pageData.en_last_name, // 拼音名
+        phone: this.pageData.phone, // 手机号
+        birthday: this.pageData.birthday,
+        sex: this.pageData.sex === 1 ? "男" : "女",
+      };
+      this.certificateList[0] = {
+        cert_type: this.pageData.cert_type, // 证件类型
+        cert_no: this.pageData.cert_no, // 证件号码
+      };
+      this.group = {
+        group_name: this.pageData.group,
+        group_id: this.pageData.group_id,
+      };
+    }
+    console.log(this.pageType, this.pageData);
 
     this.getGroupList(); // 获取分组列表
   },
