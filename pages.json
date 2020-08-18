@@ -1,6 +1,12 @@
 {
   "pages": [
     {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "云上航空"
+      }
+    },
+    {
       "path": "pages/order/filter",
       "style": {
         "navigationStyle": "custom"
@@ -30,12 +36,7 @@
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/index/index",
-      "style": {
-        "navigationBarTitleText": "云上航空"
-      }
-    },
+   
     {
       "path": "pages/ticketInquiry/ticketInquiry",
       "style": {
