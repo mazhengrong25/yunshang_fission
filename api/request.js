@@ -2,10 +2,46 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-18 14:49:55
+ * @LastEditTime: 2020-08-19 11:27:47
  * @LastEditors: wish.WuJunLong
  */
-const request = (config, type) => {
+let loginInfo = uni.getStorageSync("loginInfo");
+let currentTime = new Date().getTime();
+let loginTime = new Date(loginInfo.loginTime).getTime();
+
+async function getToken() {
+  uni.request({
+    method: "POST",
+    url: "http://192.168.0.187:8092/api/login",
+    data: {
+      login_name: loginInfo.account,
+      password: loginInfo.password,
+    },
+    success: (res) => {
+      if (res.data.errorcode === 10000) {
+        let loginInfo = {
+          account: uni.getStorageSync("loginInfo").account,
+          password: uni.getStorageSync("loginInfo").password,
+          token: res.data.data.access_token,
+          loginTime: new Date(new Date().getTime() + 3600 * 1000),
+        };
+        uni.setStorageSync("loginInfo", loginInfo);
+      }
+    },
+  });
+}
+
+
+console.log('时间',currentTime > loginTime)
+async function resolve() {
+  if (currentTime > loginTime) {
+    await getToken();
+  }
+}
+resolve();
+
+
+const request = async (config, type) => {
   uni.showLoading({
     title: "加载中",
   });
@@ -28,79 +64,28 @@ const request = (config, type) => {
     config.data = {};
   }
 
-  let loginInfo = uni.getStorageSync("loginInfo");
-
-  let currentTime = new Date();
-  let loginTime = new Date(loginInfo.loginTime);
-  if (new Date(currentTime).getTime() > new Date(loginTime).getTime()) {
-    uni.request({
-      method: "POST",
-      url: "http://192.168.0.187:8092/api/login",
-      data: {
-        login_name: loginInfo.account,
-        password: loginInfo.password,
-      },
-      success: (res) => {
-        if (res.data.errorcode === 10000) {
-          let loginInfo = {
-            account: uni.getStorageSync("loginInfo").account,
-            password: uni.getStorageSync("loginInfo").password,
-            token: res.data.data.access_token,
-            loginTime: new Date(new Date().getTime() + 3600 * 1000),
-          };
-          uni.setStorageSync("loginInfo", loginInfo);
-          config["header"] = {
-            Authorization: "Bearer " + uni.getStorageSync("loginInfo").token,
-          };
-          let promise = new Promise(function (resolve, reject) {
-            uni
-              .request(config)
-              .then((responses) => {
-                uni.hideLoading();
-                // 异常
-                if (responses[0]) {
-                  uni.showToast({
-                    title: "网络超时",
-                    icon: "none",
-                  });
-                } else {
-                  let response = responses[1].data;
-                  resolve(response);
-                }
-              })
-              .catch((error) => {
-                uni.hideLoading();
-                reject(error);
-              });
+  let promise =  new Promise ((resolve, reject)  => {
+    uni
+      .request(config)
+      .then((responses) => {
+        uni.hideLoading();
+        // 异常
+        if (responses[0]) {
+          uni.showToast({
+            title: "网络超时",
+            icon: "none",
           });
-          return promise;
+        } else {
+          let response = responses[1].data;
+          resolve(response);
         }
-      },
-    });
-  } else {
-    let promise = new Promise(function (resolve, reject) {
-      uni
-        .request(config)
-        .then((responses) => {
-          uni.hideLoading();
-          // 异常
-          if (responses[0]) {
-            uni.showToast({
-              title: "网络超时",
-              icon: "none",
-            });
-          } else {
-            let response = responses[1].data;
-            resolve(response);
-          }
-        })
-        .catch((error) => {
-          uni.hideLoading();
-          reject(error);
-        });
-    });
-    return promise;
-  }
+      })
+      .catch((error) => {
+        uni.hideLoading();
+        reject(error);
+      });
+  });
+  return await promise
 };
 
 export default request;
