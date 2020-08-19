@@ -19,12 +19,13 @@
           </view>
 
         <view class="order_price">
-          <text class="price_text">总价 &yen;</text>
+          <text class="price_text">总价&yen;</text>
           <text>{{orderDetails.need_pay_amount || '金额数据错误'}}</text>
         </view>
       </view>
 
-      <view class="remaining_time">
+      <view class="remaining_time"
+	  v-if="orderDetails.status === 1" >
         <image class="time_icon" src="@/static/order_remaining_time.png" mode="aspectFit" />
         <text class="time_text">剩余支付时间：14:00</text>
       </view>
@@ -38,41 +39,46 @@
 
     <view class="details_main">
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
-        <view class="main_list filght_info">
+        <view class="main_list filght_info" v-for="(item, index) in orderDetails.routes" :key="index">
           <view class="info_header">
-            <view class="header_type">单程</view>
+            <view class="header_type">{{orderDetails.routing_type === 1?'单程':
+										orderDetails.routing_type === 2?'往返':
+										orderDetails.routing_type === 3?'多程':''}}</view>
             <view class="header_time">
-              2020-04-18
-              <text>周六</text>
+              {{item.departure_time.substring(0,10)}}
+              <text>周{{$dateTool(item.departure_time,"dddd")}}</text>
             </view>
           </view>
           <view class="info_message">
             <view class="message_box">
-              <view class="date">08:00</view>
-              <view class="address">重庆江北机场T3</view>
+              <view class="date">{{item.departure_time.substring(10,16)}}</view>
+              <view class="address">{{item.departure}}</view>
             </view>
 
             <view class="message_center">
-              <view class="date">2h30m</view>
+			<!-- <text>{{$dateTool(oitem.departure_time,"MM月DD日")}}</text> -->
+              <view class="date">{{$dateTool(item.duration,"hhhmmm")}}</view>
               <view class="center_icon"></view>
               <view class="type">直飞</view>
             </view>
 
             <view class="message_box">
-              <view class="date">10:00</view>
-              <view class="address">首尔仁川机场T2</view>
+              <view class="date">{{item.arrive_time.substring(10,16)}}</view>
+              <view class="address">{{item.arrive}}</view>
             </view>
           </view>
 
           <view class="filght_message">
             <view class="message_icon"></view>
-            <view class="message_list">南航CZ2801</view>
+            <view class="message_list">{{item.inter_segments[0].flight_no}}</view>
             <view class="message_list">空客A320</view>
             <view class="message_list">有早餐</view>
           </view>
 
           <view class="filght_bottom">
-            <view class="bottom_list">W经济舱</view>
+            <view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
+										item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
+										item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
             <view class="bottom_list">退改签规则</view>
             <view class="bottom_list">每人托运2件，每件23KG</view>
           </view>
@@ -90,36 +96,41 @@
               </view>
 
               <view class="list_message">
-                <view class="message_title">{{item.credential === 0? '身份证': ''}}</view>
-                <view class="message_number">50000000000000</view>
+                <view class="message_title">{{item.credential === '0'? '身份证':
+											  item.credential === '1'? '护照':
+											  item.credential === '2'? '港澳通行证':
+											  item.credential === '3'? '其它证件':
+											  item.credential === '4'? '台胞证':
+											  item.credential === '5'? '台湾通行证':''}}</view>
+                <view class="message_number">{{item.credential_no}}</view>	<!-- 身份证号码 -->
               </view>
             </view>
           </view>
 
-          <view class="contact">
+          <view class="contact"	v-for="(item, index) in orderDetails.passengers" :key="index">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">马冬梅</view>
+              <view class="list_message">{{item.en_first_name}}{{item.en_last_name}}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
-              <view class="list_message">13212341234</view>
+              <view class="list_message">{{item.phone}}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">已购保险</view>
-              <view class="list_message">保险</view>
+              <view class="list_message">{{item.insure_price}}元{{item.insure_count}}份</view>
             </view>
           </view>
         </view>
 
-        <view class="main_list certificate">
+        <view class="main_list certificate" v-for="(item, index) in orderDetails.passengers" :key="index">
           <view class="main_list_title">报销凭证</view>
           <view class="certificate_message">
             <view class="message_title">邮寄地址</view>
             <view class="message_text">
               <view>
                 <text>马冬梅</text>
-                <text>13212341234</text>
+                <text>17600129126</text>
               </view>
               <view>重庆市渝中区长江一路</view>
             </view>
@@ -143,11 +154,11 @@
             </view>
             <view class="list_item">
               <view class="item_title">预定时间</view>
-              <view class="item_message">2020年8月6日14:41:19</view>
+              <view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
             </view>
             <view class="list_item">
               <view class="item_title">备注</view>
-              <view class="item_message input-right-arrow"></view>
+              <view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
             </view>
           </view>
         </view>
@@ -162,27 +173,37 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      orderDetails: {}, // 订单详情
+      orderDetails: [], // 订单详情
       flightData: {}, // 航班信息
     };
   },
   methods: {
     // 获取订单详情
     getOrderDetails(val) {
+		console.log('订单详情',val);
       let data = {
-        order_no: val,
+        order_no:val
       };
       orderApi.orderInterDetails(data).then((res) => {
         console.log(res);
+		if (res.errorcode === 10000) {
+		  this.orderDetails = res.data;
+		}else {
+		  uni.showToast({
+		    title: res.msg,
+		    icon: "none",
+		  });
+		}
       });
     },
 
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    console.log(JSON.parse(data.orderData));
-    this.orderDetails = JSON.parse(data.orderData);
-    // this.getOrderDetails(data.orderNo);
+	let orderData = JSON.parse(data.orderData)
+	console.log(JSON.parse(data.orderData));
+    // this.orderDetails = JSON.parse(data.orderData);
+    this.getOrderDetails(orderData.order_no);
   },
 };
 </script>
