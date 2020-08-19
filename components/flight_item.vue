@@ -57,9 +57,7 @@
 			
 			// 跳转预定页面
 			jumpReservation(){
-				uni.navigateTo({
-					url: '/pages/flightReservation/flightReservation'
-				})
+				this.$emit('jumpReservation', true,this.flightData)
 			},
 		}
 	}

@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-18 15:32:04
+ * @LastEditTime: 2020-08-19 09:49:26
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -41,7 +41,7 @@
               <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'hh:mm')}}</view>
               <view
                 class="ticket_address"
-              >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal}}</view>
+              >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
             </view>
             <view class="ticket_arrow">
               <view>{{item.segments[0].duration}}</view>
@@ -72,12 +72,12 @@
           <view class="ticket_price">
             <text class="currency">&yen;</text>
             <view
-              v-if="item.nfd.ItineraryInfos[0].cabinPrices.ADT.rulePrice.price"
-            >{{item.nfd.ItineraryInfos[0].cabinPrices.ADT.rulePrice.price}}</view>
+              v-if="item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price"
+            >{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price}}</view>
             <view v-else class="not_price"></view>
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
-          <view class="ticket_cabin">{{item.nfd.ItineraryInfos[0].cabinInfo.cabinDesc}}</view>
+          <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>
       </view>
@@ -134,15 +134,16 @@ export default {
   methods: {
     // 获取航班信息
     getTicketData(data) {
+      this.ticketList = []
       ticket.getTicket(data).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
-          res.data.IBE.forEach((item) => {
-            item["nfd"] = {};
-          });
+          // res.data.IBE.forEach((item) => {
+          //   item["nfd"] = {};
+          // });
           this.ticketList = res.data.IBE;
-          console.log(this.ticketList)
-          this.getNfdData();
+          console.log(this.ticketList);
+          // this.getNfdData();
         } else {
           uni.showToast({
             title: res.msg,
@@ -179,10 +180,17 @@ export default {
     clickBtn(val) {
       console.log(val);
       this.activeTimeNumber = val.number;
+      let airMessage = {
+        departure: this.ticketData.to.city_code, // 起飞机场三字码
+        arrival: this.ticketData.from.city_code, // 到达机场三字码
+        departureTime: val.date, // 起飞时间
+        airline: "", // 航司二字码
+      };
+      this.getTicketData(airMessage);
     },
     // 时间列表处理
     getDateList() {
-      let day = moment().format("YYYY-MM-DD");
+      let day = moment(this.ticketData.toTime.date).format("YYYY-MM-DD");
       let dayNumber = 0;
       for (let index = 0; index < 7; index++) {
         this.ticketTimeList.push({
@@ -192,10 +200,14 @@ export default {
             nextWeek: "ddd",
             sameElse: "dddd",
           }),
-          number: moment(day).add(dayNumber, "d").format("DD"),
+          date: moment(this.ticketData.toTime.date)
+            .add(dayNumber, "d")
+            .format("YYYY-MM-DD"),
+          number: moment(day).add(dayNumber, "d").format("DD") === '01'?moment(day).add(dayNumber, "d").format("MM") + '-' + moment(day).add(dayNumber, "d").format("DD") :moment(day).add(dayNumber, "d").format("DD"),
         });
         dayNumber += 1;
       }
+      this.activeTimeNumber = this.ticketTimeList[0].number;
     },
 
     // 返回日历选择

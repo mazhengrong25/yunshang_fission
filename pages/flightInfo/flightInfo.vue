@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-19 08:54:23
+ * @LastEditTime: 2020-08-19 10:14:34
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -15,14 +15,14 @@
     <flight-header :flightData="flightData"></flight-header>
 
     <view class="flight_cabin">
-      <view class="cabin_header">
+      <view :class="['cabin_header',{'isDisplay':cabinHeader.length > 1}]">
         <view
           :class="['cabin_header_box',{'is_active': current === index}]"
           @click="checkedHeader(index)"
           v-for="(item, index) in cabinHeader"
           :key="index"
         >
-          {{item === 'NFD'?'特价':item}}
+          {{item}}
           <view class="cabin_header_line"></view>
         </view>
       </view>
@@ -30,7 +30,13 @@
       <swiper class="cabin_content" @change="change" :current="current">
         <swiper-item v-for="(header, headerIndex) in cabinHeader" :key="headerIndex">
           <view class="cabin_content_item">
-            <flight-item v-for="(item, index) in cabinList[header]" :key="index" :flightData="item" @openExpDialog="openExp"></flight-item>
+            <flight-item
+              v-for="(item, index) in cabinList[header]"
+              :key="index"
+              :flightData="item"
+              @openExpDialog="openExp"
+              @jumpReservation="jumpReservationBtn"
+            ></flight-item>
           </view>
         </swiper-item>
       </swiper>
@@ -86,6 +92,7 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0, // 导航栏高度
+      airMessage: {}, // 原始数据
       ticketAddress: {
         // 导航栏地址
         to: "重庆",
@@ -127,12 +134,11 @@ export default {
       this.$refs.flightExplanation.close();
     },
 
-
     // 打开退改签说明弹窗
-    openExp(type,data){
-      console.log(data)
-      this.ruleInfos = data
-      this.$refs.flightExplanation.open()
+    openExp(type, data) {
+      console.log(data);
+      this.ruleInfos = data;
+      this.$refs.flightExplanation.open();
     },
     // 弹窗轮播标题切换
     checkedExplanationBtn(index) {
@@ -141,6 +147,13 @@ export default {
     // 弹窗轮播切换
     popupChange(e) {
       this.popupCurrent = e.detail.current;
+    },
+
+    // 跳转预定页面
+    jumpReservationBtn(type,data){
+      	uni.navigateTo({
+					url: '/pages/flightReservation/flightReservation?data=' + JSON.stringify(data)
+				})
     },
   },
   onLoad(data) {
@@ -180,21 +193,23 @@ export default {
       food: airData.segments[0].hasMeal, // 餐饮
     };
 
+    // 组装原始数据
+    this.airMessage = {
+      ticketAddress: this.ticketAddress,
+      flightData: this.flightData
+    }
+
     // 组装航班列表信息
     // this.cabinHeader
-    if (airData.nfd.ItineraryInfos.length > 0) {
-      this.cabinHeader = Object.keys(airData.ItineraryInfos);
-      // 组装特价舱数据
+    let airDataName = Object.keys(airData.ItineraryInfos);
 
-      // 组装经济舱/公务舱数据
-      this.cabinHeader.forEach((item) => {
-        this.cabinList[item] = []
-        this.cabinList[item].ruleInfos = {}
-        let dataArr =
-          item === "NFD"
-            ? airData.nfd.ItineraryInfos
-            : airData.ItineraryInfos[item];
-
+    // 组装经济舱/公务舱数据
+    airDataName.forEach((item) => {
+      if (item !== "NFD") {
+        this.cabinHeader.push(item)
+        this.cabinList[item] = [];
+        this.cabinList[item].ruleInfos = {};
+        let dataArr = airData.ItineraryInfos[item];
         dataArr.forEach((oitem) => {
           this.cabinList[item].push({
             type: item,
@@ -208,11 +223,12 @@ export default {
             voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
             cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
             baggage: oitem.cabinInfo.baggage, // 行李额
-            ruleInfos: oitem.ruleInfos,  // 退改信息
+            ruleInfos: oitem.ruleInfos, // 退改信息
+            data: oitem
           });
         });
-      });
-    }
+      }
+    });
   },
 };
 </script>
@@ -232,11 +248,16 @@ export default {
     .cabin_header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       background: rgba(223, 238, 254, 1);
       border-radius: 20upx 20upx 0 0;
       padding: 0 60upx;
       margin: 0 20upx;
+      &.isDisplay{
+        justify-content: space-between;
+        .cabin_header_box{
+          margin-right: 0;
+        }
+      }
 
       .cabin_header_box {
         font-size: 30upx;
@@ -245,6 +266,9 @@ export default {
         height: 90upx;
         line-height: 90upx;
         position: relative;
+        &:not(:last-child){
+          margin-right: 160upx;
+        }
 
         &.is_active {
           font-weight: bold;
@@ -287,7 +311,7 @@ export default {
 
     .cabin_content {
       flex: 1;
-      height: calc(100vh - 555upx);
+      height: calc(100vh - 505upx);
 
       .cabin_content_item {
         overflow-y: auto;

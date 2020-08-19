@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-18 14:45:46
+ * @LastEditTime: 2020-08-19 10:04:23
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -182,6 +182,7 @@ import ticketInput from "@/components/ticket_input.vue"; // 航程选择
 import messageDialog from "@/components/message_dialog.vue"; // 信息弹窗内容
 
 import moment from "moment";
+moment.locale("zh-cn");
 export default {
   components: {
     modelSwiper,
@@ -233,7 +234,11 @@ export default {
 
       popupCurrent: 0, // 弹窗轮播下标
 
-      airMessage: {},
+      airMessage: {
+        to: {},
+        from: {},
+        toTime: {}
+      },
     };
   },
   onLoad() {},
@@ -354,10 +359,39 @@ export default {
     // 提交按钮
     submitTicket() {
       console.log("提交");
-      this.airMessage['type'] = this.ticketType
-      console.log(this.airMessage)
+      this.airMessage["type"] = this.ticketType;
+      
+      if (Object.keys(this.airMessage.to).length === 0) {
+        this.airMessage.to = {
+          city_code: "CKG",
+          city_name: "重庆",
+          country_code: "CN",
+          province: "重庆",
+        };
+      }
+      if (Object.keys(this.airMessage.from).length === 0) {
+        this.airMessage.from = {
+          city_code: "BJS",
+          city_name: "北京",
+          country_code: "CN",
+          province: "北京",
+        };
+      } 
+      if (Object.keys(this.airMessage.toTime).length === 0) {
+        this.airMessage.toTime = {
+          date: moment().add(1, "d").format("YYYY-MM-DD"),
+          month: moment().add(1, "d").format("M月DD日"),
+          status: "start",
+          type: "time",
+          week: moment().add(1, "d").format("ddd"),
+        };
+      }
+      console.log(this.airMessage.from)
+      console.log(this.airMessage);
       uni.navigateTo({
-        url: "/pages/ticketInquiry/ticketInquiry?data=" + JSON.stringify(this.airMessage),
+        url:
+          "/pages/ticketInquiry/ticketInquiry?data=" +
+          JSON.stringify(this.airMessage),
       });
     },
   },
@@ -368,12 +402,12 @@ export default {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
-      if(cityData.status === 'to'){
+      if (cityData.status === "to") {
         this.addressForm.to = cityData.data.city_name;
-        this.airMessage['to'] = cityData.data
-      }else if(cityData.status === 'from'){
+        this.airMessage["to"] = cityData.data;
+      } else if (cityData.status === "from") {
         this.addressForm.from = cityData.data.city_name;
-        this.airMessage['from'] = cityData.data
+        this.airMessage["from"] = cityData.data;
       }
       console.log(cityData);
       uni.removeStorageSync("city");
@@ -381,16 +415,16 @@ export default {
     // 获取时间日期
     if (uni.getStorageSync("time")) {
       let timeData = JSON.parse(uni.getStorageSync("time"));
-       if(timeData.status === 'start'){
+      if (timeData.status === "start") {
         this.addressForm.toTime = timeData.month;
         this.addressForm.toDay = timeData.week;
-        this.airMessage['toTime'] = timeData
-      }else if(timeData.status === 'end'){
+        this.airMessage["toTime"] = timeData;
+      } else if (timeData.status === "end") {
         this.addressForm.fromTime = timeData.month;
         this.addressForm.fromDay = timeData.week;
-        this.airMessage['fromTime'] = timeData
+        this.airMessage["fromTime"] = timeData;
       }
-      
+
       console.log(this.addressForm);
       uni.removeStorageSync("time");
     }

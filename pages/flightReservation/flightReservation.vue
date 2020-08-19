@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-07-23 17:31:51
+ * @LastEditTime: 2020-08-19 10:14:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -312,8 +312,9 @@ export default {
 
 		},
   },
-  onLoad() {
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    console.log(JSON.parse(data.data))
   }
 };
 </script>
