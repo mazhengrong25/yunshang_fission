@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-08-18 15:55:47
+ * @LastEditTime: 2020-08-19 08:54:59
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -61,9 +61,6 @@
 					url: '/pages/flightReservation/flightReservation'
 				})
 			},
-		},
-		created () {
-			console.log(this.flightData)
 		}
 	}
 </script>
