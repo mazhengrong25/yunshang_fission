@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-12 10:37:03
+ * @LastEditTime: 2020-08-18 14:45:46
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -404,7 +404,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .index {
   background: #f3f5f7;
 

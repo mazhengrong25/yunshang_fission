@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-13 18:16:15
+ * @LastEditTime: 2020-08-19 08:54:23
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -30,7 +30,7 @@
       <swiper class="cabin_content" @change="change" :current="current">
         <swiper-item v-for="(header, headerIndex) in cabinHeader" :key="headerIndex">
           <view class="cabin_content_item">
-            <flight-item v-for="(item, index) in cabinList[header]" :key="index" :flightData="item"></flight-item>
+            <flight-item v-for="(item, index) in cabinList[header]" :key="index" :flightData="item" @openExpDialog="openExp"></flight-item>
           </view>
         </swiper-item>
       </swiper>
@@ -109,6 +109,8 @@ export default {
       cabinList: {},
 
       popupCurrent: 0, // 弹窗轮播下标
+
+      ruleInfos: {}, // 退改签信息
     };
   },
   methods: {
@@ -125,6 +127,13 @@ export default {
       this.$refs.flightExplanation.close();
     },
 
+
+    // 打开退改签说明弹窗
+    openExp(type,data){
+      console.log(data)
+      this.ruleInfos = data
+      this.$refs.flightExplanation.open()
+    },
     // 弹窗轮播标题切换
     checkedExplanationBtn(index) {
       this.popupCurrent = index;
@@ -180,6 +189,7 @@ export default {
       // 组装经济舱/公务舱数据
       this.cabinHeader.forEach((item) => {
         this.cabinList[item] = []
+        this.cabinList[item].ruleInfos = {}
         let dataArr =
           item === "NFD"
             ? airData.nfd.ItineraryInfos
@@ -198,11 +208,10 @@ export default {
             voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
             cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
             baggage: oitem.cabinInfo.baggage, // 行李额
+            ruleInfos: oitem.ruleInfos,  // 退改信息
           });
         });
       });
-
-      console.log(this.cabinList);
     }
   },
 };

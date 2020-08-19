@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-08-13 18:14:14
+ * @LastEditTime: 2020-08-18 15:55:47
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -51,7 +51,8 @@
 		methods: {
 			// 打开说明弹窗
 			openFlightPopop(){  
-				this.$parent.$refs.flightExplanation.open()
+				this.$emit('openExpDialog', true, this.flightData.ruleInfos)
+				// this.$parent.$refs.flightExplanation.open()
 			},
 			
 			// 跳转预定页面
@@ -61,6 +62,9 @@
 				})
 			},
 		},
+		created () {
+			console.log(this.flightData)
+		}
 	}
 </script>
 

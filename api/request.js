@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-17 10:26:00
+ * @LastEditTime: 2020-08-18 14:49:55
  * @LastEditors: wish.WuJunLong
  */
 const request = (config, type) => {
@@ -49,6 +49,9 @@ const request = (config, type) => {
             loginTime: new Date(new Date().getTime() + 3600 * 1000),
           };
           uni.setStorageSync("loginInfo", loginInfo);
+          config["header"] = {
+            Authorization: "Bearer " + uni.getStorageSync("loginInfo").token,
+          };
           let promise = new Promise(function (resolve, reject) {
             uni
               .request(config)
