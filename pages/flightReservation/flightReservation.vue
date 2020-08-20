@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-08-19 10:14:02
+ * @LastEditTime: 2020-08-19 18:32:12
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -19,7 +19,9 @@
         <view class="passenger_title">
           <view class="title_text">
             <text v-if="passengerList.length < 1">乘机人</text>
-            <text v-else>已选1成人，1儿童，1婴儿</text>
+            <text
+              v-else
+            >已选 {{passengerNumber.adt? passengerNumber.adt + '成人': ''}}{{passengerNumber.chd? '，'+passengerNumber.chd + '儿童': ''}}{{passengerNumber.inf? '，'+passengerNumber.inf + '婴儿': ''}}</text>
           </view>
           <view class="add_passenger_btn" @click="jumpPassengerPage">添加乘机人</view>
         </view>
@@ -31,19 +33,24 @@
               <view class="message_info">
                 <view class="info_left">
                   <view class="type">{{item.type}}票</view>
-                  <view class="user_name">{{item.userName}}</view>
-                  <view class="position">{{item.position?item.position:'未分组'}}</view>
+                  <view class="user_name">{{item.name}}</view>
+                  <view class="position">{{item.group?item.group:'未分组'}}</view>
                 </view>
                 <view class="edit_btn"></view>
               </view>
 
               <view class="message_info">
                 <view class="bottom_left">
-                  <view class="bottom_title">{{item.type === '成人'? '身份证': '出生证明'}}</view>
-                  <view class="card">{{item.idCard}}</view>
+                  <view class="bottom_title">{{item.cert_type}}</view>
+                  <view class="card">{{item.cert_no}}</view>
                 </view>
                 <view class="insurance_box">
-                  <yun-switch :value="item.ins" text="保险" @switchStauts="passInsSwitch()" :index="index"></yun-switch>
+                  <yun-switch
+                    :value="item.is_insure"
+                    text="保险"
+                    @switchStauts="passInsSwitch()"
+                    :index="index"
+                  ></yun-switch>
                 </view>
               </view>
             </view>
@@ -72,6 +79,7 @@
           </view>
           <view class="form_item">
             <view class="form_item_title">手机号</view>
+            <!--
             <picker
               class="phone_numbering"
               @change="bindPickerChange"
@@ -81,6 +89,7 @@
             >
               <view class="phone_numbering_input">{{areaCode[areaCodeIndex]}}</view>
             </picker>
+            -->
             <input
               class="form_item_input"
               type="number"
@@ -99,18 +108,26 @@
         <view class="insurance_box">
           <view
             class="insurance_box_item"
-            v-for="(item, index) in insuranceList"
+            v-for="(item, index) in insuranceList.slice(0, moreInsurance)"
             :key="index"
-            @click="changeInsurance(item)"
+            @click="changeInsurance(insuranceList[index])"
           >
-            <view class="item_name">{{item.value}}</view>
+            <view class="item_name">
+              {{item.insure_desc}}(保额{{(Number(item.amount) / 10000).toFixed(0)}}万)
+              <text :class="['item_icon', {true: item.type}]"></text>
+            </view>
             <view class="item_check">
               <view class="item_price">
-                <text>&yen; {{item.checked}}</text>/份
+                <text>&yen; {{Number(item.default_dis_price).toFixed(0)}}</text>/份
               </view>
-              <view :class="['item_icon',{'is_active':insuranceActive.value === item.value}]"></view>
+              <view :class="['item_icon',{'is_active':insuranceActive.id === item.id}]"></view>
             </view>
           </view>
+          <view
+            v-if="insuranceList.length > 4"
+            @click="showMoreInsurance()"
+            :class="['more_btn',{open: moreInsurance === 4}]"
+          >{{moreInsurance === 4?'展开全部':'收起全部'}}</view>
         </view>
       </view>
 
@@ -132,31 +149,33 @@
         </view>
       </view>
 
-      <view class="reimbursement box-shadow-style">
-        <view class="item_list">
-          <view class="list_title">报销凭证</view>
-          <yun-switch :value="reimbursement" @switchStauts="reimbursementSwitch"></yun-switch>
-        </view>
+      <!-- 
+        <view class="reimbursement box-shadow-style">
+          <view class="item_list">
+            <view class="list_title">报销凭证</view>
+            <yun-switch :value="reimbursement" @switchStauts="reimbursementSwitch"></yun-switch>
+          </view>
 
-        <view class="flase_reim" v-if="!reimbursement">您未选择报销凭证，订单出票后可在详情页内申请</view>
-        <view class="true_reim" v-else>
-          <view class="reim_title">邮寄地址</view>
+          <view class="flase_reim" v-if="!reimbursement">您未选择报销凭证，订单出票后可在详情页内申请</view>
+          <view class="true_reim" v-else>
+            <view class="reim_title">邮寄地址</view>
 
-          <view class="reim_box" @click="jumpAddMailAddress">
-            <view class="not_reim">请填写邮件地址</view>
-            <!-- <view class="reim_message">
-							<view class="message_list">
-								<text>马某某</text><text>1321241234</text>
-							</view>
-							<view class="message_list">重庆市渝中区长江一路69号云上航空4楼</view>
-            </view>-->
+            <view class="reim_box" @click="jumpAddMailAddress">
+              <view class="not_reim">请填写邮件地址</view>
+              <view class="reim_message">
+                <view class="message_list">
+                  <text>马某某</text><text>1321241234</text>
+                </view>
+                <view class="message_list">重庆市渝中区长江一路69号云上航空4楼</view>
+              </view>
+            </view>
           </view>
         </view>
-      </view>
+      -->
 
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
-        <text>《关于规范互联网机票销售行为的通知》</text>
+        <text @click="openDiscDialog()">《关于规范互联网机票销售行为的通知》</text>
         <text>《山东航运输总条件》</text>
         <text>《锂电池航空运输规范》</text>
       </view>
@@ -165,10 +184,9 @@
     <view class="bottom_bar">
       <view class="left_message">
         <view class="not_pass_message" v-if="passengerList.length < 1">请先添加乘机人</view>
-				<view class="pass_message" @click="openOrderInfo()">
-					<text>合计：&yen;</text>
-					798
-				</view>
+        <view class="pass_message" @click="openOrderInfo()">
+          <text>合计：&yen;</text>798
+        </view>
       </view>
       <view class="right_btn">去支付</view>
     </view>
@@ -177,9 +195,10 @@
 
 <script>
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
+import insurance from "@/api/insurance.js";
 export default {
   components: {
-    flightHeader
+    flightHeader,
   },
   data() {
     return {
@@ -187,7 +206,7 @@ export default {
       headerAddress: {
         // 导航栏信息
         to: "重庆",
-        from: "北京"
+        from: "北京",
       },
       flightData: {
         // 航班头部信息
@@ -200,78 +219,37 @@ export default {
         toAddress: "北京首都机场T3", // 到达机场
         airline: "南航", // 航司
         model: "空客A320(中)", // 机型
-        food: "有早餐" // 餐饮
+        food: "有早餐", // 餐饮
       },
 
-      passengerList: [
-        // 乘机人列表
-        {
-					id: 1,
-          type: "成人",
-          userName: "白大飞",
-          position: "销售部",
-          idCard: "500123123412341234",
-          ins: false
-        },
-        {
-					id: 2,
-          type: "儿童",
-          userName: "白小飞",
-          position: "",
-          idCard: "500123123412341234",
-          ins: true
-        },
-        {
-					id: 3,
-          type: "婴儿",
-          userName: "白飞飞",
-          position: "",
-          idCard: "500123123412341234",
-          ins: true
-        }
-      ],
+      passengerList: [], // 乘机人列表
+      passengerNumber: {}, // 乘机人数量
 
       orderPassenger: {
         // 订单联系人信息
         userName: "", // 联系人
-        telPhone: "" // 手机号
+        telPhone: "", // 手机号
       },
-      insuranceList: [
-        {
-          // 保险列表
-          value: "众安航意险20元(保额80万）",
-          checked: 20
-        },
-        {
-          value: "众安航意险30元(保额320万）",
-          checked: 30
-        },
-        {
-          value: "众安航意险40元(保额420万）",
-          checked: 40
-        },
-        {
-          value: "众安航意险50元(保额500万）",
-          checked: 50
-        }
-      ],
-      insuranceActive: "", // 选择保险
+      insuranceList: [], // 保险列表
+      moreInsurance: 4, // 保险默认显示条数
+      insuranceActive: {}, // 选择保险
 
       areaCode: ["+86", "+01", "+02", "+03"], // 手机区号
       areaCodeIndex: 0, // 手机区号下标
 
-      reimbursement: false // 报销凭证开关
+      reimbursement: false, // 报销凭证开关
     };
   },
   methods: {
     changeInsurance(val) {
+      console.log(val)
       // 保险选择
-      this.insuranceActive = val !== this.insuranceActive ? val : "";
+      this.insuranceActive = val.id !== this.insuranceActive.id ? val : "";
       console.log(this.insuranceActive);
     },
 
     // 选择手机区号
-    bindPickerChange: function(e) {
+    bindPickerChange: function (e) {
       console.log("picker发送选择改变，携带值为", e.target.value);
       this.areaCodeIndex = e.target.value;
     },
@@ -284,38 +262,96 @@ export default {
     // 跳转报销凭证 添加邮件地址
     jumpAddMailAddress() {
       uni.navigateTo({
-        url: "/pages/flightReservation/mailAddress"
+        url: "/pages/flightReservation/mailAddress",
       });
-		},
+    },
 
-		// 添加乘机人按钮
-		jumpPassengerPage(){
-			uni.navigateTo({
-        url: "/pages/flightReservation/passengerList"
+    // 添加乘机人按钮
+    jumpPassengerPage() {
+      uni.navigateTo({
+        url: "/pages/flightReservation/passengerList",
       });
-		},
+    },
 
-		// 移除乘机人
-		removePassenger(data){
-			this.passengerList.splice(this.passengerList.findIndex(item => item.id === data.id),1)
-		},
-		// 乘机人保险开关
-		passInsSwitch(e,index){
-			console.log(e,index)
-			this.passengerList[index].ins = e
-		},
-		
+    // 移除乘机人
+    removePassenger(data) {
+      this.passengerList.splice(
+        this.passengerList.findIndex((item) => item.id === data.id),
+        1
+      );
+      this.passengerNumber = {
+        adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量
+        chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
+        inf: this.passengerList.filter((u) => u.type === "婴儿").length, // 婴儿数量
+      };
+    },
 
+    // 获取保险列表
+    getPassInsData() {
+      insurance.insuranceList().then((res) => {
+        if (res.errorcode === 10000) {
+          this.insuranceList = res.data;
+          this.insuranceList.forEach((item) => {
+            item['is_insure'] = false
+            item["type"] = item.insure_desc.indexOf("电子") === -1;
+            item.insure_desc = item.insure_desc.slice(
+              0,
+              item.insure_desc.indexOf("元") + 1
+            );
+          });
+          console.log(this.insuranceList);
+        } else {
+          uni.showToast({
+            title: "保险列表获取失败，" + res.msg,
+            icon: "none",
+          });
+        }
+      });
+    },
 
-		// 打开金额明细弹窗
-		openOrderInfo(){
+    // 展开保险列表
+    showMoreInsurance() {
+      this.moreInsurance =
+        this.moreInsurance === 4 ? this.insuranceList.length : 4;
+    },
 
-		},
+    // 乘机人保险开关
+    passInsSwitch(e, index) {
+      this.$nextTick(() =>{
+         this.passengerList[index].is_insure = e;
+      })
+    },
+
+    // 打开免责声明弹窗
+    openDiscDialog(type){
+      
+    },
+
+    // 打开金额明细弹窗
+    openOrderInfo() {},
+  },
+  onShow() {
+    // 获取乘客列表
+    let passenger = uni.getStorageSync("passengerList");
+    if (passenger) {
+      this.passengerList = JSON.parse(passenger);
+      this.passengerNumber = {
+        adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量
+        chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
+        inf: this.passengerList.filter((u) => u.type === "婴儿").length, // 婴儿数量
+      };
+      uni.removeStorageSync('passengerList');
+    }
+
   },
   onLoad(data) {
+    this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    console.log(JSON.parse(data.data))
-  }
+    console.log(JSON.parse(data.data));
+    let airData = JSON.parse(data.data);
+    this.headerAddress = airData.ticketAddress;
+    this.flightData = airData.flightData;
+  },
 };
 </script>
 
@@ -361,10 +397,10 @@ export default {
       padding-top: 44upx;
       .main_list {
         display: flex;
-				align-items: center;
-				&:not(:nth-last-child(2)){
-					margin-bottom: 40upx;
-				}
+        align-items: center;
+        &:not(:nth-last-child(2)) {
+          margin-bottom: 40upx;
+        }
         .remove_btn {
           background: url(@/static/number_remove_btn.png) no-repeat center
             center;
@@ -437,8 +473,8 @@ export default {
         justify-content: center;
         font-size: 30upx;
         font-weight: bold;
-				color: rgba(0, 112, 226, 1);
-				margin-top: 24upx;
+        color: rgba(0, 112, 226, 1);
+        margin-top: 24upx;
         .add_child_btn_icon {
           width: 30upx;
           height: 30upx;
@@ -533,6 +569,22 @@ export default {
           font-size: 28upx;
           font-weight: 400;
           color: rgba(42, 42, 42, 1);
+          display: inline-flex;
+          align-items: center;
+          .item_icon {
+            display: block;
+            width: 47upx;
+            height: 33upx;
+            background: url(@/static/insurance_type_1.png) no-repeat center
+              center;
+            background-size: contain;
+            margin-left: 10upx;
+            &.true {
+              background: url(@/static/insurance_type_2.png) no-repeat center
+                center;
+              background-size: contain;
+            }
+          }
         }
 
         .item_check {
@@ -563,6 +615,30 @@ export default {
               background-size: contain;
             }
           }
+        }
+      }
+      .more_btn {
+        font-size: 24upx;
+        font-weight: 400;
+        color: rgba(175, 185, 196, 1);
+        margin-top: 30upx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &.open {
+          &::after {
+            transform: rotate(-270deg);
+          }
+        }
+        &::after {
+          content: "";
+          background: url(@/static/arrow.png) no-repeat center center;
+          background-size: contain;
+          width: 12upx;
+          height: 20upx;
+          transform: rotate(-90deg);
+          display: block;
+          margin-left: 10upx;
         }
       }
     }
@@ -683,27 +759,28 @@ export default {
         font-size: 28upx;
         font-weight: 400;
         color: rgba(42, 42, 42, 1);
-			}
-			.pass_message{
-				font-size: 40upx;
-				font-weight:bold;
-				color:rgba(0,112,226,1);
-				text{
-					font-size: 28upx;
-					font-weight: 400;
-					margin-right: 6upx;
-				}
-				&::after{
-					content: '';
-					display: inline-block;
-					background: url(@/static/flight_checked_btn.png) no-repeat center center;
-					background-size: contain;
-					width: 16upx;
-					height: 12upx;
-					margin-left: 16upx;
-					padding-bottom: 20upx;
-				}
-			}
+      }
+      .pass_message {
+        font-size: 40upx;
+        font-weight: bold;
+        color: rgba(0, 112, 226, 1);
+        text {
+          font-size: 28upx;
+          font-weight: 400;
+          margin-right: 6upx;
+        }
+        &::after {
+          content: "";
+          display: inline-block;
+          background: url(@/static/flight_checked_btn.png) no-repeat center
+            center;
+          background-size: contain;
+          width: 16upx;
+          height: 12upx;
+          margin-left: 16upx;
+          padding-bottom: 20upx;
+        }
+      }
     }
 
     .right_btn {

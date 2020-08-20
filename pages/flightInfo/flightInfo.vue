@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-19 10:14:34
+ * @LastEditTime: 2020-08-19 11:49:33
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -151,17 +151,18 @@ export default {
 
     // 跳转预定页面
     jumpReservationBtn(type,data){
+        this.airMessage['data'] = data
       	uni.navigateTo({
-					url: '/pages/flightReservation/flightReservation?data=' + JSON.stringify(data)
+					url: '/pages/flightReservation/flightReservation?data=' + JSON.stringify(this.airMessage)
 				})
     },
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    console.log(JSON.parse(data.airData));
 
     // 组装航程头部信息
     let airData = JSON.parse(data.airData);
+    console.log(airData)
     this.ticketAddress = {
       to: airData.to,
       from: airData.from,

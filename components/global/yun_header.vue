@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-08-04 15:43:17
+ * @LastEditTime: 2020-08-19 16:55:18
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -64,11 +64,7 @@ export default {
   },
   methods: {
     goBack() {
-      uni.navigateBack({
-        delta: 1,
-        animationType: "pop-out",
-        animationDuration: 200
-      });
+      uni.navigateBack();
     }
   }
 };

@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-08-17 09:36:04
+ * @LastEditTime: 2020-08-19 15:43:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -25,7 +25,7 @@
       </view>
 
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="mian_list">
-        <uni-swipe-action>
+        <uni-swipe-action :disabled="passengerType">
           <uni-swipe-action-item v-for="(item, index) in passengerList" :key="index">
             <view class="list_item" @click="checkedPassenger(item, index)">
               <view class="checked" v-if="!passengerType">
@@ -82,6 +82,8 @@ export default {
       groupList: [], // 分组列表
 
       passengerList: [], // 乘机人列表
+
+      checkePassenger: [], // 已选择乘客列表
     };
   },
   methods: {
@@ -177,10 +179,19 @@ export default {
     // 选中乘机人
     checkedPassenger(data, index) {
       this.passengerList[index].checked = !this.passengerList[index].checked;
+      if(this.passengerList[index].checked){
+        let info = this.passengerList[index]
+        this.checkePassenger.push(info)
+      }else{
+        this.checkePassenger.splice(this.checkePassenger.findIndex(item => item.id === data.id), 1)
+      }
     },
 
     // 确认乘机人
-    returnBtn() {},
+    returnBtn() {
+      uni.setStorageSync('passengerList', JSON.stringify(this.checkePassenger))
+      uni.navigateBack()
+    },
   },
   onShow(){
     this.getPassengerData();
