@@ -36,8 +36,18 @@ function orderInterDetails(data) {
   })
 };
 
+//点击退票
+function orderInterRefund(data) {
+	return request({
+		method:'POST',
+		url:'/api/interOrder/orderRfound',
+		data: data
+	})
+}
+
 export default{
   orderList,
   orderInterList,
-  orderInterDetails
+  orderInterDetails,
+  orderInterRefund
 }

@@ -148,9 +148,7 @@
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
             <view class="time_text">剩余支付时间：</view>
-<!--            <view-->
-<!--              class="time_number"-->
-<!--            >{{$timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</view>-->
+           <view class="time_number">{{$timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</view>
           </view>
 
           <view

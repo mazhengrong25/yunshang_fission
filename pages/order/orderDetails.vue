@@ -27,13 +27,17 @@
       <view class="remaining_time"
 	  v-if="orderDetails.status === 1" >
         <image class="time_icon" src="@/static/order_remaining_time.png" mode="aspectFit" />
-        <text class="time_text">剩余支付时间：14:00</text>
+        <text class="time_text">剩余支付时间：{{$timeDiff(new Date(orderDetails.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</text>
       </view>
 
       <view class="order_option">
-        <view class="option_btn">发送短信</view>
-        <view class="option_btn">取消订单</view>
-        <view class="option_btn important_btn">去支付</view>
+        <view class="option_btn" v-if="orderDetails.status === 1">取消订单</view>
+        <view class="option_btn important_btn" v-if="orderDetails.status === 1">去支付</view>
+		<view class="option_btn" v-if="orderDetails.status === 3">报销凭证</view>
+		<view class="option_btn" v-if="orderDetails.status === 3" @click="getRefund()">退票</view>
+		<view class="option_btn" v-if="orderDetails.status === 3">改签</view>
+		<view class="option_btn" v-if="orderDetails.status === 5">查看退废单</view>
+		<view class="option_btn" v-if="orderDetails.status === 5">再次预定</view>
       </view>
     </view>
 
@@ -46,7 +50,7 @@
 										orderDetails.routing_type === 3?'多程':''}}</view>
             <view class="header_time">
               {{item.departure_time.substring(0,10)}}
-              <text>周{{$dateTool(item.departure_time,"dddd")}}</text>
+              <text>{{$dateTool(item.departure_time,"ddd")}}</text>
             </view>
           </view>
           <view class="info_message">
@@ -56,8 +60,7 @@
             </view>
 
             <view class="message_center">
-			<!-- <text>{{$dateTool(oitem.departure_time,"MM月DD日")}}</text> -->
-              <view class="date">{{$dateTool(item.duration,"hhhmmm")}}</view>
+              <view class="date">{{(item.duration.replace(":","h"))}}m</view>
               <view class="center_icon"></view>
               <view class="type">直飞</view>
             </view>
@@ -123,7 +126,7 @@
           </view>
         </view>
 
-        <view class="main_list certificate" v-for="(item, index) in orderDetails.passengers" :key="index">
+     <!--  <view class="main_list certificate" v-for="(item, index) in orderDetails.passengers" :key="index">
           <view class="main_list_title">报销凭证</view>
           <view class="certificate_message">
             <view class="message_title">邮寄地址</view>
@@ -135,7 +138,7 @@
               <view>重庆市渝中区长江一路</view>
             </view>
           </view>
-        </view>
+        </view> -->
 
         <view class="main_list order_message">
           <view class="main_list_title">订单信息</view>
@@ -196,6 +199,14 @@ export default {
 		}
       });
     },
+	
+	//点击退票跳转页面
+	// 跳转订单详情
+	getRefund(data) {
+	  uni.navigateTo({
+	    url: "/pages/order/refund?orderData=" + JSON.stringify(data),
+	  });
+	},
 
   },
   onLoad(data) {
