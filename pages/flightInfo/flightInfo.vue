@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-20 16:32:20
+ * @LastEditTime: 2020-08-21 10:32:00
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -242,9 +242,7 @@ export default {
         airData.segments[0].arrAirportName +
         "机场" +
         airData.segments[0].arrTerminal, // 到达机场
-      airIcon:
-        "http://192.168.0.187:8092/" +
-        airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)].image,
+      airIcon:  airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)].image,
       airline:
         airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
           .air_name + airData.segments[0].flightNumber, // 航司

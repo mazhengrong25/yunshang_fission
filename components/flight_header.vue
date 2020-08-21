@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-08-20 17:14:36
+ * @LastEditTime: 2020-08-21 09:58:56
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -39,7 +39,7 @@
     </view>
 
     <view class="flight_reservation_box" v-if="!flightInfo">
-      W经济舱 | 退改签规则 | 每人托运2件,每件23KG
+      {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
       <view class="message_more_btn"></view>
     </view>
   </view>

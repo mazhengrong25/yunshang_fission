@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-08-20 18:33:15
+ * @LastEditTime: 2020-08-21 18:22:03
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -74,7 +74,7 @@
               type="text"
               placeholder="请填写姓名"
               placeholder-style="fontSize: 28upx;fontWeight:400;color:rgba(175,185,196,1);"
-              v-model="orderPassenger.userName"
+              v-model="orderPassenger.name"
             />
           </view>
           <view class="form_item">
@@ -95,7 +95,7 @@
               type="number"
               placeholder="用于接收订单通知"
               placeholder-style="fontSize: 28upx;fontWeight:400;color:rgba(175,185,196,1);"
-              v-model="orderPassenger.telPhone"
+              v-model="orderPassenger.phone"
             />
           </view>
         </view>
@@ -145,7 +145,7 @@
             <view class="list_name">返点</view>
 
             <view class="list_price">&yen; 5</view>
-          </view> -->
+          </view>-->
         </view>
       </view>
 
@@ -176,7 +176,7 @@
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
         <text @click="openDiscDialog()">《关于规范互联网机票销售行为的通知》</text>
-        <text>《山东航运输总条件》</text>
+        <text @click="openStatementWeb()">《{{statement.title}}》</text>
         <text>《锂电池航空运输规范》</text>
       </view>
     </scroll-view>
@@ -189,8 +189,13 @@
           {{priceInfo.totalPrice}}
         </view>
       </view>
-      <view class="right_btn">去支付</view>
+      <view
+        :class="['right_btn',{is_true: passengerList.length > 0 && orderPassenger.name && orderPassenger.phone}]"
+        @click="submitOrder()"
+      >去支付</view>
     </view>
+
+    <web-view v-if="showStatementWeb" :webview-styles="webviewStyles" :src="statement.url"></web-view>
 
     <!-- 金额明细弹窗 -->
     <uni-popup ref="priceInfoDialog" type="bottom">
@@ -263,6 +268,9 @@ export default {
         to: "重庆",
         from: "北京",
       },
+
+      disMessage: {}, // 分销商信息
+
       flightData: {
         // 航班头部信息
         flightType: "单程", // 航程类型
@@ -277,6 +285,8 @@ export default {
         airline: "南航", // 航司
         model: "空客A320(中)", // 机型
         food: "有早餐", // 餐饮
+        cabin: "", // 舱位信息
+        baggage: "", // 行李额
       },
 
       passengerList: [], // 乘机人列表
@@ -284,8 +294,8 @@ export default {
 
       orderPassenger: {
         // 订单联系人信息
-        userName: "", // 联系人
-        telPhone: "", // 手机号
+        name: "", // 联系人
+        phone: "", // 手机号
       },
       insuranceList: [], // 保险列表
       moreInsurance: 4, // 保险默认显示条数
@@ -303,9 +313,19 @@ export default {
         chdPrice: 0, // 儿童票价
         infPrice: 0, // 婴儿票价
         buildPrice: 0, // 机建燃油费
-        insPrice: 0,  // 保险票价
+        insPrice: 0, // 保险票价
         buildPrice: 0, // 机建燃油费
         reward: 0, // 奖励金额
+      },
+
+      statement: {}, // 免责声明
+
+      showStatementWeb: false, // 外部链接
+      webviewStyles: {
+        // 外部链接进度条样式
+        progress: {
+          color: "#FF3333",
+        },
       },
     };
   },
@@ -337,7 +357,12 @@ export default {
             airline: segmentMessage.airline_CN + segmentMessage.flightNumber, // 航司
             model: segmentMessage.aircraftCode, // 机型
             food: "有早餐", // 餐饮
+            cabin: res.data.cabinInfo.cabinCode + res.data.cabinInfo.cabinDesc, // 舱位信息
+            baggage: res.data.cabinInfo.baggage, // 行李额
           };
+
+          // 组装分销商数据
+          this.disMessage = res.data.dis_msg;
 
           let insurance_list = res.data.insurance_list; // 组装保险信息
           insurance_list.forEach((item) => {
@@ -359,6 +384,12 @@ export default {
             buildPrice: Number(res.data.adtPrice.build), // 机建燃油费
             reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
           };
+
+          this.statement = {
+            // 组装免责声明
+            title: res.data.air_line.title,
+            url: res.data.air_line.url,
+          };
         } else {
           uni.showToast({
             title: res.msg,
@@ -368,12 +399,14 @@ export default {
       });
     },
 
-// 保险选择
+    // 保险选择
     changeInsurance(val) {
       console.log(val);
       this.insuranceActive = val.id !== this.insuranceActive.id ? val : "";
-      this.priceInfo.insPrice = this.insuranceActive.default_dis_price?Number(this.insuranceActive.default_dis_price):0
-      this.getTotalPrice()
+      this.priceInfo.insPrice = this.insuranceActive.default_dis_price
+        ? Number(this.insuranceActive.default_dis_price)
+        : 0;
+      this.getTotalPrice();
     },
 
     // 选择手机区号
@@ -413,8 +446,7 @@ export default {
         inf: this.passengerList.filter((u) => u.type === "婴儿").length, // 婴儿数量
       };
 
-      this.getTotalPrice()
-      
+      this.getTotalPrice();
     },
 
     // 获取保险列表
@@ -449,9 +481,17 @@ export default {
     // 乘机人保险开关
     passInsSwitch(e, index) {
       this.$set(this.passengerList[index], "is_insure", e);
-      this.passengerNumber.ins = this.passengerList.filter((u) => u.is_insure === true).length > 0?this.passengerList.filter((u) => u.is_insure === true).length:0
-      this.getTotalPrice()
+      this.passengerNumber.ins =
+        this.passengerList.filter((u) => u.is_insure === true).length > 0
+          ? this.passengerList.filter((u) => u.is_insure === true).length
+          : 0;
+      this.getTotalPrice();
       // this.passengerList[index].is_insure = JSON.parse(JSON.stringify(e));
+    },
+
+    // 打开免责声明 外部链接
+    openStatementWeb() {
+      this.showStatementWeb = true;
     },
 
     // 打开免责声明弹窗
@@ -462,24 +502,100 @@ export default {
       this.$refs.priceInfoDialog.open();
     },
 
-
     // 计算金额总价
-    getTotalPrice(){
-      let totalPrice = 
-        Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) + 
+    getTotalPrice() {
+      let totalPrice =
+        Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
         Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
         Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
         Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
-        Number(this.passengerNumber.ins || 0) * Number(this.priceInfo.insPrice || 0);
-        // 组装金额数据
-        this.$set(this.priceInfo, "totalPrice", totalPrice);
+        Number(this.passengerNumber.ins || 0) *
+          Number(this.priceInfo.insPrice || 0);
+      // 组装金额数据
+      this.$set(this.priceInfo, "totalPrice", totalPrice);
 
-        // 计算奖励金额
-        this.$set(this.priceInfo, "reward", this.priceInfo.reward * this.passengerNumber.adt);
+      // 计算奖励金额
+      this.$set(
+        this.priceInfo,
+        "reward",
+        this.priceInfo.reward * this.passengerNumber.adt
+      );
     },
     // 关闭金额明细弹窗
     closePriceInfo() {
       this.$refs.priceInfoDialog.close();
+    },
+
+    // 去支付按钮
+    submitOrder() {
+      if (
+        this.passengerList.length < 1 ||
+        !this.orderPassenger.name ||
+        !this.orderPassenger.phone
+      ) {
+        return uni.showToast({
+          title:
+            this.passengerList.length < 1
+              ? "请选择乘机人"
+              : !this.orderPassenger.name || !this.orderPassenger.phone
+              ? "请输入联系人信息"
+              : "请完善下单信息",
+          icon: "none",
+        });
+      }
+      // 处理乘客数据
+      let passengerList = JSON.parse(JSON.stringify(this.passengerList));
+      let passengerData = [];
+      passengerList.forEach((item) => {
+        // 组装乘客数据
+        passengerData.push({
+          PassengerName: item.name, // 乘客名称
+          PassengerType:
+            item.type === "成人"
+              ? "ADT"
+              : item.type === "儿童"
+              ? "CHD"
+              : item.type === "婴儿"
+              ? "INF"
+              : "", // 乘客类型 ADT：成人 CHD：儿童 INF：婴儿
+          Credential:
+            item.cert_type === "身份证"
+              ? 0
+              : item.cert_type === "护照"
+              ? 1
+              : item.cert_type === "港澳通行证"
+              ? 2
+              : item.cert_type === "其他证件"
+              ? 8
+              : "", // 证件类型 0：身份证 1：护照 2：港澳通行证 3：其它证件
+          CredentialNo: item.cert_no, // 证件号
+          Birthday: item.birthday, // 出生日期
+          Phone: item.phone, // 手机号
+          IsInsure: item.is_insure ? 1 : 0, // 购买保险 0：否 1：是
+          Gender: item.sex === 1 ? "M" : "F", // 性别 M: 男 F: 女
+        });
+      });
+
+      // 单程下单
+      let data = {
+        passengers: passengerData, // 乘客数据
+        keys: this.relatedKey, // 航班key
+        insurance_id: this.insuranceActive.id, // 保险id
+        contacts: this.orderPassenger, // 联系人信息
+      };
+      console.log(data);
+      ticket.createOrder(data).then((res) => {
+        if (res.errorcode === 10000) {
+          uni.navigateTo({
+            url: "/pages/flightReservation/orderPay?orderId="+res.data.msg + "&flightData=" + JSON.stringify(this.flightData),
+          });
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
     },
   },
   onShow() {
@@ -493,8 +609,7 @@ export default {
         inf: this.passengerList.filter((u) => u.type === "婴儿").length, // 婴儿数量
       };
 
-      
-     this.getTotalPrice()
+      this.getTotalPrice();
       uni.removeStorageSync("passengerList");
     }
   },
@@ -959,6 +1074,9 @@ export default {
       letter-spacing: 10upx;
       opacity: 0.4;
       border-radius: 80upx;
+      &.is_true {
+        opacity: 1;
+      }
     }
   }
 

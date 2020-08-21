@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-20 16:27:08
+ * @LastEditTime: 2020-08-21 15:56:16
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -110,8 +110,8 @@ export default {
         // 导航栏地址
         to: "重庆",
         from: "北京",
-        departure: '', // 起飞机场三字码
-        arrival: '', 
+        departure: "", // 起飞机场三字码
+        arrival: "",
       },
 
       ticketTimeList: [],
@@ -136,7 +136,7 @@ export default {
   methods: {
     // 获取航班信息
     getTicketData(data) {
-      this.ticketList = []
+      this.ticketList = [];
       ticket.getTicket(data).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
@@ -148,9 +148,15 @@ export default {
           // this.getNfdData();
         } else {
           uni.showToast({
-            title: res.msg,
+            title: "查询航班失败，" + res.msg,
             icon: "none",
+            mask: true
           });
+          setTimeout(() => {
+            uni.switchTab({
+              url: "/pages/index/index",
+            });
+          }, 1000);
         }
       });
       console.log(this.ticketList);
@@ -205,7 +211,12 @@ export default {
           date: moment(this.ticketData.toTime.date)
             .add(dayNumber, "d")
             .format("YYYY-MM-DD"),
-          number: moment(day).add(dayNumber, "d").format("DD") === '01'?moment(day).add(dayNumber, "d").format("MM") + '-' + moment(day).add(dayNumber, "d").format("DD") :moment(day).add(dayNumber, "d").format("DD"),
+          number:
+            moment(day).add(dayNumber, "d").format("DD") === "01"
+              ? moment(day).add(dayNumber, "d").format("MM") +
+                "-" +
+                moment(day).add(dayNumber, "d").format("DD")
+              : moment(day).add(dayNumber, "d").format("DD"),
         });
         dayNumber += 1;
       }
@@ -230,14 +241,14 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      console.log(data)
+      console.log(data);
       data["to"] = this.ticketData.to.city_name;
       data["from"] = this.ticketData.from.city_name;
-      data['departure']= this.ticketData.to.city_code, // 起飞机场三字码
-      data['arrival']= this.ticketData.from.city_code, // 到达机场三字码
-      uni.navigateTo({
-        url: "/pages/flightInfo/flightInfo?airData=" + JSON.stringify(data),
-      });
+      (data["departure"] = this.ticketData.to.city_code), // 起飞机场三字码
+        (data["arrival"] = this.ticketData.from.city_code), // 到达机场三字码
+        uni.navigateTo({
+          url: "/pages/flightInfo/flightInfo?airData=" + JSON.stringify(data),
+        });
     },
   },
   onLoad(data) {
