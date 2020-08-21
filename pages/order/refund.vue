@@ -9,26 +9,16 @@
   <view class="refund">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票"></yun-header>
 	
+	<refundSel ></refundSel>
 	<scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
-		<!-- 退票信息 -->
-		<view class="main_list certificate">
-		  <view class="main_list_title">退票信息</view>
-		  <view class="certificate_message">
-			<view class="message_title">退票理由</view>
-			<view class="message_text">
-			  <view>
-				<text>特殊订票退票，已提供相关证明，申请...</text>
-			  </view>
-			</view>
-		  </view>
-		</view>
+	<refundTop :dataList="list" @submitBtn="submit"></refundTop>
 		<!-- 特别提醒 -->
 		<view class="sep_list">
 			<view class="list_icon">
 				<image src="@/static/refund_warn.png" mode="aspectFit" />
 			</view>
 			<view class="list_title">国际退票特别提醒</view>
-			<view class="list_icon">
+			<view class="list_right">
 				<image src="../../static/refund_right.png" mode="aspectFit"></image>
 			</view>
 		</view>
@@ -152,10 +142,18 @@
 </template>
 
 <script>
+	import refundTop from "@/components/refund_top.vue"
+	import refundSel from "@/components/refund_sel.vue"
 export default {
+	components:{
+		refundTop,
+		refundSel
+	},
   data() {
     return {
       iStatusBarHeight: 0,
+	  
+	   orderDetails: [], // 订单详情
 
       dateFilter: [
         // 日期条件筛选列表
@@ -207,6 +205,9 @@ export default {
     };
   },
   methods: {
+	  submit(val){
+		  console.log(val)
+	  },
     // 日期条件选择
     activeDate(val) {
       this.dateFilter.forEach((item) => {
@@ -481,7 +482,7 @@ export default {
 	   &.certificate {
 	     .certificate_message {
 	       margin-top: 32upx;
-	       border-top: 2upx solid #f1f3f5;
+	       // border-top: 2upx solid #f1f3f5;
 	       padding-top: 34upx;
 	       display: flex;
 	       align-items: center;
@@ -529,7 +530,6 @@ export default {
 	     display: flex;
 	     align-items: center;
 	     justify-content: center;
-	     flex: 1;
 		 border-radius: 10upx;
 		 width: 710upx;
 		 height: 60upx;
@@ -547,7 +547,20 @@ export default {
 	         height: 100%;
 	         object-fit: contain;
 	       }
+		  margin: 30upx 30upx;
+
 	     }
+		 .list_right {
+		   width: 24upx;
+		   height: 24upx;
+		   image {
+		     width: 100%;
+		     height: 100%;
+		     object-fit: contain;
+		   }
+		   margin: 30upx 30upx;
+		 
+		 }
 	     .list_title {
 	       font-size: 24upx;
 	       font-weight: 400;

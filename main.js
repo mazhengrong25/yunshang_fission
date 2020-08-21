@@ -19,6 +19,7 @@ Vue.use(uniPopupMessage)
 Vue.use(uniPopupDialog)
 
 import "@/utils/tool.js"
+import "@/utils/base.less"
 
 // 自定义组件 全局注册
 import yunSwitch from "@/components/global/yun_switch.vue"; // switch组件
