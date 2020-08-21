@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-19 11:49:33
+ * @LastEditTime: 2020-08-20 16:32:20
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -64,7 +64,7 @@
         <view class="flight_explanation_main">
           <swiper class="explanation_content" @change="popupChange" :current="popupCurrent">
             <swiper-item>
-              <view class="popup_content_item">航班信息</view>
+              <view class="popup_content_item">{{ruleInfos.back_msg}}</view>
             </swiper-item>
             <swiper-item>
               <view class="popup_content_item">经济舱</view>
@@ -76,6 +76,18 @@
         </view>
       </view>
     </uni-popup>
+
+    <!-- 验价弹窗 -->
+    <uni-popup ref="checkPricePopup" type="dialog">
+      <view class="check_Price">
+        <view class="box_title">预定价格变更</view>
+        <view class="content_text">您的当前预定票价已变动至&yen;{{newPrice}}需要继续购买吗？</view>
+        <view class="box_bottom">
+          <view class="submit" @click="submitCheckPrice">确 定</view>
+          <view @click="closeCheckPrice">取 消</view>
+        </view>
+      </view>
+    </uni-popup>
   </scroll-view>
 </template>
 
@@ -84,6 +96,7 @@ import moment from "moment";
 moment.locale("zh-cn");
 import flightHeader from "@/components/flight_header.vue";
 import flightItem from "@/components/flight_item.vue";
+import ticket from "@/api/ticketInquiry.js";
 export default {
   components: {
     flightHeader,
@@ -118,6 +131,8 @@ export default {
       popupCurrent: 0, // 弹窗轮播下标
 
       ruleInfos: {}, // 退改签信息
+
+      newPrice: '', // 验价新价格
     };
   },
   methods: {
@@ -149,12 +164,53 @@ export default {
       this.popupCurrent = e.detail.current;
     },
 
-    // 跳转预定页面
-    jumpReservationBtn(type,data){
-        this.airMessage['data'] = data
-      	uni.navigateTo({
-					url: '/pages/flightReservation/flightReservation?data=' + JSON.stringify(this.airMessage)
-				})
+    // 跳转预定页面 - 先验价再跳转
+    jumpReservationBtn(type, data) {
+      this.airMessage["data"] = data;
+      console.log(this.airMessage);
+      let params = {
+        sourceCode: "IBE",
+        queryDate: this.airMessage.flightData.time,
+        departure: this.airMessage.ticketAddress.departure,
+        destination: this.airMessage.ticketAddress.arrival,
+        systemMsg: "",
+        segments: this.airMessage.airSegments,
+        ItineraryInfo: this.airMessage.data.data,
+        relatedKey: "11",
+      };
+      ticket.checkPrice(params).then((res) => {
+        if (res.errorcode === 10000) {
+          if (res.data.check_price_status) {
+            uni.navigateTo({
+              url:
+                "/pages/flightReservation/flightReservation?key=" +
+                res.data.keys + '&price='+res.data.price,
+            });
+          } else {
+            this.newPrice = res.data.price;
+            this.relatedKey = res.data.keys;
+            this.$refs.checkPricePopup.open();
+          }
+        } else {
+          uni.showToast({
+            title: "验价失败，请稍后重试，" + res.msg,
+            icon: "none",
+          });
+        }
+      });
+    },
+
+    // 关闭验价弹窗
+    closeCheckPrice() {
+      this.$refs.checkPricePopup.close();
+    },
+    // 确认验价信息跳转预定页面
+    submitCheckPrice() {
+      this.closeCheckPrice();
+      uni.navigateTo({
+        url:
+          "/pages/flightReservation/flightReservation?key=" + this.relatedKey  + '&price='+ this.newPrice,
+      });
     },
   },
   onLoad(data) {
@@ -162,10 +218,12 @@ export default {
 
     // 组装航程头部信息
     let airData = JSON.parse(data.airData);
-    console.log(airData)
+    console.log(airData);
     this.ticketAddress = {
       to: airData.to,
       from: airData.from,
+      departure: airData.departure, // 起飞机场三字码
+      arrival: airData.arrival, // 到达机场三字码
     };
     this.flightData = {
       flightType: "单程", // 航程类型
@@ -197,8 +255,9 @@ export default {
     // 组装原始数据
     this.airMessage = {
       ticketAddress: this.ticketAddress,
-      flightData: this.flightData
-    }
+      airSegments: airData.segments,
+      flightData: this.flightData,
+    };
 
     // 组装航班列表信息
     // this.cabinHeader
@@ -207,7 +266,7 @@ export default {
     // 组装经济舱/公务舱数据
     airDataName.forEach((item) => {
       if (item !== "NFD") {
-        this.cabinHeader.push(item)
+        this.cabinHeader.push(item);
         this.cabinList[item] = [];
         this.cabinList[item].ruleInfos = {};
         let dataArr = airData.ItineraryInfos[item];
@@ -225,7 +284,7 @@ export default {
             cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
             baggage: oitem.cabinInfo.baggage, // 行李额
             ruleInfos: oitem.ruleInfos, // 退改信息
-            data: oitem
+            data: oitem,
           });
         });
       }
@@ -253,9 +312,9 @@ export default {
       border-radius: 20upx 20upx 0 0;
       padding: 0 60upx;
       margin: 0 20upx;
-      &.isDisplay{
+      &.isDisplay {
         justify-content: space-between;
-        .cabin_header_box{
+        .cabin_header_box {
           margin-right: 0;
         }
       }
@@ -267,7 +326,7 @@ export default {
         height: 90upx;
         line-height: 90upx;
         position: relative;
-        &:not(:last-child){
+        &:not(:last-child) {
           margin-right: 160upx;
         }
 
@@ -386,6 +445,53 @@ export default {
     .flight_explanation_main {
       background: rgba(255, 255, 255, 1);
       padding: 20upx 20upx 60upx;
+    }
+  }
+
+  .check_Price {
+    width: 540upx;
+    height: 330upx;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 20upx;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 36upx;
+    .box_title {
+      font-size: 36upx;
+      font-weight: bold;
+      color: rgba(42, 42, 42, 1);
+      text-align: center;
+      margin-bottom: 32upx;
+    }
+    .content_text {
+      font-size: 26upx;
+      font-weight: 400;
+      color: rgba(42, 42, 42, 1);
+      padding: 0 30upx;
+      letter-spacing: 4upx;
+      line-height: 45upx;
+    }
+    .box_bottom {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      height: 90upx;
+      view {
+        flex: 1;
+        background: rgba(0, 112, 226, 0.1);
+        font-size: 28upx;
+        font-weight: 400;
+        color: rgba(0, 112, 226, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        &.submit {
+          background: rgba(0, 112, 226, 1);
+          color: rgba(255, 255, 255, 1);
+        }
+      }
     }
   }
 }

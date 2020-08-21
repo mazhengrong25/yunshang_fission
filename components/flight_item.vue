@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-08-19 08:54:59
+ * @LastEditTime: 2020-08-20 14:45:31
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -11,8 +11,8 @@
 			<view class="box_header_left">
 				<view class="left_prcie">
 					<text class="unit">&yen;</text>
-					{{flightData.price}}
-					<view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view>
+					{{flightData.data.cabinPrices.ADT.rulePrice.price}}
+					<!-- <view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view> -->
 				</view>
 				<view class="left_reward" v-if="flightData.reward > 0">奖励金 &yen;{{flightData.reward}}</view>
 			</view>
@@ -27,9 +27,9 @@
 				{{flightData.cabin}} | 退改签规则 {{flightData.baggage?' | ' + flightData.baggage: ''}}
 				<view class="message_more_btn"></view>
 			</view>
-			<view class="bottom_ticket_info">
+			<!-- <view class="bottom_ticket_info">
 				30分钟内出票 | 提供发票
-			</view>
+			</view> -->
 		</view>
 
 	</view>

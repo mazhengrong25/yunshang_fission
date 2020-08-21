@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-19 17:02:37
+ * @LastEditTime: 2020-08-20 16:27:08
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -44,7 +44,7 @@
               >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
             </view>
             <view class="ticket_arrow">
-              <view>{{item.segments[0].duration}}</view>
+              <view>{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
               <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
             </view>
             <view class="ticket_end ticket_time">
@@ -110,6 +110,8 @@ export default {
         // 导航栏地址
         to: "重庆",
         from: "北京",
+        departure: '', // 起飞机场三字码
+        arrival: '', 
       },
 
       ticketTimeList: [],
@@ -228,8 +230,11 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
+      console.log(data)
       data["to"] = this.ticketData.to.city_name;
       data["from"] = this.ticketData.from.city_name;
+      data['departure']= this.ticketData.to.city_code, // 起飞机场三字码
+      data['arrival']= this.ticketData.from.city_code, // 到达机场三字码
       uni.navigateTo({
         url: "/pages/flightInfo/flightInfo?airData=" + JSON.stringify(data),
       });
@@ -290,6 +295,8 @@ export default {
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
       from: this.ticketData.from.city_name,
+      departure: this.ticketData.to.city_code, // 起飞机场三字码
+      arrival: this.ticketData.from.city_code, // 到达机场三字码
     };
     let airMessage = {
       departure: this.ticketData.to.city_code, // 起飞机场三字码

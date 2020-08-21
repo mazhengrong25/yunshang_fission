@@ -2,7 +2,7 @@
  * @Description: 弹窗选择器
  * @Author: wish.WuJunLong
  * @Date: 2020-07-29 17:14:32
- * @LastEditTime: 2020-08-14 17:49:17
+ * @LastEditTime: 2020-08-20 17:47:38
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -84,7 +84,7 @@ export default {
     const month = date.getMonth() + 1;
     const days = [];
     const day = date.getDate();
-    for (let i = 1990; i <= date.getFullYear(); i++) {
+    for (let i = 1900; i <= date.getFullYear(); i++) {
       years.push(i);
     }
     for (let i = 1; i <= 12; i++) {
