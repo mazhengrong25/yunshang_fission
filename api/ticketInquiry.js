@@ -2,7 +2,7 @@
  * @Description: AV查询 获取航班信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-08-12 09:27:37
+ * @LastEditTime: 2020-08-21 18:08:05
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -26,7 +26,57 @@ function getNfd (data) {
 	})
 }
 
+
+// 验价
+function checkPrice(data){
+	return request({
+		method: "POST",
+    url: '/api/checkPrice',
+    data: data
+	})
+}
+
+
+// 获取预定信息
+function getTicketInfo(key,data){
+	return request({
+		method: "GET",
+		url: '/api/inland/entry/'+key +'?price='+data,
+	})
+}
+
+// 单程下单
+function createOrder(data){
+	return request({
+		method: "POST",
+		url: '/api/insert/order',
+		data: data
+	})
+}
+
+// 获取支付信息
+function getPayInfo(data){
+	return request({
+		method: "GET",
+		url: '/api/pay/' + data,
+	})
+}
+
+// 支付
+function payOrder(id,data){
+	return request({
+		method: "POST",
+		url: '/api/pay/' + id,
+		data: data
+	})
+}
+
 export default{
 	getTicket,
-	getNfd
+	getNfd,
+	checkPrice,
+	getTicketInfo,
+	createOrder,
+	getPayInfo,
+	payOrder
 }

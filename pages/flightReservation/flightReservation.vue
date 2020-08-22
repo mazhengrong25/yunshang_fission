@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-08-19 18:32:12
+ * @LastEditTime: 2020-08-21 18:22:03
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -74,7 +74,7 @@
               type="text"
               placeholder="请填写姓名"
               placeholder-style="fontSize: 28upx;fontWeight:400;color:rgba(175,185,196,1);"
-              v-model="orderPassenger.userName"
+              v-model="orderPassenger.name"
             />
           </view>
           <view class="form_item">
@@ -95,7 +95,7 @@
               type="number"
               placeholder="用于接收订单通知"
               placeholder-style="fontSize: 28upx;fontWeight:400;color:rgba(175,185,196,1);"
-              v-model="orderPassenger.telPhone"
+              v-model="orderPassenger.phone"
             />
           </view>
         </view>
@@ -139,13 +139,13 @@
           <view class="reward_list">
             <view class="list_name">奖励金</view>
 
-            <view class="list_price">&yen; 12</view>
+            <view class="list_price">&yen; {{priceInfo.reward}}</view>
           </view>
-          <view class="reward_list">
+          <!-- <view class="reward_list">
             <view class="list_name">返点</view>
 
             <view class="list_price">&yen; 5</view>
-          </view>
+          </view>-->
         </view>
       </view>
 
@@ -176,7 +176,7 @@
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
         <text @click="openDiscDialog()">《关于规范互联网机票销售行为的通知》</text>
-        <text>《山东航运输总条件》</text>
+        <text @click="openStatementWeb()">《{{statement.title}}》</text>
         <text>《锂电池航空运输规范》</text>
       </view>
     </scroll-view>
@@ -184,18 +184,75 @@
     <view class="bottom_bar">
       <view class="left_message">
         <view class="not_pass_message" v-if="passengerList.length < 1">请先添加乘机人</view>
-        <view class="pass_message" @click="openOrderInfo()">
-          <text>合计：&yen;</text>798
+        <view class="pass_message" v-else @click="openOrderInfo()">
+          <text>合计：&yen;</text>
+          {{priceInfo.totalPrice}}
         </view>
       </view>
-      <view class="right_btn">去支付</view>
+      <view
+        :class="['right_btn',{is_true: passengerList.length > 0 && orderPassenger.name && orderPassenger.phone}]"
+        @click="submitOrder()"
+      >去支付</view>
     </view>
+
+    <web-view v-if="showStatementWeb" :webview-styles="webviewStyles" :src="statement.url"></web-view>
+
+    <!-- 金额明细弹窗 -->
+    <uni-popup ref="priceInfoDialog" type="bottom">
+      <view class="price_info">
+        <view class="title">
+          金额明细
+          <view class="close_btn" @click="closePriceInfo()"></view>
+        </view>
+
+        <view class="info_content">
+          <view class="info_list">
+            <view class="list_title">成人票价</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.adtPrice}}</text>
+              <text>×{{passengerNumber.adt}}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.chd > 0">
+            <view class="list_title">儿童票价</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.chdPrice}}</text>
+              <text>×{{passengerNumber.chd}}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.inf > 0">
+            <view class="list_title">婴儿票价</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.infPrice}}</text>
+              <text>×{{passengerNumber.inf}}人</text>
+            </view>
+          </view>
+          <view class="info_list">
+            <view class="list_title">机建+燃油</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.buildPrice}}</text>
+              <text>×{{passengerNumber.adt}}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.ins > 0">
+            <view class="list_title">保险</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice:0}}</text>
+              <text>×{{passengerNumber.ins?passengerNumber.ins:0}}人</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script>
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
 import insurance from "@/api/insurance.js";
+import ticket from "@/api/ticketInquiry.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   components: {
     flightHeader,
@@ -203,23 +260,33 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度
+
+      relatedKey: "", // 关联key
+
       headerAddress: {
         // 导航栏信息
         to: "重庆",
         from: "北京",
       },
+
+      disMessage: {}, // 分销商信息
+
       flightData: {
         // 航班头部信息
         flightType: "单程", // 航程类型
-        time: "2020-4-18 周六", // 航程日期
+        time: "2020-4-18", // 航程日期
+        week: "周六", // 航程星期
         fromTime: "08:00", // 出发时间
         fromAddress: "重庆江北机场T3", // 出发机场
         duration: "2h30m", // 飞行时长
         toTime: "10:32", // 到达时间
         toAddress: "北京首都机场T3", // 到达机场
+        airIcon: "", // 航司图片
         airline: "南航", // 航司
         model: "空客A320(中)", // 机型
         food: "有早餐", // 餐饮
+        cabin: "", // 舱位信息
+        baggage: "", // 行李额
       },
 
       passengerList: [], // 乘机人列表
@@ -227,8 +294,8 @@ export default {
 
       orderPassenger: {
         // 订单联系人信息
-        userName: "", // 联系人
-        telPhone: "", // 手机号
+        name: "", // 联系人
+        phone: "", // 手机号
       },
       insuranceList: [], // 保险列表
       moreInsurance: 4, // 保险默认显示条数
@@ -238,14 +305,108 @@ export default {
       areaCodeIndex: 0, // 手机区号下标
 
       reimbursement: false, // 报销凭证开关
+
+      priceInfo: {
+        // 金额数据
+        totalPrice: 0, // 总价
+        adtPrice: 0, // 成人票价
+        chdPrice: 0, // 儿童票价
+        infPrice: 0, // 婴儿票价
+        buildPrice: 0, // 机建燃油费
+        insPrice: 0, // 保险票价
+        buildPrice: 0, // 机建燃油费
+        reward: 0, // 奖励金额
+      },
+
+      statement: {}, // 免责声明
+
+      showStatementWeb: false, // 外部链接
+      webviewStyles: {
+        // 外部链接进度条样式
+        progress: {
+          color: "#FF3333",
+        },
+      },
     };
   },
   methods: {
+    // 获取预定页面信息
+    getData() {
+      ticket.getTicketInfo(this.relatedKey, this.price).then((res) => {
+        if (res.errorcode === 10000) {
+          let segmentMessage = res.data.segment; // 航班信息
+          this.flightData = {
+            // 组装航班信息
+            flightType: "单程", // 航程类型
+            time: moment(segmentMessage.depTime).format("YYYY-MM-DD"), // 航程日期
+            week: segmentMessage.week, // 航程星期
+            fromTime: segmentMessage.departureTime, // 出发时间
+            fromAddress:
+              segmentMessage.depAirport_CN.city_name +
+              segmentMessage.depAirport_CN.air_port_name +
+              "机场" +
+              segmentMessage.depTerminal, // 出发机场
+            duration: segmentMessage.duration, // 飞行时长
+            toTime: segmentMessage.arrivalTime, // 到达时间
+            toAddress:
+              segmentMessage.arrAirport_CN.city_name +
+              segmentMessage.arrAirport_CN.air_port_name +
+              "机场" +
+              segmentMessage.arrTerminal, // 到达机场
+            airIcon: segmentMessage.airline_png, // 航司图片
+            airline: segmentMessage.airline_CN + segmentMessage.flightNumber, // 航司
+            model: segmentMessage.aircraftCode, // 机型
+            food: "有早餐", // 餐饮
+            cabin: res.data.cabinInfo.cabinCode + res.data.cabinInfo.cabinDesc, // 舱位信息
+            baggage: res.data.cabinInfo.baggage, // 行李额
+          };
+
+          // 组装分销商数据
+          this.disMessage = res.data.dis_msg;
+
+          let insurance_list = res.data.insurance_list; // 组装保险信息
+          insurance_list.forEach((item) => {
+            item["is_insure"] = false;
+            item["type"] = item.insure_desc.indexOf("电子") === -1;
+            item.insure_desc = item.insure_desc.slice(
+              0,
+              item.insure_desc.indexOf("元") + 1
+            );
+          });
+          this.insuranceList = insurance_list;
+
+          this.priceInfo = {
+            // 组装金额数据
+            totalPrice: 0, // 总价
+            adtPrice: res.data.adtPrice.settle_price, // 成人票价
+            chdPrice: res.data.chdPrice.price, // 儿童票价
+            infPrice: res.data.infPrice.price, // 婴儿票价
+            buildPrice: Number(res.data.adtPrice.build), // 机建燃油费
+            reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
+          };
+
+          this.statement = {
+            // 组装免责声明
+            title: res.data.air_line.title,
+            url: res.data.air_line.url,
+          };
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
+    },
+
+    // 保险选择
     changeInsurance(val) {
-      console.log(val)
-      // 保险选择
+      console.log(val);
       this.insuranceActive = val.id !== this.insuranceActive.id ? val : "";
-      console.log(this.insuranceActive);
+      this.priceInfo.insPrice = this.insuranceActive.default_dis_price
+        ? Number(this.insuranceActive.default_dis_price)
+        : 0;
+      this.getTotalPrice();
     },
 
     // 选择手机区号
@@ -284,6 +445,8 @@ export default {
         chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
         inf: this.passengerList.filter((u) => u.type === "婴儿").length, // 婴儿数量
       };
+
+      this.getTotalPrice();
     },
 
     // 获取保险列表
@@ -292,7 +455,7 @@ export default {
         if (res.errorcode === 10000) {
           this.insuranceList = res.data;
           this.insuranceList.forEach((item) => {
-            item['is_insure'] = false
+            item["is_insure"] = false;
             item["type"] = item.insure_desc.indexOf("电子") === -1;
             item.insure_desc = item.insure_desc.slice(
               0,
@@ -317,18 +480,123 @@ export default {
 
     // 乘机人保险开关
     passInsSwitch(e, index) {
-      this.$nextTick(() =>{
-         this.passengerList[index].is_insure = e;
-      })
+      this.$set(this.passengerList[index], "is_insure", e);
+      this.passengerNumber.ins =
+        this.passengerList.filter((u) => u.is_insure === true).length > 0
+          ? this.passengerList.filter((u) => u.is_insure === true).length
+          : 0;
+      this.getTotalPrice();
+      // this.passengerList[index].is_insure = JSON.parse(JSON.stringify(e));
+    },
+
+    // 打开免责声明 外部链接
+    openStatementWeb() {
+      this.showStatementWeb = true;
     },
 
     // 打开免责声明弹窗
-    openDiscDialog(type){
-      
-    },
+    openDiscDialog(type) {},
 
     // 打开金额明细弹窗
-    openOrderInfo() {},
+    openOrderInfo() {
+      this.$refs.priceInfoDialog.open();
+    },
+
+    // 计算金额总价
+    getTotalPrice() {
+      let totalPrice =
+        Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
+        Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
+        Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
+        Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
+        Number(this.passengerNumber.ins || 0) *
+          Number(this.priceInfo.insPrice || 0);
+      // 组装金额数据
+      this.$set(this.priceInfo, "totalPrice", totalPrice);
+
+      // 计算奖励金额
+      this.$set(
+        this.priceInfo,
+        "reward",
+        this.priceInfo.reward * this.passengerNumber.adt
+      );
+    },
+    // 关闭金额明细弹窗
+    closePriceInfo() {
+      this.$refs.priceInfoDialog.close();
+    },
+
+    // 去支付按钮
+    submitOrder() {
+      if (
+        this.passengerList.length < 1 ||
+        !this.orderPassenger.name ||
+        !this.orderPassenger.phone
+      ) {
+        return uni.showToast({
+          title:
+            this.passengerList.length < 1
+              ? "请选择乘机人"
+              : !this.orderPassenger.name || !this.orderPassenger.phone
+              ? "请输入联系人信息"
+              : "请完善下单信息",
+          icon: "none",
+        });
+      }
+      // 处理乘客数据
+      let passengerList = JSON.parse(JSON.stringify(this.passengerList));
+      let passengerData = [];
+      passengerList.forEach((item) => {
+        // 组装乘客数据
+        passengerData.push({
+          PassengerName: item.name, // 乘客名称
+          PassengerType:
+            item.type === "成人"
+              ? "ADT"
+              : item.type === "儿童"
+              ? "CHD"
+              : item.type === "婴儿"
+              ? "INF"
+              : "", // 乘客类型 ADT：成人 CHD：儿童 INF：婴儿
+          Credential:
+            item.cert_type === "身份证"
+              ? 0
+              : item.cert_type === "护照"
+              ? 1
+              : item.cert_type === "港澳通行证"
+              ? 2
+              : item.cert_type === "其他证件"
+              ? 8
+              : "", // 证件类型 0：身份证 1：护照 2：港澳通行证 3：其它证件
+          CredentialNo: item.cert_no, // 证件号
+          Birthday: item.birthday, // 出生日期
+          Phone: item.phone, // 手机号
+          IsInsure: item.is_insure ? 1 : 0, // 购买保险 0：否 1：是
+          Gender: item.sex === 1 ? "M" : "F", // 性别 M: 男 F: 女
+        });
+      });
+
+      // 单程下单
+      let data = {
+        passengers: passengerData, // 乘客数据
+        keys: this.relatedKey, // 航班key
+        insurance_id: this.insuranceActive.id, // 保险id
+        contacts: this.orderPassenger, // 联系人信息
+      };
+      console.log(data);
+      ticket.createOrder(data).then((res) => {
+        if (res.errorcode === 10000) {
+          uni.navigateTo({
+            url: "/pages/flightReservation/orderPay?orderId="+res.data.msg + "&flightData=" + JSON.stringify(this.flightData),
+          });
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
+    },
   },
   onShow() {
     // 获取乘客列表
@@ -340,17 +608,22 @@ export default {
         chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
         inf: this.passengerList.filter((u) => u.type === "婴儿").length, // 婴儿数量
       };
-      uni.removeStorageSync('passengerList');
-    }
 
+      this.getTotalPrice();
+      uni.removeStorageSync("passengerList");
+    }
   },
   onLoad(data) {
-    this.getPassInsData();
+    // this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    console.log(JSON.parse(data.data));
-    let airData = JSON.parse(data.data);
-    this.headerAddress = airData.ticketAddress;
-    this.flightData = airData.flightData;
+    // let airData = JSON.parse(data.data);
+    console.log(data);
+    this.relatedKey = data.key;
+    this.price = data.price;
+
+    this.getData();
+    // this.headerAddress = airData.ticketAddress;
+    // this.flightData = airData.flightData;
   },
 };
 </script>
@@ -801,6 +1074,69 @@ export default {
       letter-spacing: 10upx;
       opacity: 0.4;
       border-radius: 80upx;
+      &.is_true {
+        opacity: 1;
+      }
+    }
+  }
+
+  .price_info {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
+    .title {
+      height: 140upx;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 80upx 80upx 0 0;
+      position: relative;
+      border-bottom: 2upx solid rgba(217, 225, 234, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .close_btn {
+        position: absolute;
+        background: url(@/static/popup_close.png) no-repeat;
+        background-size: contain;
+        width: 30upx;
+        height: 30upx;
+        top: 54upx;
+        right: 44upx;
+      }
+    }
+    .info_content {
+      background: #fff;
+      padding: 40upx;
+      .info_list {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 40upx;
+        .list_title {
+          font-size: 28upx;
+          font-weight: bold;
+          color: rgba(51, 51, 51, 1);
+        }
+        .list_message {
+          font-size: 28upx;
+          font-weight: 500;
+          text {
+            display: inline-flex;
+            &:first-child {
+              color: rgba(255, 0, 0, 1);
+            }
+            &:last-child {
+              margin-left: 20upx;
+              color: rgba(153, 153, 153, 1);
+            }
+          }
+        }
+      }
     }
   }
 }
