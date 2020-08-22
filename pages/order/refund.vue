@@ -8,131 +8,92 @@
 <template>
   <view class="refund">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票"></yun-header>
-	
-	<refundSel ></refundSel>
+	<!-- 正文 -->
 	<scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
+	<!-- 退票信息 -->
 	<refundTop :dataList="list" @submitBtn="submit"></refundTop>
-		<!-- 特别提醒 -->
-		<view class="sep_list">
-			<view class="list_icon">
-				<image src="@/static/refund_warn.png" mode="aspectFit" />
-			</view>
-			<view class="list_title">国际退票特别提醒</view>
-			<view class="list_right">
-				<image src="../../static/refund_right.png" mode="aspectFit"></image>
-			</view>
+	<!-- 特别提醒 -->
+	<view class="sep_list">
+		<view class="list_icon">
+			<image src="@/static/refund_warn.png" mode="aspectFit" />
 		</view>
-		
-		<!-- 航班信息 -->
-		<view class="main_list filght_info" v-for="(item, index) in orderDetails.routes" :key="index">
-		  <view class="info_header">
-		    <view class="header_type">{{orderDetails.routing_type === 1?'单程':
-										orderDetails.routing_type === 2?'往返':
-										orderDetails.routing_type === 3?'多程':''}}</view>
-		    <view class="header_time">
-		      {{item.departure_time.substring(0,10)}}
-		      <text>{{$dateTool(item.departure_time,"ddd")}}</text>
-		    </view>
-		  </view>
-		  <view class="info_message">
-		    <view class="message_box">
-		      <view class="date">{{item.departure_time.substring(10,16)}}</view>
-		      <view class="address">{{item.departure}}</view>
-		    </view>
-		
-		    <view class="message_center">
-		      <view class="date">{{(item.duration.replace(":","h"))}}m</view>
-		      <view class="center_icon"></view>
-		      <view class="type">直飞</view>
-		    </view>
-		
-		    <view class="message_box">
-		      <view class="date">{{item.arrive_time.substring(10,16)}}</view>
-		      <view class="address">{{item.arrive}}</view>
-		    </view>
-		  </view>
-		
-		  <view class="filght_message">
-		    <view class="message_icon"></view>
-		    <view class="message_list">{{item.inter_segments[0].flight_no}}</view>
-		    <view class="message_list">空客A320</view>
-		    <view class="message_list">有早餐</view>
-		  </view>
-		
-		  <view class="filght_bottom">
-		    <view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
-										item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
-										item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
-		    <view class="bottom_list">退改签规则</view>
-		    <view class="bottom_list">每人托运2件，每件23KG</view>
-		  </view>
+		<view class="list_title">国际退票特别提醒</view>
+		<view class="list_right">
+			<image src="../../static/refund_right.png" mode="aspectFit"></image>
 		</view>
-		<!-- 出行信息 -->
-		<view class="main_list passenger">
-		  <view class="main_list_title">出行信息</view>
-		  <view class="passenger_list">
-		    <view class="list_item" v-for="(item, index) in orderDetails.passengers" :key="index">
-		      <view class="list_info">
-		        <view class="info_type">{{item.passenger_type === 'ADT'?'成人':item.passenger_type === 'CNN'?'儿童':item.passenger_type === 'INF'?'婴儿':''}}票</view>
-		        <view class="info_name">{{item.en_first_name}} {{item.en_last_name}}</view>
-		        <view class="is_insurance" v-if="item.insure_count > 0"></view>
-		        <view class="group_type">员工</view>
-		      </view>
-		
-		      <view class="list_message">
-		        <view class="message_title">{{item.credential === '0'? '身份证':
-											  item.credential === '1'? '护照':
-											  item.credential === '2'? '港澳通行证':
-											  item.credential === '3'? '其它证件':
-											  item.credential === '4'? '台胞证':
-											  item.credential === '5'? '台湾通行证':''}}</view>
-		        <view class="message_number">{{item.credential_no}}</view>	<!-- 身份证号码 -->
-		      </view>
-		    </view>
-		  </view>
-		
-		  <view class="contact"	v-for="(item, index) in orderDetails.passengers" :key="index">
-		    <view class="contact_list">
-		      <view class="list_title">联系人</view>
-		      <view class="list_message">{{item.en_first_name}}{{item.en_last_name}}</view>
-		    </view>
-		    <view class="contact_list">
-		      <view class="list_title">联系电话</view>
-		      <view class="list_message">{{item.phone}}</view>
-		    </view>
-		    <view class="contact_list">
-		      <view class="list_title">已购保险</view>
-		      <view class="list_message">{{item.insure_price}}元{{item.insure_count}}份</view>
-		    </view>
-		  </view>
+	</view>
+	<!-- 航班信息 -->
+	<view class="main_list filght_info" v-for="(item, index) in orderDetails.routes" :key="index">
+	  <view class="info_header">
+		<view class="header_type">{{orderDetails.routing_type === 1?'单程':
+									orderDetails.routing_type === 2?'往返':
+									orderDetails.routing_type === 3?'多程':''}}</view>
+		<view class="header_time">
+		  {{item.departure_time.substring(0,10)}}
+		  <text>{{$dateTool(item.departure_time,"ddd")}}</text>
 		</view>
-		
-		<!-- 订单信息 -->
-		<view class="main_list order_message">
-		  <view class="main_list_title">订单信息</view>
-		  <view class="message_list">
-		    <view class="list_item">
-		      <view class="item_title">订单编号</view>
-		      <view class="item_message">{{orderDetails.order_no}}</view>
-		    </view>
-		    <view class="list_item">
-		      <view class="item_title">PNR</view>
-		      <view class="item_message">{{orderDetails.pnr_code}}</view>
-		    </view>
-		    <view class="list_item">
-		      <view class="item_title">订票员</view>
-		      <view class="item_message">{{orderDetails.book_user}}</view>
-		    </view>
-		    <view class="list_item">
-		      <view class="item_title">预定时间</view>
-		      <view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
-		    </view>
-		    <view class="list_item">
-		      <view class="item_title">备注</view>
-		      <view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
-		    </view>
-		  </view>
+	  </view>
+	  <view class="info_message">
+		<view class="message_box">
+		  <view class="date">{{item.departure_time.substring(10,16)}}</view>
+		  <view class="address">{{item.departure}}</view>
 		</view>
+	
+		<view class="message_center">
+		  <view class="date">{{(item.duration.replace(":","h"))}}m</view>
+		  <view class="center_icon"></view>
+		  <view class="type">直飞</view>
+		</view>
+	
+		<view class="message_box">
+		  <view class="date">{{item.arrive_time.substring(10,16)}}</view>
+		  <view class="address">{{item.arrive}}</view>
+		</view>
+	  </view>
+	
+	  <view class="filght_message">
+		<view class="message_icon"></view>
+		<view class="message_list">{{item.inter_segments[0].flight_no}}</view>
+		<view class="message_list">空客A320</view>
+		<view class="message_list">有早餐</view>
+	  </view>
+	
+	  <view class="filght_bottom">
+		<view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
+									item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
+									item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
+		<view class="bottom_list">退改签规则</view>
+		<view class="bottom_list">每人托运2件，每件23KG</view>
+	  </view>
+	</view>
+	<!-- 出行信息 -->
+	<refundSel ></refundSel>
+	<!-- 订单信息 -->
+	<view class="main_list order_message">
+	  <view class="main_list_title">订单信息</view>
+	  <view class="message_list">
+		<view class="list_item">
+		  <view class="item_title">订单编号</view>
+		  <view class="item_message">{{orderDetails.order_no}}</view>
+		</view>
+		<view class="list_item">
+		  <view class="item_title">PNR</view>
+		  <view class="item_message">{{orderDetails.pnr_code}}</view>
+		</view>
+		<view class="list_item">
+		  <view class="item_title">订票员</view>
+		  <view class="item_message">{{orderDetails.book_user}}</view>
+		</view>
+		<view class="list_item">
+		  <view class="item_title">预定时间</view>
+		  <view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
+		</view>
+		<view class="list_item">
+		  <view class="item_title">备注</view>
+		  <view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
+		</view>
+	  </view>
+	</view>
 	</scroll-view>
 	<!-- 提交申请按钮 -->
 	<view class="filter_bottom">
@@ -253,6 +214,48 @@ export default {
 .refund {
 	 background: rgba(243, 245, 247, 1);
 	 height: 100vh;
+	 position: relative;
+	 
+	 .sep_list {
+	 	 display: flex;
+	 	 align-items: center;
+	 	 justify-content: start;
+	 	 border-radius: 10upx;
+	 	 width: 710upx;
+	 	 height: 60upx;
+	 	 background-color: RGBA(244, 236, 226, 1);
+	 	 z-index: 1;
+	 	 margin-left: 23upx;
+	 	 .list_icon {
+	 	   width: 24upx;
+	 	   height: 24upx;
+	 	   image {
+	 		 width: 100%;
+	 		 height: 100%;
+	 		 object-fit: contain;
+	 	   }
+	 	  margin: 10upx 10upx;
+	 	  margin-bottom: 40upx;
+	 
+	 	 }
+	 	 .list_right {
+	 	   width: 24upx;
+	 	   height: 24upx;
+	 	   image {
+	 		 width: 100%;
+	 		 height: 100%;
+	 		 object-fit: contain;
+	 	   }
+	 	   margin-left: 439upx;
+	 	   margin-bottom: 30upx;
+	 	 
+	 	 }
+	 	 .list_title {
+	 	   font-size: 24upx;
+	 	   font-weight: 400;
+	 	   color: rgba(251, 152, 38, 1);
+	 	 }
+	 }
 	 .main_list {
 	   background: rgba(255, 255, 255, 1);
 	   box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
@@ -524,50 +527,7 @@ export default {
 	       }
 	     }
 	   }
-	 }
-	
-	   .sep_list {
-	     display: flex;
-	     align-items: center;
-	     justify-content: center;
-		 border-radius: 10upx;
-		 width: 710upx;
-		 height: 60upx;
-		 background-color: RGBA(244, 236, 226, 1);
-		 z-index: 1;
-	     margin-left: 23upx;
-	     &:not(:last-child) {
-	       border-right: 2upx solid #eaeaea;
-	     }
-	     .list_icon {
-	       width: 24upx;
-	       height: 24upx;
-	       image {
-	         width: 100%;
-	         height: 100%;
-	         object-fit: contain;
-	       }
-		  margin: 30upx 30upx;
-
-	     }
-		 .list_right {
-		   width: 24upx;
-		   height: 24upx;
-		   image {
-		     width: 100%;
-		     height: 100%;
-		     object-fit: contain;
-		   }
-		   margin: 30upx 30upx;
-		 
-		 }
-	     .list_title {
-	       font-size: 24upx;
-	       font-weight: 400;
-	       color: rgba(251, 152, 38, 1);
-	     }
-	   }
-	 
+	 }	 
 	.filter_bottom {
 	  display: flex;
 	  align-items: center;

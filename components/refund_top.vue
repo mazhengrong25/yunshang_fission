@@ -15,9 +15,12 @@
 		<view style="border-top: 2upx solid rgba(241, 243, 245, 1);"></view>
 		<view class="middle_message">
 			<view class="message_first">退票理由</view>
-			<view class="message_bottom">
+			<view class="message_bottom input-right-arrow">
 				<text>特殊订票退票，已提供相关证明，申请...</text>
 			</view>
+			<!-- <view class="messsage_right">
+				<image src="../static/arrow_white.png" mode="aspectFit"></image>
+			</view> -->
 		</view>
 	 </view> 
 </template>
@@ -90,6 +93,15 @@
 				font-size: 28upx;
 				font-weight: bold;
 				color: rgba(42, 42, 42, 1)
+			}
+			.message_right{
+				width: 5upx;
+				height: 5upx;
+				image {
+				  width: 100%;
+				  height: 100%;
+				}
+				// margin: 30upx 30upx;
 			}
 		}
 			

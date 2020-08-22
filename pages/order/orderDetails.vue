@@ -34,7 +34,8 @@
         <view class="option_btn" v-if="orderDetails.status === 1">取消订单</view>
         <view class="option_btn important_btn" v-if="orderDetails.status === 1">去支付</view>
 		<view class="option_btn" v-if="orderDetails.status === 3">报销凭证</view>
-		<view class="option_btn" v-if="orderDetails.status === 3" @click="getRefund()">退票</view>
+		<view class="option_btn" v-if="orderDetails.status === 3" 
+		@click="getRefund(item)">退票</view>
 		<view class="option_btn" v-if="orderDetails.status === 3">改签</view>
 		<view class="option_btn" v-if="orderDetails.status === 5">查看退废单</view>
 		<view class="option_btn" v-if="orderDetails.status === 5">再次预定</view>
@@ -203,6 +204,7 @@ export default {
 	//点击退票跳转页面
 	// 跳转订单详情
 	getRefund(data) {
+	  console.log('退票',data)
 	  uni.navigateTo({
 	    url: "/pages/order/refund?orderData=" + JSON.stringify(data),
 	  });
