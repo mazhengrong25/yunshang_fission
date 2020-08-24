@@ -36,6 +36,15 @@ function orderInterDetails(data) {
   })
 };
 
+// 国内订单详情
+function orderDetails(data) {
+	return request({
+		method: 'POST',
+		url:'/api/order/details',
+		data: data
+	})
+}
+
 //点击退票
 function orderInterRefund(data) {
 	return request({
@@ -49,5 +58,6 @@ export default{
   orderList,
   orderInterList,
   orderInterDetails,
+  orderDetails,
   orderInterRefund
 }
