@@ -56,6 +56,7 @@ export default {
   methods: {
     // 排序按钮
     filterBtn(val) {
+      this.$emit('filterType',val)
       this.filterBtnActive = val;
     },
     // 打开筛选弹窗

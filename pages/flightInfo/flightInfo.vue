@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-21 10:32:00
+ * @LastEditTime: 2020-08-24 13:39:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -113,16 +113,16 @@ export default {
       },
       flightData: {
         // 航班头部信息
-        flightType: "单程", // 航程类型
-        time: "2020-4-18 周六", // 航程日期
-        fromTime: "08:00", // 出发时间
-        fromAddress: "重庆江北机场T3", // 出发机场
-        duration: "2h30m", // 飞行时长
-        toTime: "10:32", // 到达时间
-        toAddress: "北京首都机场T3", // 到达机场
-        airline: "南航", // 航司
-        model: "空客A320(中)", // 机型
-        food: "有早餐", // 餐饮
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
       },
       cabinHeader: [], // 舱位选择列表
       current: 0, // 轮播图下标
@@ -229,14 +229,14 @@ export default {
       flightType: "单程", // 航程类型
       time: moment(airData.QueryDate).format("YYYY-MM-DD"), // 航程日期
       week: moment(airData.QueryDate).format("ddd"),
-      fromTime: moment(airData.segments[0].depTime).format("hh:mm"), // 出发时间
+      fromTime: moment(airData.segments[0].depTime).format("HH:mm"), // 出发时间
       fromAddress:
         airData.to +
         airData.segments[0].depAirportName +
         "机场" +
         airData.segments[0].depTerminal, // 出发机场
       duration: airData.segments[0].duration, // 飞行时长
-      toTime: moment(airData.segments[0].arrTime).format("hh:mm"), // 到达时间
+      toTime: moment(airData.segments[0].arrTime).format("HH:mm"), // 到达时间
       toAddress:
         airData.from +
         airData.segments[0].arrAirportName +

@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-21 15:56:16
+ * @LastEditTime: 2020-08-24 18:30:58
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -38,7 +38,7 @@
         <view class="ticket_left">
           <view class="ticket_message">
             <view class="ticket_start ticket_time">
-              <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'hh:mm')}}</view>
+              <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
               <view
                 class="ticket_address"
               >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
@@ -49,7 +49,7 @@
             </view>
             <view class="ticket_end ticket_time">
               <view class="ticket_date">
-                {{$dateTool(item.segments[0].arrTime,'hh:mm')}}
+                {{$dateTool(item.segments[0].arrTime,'HH:mm')}}
                 <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
               </view>
               <view
@@ -84,7 +84,7 @@
     </scroll-view>
 
     <view class="footer_box">
-      <flight-filter @openFilter="openFilter"></flight-filter>
+      <flight-filter @openFilter="openFilter" @filterType="listFilter"></flight-filter>
     </view>
 
     <flight-filter-dialog ref="filterDialog"></flight-filter-dialog>
@@ -228,6 +228,14 @@ export default {
       uni.navigateTo({
         url: "/pages/dateSelect/dateSelect",
       });
+    },
+
+    // 列表筛选
+    listFilter(val){
+      if(val === 'price'){
+
+      }
+      console.log(val)
     },
 
     // 打开筛选
