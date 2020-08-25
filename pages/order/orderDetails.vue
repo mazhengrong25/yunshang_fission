@@ -188,6 +188,7 @@ export default {
       let data = {
         order_no:val
       };
+	  
       orderApi.orderInterDetails(data).then((res) => {
         console.log(res);
 		if (res.errorcode === 10000) {
@@ -199,6 +200,18 @@ export default {
 		  });
 		}
       });
+	  
+	  // orderApi.orderDetails(data).then((res) => {
+	  //   console.log(res);
+	  // 		if (res.errorcode === 10000) {
+	  // 		  this.orderDetails = res.data;
+	  // 		}else {
+	  // 		  uni.showToast({
+	  // 		    title: res.msg,
+	  // 		    icon: "none",
+	  // 		  });
+	  // 		}
+	  // });
     },
 	
 	//点击退票跳转页面
@@ -214,7 +227,7 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 	let orderData = JSON.parse(data.orderData)
-	console.log(JSON.parse(data.orderData));
+	console.log('orderData',JSON.parse(data.orderData));
     // this.orderDetails = JSON.parse(data.orderData);
     this.getOrderDetails(orderData.order_no);
   },

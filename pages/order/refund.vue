@@ -9,7 +9,7 @@
   <view class="refund">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票"></yun-header>
 	<!-- 正文 -->
-	<scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
+	<scroll-view :enable-back-to-top="true" :scroll-y="true" class="content"
 	<!-- 退票信息 -->
 	<refundTop :dataList="list" @submitBtn="submit"></refundTop>
 	<!-- 特别提醒 -->
@@ -23,8 +23,9 @@
 		</view>
 	</view>
 	<!-- 航班信息 -->
-	<view class="main_list filght_info" v-for="(item, index) in orderDetails.routes" :key="index">
-	  <view class="info_header">
+	<view class="main_list filght_info">
+	<view class="main_list_title">航班信息</view>
+	 <view class="info_header">
 		<view class="header_type">{{orderDetails.routing_type === 1?'单程':
 									orderDetails.routing_type === 2?'往返':
 									orderDetails.routing_type === 3?'多程':''}}</view>

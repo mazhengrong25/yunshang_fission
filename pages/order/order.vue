@@ -18,9 +18,9 @@
           <view class="order_title">国内机票</view>
         </view>
         <view class="order_right">
-          <view class="list_item" @click="jumpOrderList()">国内订单</view>
-          <view class="list_item" @click="jumpOrderList()">国内退票订单</view>
-          <view class="list_item" @click="jumpOrderList()">国内改签订单</view>
+          <view class="list_item" @click="jumpOrderList('0')">国内订单</view>
+          <view class="list_item" @click="jumpOrderList('1')">国内退票订单</view>
+          <view class="list_item" @click="jumpOrderList('2')">国内改签订单</view>
         </view>
       </view>
       <view class="order_list">
@@ -31,9 +31,9 @@
           <view class="order_title">国际机票</view>
         </view>
         <view class="order_right">
-          <view class="list_item" @click="jumpOrderList()">国际订单</view>
-          <view class="list_item" @click="jumpOrderList()">国际退票订单</view>
-          <view class="list_item" @click="jumpOrderList()">国际改签订单</view>
+          <view class="list_item" @click="jumpOrderList('3')">国际订单</view>
+          <view class="list_item" @click="jumpOrderList('4')">国际退票订单</view>
+          <view class="list_item" @click="jumpOrderList('5')">国际改签订单</view>
         </view>
       </view>
     </scroll-view>
@@ -48,9 +48,9 @@ export default {
     };
   },
   methods: {
-    jumpOrderList() {
+    jumpOrderList(type) {
       uni.navigateTo({
-        url: "/pages/order/orderList",
+        url: "/pages/order/orderList?type="+type,
       });
     },
   },

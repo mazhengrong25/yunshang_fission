@@ -7,7 +7,7 @@
 -->
 <template>
   <view class="order_list">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="国际订单"></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" :centerTitle="orderHeaderTitle"></yun-header>
     <view class="order_header">
       <view
         :class="['header_list',{'active': headerActive === index}]"
@@ -47,49 +47,57 @@
       @scrolltolower="nextPageData()"
     >
       <!-- 国内机票盒子 -->
-      <!-- <view class="content_list">
-        <view class="list_tyle">{{item.routing_type === 1? '单程机票': item.routing_type === 2? '往返机票': item.routing_type === 3? '多程机票': ''}}</view>
-        <view class="list_item" v-for="(oitem, oindex) in item.routes" :key="oindex">
+     <view class="content_list"
+	  v-for="(item, index) in innerList"
+	  :key="index"
+	  @click="jumpOrderDetails(item)">
+        <view class="list_tyle">{{item.segment_type === 1? '单程机票': item.segment_type === 2? '往返机票': item.segment_type === 3? '多程机票': ''}}</view>
+        <view class="list_item" v-for="(oitem, oindex) in item.ticket_segments" :key="oindex">
           <view class="item_header">
             <view class="item_title">
-              <view class="title_type" v-if="item.routes.length > 1">{{item.direction_type === 1?'去程':item.direction_type === 2?'回程':item.direction_type === 3?'第'+(oindex + 1)+'程':''}}</view>
-              <view class="title">{{oitem.departure}} - {{otem.arrive}}</view>
+              <view class="title_type" v-if="item.ticket_segments.length > 1">{{item.direction_type === 1?'去程':item.direction_type === 2?'回程':item.direction_type === 3?'第'+(oindex + 1)+'程':''}}</view>
+              <view class="title">{{oitem.departure}} - {{oitem.arrive}}</view>
             </view>
             <view class="item_price">
-              <text>&yen;</text>{{item.need_pay_amount}}
+              <text>&yen;</text> {{item.ticket_price || '金额错误'}}
             </view>
           </view>
           <view class="item_info">
             <view class="info_left">
               <text>{{oitem.flight_no}}</text>
-              <text>{{moment(oitem.departure_time).format("MM月DD日")}}</text>
-              <text>{{moment(oitem.departure_time).format("hh:mm")}}起飞</text>
+			 <text>{{$dateTool(oitem.departure_time,"MM月DD日")}}</text>
+			 <text>{{$dateTool(oitem.departure_time,"hh:mm")}}起飞</text>
             </view>
-            <view class="info_right">已预定</view>
+            <view class="info_right">
+				{{item.status === 1? '待出票':
+				item.status === 3? '已出票':
+				item.status === 5? '已取消': ''}}
+			</view>
           </view>
 
-          <view class="item_time">
+          <view class="item_time"
+		  v-if="item.pay_status === 1">
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
             <view class="time_text">剩余时间：</view>
-            <view class="time_number">15分钟</view>
+            <view class="time_number">{{$timeDiff(new Date(item.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</view>
           </view>
 
-          <view class="item_btn_box">
+          <view class="item_btn_box"
+		  v-if="item.pay_status === 1">
             <view class="item_btn close_btn">取消订单</view>
             <view class="item_btn submit_btn">去支付</view>
           </view>
         </view>
-      </view>-->
+      </view>
 
       <!-- 国际机票盒子 -->
       <view
         class="content_list"
         v-for="(item, index) in orderList"
         :key="index"
-        @click="jumpOrderDetails(item)"
-      >
+        @click="jumpOrderDetails(item)">
         <view
           class="list_tyle"
         >{{item.routing_type === 1? '单程机票': item.routing_type === 2? '往返机票': item.routing_type === 3? '多程机票': ''}}</view>
@@ -170,6 +178,8 @@
 
 <script>
 import orderApi from "@/api/order.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
@@ -179,44 +189,98 @@ export default {
       orderPageNumber: 1, // 当前订单页数
       orderPageStatus: true, // 是否允许加载下一页数据
       orderList: [], // 订单列表数据
+	  
+	  
+	  orderListType: '', // 订单列表页 类型
+	  orderHeaderTitle: '', // 订单列表页头部标题
+	  innerList:[], //国内列表
     };
   },
   methods: {
     checkedHeaderActive(index) {
-      this.headerActive = index;
-      this.orderPageNumber = 1;
-      this.orderList = [];
-      this.getOrderList();
+		console.log(index)
+		this.headerActive = index;
+		this.orderPageNumber = 1;
+		if(this.orderListType === '0'){
+			let activeIndex = 
+				index === 2? 1: // 待出票
+				index === 3? 3:  // 已出票
+				index === 4? 5:'' // 已取消
+		}else{
+			this.orderList = [];
+			this.innerList = [];
+			this.getOrderList();
+		}
+      
+      
     },
 
     getOrderList() {
       this.orderPageStatus = true;
-      let data = {
-        status:
-          this.headerActive === 0
-            ? "-1"
-            : this.headerActive === 4
-            ? 5
-            : this.headerActive,
-        page: this.orderPageNumber,
-      };
-      orderApi.orderInterList(data).then((res) => {
-        if (res.errorcode === 10000) {
-          if (this.orderList.length > 0) {
-            this.orderList.push.apply(this.orderList, res.data.data);
-          } else {
-            this.orderList = res.data.data;
-          }
-          if (this.orderPageNumber >= res.data.last_page) {
-            this.orderPageStatus = false;
-          }
-        } else {
-          uni.showToast({
-            title: res.msg,
-            icon: "none",
-          });
-        }
-      });
+	  if(this.orderListType === '3'){
+		  let data = {
+		    status:
+		      this.headerActive === 0
+		        ? "-1"
+		        : this.headerActive === 4
+		        ? 5
+		        : this.headerActive,
+		    page: this.orderPageNumber,
+		  };
+		  orderApi.orderInterList(data).then((res) => {
+		    if (res.errorcode === 10000) {
+		      if (this.orderList.length > 0) {
+		        this.orderList.push.apply(this.orderList, res.data.data);
+		      } else {
+		        this.orderList = res.data.data;
+		      }
+		      if (this.orderPageNumber >= res.data.last_page) {
+		        this.orderPageStatus = false;
+		      }
+		    } else {
+		      uni.showToast({
+		        title: 'res.msg',
+		        icon: "none",
+		      });
+		    }
+		  });
+		  
+	  }else if(this.orderListType === '0'){
+		  let data = {
+		    status:
+		      this.headerActive === 0
+		        ? "-1"
+				: this.headerActive === 1
+				? "-1"
+		        : this.headerActive === 2
+		        ? 1
+				: this.headerActive === 4
+				? 5
+		        : this.headerActive,
+		    page: this.orderPageNumber,
+		  		created_at: moment().subtract(3, 'days').format("YYYY-MM-DD")
+		  };
+		  orderApi.orderList(data).then((res) => {
+			  console.log(res);
+		    if (res.result === 10000) {
+		      if (this.innerList.length > 0) {
+		        this.innerList.push.apply(this.innerList, res.data.data);
+		      } else {
+		        this.innerList = res.data.data;
+		      }
+		      if (this.orderPageNumber >= res.data.last_page) {
+		        this.orderPageStatus = false;
+		      }
+			  console.log(this.innerList)
+		    } else {
+		      uni.showToast({
+		        title: 'res.msg',
+		        icon: "none",
+		      });
+		    }
+		  });
+	  }
+	  
     },
     // 下一页数据
     nextPageData() {
@@ -231,17 +295,28 @@ export default {
       }
     },
 
-    // 跳转订单详情
+    // 跳转国际订单详情
     jumpOrderDetails(data) {
+		
       uni.navigateTo({
         url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data),
       });
     },
   },
-  onLoad() {
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.getOrderList();
+	this.orderListType = data.type
+	this.orderHeaderTitle = 
+		this.orderListType === '0'?'国内订单': 
+		this.orderListType === '1'?'国内退票订单': 
+		this.orderListType === '2'?'国内改签订单': 
+		this.orderListType === '3'?'国际订单':
+		this.orderListType === '4'?'国际退票订单':
+		this.orderListType === '5'?'国际改签订单':''
+	console.log(this.orderHeaderTitle)
+	this.getOrderList();
   },
+  
 };
 </script>
 
