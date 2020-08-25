@@ -68,7 +68,7 @@
 			 <text>{{$dateTool(oitem.departure_time,"MM月DD日")}}</text>
 			 <text>{{$dateTool(oitem.departure_time,"hh:mm")}}起飞</text>
             </view>
-            <view class="info_right"  v-if="item.segment_type !== 1">
+            <view class="info_right">
 				{{item.status === 1? '待出票':
 				item.status === 3? '已出票':
 				item.status === 5? '已取消': ''}}
@@ -178,6 +178,8 @@
 
 <script>
 import orderApi from "@/api/order.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
@@ -196,25 +198,35 @@ export default {
   },
   methods: {
     checkedHeaderActive(index) {
-      this.headerActive = index;
-      this.orderPageNumber = 1;
-      this.orderList = [];
-	  this.innerList = [];
-      this.getOrderList();
+		console.log(index)
+		this.headerActive = index;
+		this.orderPageNumber = 1;
+		if(this.orderListType === '0'){
+			let activeIndex = 
+				index === 2? 1: // 待出票
+				index === 3? 3:  // 已出票
+				index === 4? 5:'' // 已取消
+		}else{
+			this.orderList = [];
+			this.innerList = [];
+			this.getOrderList();
+		}
+      
+      
     },
 
     getOrderList() {
       this.orderPageStatus = true;
-      let data = {
-        status:
-          this.headerActive === 0
-            ? "-1"
-            : this.headerActive === 4
-            ? 5
-            : this.headerActive,
-        page: this.orderPageNumber,
-      };
 	  if(this.orderListType === '3'){
+		  let data = {
+		    status:
+		      this.headerActive === 0
+		        ? "-1"
+		        : this.headerActive === 4
+		        ? 5
+		        : this.headerActive,
+		    page: this.orderPageNumber,
+		  };
 		  orderApi.orderInterList(data).then((res) => {
 		    if (res.errorcode === 10000) {
 		      if (this.orderList.length > 0) {
@@ -234,7 +246,20 @@ export default {
 		  });
 		  
 	  }else if(this.orderListType === '0'){
-		  
+		  let data = {
+		    status:
+		      this.headerActive === 0
+		        ? "-1"
+				: this.headerActive === 1
+				? "-1"
+		        : this.headerActive === 2
+		        ? 1
+				: this.headerActive === 4
+				? 5
+		        : this.headerActive,
+		    page: this.orderPageNumber,
+		  		created_at: moment().subtract(3, 'days').format("YYYY-MM-DD")
+		  };
 		  orderApi.orderList(data).then((res) => {
 			  console.log(res);
 		    if (res.result === 10000) {
@@ -272,6 +297,7 @@ export default {
 
     // 跳转国际订单详情
     jumpOrderDetails(data) {
+		
       uni.navigateTo({
         url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data),
       });

@@ -227,7 +227,7 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 	let orderData = JSON.parse(data.orderData)
-	console.log(JSON.parse(data.orderData));
+	console.log('orderData',JSON.parse(data.orderData));
     // this.orderDetails = JSON.parse(data.orderData);
     this.getOrderDetails(orderData.order_no);
   },
