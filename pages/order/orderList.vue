@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-25 14:27:54
+ * @LastEditTime: 2020-08-25 14:29:35
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -237,18 +237,8 @@ export default {
 		  
 	  }else if(this.orderListType === '0'){
 		  let data = {
-		    status:
-		      this.headerActive === 0
-		        ? "-1"
-				: this.headerActive === 1
-				? "-1"
-		        : this.headerActive === 2
-		        ? 1
-				: this.headerActive === 4
-				? 5
-		        : this.headerActive,
 		    page: this.orderPageNumber,
-		  		created_at: moment().subtract(3, 'days').format("YYYY-MM-DD")
+		  	created_at: moment().subtract(3, 'days').format("YYYY-MM-DD")
 		  };
 		  orderApi.orderList(data).then((res) => {
 			  console.log(res);
