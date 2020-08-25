@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-08-21 18:22:03
+ * @LastEditTime: 2020-08-25 12:07:32
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -392,9 +392,13 @@ export default {
           };
         } else {
           uni.showToast({
-            title: res.msg,
+            title: res.data,
             icon: "none",
+            mask: true
           });
+          setTimeout(() =>{
+            uni.navigateBack();
+          },2500)
         }
       });
     },
@@ -580,15 +584,16 @@ export default {
       let data = {
         passengers: passengerData, // 乘客数据
         keys: this.relatedKey, // 航班key
-        insurance_id: this.insuranceActive.id, // 保险id
+        insurance_id: this.insuranceActive.id || 0, // 保险id
         contacts: this.orderPassenger, // 联系人信息
       };
-      console.log(data);
+      
       ticket.createOrder(data).then((res) => {
         if (res.errorcode === 10000) {
           uni.navigateTo({
-            url: "/pages/flightReservation/orderPay?orderId="+res.data.msg + "&flightData=" + JSON.stringify(this.flightData),
+            url: "/pages/flightReservation/orderPay?orderId="+JSON.stringify(res.data) + "&flightData=" + JSON.stringify(this.flightData),
           });
+          console.log(res.data,this.flightData);
         } else {
           uni.showToast({
             title: res.msg,

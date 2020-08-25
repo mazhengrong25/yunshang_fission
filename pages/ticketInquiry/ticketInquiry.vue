@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-24 18:30:58
+ * @LastEditTime: 2020-08-25 12:02:37
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -138,19 +138,25 @@ export default {
     getTicketData(data) {
       this.ticketList = [];
       ticket.getTicket(data).then((res) => {
-        console.log(res);
+        console.log(res); 
         if (res.errorcode === 10000) {
           // res.data.IBE.forEach((item) => {
           //   item["nfd"] = {};
           // });
           this.ticketList = res.data.IBE;
           console.log(this.ticketList);
+          if (this.ticketList.length < 1) {
+            uni.showToast({
+              title: "当日暂无航班信息，请切换其他日期",
+              icon: "none",
+            });
+          }
           // this.getNfdData();
         } else {
           uni.showToast({
             title: "查询航班失败，" + res.msg,
             icon: "none",
-            mask: true
+            mask: true,
           });
           setTimeout(() => {
             uni.switchTab({
@@ -231,11 +237,10 @@ export default {
     },
 
     // 列表筛选
-    listFilter(val){
-      if(val === 'price'){
-
+    listFilter(val) {
+      if (val === "price") {
       }
-      console.log(val)
+      console.log(val);
     },
 
     // 打开筛选

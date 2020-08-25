@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-17 10:00:14
+ * @LastEditTime: 2020-08-25 14:27:54
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -198,21 +198,11 @@ export default {
   },
   methods: {
     checkedHeaderActive(index) {
-		console.log(index)
 		this.headerActive = index;
 		this.orderPageNumber = 1;
-		if(this.orderListType === '0'){
-			let activeIndex = 
-				index === 2? 1: // 待出票
-				index === 3? 3:  // 已出票
-				index === 4? 5:'' // 已取消
-		}else{
-			this.orderList = [];
-			this.innerList = [];
-			this.getOrderList();
-		}
-      
-      
+		this.orderList = [];
+		this.innerList = [];
+		this.getOrderList();
     },
 
     getOrderList() {
@@ -267,11 +257,18 @@ export default {
 		        this.innerList.push.apply(this.innerList, res.data.data);
 		      } else {
 		        this.innerList = res.data.data;
-		      }
+          }
+          if(this.headerActive !== 0 && this.headerActive !== 1){
+            let activeIndex = 
+              this.headerActive === 2? 1: // 待出票
+              this.headerActive === 3? 3:  // 已出票
+              this.headerActive === 4? 5: 0 // 已取消
+            this.innerList = this.innerList.filter(item => item.status === activeIndex)
+          }
+          
 		      if (this.orderPageNumber >= res.data.last_page) {
 		        this.orderPageStatus = false;
 		      }
-			  console.log(this.innerList)
 		    } else {
 		      uni.showToast({
 		        title: 'res.msg',

@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-08-21 18:19:34
+ * @LastEditTime: 2020-08-25 14:15:52
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -20,9 +20,11 @@
       <flight-header :flightData="flightData"></flight-header>
 
       <view class="order_message box-shadow-style">
-        <view class="message_list">
-          <view class="list_title">订单编号</view>
-          <view class="list_text">{{payOrder}}</view>
+        <view class="message_list" v-for="(item, index) in payOrder" :key="index">
+          <view class="list_title">
+            {{payOrder.length> 1 && index === 0? '成人':'儿童'}}订单编号
+          </view>
+          <view class="list_text">{{item}}</view>
         </view>
         <view class="message_list">
           <view class="list_title">收款方</view>
@@ -54,8 +56,9 @@
         您的订单已提交，剩余支付时间
         <text>{{remainingTime}}</text>
       </view>
-      <view class="bottom_submit">
-        <view :class="['submit_pay',{is_disabled: !payBtnStatus}]" @click="jumpPay()">立即支付</view>
+      <view :class="['bottom_submit',{is_two_pay: payOrder.length> 1}]">
+        <view :class="['submit_pay',{is_disabled: !payBtnStatus}]" @click="jumpPay()">{{payOrder.length> 1? '成人支付':'立即支付'}}</view>
+        <view v-if="payOrder.length> 1" :class="['submit_pay child_pay',{is_disabled: childPayStatus}]"  @click="jumpPay('儿童')">儿童支付</view>
       </view>
     </view>
   </view>
@@ -77,42 +80,60 @@ export default {
       payOrder: "", // 订单号
       flightData: {}, // 航程信息
       payType: "钱包",
-      payBtnStatus: true, // 支付按钮
-
+      
       payData: {}, // 订单详情数据
       remainingTime: "00:00",
 
       _inter: {}, // 倒计时
+
+      payBtnStatus: true, // 支付按钮
+      childPayStatus: false,  // 儿童票支付状态
     };
   },
   methods: {
     // 获取订单详情
     getOrderDetails() {
-      // this.payOrder = "5000202008211416302708941000000006";
-      let base64Data = uni.arrayBufferToBase64(new Buffer(this.payOrder));
-      ticket.getPayInfo(base64Data).then((res) => {
-        if (res.errorcode === 10000) {
-          this.payData = res.data;
-          // this.payData.second = 10;
-          if (this.payData.second <= 0) {
-            this.payBtnStatus = false;
+      // this.payOrder = ["5000202008251120342122657000000006"];
+      let base64Data = uni.arrayBufferToBase64(new Buffer(this.payOrder[0]));
+      ticket
+        .getPayInfo(base64Data)
+        .then((res) => {
+          if (res.errorcode === 10000) {
+            this.payData = res.data;
+            // this.payData.second = 10;
+            if (this.payData.second <= 0) {
+              this.payBtnStatus = false;
+              uni.showToast({
+                title: "支付超时",
+                time: 2000,
+                mask: true,
+                icon: "none",
+              });
+            }
+            this._inter = setInterval(() => {
+              this.orderCountdown();
+            }, 1000);
+          } else {
             uni.showToast({
-              title: "支付超时",
-              time: 2000,
-              mask: true,
+              title: res.data,
               icon: "none",
+              mask: true,
             });
+            setTimeout(() => {
+              uni.navigateBack();
+            }, 2500);
           }
-          this._inter = setInterval(() => {
-            this.orderCountdown();
-          }, 1000);
-        } else {
+        })
+        .catch((e) => {
           uni.showToast({
-            title: res.msg,
+            title: "数据获取错误，请稍后重试",
             icon: "none",
+            mask: true,
           });
-        }
-      });
+          setTimeout(() => {
+            uni.navigateBack();
+          }, 2500);
+        });
     },
 
     // 订单倒计时
@@ -140,16 +161,26 @@ export default {
     },
 
     // 立即支付按钮
-    jumpPay() {
-      if (this.payBtnStatus) {
+    jumpPay(type) {
+      if (this.payBtnStatus && !this.childPayStatus) {
         let data = {
           pay_type: this.payType === "钱包" ? 1 : "",
         };
+        let payType = type === '儿童'? 1: 0
         ticket
-          .payOrder(uni.arrayBufferToBase64(new Buffer(this.payOrder)), data)
+          .payOrder(uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])), data)
           .then((res) => {
             if (res.errorcode === 10000) {
-							
+              if(payType === 1){
+                this.childPayStatus = true
+              }else{
+                this.payBtnStatus = false
+              }
+              uni.showToast({
+                title: "支付成功",
+                icon: "none",
+                mask: true,
+              });
             } else {
               uni.showToast({
                 title: res.data,
@@ -157,13 +188,35 @@ export default {
               });
             }
           });
+        
       }
     },
   },
   onLoad(data) {
-		this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-		this.payOrder = data.orderId
+    console.log(data.flightData);
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.payOrder = JSON.parse(data.orderId)
     this.flightData = JSON.parse(data.flightData);
+    // this.payOrder = [
+    //   "5000202008251131322238381000000006",
+    //   "5000202008251131332272295000000006",
+    // ];
+    // this.flightData = {
+    //   airIcon: "/assets/airline/PN.png",
+    //   airline: "西部PN6403",
+    //   baggage: "行李额0KG",
+    //   cabin: "T经济舱",
+    //   duration: "2:10",
+    //   flightType: "单程",
+    //   food: "有早餐",
+    //   fromAddress: "重庆江北机场T2",
+    //   fromTime: "06:40",
+    //   model: "空中客车320",
+    //   time: "2020-08-27",
+    //   toAddress: "西双版纳嘎洒机场--",
+    //   toTime: "08:50",
+    //   week: "周四",
+    // };
     this.getOrderDetails();
   },
 };
@@ -218,7 +271,7 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      &:first-child {
+      &:not(:last-child) {
         border-bottom: 2upx solid rgba(241, 243, 245, 1);
         padding-bottom: 30upx;
         margin-bottom: 30upx;
@@ -227,6 +280,21 @@ export default {
         font-size: 24upx;
         font-weight: 400;
         color: rgba(153, 153, 153, 1);
+        display: inline-flex;
+        align-items: center;
+        .title_tag {
+          width: 80upx;
+          height: 30upx;
+          border: 1px solid rgba(127, 183, 240, 1);
+          border-radius: 20upx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 10upx;
+          font-size: 20upx;
+          font-weight: 400;
+          color: rgba(127, 183, 240, 1);
+        }
       }
       .list_text {
         font-size: 24upx;
@@ -294,6 +362,23 @@ export default {
       align-items: center;
       justify-content: center;
       border-top: 2upx solid #e5e5e5;
+      &.is_two_pay{
+        .submit_pay{
+          width: 45%;
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+          &.child_pay{
+            border-radius: 80upx;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background: linear-gradient(
+          90deg,
+          rgba(251,152,38,.6) 0%,
+          rgba(251,152,38,1)
+        );
+          }
+        }
+      }
       .submit_pay {
         width: 650upx;
         height: 90upx;
