@@ -2,13 +2,13 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-25 12:03:30
+ * @LastEditTime: 2020-08-26 14:04:40
  * @LastEditors: wish.WuJunLong
  */
 
-let loginInfo = uni.getStorageSync("loginInfo");
 
 function getToken() {
+  let loginInfo = uni.getStorageSync("loginInfo");
   uni.request({
     method: "POST",
     url: "http://192.168.0.187:8092/api/login",
@@ -31,10 +31,11 @@ function getToken() {
 }
 
 const request = async (config, type) => {
+  let loginInfo = uni.getStorageSync("loginInfo");
   let currentTime = new Date().getTime();
   let loginTime = new Date(loginInfo.loginTime).getTime();
-  console.log("时间", currentTime, loginTime, currentTime > loginTime);
   if (currentTime > loginTime) {
+    console.log("时间", currentTime, loginTime, currentTime > loginTime);
     getToken();
   }
   uni.showLoading({

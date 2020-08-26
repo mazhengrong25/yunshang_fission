@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-25 09:24:28
+ * @LastEditTime: 2020-08-26 14:15:08
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -237,7 +237,7 @@ export default {
       airMessage: {
         to: {},
         from: {},
-        toTime: {}
+        toTime: {},
       },
     };
   },
@@ -289,6 +289,7 @@ export default {
     closeFromBtn() {
       this.addressForm.fromTime = "";
       this.addressForm.fromDay = "";
+      delete this.airMessage["fromTime"]
     },
 
     // 获取当前swiper-item高度
@@ -359,8 +360,8 @@ export default {
     // 提交按钮
     submitTicket() {
       console.log("提交");
-      this.airMessage["type"] = this.ticketType;
-      
+      this.airMessage["type"] = this.currentTab;
+
       if (Object.keys(this.airMessage.to).length === 0) {
         this.airMessage.to = {
           city_code: "CKG",
@@ -376,7 +377,7 @@ export default {
           country_code: "CN",
           province: "北京",
         };
-      } 
+      }
       if (Object.keys(this.airMessage.toTime).length === 0) {
         this.airMessage.toTime = {
           date: moment().add(1, "d").format("YYYY-MM-DD"),
@@ -386,11 +387,16 @@ export default {
           week: moment().add(1, "d").format("ddd"),
         };
       }
-      console.log(this.airMessage.from)
       console.log(this.airMessage);
+      let jumpUrl
+      if (this.currentTab === 0 && !this.airMessage.fromTime) {
+        jumpUrl = "/pages/ticketInquiry/ticketInquiry";
+      } else if (this.currentTab === 0 && this.airMessage.fromTime) {
+        jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
+      }
       uni.navigateTo({
         url:
-          "/pages/ticketInquiry/ticketInquiry?data=" +
+          jumpUrl + "?data=" +
           JSON.stringify(this.airMessage),
       });
     },

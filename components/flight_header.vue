@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-08-24 12:00:43
+ * @LastEditTime: 2020-08-25 16:53:49
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -20,7 +20,7 @@
       <view class="center_message">
         <view
           class="duration"
-        >{{Number(flightData.duration.split(":")[0])}}h{{Number(flightData.duration.split(":")[1])}}m</view>
+        >{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[0]):flightData.duration}}h{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[1]):flightData.duration}}m</view>
         <view class="arrow_icon"></view>
       </view>
       <view class="right_message address_message">

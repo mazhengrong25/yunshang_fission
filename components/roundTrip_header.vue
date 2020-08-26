@@ -6,17 +6,17 @@
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
-	<view class="roundTrip_header">
+	<view class="roundTrip_header" @click="jumpDatePage">
 		<view class="time_box start_time">
-			<view class="tiem">06月10日</view>
-			<view class="week">周三</view>
+			<view class="tiem">{{timeData.toTime.month}}</view>
+			<view class="week">{{timeData.toTime.week}}</view>
 		</view>
 		<view class="time_line">
-			4天
+			{{timeData.jetLag}}天
 		</view>
 		<view class="time_box end_time">
-			<view class="tiem">06月14日</view>
-			<view class="week">周日</view>
+			<view class="tiem">{{timeData.fromTime.month}}</view>
+			<view class="week">{{timeData.fromTime.week}}</view>
 		</view>
 		<view class="jump_time_btn"></view>
 	</view>
@@ -24,10 +24,21 @@
 
 <script>
 	export default {
+		props: {
+			timeData: {
+				type: Object,
+				default: () => {}
+			}
+		},
 		data() {
 			return {
 				
 			};
+		},
+		methods: {
+			jumpDatePage(){
+				this.$emit('jumpDatePage',true)
+			},
 		}
 	}
 </script>

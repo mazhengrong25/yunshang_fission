@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-08-19 15:43:17
+ * @LastEditTime: 2020-08-25 18:10:09
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -189,6 +189,7 @@ export default {
 
     // 确认乘机人
     returnBtn() {
+      console.log(this.checkePassenger)
       uni.setStorageSync('passengerList', JSON.stringify(this.checkePassenger))
       uni.navigateBack()
     },
@@ -199,6 +200,8 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.passengerType = data.type === "userInfo";
+    this.chdinfNumber = data.chdinfNumber?JSON.parse(data.chdinfNumber): {}
+    console.log(this.chdinfNumber)
   },
 };
 </script>

@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-24 13:39:17
+ * @LastEditTime: 2020-08-26 11:02:07
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -111,6 +111,7 @@ export default {
         to: "重庆",
         from: "北京",
       },
+      fileKey: '', // av 查询key
       flightData: {
         // 航班头部信息
         flightType: "", // 航程类型
@@ -170,6 +171,7 @@ export default {
       console.log(this.airMessage);
       let params = {
         sourceCode: "IBE",
+        file_key: this.fileKey,
         queryDate: this.airMessage.flightData.time,
         departure: this.airMessage.ticketAddress.departure,
         destination: this.airMessage.ticketAddress.arrival,
@@ -215,6 +217,9 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+
+    // 获取fileKey
+    this.fileKey = data.fileKey
 
     // 组装航程头部信息
     let airData = JSON.parse(data.airData);

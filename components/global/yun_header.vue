@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-08-19 16:55:18
+ * @LastEditTime: 2020-08-26 15:50:39
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -24,49 +24,59 @@
 <script>
 export default {
   props: {
-    showReturn: {  // 显示返回按钮
+    showReturn: {
+      // 显示返回按钮
       type: Boolean,
-      default: () => true
+      default: () => true,
     },
     centerTitle: {
       // 居中文字标题
       type: String,
-      default: () => ""
+      default: () => "",
     },
     statusType: {
       // 导航栏状态 flase单程 true往返
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
     headerAddress: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     statusHeight: {
       // 导航栏默认高度
       type: Number,
-      default: () => 25
+      default: () => 25,
     },
     headerBottom: {
       // 导航栏下边距
       type: Number,
-      default: () => 0
+      default: () => 0,
     },
     headerColor: {
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
   },
   data() {
     return {
-      iStatusBarHeight: 0 // 状态栏高度
+      iStatusBarHeight: 0, // 状态栏高度
     };
   },
   methods: {
+    // 返回上一页按钮 如果上一页不存在 则返回主页
     goBack() {
-      uni.navigateBack();
-    }
-  }
+      let pages = getCurrentPages();
+      let curPage = pages[pages.length - 2];
+      if (pages.length <= 1) {
+        uni.switchTab({
+          url: "/pages/index/index",
+        });
+      } else {
+        uni.navigateBack({delta: curPage});
+      }
+    },
+  },
 };
 </script>
 
@@ -79,14 +89,14 @@ export default {
   align-items: center;
   padding-top: var(--status-bar-height);
   z-index: 999;
-  &.white{
+  &.white {
     background: #fff;
-    .go_back{
+    .go_back {
       background: url(@/static/go_back_white.png) no-repeat center center;
       background-size: 23upx 31upx;
     }
     .title,
-    .center_title{
+    .center_title {
       color: #000;
     }
   }
@@ -105,9 +115,9 @@ export default {
     justify-content: center;
     font-size: 36upx;
     font-weight: bold;
-		color: rgba(255, 255, 255, 1);
-		letter-spacing: 10upx;
-		width: 100%;
+    color: rgba(255, 255, 255, 1);
+    letter-spacing: 10upx;
+    width: 100%;
   }
   .title {
     font-size: 36upx;

@@ -2,68 +2,125 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-07-23 14:51:38
+ * @LastEditTime: 2020-08-26 15:30:29
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="ticketRoundTrip">
     <!-- 导航栏 -->
-    <yun-header
-      :statusHeight="iStatusBarHeight"
-      :statusType="true"
-      :headerAddress="ticketAddress"
-    ></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" :statusType="true" :headerAddress="ticketAddress"></yun-header>
     <!-- 往返时间 -->
     <view class="header_time">
-      <round-trip-header></round-trip-header>
+      <round-trip-header :timeData="timeData" @jumpDatePage="jumpDatePage"></round-trip-header>
     </view>
     <!-- 航班列表 -->
     <scroll-view :enable-back-to-top="true" class="flight_list" :scroll-y="true">
-      <view
-        v-for="(item, index) in flightList"
-        :key="index"
-        @click="checkedFlight(item,index)"
-        v-bind:class="[{toActive: item.toActive},{fromActive: item.fromActive},'flight_box']"
-      >
-        <view class="box_top">
-          <view class="top_time start_time">
-            <view class="time">{{item.toTime}}</view>
-            <view class="address">{{item.toAddress}}</view>
-          </view>
-          <view class="flight_line">
-            <view class="time">{{item.time}}</view>
-            <view class="line_icon"></view>
-          </view>
-          <view class="top_time end_time">
-            <view class="time">{{item.fromTime}}</view>
-            <view class="address">{{item.fromAddress}}</view>
+      <view class="flight_content">
+        <view class="left_flight">
+          <view
+            v-for="(item, index) in flightList"
+            :key="index"
+            @click="checkedFlight('to',item,index)"
+            :class="[{toActive: index === toActive},'flight_box']"
+          >
+            <view class="box_top">
+              <view class="top_time start_time">
+                <view class="time">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
+                <view
+                  class="address"
+                >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+              </view>
+              <view class="flight_line">
+                <view
+                  class="time"
+                >{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
+                <view class="line_icon"></view>
+              </view>
+              <view class="top_time end_time">
+                <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
+                <view
+                  class="address"
+                >{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+              </view>
+            </view>
+            <view class="total_price_message">
+              <!-- <text v-if="!item.premium && item.totalPrice">往返总价</text> -->
+            </view>
+            <view class="flight_bottom">
+              <view class="airlines">
+                <image
+                  class="airlines_icon"
+                  :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+                  mode="contain"
+                />
+                {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}}
+              </view>
+              <view class="price">
+                <view class="price_mini">&yen;</view>
+                <!-- <text>{{item.totalPrice}}</text> -->
+                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price}}</text>
+                <!-- <view class="price_mini">起</view> -->
+              </view>
+            </view>
           </view>
         </view>
-        <view class="total_price_message">
-          <text v-if="!item.premium && item.totalPrice">往返总价</text>
-        </view>
-        <view class="flight_bottom">
-          <view class="airlines">
-            <image class="airlines_icon" src="@/static/ticket_icon.png" mode="contain" />
-            {{item.airlines}}
-          </view>
-          <view class="price">
-            <view class="price_mini" v-if="item.premium && !item.totalPrice">补</view>
-            <view class="price_mini">&yen;</view>
-            <text>{{item.totalPrice}}</text>
-            <text>{{item.premium}}</text>
-            <view class="price_mini" v-if="!item.premium && item.totalPrice">起</view>
+
+        <view class="right_flight">
+          <view
+            v-for="(item, index) in roundFlightList"
+            :key="index"
+            @click="checkedFlight('from',item,index)"
+            :class="[{fromActive: index === fromActive},'flight_box']"
+          >
+            <view class="box_top">
+              <view class="top_time start_time">
+                <view class="time">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
+                <view
+                  class="address"
+                >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+              </view>
+              <view class="flight_line">
+                <view
+                  class="time"
+                >{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
+                <view class="line_icon"></view>
+              </view>
+              <view class="top_time end_time">
+                <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
+                <view
+                  class="address"
+                >{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+              </view>
+            </view>
+            <view class="total_price_message">
+              <!-- <text v-if="!item.premium && item.totalPrice">往返总价</text> -->
+            </view>
+            <view class="flight_bottom">
+              <view class="airlines">
+                <image
+                  class="airlines_icon"
+                  :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+                  mode="contain"
+                />
+                {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}}
+              </view>
+              <view class="price">
+                <!-- <view class="price_mini">补</view> -->
+                <view class="price_mini">&yen;</view>
+                <!-- <text>{{item.totalPrice}}</text> -->
+                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price}}</text>
+              </view>
+            </view>
           </view>
         </view>
       </view>
     </scroll-view>
 
     <view class="filter">
-			<flight-filter @openFilter="openFilter" :filterMini="true"></flight-filter>
-		</view>
+      <flight-filter @openFilter="openFilter" :filterMini="true"></flight-filter>
+    </view>
 
-    
-		<flight-filter-dialog ref="filterDialog" :directFlight="true"></flight-filter-dialog>
+    <flight-filter-dialog ref="filterDialog" :directFlight="true"></flight-filter-dialog>
 
     <view class="bottom_bar">
       <view class="left_message">
@@ -81,269 +138,160 @@
 import roundTripHeader from "@/components/roundTrip_header.vue"; // 往返日期状态栏
 import flightFilter from "@/components/flight_filter.vue"; // 航班筛选
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
+import ticket from "@/api/ticketInquiry.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
   components: {
     roundTripHeader,
     flightFilter,
-    flightFilterDialog
+    flightFilterDialog,
   },
   data() {
     return {
       iStatusBarHeight: 0, // 导航栏高度
-      ticketAddress: {
-        // 导航栏地址
-        to: "重庆",
-        from: "上海"
-      },
 
-      flightList: [
-        // 航班信息
-        {
-					id: 1,
-          toTime: "08:00", // 出发时间
-          toAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "665", // 总价
-          premium: "",
-          toActive: false
-        },
-        {
-					id: 2,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 3,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 4,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        },
-        {
-					id: 5,
-          toTime: "08:00", // 出发时间
-          tiAddress: "江北T3", // 出发地址
-          time: "2h30m", // 时长
-          fromTime: "10:30", // 到达时间
-          fromAddress: "大兴", // 到达地址
-          airlines: "南航CZ2801", // 航司
-          totalPrice: "", // 总价
-          premium: "20"
-        }
-      ],
+      ticketData: {}, // 航班数据
+      timeData: {}, // 日期数据
+
+      ticketAddress: {}, // 导航栏地址
+
+      flightList: [], // 航班信息
+
+      roundFlightList: [], // 往返航班信息
 
       checketFlightList: [], // 选中航程
-
+      toActive: 0, // 默认选中去程
+      fromActive: 0, // 默认选中返程
     };
   },
   methods: {
-    // 选择航班
-    checkedFlight(val, index) {
-
-			// this.checketFlightList.push(val)
-			// this.flightList[index].toActive = true;
-
-      if (this.checketFlightList.length < 1) {
-        if (this.flightList[index].toActive) {
-					this.flightList[index].toActive = false;
-					this.checketFlightList.splice(this.checketFlightList.findIndex(item => item.id === id),1)
+    // 获取去程航班信息
+    getTicketData() {
+      this.flightList = [];
+      let data = {
+        departure: this.ticketAddress.departure, // 起飞机场三字码
+        arrival: this.ticketAddress.arrival, // 到达机场三字码
+        departureTime: this.ticketAddress.departureTime, // 起飞时间
+        airline: "", // 航司二字码
+      };
+      ticket.getTicket(data).then((res) => {
+        console.log(res);
+        if (res.errorcode === 10000) {
+          this.file_key = res.data.IBE.file_key;
+          this.flightList = res.data.IBE.list;
+          console.log(this.flightList);
+          if (this.flightList.length < 1) {
+            uni.showToast({
+              title: "当日暂无去程航班信息，请切换其他日期",
+              icon: "none",
+            });
+          }
         } else {
-					this.flightList[index].toActive = true;
-					this.checketFlightList.push(val)
+          uni.showToast({
+            title: "查询去程航班失败，" + res.msg,
+            icon: "none",
+            mask: true,
+            duration: 4000,
+          });
+          setTimeout(() => {
+            uni.switchTab({
+              url: "/pages/index/index",
+            });
+          }, 2000);
         }
-			}else if(this.checketFlightList.length < 2){
-				if (this.flightList[index].fromActive) {
-					this.flightList[index].fromActive = false;
-					this.checketFlightList.splice(this.checketFlightList.findIndex(item => item.id === id),1)
+      });
+      console.log("去程", this.flightList);
+    },
+    // 获取返程航班信息
+    getRoundTicketData() {
+      this.roundFlightList = [];
+      let data = {
+        departure: this.ticketAddress.arrival, // 起飞机场三字码
+        arrival: this.ticketAddress.departure, // 到达机场三字码
+        departureTime: this.ticketAddress.arrTime, // 起飞时间
+        airline: "", // 航司二字码
+      };
+      ticket.getTicket(data).then((res) => {
+        console.log(res);
+        if (res.errorcode === 10000) {
+          this.file_key = res.data.IBE.file_key;
+          this.roundFlightList = res.data.IBE.list;
+          console.log(this.roundFlightList);
+          if (this.roundFlightList.length < 1) {
+            uni.showToast({
+              title: "当日暂无返程航班信息，请切换其他日期",
+              icon: "none",
+            });
+          }
         } else {
-					this.flightList[index].fromActive = true;
-					this.checketFlightList.push(val)
+          uni.showToast({
+            title: "查询返程航班失败，" + res.msg,
+            icon: "none",
+            mask: true,
+            duration: 4000,
+          });
+          setTimeout(() => {
+            uni.switchTab({
+              url: "/pages/index/index",
+            });
+          }, 2000);
         }
-			}
-			console.log(this.checketFlightList)
+      });
+      console.log("返程", this.roundFlightList);
     },
 
+    // 选择航班
+    checkedFlight(type, val, index) {
+      console.log(type, val, index)
+      if(type === 'to'){
+        this.toActive = index
+      }else if(type === 'from'){
+        this.fromActive = index
+      }
+    },
+
+    // 跳转日历
+    jumpDatePage(){
+      
+    },
 
     // 打开筛选
     openFilter() {
-      this.$refs.filterDialog.openFilterDialog()
+      this.$refs.filterDialog.openFilterDialog();
     },
     // 关闭弹出框
     closeFilterDialog() {
-      this.$refs.filterDialog.closeFilterDialog()
+      this.$refs.filterDialog.closeFilterDialog();
     },
-
   },
-  onLoad() {
+  onShow() {
+    this.getTicketData();
+    this.getRoundTicketData();
+  },
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-  }
+    this.ticketData = data.data ? JSON.parse(data.data) : "";
+    // 组装头部数据
+    this.ticketAddress = {
+      to: this.ticketData.to.city_name,
+      from: this.ticketData.from.city_name,
+      departure: this.ticketData.to.city_code, // 起飞机场三字码
+      arrival: this.ticketData.from.city_code, // 到达机场三字码
+      departureTime: this.ticketData.toTime.date, // 起飞时间
+      arrTime: this.ticketData.fromTime.date,
+    };
+
+    // 组装日期数据
+    this.timeData = {
+      toTime: this.ticketData.toTime,
+      fromTime: this.ticketData.fromTime,
+      jetLag: moment(this.ticketData.fromTime.date).diff(
+        moment(this.ticketData.toTime.date),
+        "days"
+      ),
+    };
+  },
 };
 </script>
 
@@ -360,39 +308,38 @@ export default {
   }
   .flight_list {
     flex: 1;
-    width: auto;
+    width: 100%;
     overflow-y: auto;
+
+    .flight_content {
+      display: flex;
+      justify-content: space-between;
+      padding: 20upx;
+    }
+    .left_flight,
+    .right_flight {
+      display: flex;
+      flex-direction: column;
+      width: 350upx;
+      margin-bottom: 140upx;
+    }
     .flight_box {
       background: rgba(255, 255, 255, 1);
       box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
       padding: 28upx 16upx 16upx;
       display: inline-flex;
       flex-direction: column;
-      width: 42%;
+      // width: 42%;
       margin-bottom: 4upx;
-			position: relative;
-			border: 2upx solid transparent;
-			overflow: hidden;
-      &:first-child,
-      &:nth-child(2) {
+      position: relative;
+      border: 2upx solid transparent;
+      overflow: hidden;
+      &:first-child {
         border-radius: 20upx 20upx 0 0;
-        margin-top: 20upx;
       }
-      &:nth-child(even) {
-        margin-right: 20upx;
-      }
-      &:nth-child(odd) {
-        margin-left: 20upx;
-      }
-      &:not(:nth-child(2n)) {
-        margin-right: 7upx;
-      }
-      &:last-child,
-      &:nth-last-child(2) {
-        margin-bottom: 140upx;
-      }
+
       &.toActive {
-				border:2upx solid rgba(0,112,226,1);
+        border: 2upx solid rgba(0, 112, 226, 1);
         &::before {
           content: "已选去程";
           position: absolute;
@@ -408,10 +355,10 @@ export default {
           color: rgba(255, 255, 255, 1);
           background: rgba(0, 112, 226, 1);
         }
-			}
-			&.fromActive{
-				border:2upx solid rgba(133,205,131,1);
-				&::before {
+      }
+      &.fromActive {
+        border: 2upx solid rgba(133, 205, 131, 1);
+        &::before {
           content: "已选返程";
           position: absolute;
           top: 0;
@@ -423,10 +370,10 @@ export default {
           border-radius: 0 0 20upx 0;
           font-size: 16upx;
           font-weight: 400;
-					color: rgba(255, 255, 255, 1);
-					background:rgba(133,205,131,1);
+          color: rgba(255, 255, 255, 1);
+          background: rgba(133, 205, 131, 1);
         }
-			}
+      }
       .box_top {
         display: flex;
         align-items: flex-start;
@@ -454,8 +401,7 @@ export default {
           color: rgba(175, 185, 196, 1);
           margin: 0 28upx;
           .line_icon {
-            background: url(@/static/ticket_path.png) no-repeat center
-              center;
+            background: url(@/static/ticket_path.png) no-repeat center center;
             background-size: contain;
             width: 80upx;
             height: 14upx;
@@ -502,20 +448,19 @@ export default {
     }
   }
 
-  .filter{
+  .filter {
     position: fixed;
     width: calc(100% - 40upx);
-    bottom: calc( 156upx + var(--status-bar-height) );
+    bottom: calc(156upx + var(--status-bar-height));
     left: 20upx;
     height: 80upx;
     border-radius: 50upx;
-    box-shadow:0 0 12upx rgba(0,0,0,0.16);
-    background:rgba(255,255,255,1);
+    box-shadow: 0 0 12upx rgba(0, 0, 0, 0.16);
+    background: rgba(255, 255, 255, 1);
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
 
   .bottom_bar {
     background: rgba(255, 255, 255, 1);

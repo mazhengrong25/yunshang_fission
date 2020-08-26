@@ -164,6 +164,12 @@
       }
     },
     {
+      "path": "pages/flightReservation/payResult",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/ticketInquiry/ticketRoundTrip",
       "style": {
         "navigationStyle": "custom"

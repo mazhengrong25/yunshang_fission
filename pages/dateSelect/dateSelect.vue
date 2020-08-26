@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-08-13 09:49:05
+ * @LastEditTime: 2020-08-25 16:55:57
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -200,7 +200,7 @@ export default {
             box-shadow: none;
           }
           &.active {
-            color: transparent;
+            color: transparent !important;
             position: relative;
             border: 4upx solid rgba(0, 112, 226, 0.2);
             &::before {
