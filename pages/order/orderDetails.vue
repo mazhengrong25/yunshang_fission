@@ -10,7 +10,7 @@
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="订单详情"></yun-header>
 
 	<!-- 国际详情 -->
-    <view class="details_header" v-if="orderListType === 3">
+    <view class="details_header" v-if="orderListType === '3'">
       <view class="header_top">
         <view class="order_type">
           {{orderDetails.status === 1? '已预订':
@@ -186,12 +186,12 @@ export default {
   methods: {
     // 获取订单详情
     getOrderDetails(val) {
-		console.log('订单详情',val);
+		console.log('订单详情',val,this.orderListType);
       let data = {
         order_no:val
       };
 	  
-	  if(this.orderListType === 3) {
+	  if(this.orderListType === '3') {
 		  
 		  orderApi.orderInterDetails(data).then((res) => {
 		    console.log(res);
@@ -202,11 +202,11 @@ export default {
 		  		    title: res.msg,
 		  		    icon: "none",
 		  		  });
-		  		}
+		  		} 
 		  });
 		  
 		  
-	  }else if( this.orderListType === 0){
+	  }else if( this.orderListType === '0'){
 		  
 		  orderApi.orderDetails(data).then((res) => {
 		    console.log(res);
@@ -236,6 +236,7 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 	let orderData = JSON.parse(data.orderData)
+	console.log(data)
 	this.orderListType = data.type
 	this.orderHeaderTitle = 
 		this.orderListType === '0'?'国内订单': 

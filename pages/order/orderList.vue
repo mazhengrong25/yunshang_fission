@@ -56,7 +56,7 @@
           <view class="item_header">
             <view class="item_title">
               <view class="title_type" v-if="item.ticket_segments.length > 1">{{item.direction_type === 1?'去程':item.direction_type === 2?'回程':item.direction_type === 3?'第'+(oindex + 1)+'程':''}}</view>
-              <view class="title">{{oitem.departure}} - {{oitem.arrive}}</view>
+              <view class="title">{{oitem.departure_msg.city_name}} - {{oitem.arrive_msg.city_name}}</view>
             </view>
             <view class="item_price">
               <text>&yen;</text> {{item.ticket_price || '金额错误'}}
@@ -294,9 +294,8 @@ export default {
     jumpOrderDetails(data) {
 		
       uni.navigateTo({
-        url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data),
+        url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data) + '&type='+this.orderListType,
       });
-	  console.log('123',JSON.stringify(data));
     },
   },
   onLoad(data) {
