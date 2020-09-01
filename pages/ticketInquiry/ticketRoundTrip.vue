@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-01 10:18:44
+ * @LastEditTime: 2020-09-01 16:16:32
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -50,7 +50,7 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
                   mode="contain"
                 />
                 {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}}
@@ -99,7 +99,7 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
                   mode="contain"
                 />
                 {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}}

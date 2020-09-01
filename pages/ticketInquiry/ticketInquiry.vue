@@ -61,7 +61,7 @@
           <view class="ticket_details">
             <image
               class="ticket_details_icon"
-              :src="'http://192.168.0.187:8092/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+              :src="'https://fxxcx.ystrip.cn/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
               mode="contain"
             />
             {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode}}

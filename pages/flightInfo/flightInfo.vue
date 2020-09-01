@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-01 11:34:23
+ * @LastEditTime: 2020-09-01 15:05:55
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -78,7 +78,6 @@
                 v-for="(item, index) in depCabinList[header]"
                 :key="index"
                 :flightData="item"
-                :flightDataIndex="index"
                 @openExpDialog="openExp"
                 @jumpReservation="jumpReservationBtn"
               ></flight-item>
@@ -162,10 +161,7 @@ export default {
       fileKey: "", // av 查询key
       roundTripFileKey: "", // 返程av查询key
 
-      airNumber: null,  // 去程下标
-      depNumber: null, // 返程下标
-
-      airHeader: '', // 去程类型
+      airActiveInfo: {}, // 去程预定
 
       flightData: {
         // 航班头部信息
@@ -213,7 +209,6 @@ export default {
   methods: {
     // 往返 - 往返舱位选择
     roundTripBtn(type) {
-      console.log(type);
       this.roundTripBtnActive = type;
     },
 
@@ -246,12 +241,15 @@ export default {
     },
 
     // 跳转预定页面 - 先验价再跳转
-    jumpReservationBtn(type, data, dataIndex) {
-      console.log(type, data, dataIndex);
+    jumpReservationBtn(type, data) {
+      console.log(type, data);
       let params
       if (this.roundTripBtnActive === 0) {  // 去程验价数据组装
-        this.airNumber = dataIndex  // 去程下标
-        this.airHeader = data.type  // 去程类型
+        this.airActiveInfo = {
+          cabin: data.cabin,
+          price: data.data.cabinPrices.ADT.price,
+          type: data.type
+        }
         this.airMessage["data"] = data;
         params = {
           sourceCode: "IBE",
@@ -317,8 +315,21 @@ export default {
         });
       } else {
         // 往返验价
-        console.log(this.depCabinList[this.airHeader][this.airNumber])
         console.log("往返验价");
+        console.log(this.airActiveInfo)
+        console.log(this.cabinList[this.airActiveInfo.type])
+        this.cabinList[this.airActiveInfo.type].forEach(item =>{
+          if(item.cabin === this.airActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.airActiveInfo.price){
+            console.log(item)
+            item['active'] = true
+          }
+        })
+
+        // this.airActiveInfo = {
+        //   cabin: data.cabin,
+        //   price: data.data.cabinPrices.ADT.price,
+        //   type: data.type
+        // }
         this.closeCheckPrice();
       }
     },
@@ -360,7 +371,7 @@ export default {
           "机场" +
           airData.segments[0].arrTerminal, // 到达机场
         airIcon:
-          "http://192.168.0.187:8092/" +
+          "https://fxxcx.ystrip.cn/" +
           airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
             .image,
         airline:
@@ -441,7 +452,7 @@ export default {
           "机场" +
           airData.segments[0].arrTerminal, // 到达机场
         airIcon:
-          "http://192.168.0.187:8092/" +
+          "https://fxxcx.ystrip.cn/" +
           airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
             .image,
         airline:
@@ -470,7 +481,7 @@ export default {
           "机场" +
           depData.segments[0].depTerminal, // 出发机场
         airIcon:
-          "http://192.168.0.187:8092/" +
+          "https://fxxcx.ystrip.cn/" +
           depData.segments[0][depData.segments[0].flightNumber.slice(0, 2)]
             .image,
         airline:

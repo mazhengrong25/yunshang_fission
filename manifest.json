@@ -1,5 +1,5 @@
 {
-    "name" : "yunshang_fission",
+    "name" : "云上航空分销小程序",
     "appid" : "__UNI__EA8B56E",
     "description" : "",
     "versionName" : "1.0.0",
@@ -16,9 +16,9 @@
             "autoclose" : true,
             "delay" : 0
         },
-        "safearea": {
-            "bottom": {
-                "offset": "none"
+        "safearea" : {
+            "bottom" : {
+                "offset" : "none"
             }
         },
         /* 模块配置 */
@@ -62,7 +62,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx19fa3183911b1c10",
+        "appid" : "wxfe1f2313e5bf0576",
         "setting" : {
             "urlCheck" : false,
             "es6" : true,

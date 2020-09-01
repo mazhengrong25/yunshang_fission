@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-27 18:30:53
+ * @LastEditTime: 2020-09-01 16:15:45
  * @LastEditors: wish.WuJunLong
  */
 
@@ -11,7 +11,7 @@ async function getToken() {
   let loginInfo = uni.getStorageSync("loginInfo");
   await uni.request({
     method: "POST",
-    url: "http://192.168.0.187:8092/api/login",
+    url: "https://fxxcx.ystrip.cn/api/login",
     data: {
       login_name: loginInfo.account,
       password: loginInfo.password,
@@ -45,9 +45,9 @@ const request = async (config, type) => {
   let baseUrl;
   if (type === "user") {
     // 调用用户信息地址
-    baseUrl = "http://192.168.0.187:8088";
+    baseUrl = "https://fxxcx.ystrip.cn/user";
   } else {
-    baseUrl = "http://192.168.0.187:8092";
+    baseUrl = "https://fxxcx.ystrip.cn";
   }
   config.url = baseUrl + config.url;
   if (uni.getStorageSync("loginInfo").token) {
