@@ -256,6 +256,7 @@ export default {
 		      } else {
 		        this.innerList = res.data.data;
           }
+		  
           if(this.headerActive !== 0 && this.headerActive !== 1){
             let activeIndex = 
               this.headerActive === 2? 1: // 待出票
@@ -267,6 +268,7 @@ export default {
 		      if (this.orderPageNumber >= res.data.last_page) {
 		        this.orderPageStatus = false;
 		      }
+			  console.log(this.headerActive)
 		    } else {
 		      uni.showToast({
 		        title: 'res.msg',
@@ -292,10 +294,16 @@ export default {
 
     // 跳转国际订单详情
     jumpOrderDetails(data) {
-		
-      uni.navigateTo({
-        url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data) + '&type='+this.orderListType,
-      });
+	  if(this.orderListType === '3'){
+		  uni.navigateTo({
+		    url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data) + '&type='+this.orderListType,
+		  });
+	  }else if(this.orderListType === '0'){
+		  uni.navigateTo({
+		  	url:"/pages/order/orderinterDetails?listData=" + JSON.stringify(data) + '&type='+this.orderListType,
+		  })
+	  }
+      
     },
   },
   onLoad(data) {
