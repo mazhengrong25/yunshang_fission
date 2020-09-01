@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-08-26 15:30:29
+ * @LastEditTime: 2020-09-01 10:18:44
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -117,7 +117,7 @@
     </scroll-view>
 
     <view class="filter">
-      <flight-filter @openFilter="openFilter" :filterMini="true"></flight-filter>
+      <flight-filter @openFilter="openFilter" :filterMini="true" @filterType="listFilter"></flight-filter>
     </view>
 
     <flight-filter-dialog ref="filterDialog" :directFlight="true"></flight-filter-dialog>
@@ -125,11 +125,12 @@
     <view class="bottom_bar">
       <view class="left_message">
         <view class="price_box">
-          <text>&yen;</text>695
+          <text>&yen;</text>
+          {{price}}
         </view>
         <view class="not_pass_message">往返总价</view>
       </view>
-      <view class="right_btn">下一步</view>
+      <view class="right_btn" @click="submitRoundTrip()">下一步</view>
     </view>
   </view>
 </template>
@@ -163,6 +164,11 @@ export default {
       checketFlightList: [], // 选中航程
       toActive: 0, // 默认选中去程
       fromActive: 0, // 默认选中返程
+
+      price: 0, // 往返总价
+
+      file_key: '', // 去程key
+      roundFlightKey: '', // 返程key
     };
   },
   methods: {
@@ -176,10 +182,12 @@ export default {
         airline: "", // 航司二字码
       };
       ticket.getTicket(data).then((res) => {
-        console.log(res);
         if (res.errorcode === 10000) {
           this.file_key = res.data.IBE.file_key;
           this.flightList = res.data.IBE.list;
+          this.price += this.flightList[this.toActive].ItineraryInfos[
+            "经济舱"
+          ][0].cabinPrices.ADT.rulePrice.price;
           console.log(this.flightList);
           if (this.flightList.length < 1) {
             uni.showToast({
@@ -213,11 +221,13 @@ export default {
         airline: "", // 航司二字码
       };
       ticket.getTicket(data).then((res) => {
-        console.log(res);
         if (res.errorcode === 10000) {
-          this.file_key = res.data.IBE.file_key;
+          this.roundFlightKey = res.data.IBE.file_key;
           this.roundFlightList = res.data.IBE.list;
           console.log(this.roundFlightList);
+          this.price += this.roundFlightList[this.fromActive].ItineraryInfos[
+            "经济舱"
+          ][0].cabinPrices.ADT.rulePrice.price;
           if (this.roundFlightList.length < 1) {
             uni.showToast({
               title: "当日暂无返程航班信息，请切换其他日期",
@@ -243,17 +253,51 @@ export default {
 
     // 选择航班
     checkedFlight(type, val, index) {
-      console.log(type, val, index)
-      if(type === 'to'){
-        this.toActive = index
-      }else if(type === 'from'){
-        this.fromActive = index
+      console.log(type, val, index);
+      if (type === "to") {
+        this.toActive = index;
+      } else if (type === "from") {
+        this.fromActive = index;
+      }
+      this.price =
+        this.flightList[this.toActive].ItineraryInfos["经济舱"][0].cabinPrices
+          .ADT.rulePrice.price +
+        this.roundFlightList[this.fromActive].ItineraryInfos["经济舱"][0]
+          .cabinPrices.ADT.rulePrice.price;
+    },
+
+    // 国内单程价格排序
+    priceSort(p) {
+      return (m, n) => {
+        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
+        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
+        return a - b;
+      };
+    },
+
+    // 国内单程时间排序
+    timeSort(t) {
+      return (m, n) => {
+        var a = new Date(m.segments[0][t]).getTime();
+        var b = new Date(n.segments[0][t]).getTime();
+        return a - b;
+      };
+    },
+
+    // 列表筛选
+    listFilter(val) {
+      if (val === "price") {
+        this.flightList.sort(this.priceSort("price"));
+        this.roundFlightList.sort(this.priceSort("price"));
+      } else if (val === "time") {
+        this.flightList.sort(this.timeSort("depTime"));
+        this.roundFlightList.sort(this.timeSort("depTime"));
       }
     },
 
     // 跳转日历
-    jumpDatePage(){
-      
+    jumpDatePage() {
+      console.log("跳转日历页面");
     },
 
     // 打开筛选
@@ -264,8 +308,31 @@ export default {
     closeFilterDialog() {
       this.$refs.filterDialog.closeFilterDialog();
     },
+
+    // 往返航班提交
+    submitRoundTrip() {
+      let data = {
+        ticketMessage: this.ticketAddress,
+        start: this.flightList[this.toActive],
+        end: this.roundFlightList[this.toActive]
+      }
+      let roundTripKey = {
+        start: this.file_key,
+        end: this.roundFlightKey
+      }
+      console.log(JSON.stringify(data))
+      console.log(JSON.stringify(roundTripKey))
+      uni.navigateTo({
+        url:
+          "/pages/flightInfo/flightInfo?roundTripData=" +
+          JSON.stringify(data) +
+          "&roundTripKey=" +
+          JSON.stringify(roundTripKey) + '&pageType=true'
+      });
+    },
   },
   onShow() {
+    this.price = 0
     this.getTicketData();
     this.getRoundTicketData();
   },

@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-08-26 11:02:07
+ * @LastEditTime: 2020-09-01 11:05:09
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -11,35 +11,81 @@
       :statusHeight="iStatusBarHeight"
       :headerAddress="ticketAddress"
       :headerBottom="Number(10)"
+      :statusType="roundTripType"
     ></yun-header>
-    <flight-header :flightData="flightData"></flight-header>
+    <view class="main_content">
+      <flight-header :flightData="flightData" :roundTripFlightData="roundTripFlightData" :roundTripType="roundTripType"></flight-header>
 
-    <view class="flight_cabin">
-      <view :class="['cabin_header',{'isDisplay':cabinHeader.length > 1}]">
-        <view
-          :class="['cabin_header_box',{'is_active': current === index}]"
-          @click="checkedHeader(index)"
-          v-for="(item, index) in cabinHeader"
-          :key="index"
-        >
-          {{item}}
-          <view class="cabin_header_line"></view>
-        </view>
+      <view class="round_trip_message" v-if="roundTripType">
+        <view class></view>
       </view>
 
-      <swiper class="cabin_content" @change="change" :current="current">
-        <swiper-item v-for="(header, headerIndex) in cabinHeader" :key="headerIndex">
-          <view class="cabin_content_item">
-            <flight-item
-              v-for="(item, index) in cabinList[header]"
-              :key="index"
-              :flightData="item"
-              @openExpDialog="openExp"
-              @jumpReservation="jumpReservationBtn"
-            ></flight-item>
+      <view class="round_trip_checked" v-if="roundTripType">
+        <button
+          :class="['checked_btn',{active: roundTripBtnActive === 0}]"
+          @click="roundTripBtn(0)"
+        >选择去程</button>
+        <button
+          :class="['checked_btn',{active: roundTripBtnActive === 1}]"
+          @click="roundTripBtn(1)"
+        >选择返程</button>
+      </view>
+      <view class="flight_cabin" v-if="roundTripBtnActive === 0">
+        <view :class="['cabin_header',{'isDisplay':cabinHeader.length > 1}]">
+          <view
+            :class="['cabin_header_box',{'is_active': current === index}]"
+            @click="checkedHeader(index)"
+            v-for="(item, index) in cabinHeader"
+            :key="index"
+          >
+            {{item}}
+            <view class="cabin_header_line"></view>
           </view>
-        </swiper-item>
-      </swiper>
+        </view>
+
+        <swiper class="cabin_content" @change="change" :current="current">
+          <swiper-item v-for="(header, headerIndex) in cabinHeader" :key="headerIndex">
+            <view class="cabin_content_item">
+              <flight-item
+                v-for="(item, index) in cabinList[header]"
+                :key="index"
+                :flightData="item"
+                @openExpDialog="openExp"
+                @jumpReservation="jumpReservationBtn"
+              ></flight-item>
+            </view>
+          </swiper-item>
+        </swiper>
+      </view>
+
+      <view class="flight_cabin" v-else>
+        <view :class="['cabin_header',{'isDisplay':depCabinHeader.length > 1}]">
+          <view
+            :class="['cabin_header_box',{'is_active': current === index}]"
+            @click="checkedHeader(index)"
+            v-for="(item, index) in depCabinHeader"
+            :key="index"
+          >
+            {{item}}
+            <view class="cabin_header_line"></view>
+          </view>
+        </view>
+
+        <swiper class="cabin_content" @change="change" :current="current">
+          <swiper-item v-for="(header, headerIndex) in depCabinHeader" :key="headerIndex">
+            <view class="cabin_content_item">
+              <flight-item
+                v-for="(item, index) in depCabinList[header]"
+                :key="index"
+                :flightData="item"
+                :flightDataIndex="index"
+                @openExpDialog="openExp"
+                @jumpReservation="jumpReservationBtn"
+              ></flight-item>
+            </view>
+          </swiper-item>
+        </swiper>
+      </view>
     </view>
 
     <uni-popup ref="flightExplanation" type="bottom">
@@ -106,12 +152,19 @@ export default {
     return {
       iStatusBarHeight: 0, // 导航栏高度
       airMessage: {}, // 原始数据
+      roundTripType: false, // 是否往返
+
       ticketAddress: {
         // 导航栏地址
         to: "重庆",
         from: "北京",
       },
-      fileKey: '', // av 查询key
+      fileKey: "", // av 查询key
+      roundTripFileKey: "", // 返程av查询key
+
+      airNumber: null,  // 去程下标
+      depNumber: null, // 返程下标
+
       flightData: {
         // 航班头部信息
         flightType: "", // 航程类型
@@ -125,18 +178,43 @@ export default {
         model: "", // 机型
         food: "", // 餐饮
       },
+
+      roundTripFlightData: {
+        // 返程数据
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
+      },
+      roundTripBtnActive: 0, // 舱位选择默认值
+
       cabinHeader: [], // 舱位选择列表
       current: 0, // 轮播图下标
       cabinList: {},
+
+      depCabinHeader: [], // 返程切换头部
+      depCabinList: {}, // 返程数据
 
       popupCurrent: 0, // 弹窗轮播下标
 
       ruleInfos: {}, // 退改签信息
 
-      newPrice: '', // 验价新价格
+      newPrice: "", // 验价新价格
     };
   },
   methods: {
+    // 往返 - 往返舱位选择
+    roundTripBtn(type) {
+      console.log(type);
+      this.roundTripBtnActive = type;
+    },
+
     // 舱位等级选择
     checkedHeader(index) {
       this.current = index;
@@ -166,28 +244,42 @@ export default {
     },
 
     // 跳转预定页面 - 先验价再跳转
-    jumpReservationBtn(type, data) {
-      this.airMessage["data"] = data;
-      console.log(this.airMessage);
-      let params = {
-        sourceCode: "IBE",
-        file_key: this.fileKey,
-        queryDate: this.airMessage.flightData.time,
-        departure: this.airMessage.ticketAddress.departure,
-        destination: this.airMessage.ticketAddress.arrival,
-        systemMsg: "",
-        segments: this.airMessage.airSegments,
-        ItineraryInfo: this.airMessage.data.data,
-        relatedKey: "11",
-      };
+    jumpReservationBtn(type, data, dataIndex) {
+      console.log(type, data, dataIndex);
+      if (this.roundTripBtnActive === 0) {  // 去程验价数据组装
+        this.airNumber = dataIndex  // 去程下标
+        this.airMessage["data"] = data;
+        let params = {
+          sourceCode: "IBE",
+          file_key: this.fileKey,
+          queryDate: this.airMessage.flightData.time,
+          departure: this.airMessage.ticketAddress.departure,
+          destination: this.airMessage.ticketAddress.arrival,
+          systemMsg: "",
+          segments: this.airMessage.airSegments,
+          ItineraryInfo: this.airMessage.data.data,
+          relatedKey: "11",
+        };
+      } else {  // 返程验价数据组装
+        this.depNumber = dataIndex  // 返程下标
+      }
+
       ticket.checkPrice(params).then((res) => {
         if (res.errorcode === 10000) {
           if (res.data.check_price_status) {
-            uni.navigateTo({
-              url:
-                "/pages/flightReservation/flightReservation?key=" +
-                res.data.keys + '&price='+res.data.price,
-            });
+            if (!this.roundTripType) {
+              // 单程验价
+              uni.navigateTo({
+                url:
+                  "/pages/flightReservation/flightReservation?key=" +
+                  res.data.keys +
+                  "&price=" +
+                  res.data.price,
+              });
+            } else {
+              // 往返验价
+              console.log("往返验价");
+            }
           } else {
             this.newPrice = res.data.price;
             this.relatedKey = res.data.keys;
@@ -208,90 +300,247 @@ export default {
     },
     // 确认验价信息跳转预定页面
     submitCheckPrice() {
-      this.closeCheckPrice();
-      uni.navigateTo({
-        url:
-          "/pages/flightReservation/flightReservation?key=" + this.relatedKey  + '&price='+ this.newPrice,
-      });
+      if (!this.roundTripType) {
+        // 单程验价
+        this.closeCheckPrice();
+        uni.navigateTo({
+          url:
+            "/pages/flightReservation/flightReservation?key=" +
+            this.relatedKey +
+            "&price=" +
+            this.newPrice,
+        });
+      } else {
+        // 往返验价
+        console.log("往返验价");
+        this.closeCheckPrice();
+      }
     },
   },
   onLoad(data) {
+    console.log(data);
+    this.roundTripType = JSON.parse(data.pageType);
+    console.log(this.roundTripType)
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    // 组装单程航班数据
+    if (!this.roundTripType) {
+      // 获取fileKey
+      this.fileKey = data.fileKey;
 
-    // 获取fileKey
-    this.fileKey = data.fileKey
+      // 组装航程头部信息
+      let airData = JSON.parse(data.airData);
+      console.log(airData);
+      this.ticketAddress = {
+        to: airData.to,
+        from: airData.from,
+        departure: airData.departure, // 起飞机场三字码
+        arrival: airData.arrival, // 到达机场三字码
+      };
+      this.flightData = {
+        flightType: "单程", // 航程类型
+        time: moment(airData.QueryDate).format("YYYY-MM-DD"), // 航程日期
+        week: moment(airData.QueryDate).format("ddd"),
+        fromTime: moment(airData.segments[0].depTime).format("HH:mm"), // 出发时间
+        fromAddress:
+          airData.to +
+          airData.segments[0].depAirportName +
+          "机场" +
+          airData.segments[0].depTerminal, // 出发机场
+        duration: airData.segments[0].duration, // 飞行时长
+        toTime: moment(airData.segments[0].arrTime).format("HH:mm"), // 到达时间
+        toAddress:
+          airData.from +
+          airData.segments[0].arrAirportName +
+          "机场" +
+          airData.segments[0].arrTerminal, // 到达机场
+        airIcon:
+          "http://192.168.0.187:8092/" +
+          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
+            .image,
+        airline:
+          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
+            .air_name + airData.segments[0].flightNumber, // 航司
+        model: airData.segments[0].aircraftCode, // 机型
+        food: airData.segments[0].hasMeal, // 餐饮
+      };
 
-    // 组装航程头部信息
-    let airData = JSON.parse(data.airData);
-    console.log(airData);
-    this.ticketAddress = {
-      to: airData.to,
-      from: airData.from,
-      departure: airData.departure, // 起飞机场三字码
-      arrival: airData.arrival, // 到达机场三字码
-    };
-    this.flightData = {
-      flightType: "单程", // 航程类型
-      time: moment(airData.QueryDate).format("YYYY-MM-DD"), // 航程日期
-      week: moment(airData.QueryDate).format("ddd"),
-      fromTime: moment(airData.segments[0].depTime).format("HH:mm"), // 出发时间
-      fromAddress:
-        airData.to +
-        airData.segments[0].depAirportName +
-        "机场" +
-        airData.segments[0].depTerminal, // 出发机场
-      duration: airData.segments[0].duration, // 飞行时长
-      toTime: moment(airData.segments[0].arrTime).format("HH:mm"), // 到达时间
-      toAddress:
-        airData.from +
-        airData.segments[0].arrAirportName +
-        "机场" +
-        airData.segments[0].arrTerminal, // 到达机场
-      airIcon:  airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)].image,
-      airline:
-        airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
-          .air_name + airData.segments[0].flightNumber, // 航司
-      model: airData.segments[0].aircraftCode, // 机型
-      food: airData.segments[0].hasMeal, // 餐饮
-    };
+      // 组装原始数据
+      this.airMessage = {
+        ticketAddress: this.ticketAddress,
+        airSegments: airData.segments,
+        flightData: this.flightData,
+      };
 
-    // 组装原始数据
-    this.airMessage = {
-      ticketAddress: this.ticketAddress,
-      airSegments: airData.segments,
-      flightData: this.flightData,
-    };
+      // 组装航班列表信息
+      let airDataName = Object.keys(airData.ItineraryInfos);
 
-    // 组装航班列表信息
-    // this.cabinHeader
-    let airDataName = Object.keys(airData.ItineraryInfos);
-
-    // 组装经济舱/公务舱数据
-    airDataName.forEach((item) => {
-      if (item !== "NFD") {
-        this.cabinHeader.push(item);
-        this.cabinList[item] = [];
-        this.cabinList[item].ruleInfos = {};
-        let dataArr = airData.ItineraryInfos[item];
-        dataArr.forEach((oitem) => {
-          this.cabinList[item].push({
-            type: item,
-            // 舱位列表
-            price:
-              oitem.cabinPrices.ADT.price +
-              oitem.cabinPrices.ADT.build +
-              oitem.cabinPrices.ADT.tax, // 价格
-            priceMessage: true, // 是否包含燃油
-            reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
-            voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
-            cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
-            baggage: oitem.cabinInfo.baggage, // 行李额
-            ruleInfos: oitem.ruleInfos, // 退改信息
-            data: oitem,
+      // 组装经济舱/公务舱数据
+      airDataName.forEach((item) => {
+        if (item !== "NFD") {
+          this.cabinHeader.push(item);
+          this.cabinList[item] = [];
+          this.cabinList[item].ruleInfos = {};
+          let dataArr = airData.ItineraryInfos[item];
+          dataArr.forEach((oitem) => {
+            this.cabinList[item].push({
+              type: item,
+              // 舱位列表
+              price:
+                oitem.cabinPrices.ADT.price +
+                oitem.cabinPrices.ADT.build +
+                oitem.cabinPrices.ADT.tax, // 价格
+              priceMessage: true, // 是否包含燃油
+              reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
+              voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
+              cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
+              baggage: oitem.cabinInfo.baggage, // 行李额
+              ruleInfos: oitem.ruleInfos, // 退改信息
+              data: oitem,
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    } else {
+      let airData = JSON.parse(data.roundTripData).start;
+      let depData = JSON.parse(data.roundTripData).end;
+      let ticketData = JSON.parse(data.roundTripData).ticketMessage;
+
+      this.fileKey = JSON.parse(data.roundTripKey).start;
+
+      this.roundTripFileKey = JSON.parse(data.roundTripKey).end;
+
+      this.ticketAddress = {
+        to: ticketData.to,
+        from: ticketData.from,
+        departure: ticketData.departure, // 起飞机场三字码
+        arrival: ticketData.arrival, // 到达机场三字码
+      };
+
+      // 组装去程信息
+      this.flightData = {
+        flightType: "去程", // 航程类型
+        time: ticketData.departureTime, // 航程日期
+        week: moment(ticketData.departureTime).format("ddd"),
+        fromTime: moment(airData.segments[0].depTime).format("HH:mm"), // 出发时间
+        fromAddress:
+          ticketData.to +
+          airData.segments[0].depAirportName +
+          "机场" +
+          airData.segments[0].depTerminal, // 出发机场
+        duration: airData.segments[0].duration, // 飞行时长
+        toTime: moment(airData.segments[0].arrTime).format("HH:mm"), // 到达时间
+        toAddress:
+          ticketData.from +
+          airData.segments[0].arrAirportName +
+          "机场" +
+          airData.segments[0].arrTerminal, // 到达机场
+        airIcon:
+          "http://192.168.0.187:8092/" +
+          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
+            .image,
+        airline:
+          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
+            .air_name + airData.segments[0].flightNumber, // 航司
+        model: airData.segments[0].aircraftCode, // 机型
+        food: airData.segments[0].hasMeal, // 餐饮
+      };
+
+      // 组装返程信息
+      this.roundTripFlightData = {
+        flightType: "返程", // 航程类型
+        time: ticketData.arrTime, // 航程日期
+        week: moment(ticketData.arrTime).format("ddd"),
+        fromTime: moment(depData.segments[0].depTime).format("HH:mm"), // 出发时间
+        fromAddress:
+          ticketData.from +
+          depData.segments[0].arrAirportName +
+          "机场" +
+          depData.segments[0].arrTerminal, // 到达机场
+        duration: depData.segments[0].duration, // 飞行时长
+        toTime: moment(depData.segments[0].arrTime).format("HH:mm"), // 到达时间
+        toAddress:
+          ticketData.to +
+          depData.segments[0].depAirportName +
+          "机场" +
+          depData.segments[0].depTerminal, // 出发机场
+        airIcon:
+          "http://192.168.0.187:8092/" +
+          depData.segments[0][depData.segments[0].flightNumber.slice(0, 2)]
+            .image,
+        airline:
+          depData.segments[0][depData.segments[0].flightNumber.slice(0, 2)]
+            .air_name + depData.segments[0].flightNumber, // 航司
+        model: depData.segments[0].aircraftCode, // 机型
+        food: depData.segments[0].hasMeal, // 餐饮
+      };
+
+      // 组装原始数据
+      this.airMessage = {
+        ticketAddress: this.ticketAddress,
+        airSegments: airData.segments,
+        flightData: this.flightData,
+      };
+
+      // 组装去程航班列表信息
+      let airDataName = Object.keys(airData.ItineraryInfos);
+
+      // 组装去程经济舱/公务舱数据
+      airDataName.forEach((item) => {
+        if (item !== "NFD") {
+          this.cabinHeader.push(item);
+          this.cabinList[item] = [];
+          this.cabinList[item].ruleInfos = {};
+          let dataArr = airData.ItineraryInfos[item];
+          dataArr.forEach((oitem) => {
+            this.cabinList[item].push({
+              type: item,
+              // 舱位列表
+              price:
+                oitem.cabinPrices.ADT.price +
+                oitem.cabinPrices.ADT.build +
+                oitem.cabinPrices.ADT.tax, // 价格
+              priceMessage: true, // 是否包含燃油
+              reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
+              voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
+              cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
+              baggage: oitem.cabinInfo.baggage, // 行李额
+              ruleInfos: oitem.ruleInfos, // 退改信息
+              data: oitem,
+            });
+          });
+        }
+      });
+
+      // 组装返程航班列表信息
+      let depDataName = Object.keys(depData.ItineraryInfos);
+
+      // 组装去程经济舱/公务舱数据
+      depDataName.forEach((item) => {
+        if (item !== "NFD") {
+          this.depCabinHeader.push(item);
+          this.depCabinList[item] = [];
+          this.depCabinList[item].ruleInfos = {};
+          let depDataArr = depData.ItineraryInfos[item];
+          depDataArr.forEach((oitem) => {
+            this.depCabinList[item].push({
+              type: item,
+              // 舱位列表
+              price:
+                oitem.cabinPrices.ADT.price +
+                oitem.cabinPrices.ADT.build +
+                oitem.cabinPrices.ADT.tax, // 价格
+              priceMessage: true, // 是否包含燃油
+              reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
+              voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
+              cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
+              baggage: oitem.cabinInfo.baggage, // 行李额
+              ruleInfos: oitem.ruleInfos, // 退改信息
+              data: oitem,
+            });
+          });
+        }
+      });
+    }
   },
 };
 </script>
@@ -302,6 +551,49 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow-y: auto;
+  .main_content {
+    overflow-y: auto;
+    height: calc(100vh - 88upx - var(--status-bar-height));
+  }
+
+  .round_trip_checked {
+    display: flex;
+    align-items: center;
+    margin: 10upx 20upx 30upx;
+    .checked_btn {
+      flex: 1;
+      height: 80upx;
+      border: 2upx solid #afb9c4;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28upx;
+      font-weight: bold;
+      color: #666666;
+      background-color: transparent;
+      margin: 0;
+      &.active {
+        border-color: #0070e2;
+        line-height: 22upx;
+        color: #0070e2;
+        &:first-child {
+          border-right: 2upx solid #0070e2;
+        }
+        &:last-child {
+          border-left: 2upx solid #0070e2;
+        }
+      }
+      &:first-child {
+        border-radius: 20upx 0 0 20upx;
+        border-right: unset;
+      }
+      &:last-child {
+        border-radius: 0 20upx 20upx 0;
+        border-left: unset;
+      }
+    }
+  }
 
   .flight_cabin {
     flex: 1;
@@ -316,7 +608,7 @@ export default {
       padding: 0 60upx;
       margin: 0 20upx;
       &.isDisplay {
-        justify-content: space-between;
+        // justify-content: space-between;
         .cabin_header_box {
           margin-right: 0;
         }
@@ -371,7 +663,6 @@ export default {
         }
       }
     }
-
     .cabin_content {
       flex: 1;
       height: calc(100vh - 505upx);

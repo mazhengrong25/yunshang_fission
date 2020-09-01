@@ -2,14 +2,14 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-08-26 14:04:40
+ * @LastEditTime: 2020-08-27 18:30:53
  * @LastEditors: wish.WuJunLong
  */
 
 
-function getToken() {
+async function getToken() {
   let loginInfo = uni.getStorageSync("loginInfo");
-  uni.request({
+  await uni.request({
     method: "POST",
     url: "http://192.168.0.187:8092/api/login",
     data: {
@@ -36,7 +36,7 @@ const request = async (config, type) => {
   let loginTime = new Date(loginInfo.loginTime).getTime();
   if (currentTime > loginTime) {
     console.log("时间", currentTime, loginTime, currentTime > loginTime);
-    getToken();
+    await getToken();
   }
   uni.showLoading({
     title: "加载中",
@@ -60,7 +60,7 @@ const request = async (config, type) => {
     config.data = {};
   }
 
-  let promise = new Promise((resolve, reject) => {
+  let promise = await new Promise((resolve, reject) => {
     uni
       .request(config)
       .then((responses) => {
