@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-08-20 14:45:31
+ * @LastEditTime: 2020-09-01 09:43:25
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -41,6 +41,10 @@
 			flightData: {
 				type: Object,
 				default: () => {}
+			},
+			flightDataIndex: {
+				type: Number,
+				default: () => null
 			}
 		},
 		data() {
@@ -57,7 +61,7 @@
 			
 			// 跳转预定页面
 			jumpReservation(){
-				this.$emit('jumpReservation', true,this.flightData)
+				this.$emit('jumpReservation', true,this.flightData,this.flightDataIndex)
 			},
 		}
 	}

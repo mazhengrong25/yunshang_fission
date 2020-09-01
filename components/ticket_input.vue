@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-08-13 18:29:17
+ * @LastEditTime: 2020-08-26 14:09:57
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -31,9 +31,9 @@
             <text class="time_text">出发日期</text>
           </view>
         </view>
-        <view class="ticket_from_time time_box" @click="jumpDate('end')">
+        <view class="ticket_from_time time_box" @click.stop="jumpDate('end')">
           <view class="time_true" v-if="addressForm.fromTime">
-            <image class="close_from_btn" src="@/static/close.png" @click="closeFromBtn" />
+            <image class="close_from_btn" src="@/static/close.png" @click.stop="closeFromBtn" />
             <view class="time">{{addressForm.fromTime}}</view>
             <view class="time_day">{{addressForm.fromDay}}返回</view>
           </view>
@@ -73,7 +73,7 @@
         </view>
         <view class="ticket_from_time time_box">
           <view class="time_true" v-if="addressForm.fromTime">
-            <image class="close_from_btn" src="@/static/close.png" @click="closeFromBtn" />
+            <image class="close_from_btn" src="@/static/close.png" @click.stop="closeFromBtn" />
             <view class="time">{{addressForm.fromTime}}</view>
             <view class="time_day">{{addressForm.fromDay}}返回</view>
           </view>

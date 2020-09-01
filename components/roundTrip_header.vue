@@ -2,21 +2,21 @@
  * @Description: 往返日期状态栏组件
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:57:25
- * @LastEditTime: 2020-07-20 17:09:20
+ * @LastEditTime: 2020-08-28 16:10:45
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
-	<view class="roundTrip_header">
-		<view class="time_box start_time">
-			<view class="tiem">06月10日</view>
-			<view class="week">周三</view>
+	<view class="roundTrip_header" @click.stop="jumpDatePage">
+		<view class="time_box start_time" @click.stop="jumpStartPage">
+			<view class="tiem">{{timeData.toTime.month}}</view>
+			<view class="week">{{timeData.toTime.week}}</view>
 		</view>
 		<view class="time_line">
-			4天
+			{{timeData.jetLag}}天
 		</view>
-		<view class="time_box end_time">
-			<view class="tiem">06月14日</view>
-			<view class="week">周日</view>
+		<view class="time_box end_time" @click.stop="jumpEndPage">
+			<view class="tiem">{{timeData.fromTime.month}}</view>
+			<view class="week">{{timeData.fromTime.week}}</view>
 		</view>
 		<view class="jump_time_btn"></view>
 	</view>
@@ -24,10 +24,30 @@
 
 <script>
 	export default {
+		props: {
+			timeData: {
+				type: Object,
+				default: () => {}
+			}
+		},
 		data() {
 			return {
 				
 			};
+		},
+		methods: {
+			// 跳转日历
+			jumpDatePage(){
+				this.$emit('jumpDatePage',true)
+			},
+			// 跳转日历开始日期
+			jumpStartPage(){
+				console.log('跳转开始日期')
+			},
+			// 跳转日期结束日期
+			jumpEndPage(){
+				console.log('跳转结束日期')
+			},
 		}
 	}
 </script>

@@ -2,12 +2,24 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-08-13 09:49:05
+ * @LastEditTime: 2020-08-31 11:39:30
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="date_select">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="选择日期"></yun-header>
+
+    <view class="round_trip_tab" v-if="roundTripStatus.status">
+      <view :class="['date_checked',{active: roundTripStatus.type === 'start'}]" @click="checkedDate(true)">
+        <view class="checked_title">去程日期</view>
+        <view class="checked_time">{{roundTripStatus.startTime || '—'}}</view>
+      </view>
+      <view :class="['date_checked',{active: roundTripStatus.type === 'end'}]" @click="checkedDate(false)">
+        <view class="checked_title">返程日期</view>
+        <view class="checked_time">{{roundTripStatus.endTime || '—'}}</view>
+      </view>
+    </view>
+
     <view class="date_header">
       <view class="hader_list" v-for="item in weekCn" :key="item">{{item}}</view>
     </view>
@@ -25,7 +37,7 @@
           <view class="item_box not_day" v-for="(oitem, oindex) in item.type" :key="oindex"></view>
           <view
             @click="checkedDayBtn(item.title,oitem)"
-            :class="['item_box',{'active': oitem.active},{'is_before': oitem.status === false},{checked: oitem.checked}]"
+            :class="['item_box',{'active': oitem.active},{'is_before': oitem.status === false},{'checked': oitem.checked}]"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
           >{{oitem.day}}</view>
@@ -37,12 +49,12 @@
 
 <script>
 import moment from "moment";
-moment.locale('zh-cn');
+moment.locale("zh-cn");
 export default {
   data() {
     return {
-			iStatusBarHeight: 0,
-			timeStatus: '', // 日期选择状态 start起飞时间 end到达时间
+      iStatusBarHeight: 0,
+      timeStatus: "", // 日期选择状态 start起飞时间 end到达时间
       weekCn: ["日", "一", "二", "三", "四", "五", "六"], // 中国周列表
       currentDateTitle: "", // 当前年月
       dateList: [],
@@ -51,6 +63,8 @@ export default {
       dateList: [], // 日期数据
 
       checkedDay: {}, // 选中日期
+
+      roundTripStatus: {},
     };
   },
   methods: {
@@ -90,6 +104,14 @@ export default {
     nextDate() {
       this.getDateList();
     },
+
+    // 往返日期切换
+    checkedDate(type){
+      this.roundTripStatus.type = type?'start':'end';
+      console.log(this.roundTripStatus)
+      console.log(this.dateList)
+    },
+
     // 点击日期
     checkedDayBtn(month, day) {
       console.log(month, day);
@@ -104,31 +126,41 @@ export default {
               oitem.checked = false;
             });
           }
-				});
-				let fromNow = moment(moment(day.time + "-" + day.day).format("YYYY-MM-DD")).calendar(null,{
-					nextDay: '[明天]',
-					nextWeek: 'ddd',
-					sameElse: 'ddd'
-				})
-				
+        });
+        let fromNow = moment(
+          moment(day.time + "-" + day.day).format("YYYY-MM-DD")
+        ).calendar(null, {
+          nextDay: "[明天]",
+          nextWeek: "ddd",
+          sameElse: "ddd",
+        });
+
         this.checkedDay = {
-					type: 'time',
-					status: this.timeStatus,
+          type: "time",
+          status: this.timeStatus,
           date: moment(day.time + "-" + day.day).format("YYYY-MM-DD"),
           month: moment(day.time + "-" + day.day).format("M月DD日"),
-					week: fromNow,
-				};
-				console.log(this.checkedDay)
+          week: fromNow,
+        };
+        console.log(this.checkedDay);
         uni.setStorageSync("time", JSON.stringify(this.checkedDay));
-        uni.switchTab({
-          url: "/pages/index/index",
-        });
+        uni.navigateBack();
       }
     },
   },
   onLoad(data) {
-		this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-		this.timeStatus = data.type
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.timeStatus = data.type;
+    console.log(data.type)
+    if (data.status) {
+      this.roundTripStatus = {
+        status: true,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        type: data.type
+      };
+    }
+    console.log(this.roundTripStatus);
     if (this.dateList.length < 2) {
       for (let index = 0; index < 2; index++) {
         this.getDateList();
@@ -143,6 +175,46 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
+
+  .round_trip_tab {
+    display: flex;
+    align-items: center;
+    .date_checked {
+      flex: 1;
+      position: relative;
+      height: 100upx;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      &.active {
+        &::after {
+          content: "";
+          width: 144upx;
+          height: 4upx;
+          background: #0070e2;
+          display: block;
+          bottom: 0;
+          position: absolute;
+        }
+        .checked_time {
+          color: #0070e2;
+        }
+      }
+      .checked_title {
+        font-size: 24upx;
+        font-weight: bold;
+        color: #2a2a2a;
+      }
+      .checked_time {
+        font-size: 22upx;
+        font-weight: bold;
+        color: #2a2a2a;
+        margin-top: 6upx;
+      }
+    }
+  }
+
   .date_header {
     display: flex;
     align-items: center;
@@ -200,7 +272,7 @@ export default {
             box-shadow: none;
           }
           &.active {
-            color: transparent;
+            color: transparent !important;
             position: relative;
             border: 4upx solid rgba(0, 112, 226, 0.2);
             &::before {

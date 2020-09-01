@@ -2,45 +2,84 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-08-24 12:00:43
+ * @LastEditTime: 2020-09-01 10:12:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="fight_header">
-    <view class="header_message">
-      <view class="header_type">{{flightData.flightType}}</view>
-      <view class="header_time">{{flightData.time}} {{flightData.week}}</view>
-    </view>
-
-    <view class="content_message">
-      <view class="left_message address_message">
-        <view class="time">{{flightData.fromTime}}</view>
-        <view class="address">{{flightData.fromAddress}}</view>
+    <view class="fight_list">
+      <view class="header_message">
+        <view class="header_type">{{flightData.flightType}}</view>
+        <view class="header_time">{{flightData.time}} {{flightData.week}}</view>
       </view>
-      <view class="center_message">
-        <view
-          class="duration"
-        >{{Number(flightData.duration.split(":")[0])}}h{{Number(flightData.duration.split(":")[1])}}m</view>
-        <view class="arrow_icon"></view>
+
+      <view class="content_message">
+        <view class="left_message address_message">
+          <view class="time">{{flightData.fromTime}}</view>
+          <view class="address">{{flightData.fromAddress}}</view>
+        </view>
+        <view class="center_message">
+          <view 
+            class="duration"
+          >{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[0]):flightData.duration}}h{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[1]):flightData.duration}}m</view>
+          <view class="arrow_icon"></view>
+        </view>
+        <view class="right_message address_message">
+          <view class="time">{{flightData.toTime}}</view>
+          <view class="address">{{flightData.toAddress}}</view>
+        </view>
       </view>
-      <view class="right_message address_message">
-        <view class="time">{{flightData.toTime}}</view>
-        <view class="address">{{flightData.toAddress}}</view>
+
+      <view class="bottom_message">
+        <image
+          class="bottom_message_icon"
+          :src="flightData.airIcon"
+          mode="contain"
+        />
+        {{flightData.airline}}{{flightData.model?' | '+ flightData.model: ''}} {{flightData.food? ' | 有餐食': ''}}
+      </view>
+
+      <view class="flight_reservation_box" v-if="!flightInfo">
+        {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
+        <view class="message_more_btn"></view>
       </view>
     </view>
+    <view class="fight_list" v-if="roundTripType">
+      <view class="header_message">
+        <view class="header_type round_trip_type">{{roundTripFlightData.flightType}}</view>
+        <view class="header_time">{{roundTripFlightData.time}} {{roundTripFlightData.week}}</view>
+      </view>
 
-    <view class="bottom_message">
-      <image
-        class="bottom_message_icon"
-        :src="'http://192.168.0.187:8092/'+ flightData.airIcon"
-        mode="contain"
-      />
-      {{flightData.airline}}{{flightData.model?' | '+ flightData.model: ''}} {{flightData.food? ' | 有餐食': ''}}
-    </view>
+      <view class="content_message">
+        <view class="left_message address_message">
+          <view class="time">{{roundTripFlightData.fromTime}}</view>
+          <view class="address">{{roundTripFlightData.fromAddress}}</view>
+        </view>
+        <view class="center_message">
+          <view
+            class="duration"
+          >{{roundTripFlightData.duration.indexOf(':') !== -1?Number(roundTripFlightData.duration.split(":")[0]):roundTripFlightData.duration}}h{{roundTripFlightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[1]):flightData.duration}}m</view>
+          <view class="arrow_icon"></view>
+        </view>
+        <view class="right_message address_message">
+          <view class="time">{{roundTripFlightData.toTime}}</view>
+          <view class="address">{{roundTripFlightData.toAddress}}</view>
+        </view>
+      </view>
 
-    <view class="flight_reservation_box" v-if="!flightInfo">
-      {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
-      <view class="message_more_btn"></view>
+      <view class="bottom_message">
+        <image
+          class="bottom_message_icon"
+          :src="roundTripFlightData.airIcon"
+          mode="contain"
+        />
+        {{roundTripFlightData.airline}}{{roundTripFlightData.model?' | '+ roundTripFlightData.model: ''}} {{roundTripFlightData.food? ' | 有餐食': ''}}
+      </view>
+
+      <view class="flight_reservation_box" v-if="!flightInfo">
+        {{roundTripFlightData.cabin?roundTripFlightData.cabin+' | ': ''}}退改签规则 {{roundTripFlightData.baggage?' | '+ roundTripFlightData.baggage: ''}}
+        <view class="message_more_btn"></view>
+      </view>
     </view>
   </view>
 </template>
@@ -58,6 +97,15 @@ export default {
       type: Object,
       default: () => {},
     },
+    roundTripFlightData: {  // 往返数据
+      // 返程数据
+      type: Object,
+      default: () => {},
+    },
+    roundTripType: {  // 是否往返
+      type: Boolean,
+      default: () => false
+    }
   },
   data() {
     return {};
@@ -72,6 +120,13 @@ export default {
   box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
   padding: 30upx 20upx 22upx;
   margin: 0 20upx 20upx;
+  .fight_list {
+    &:nth-child(2) {
+      margin-top: 30upx;
+      padding-top: 30upx;
+      border-top: 2upx dashed #d9e1ea;
+    }
+  }
 
   .header_message {
     display: flex;
@@ -91,6 +146,9 @@ export default {
       font-weight: 400;
       color: rgba(255, 255, 255, 1);
       margin-right: 20upx;
+      &.round_trip_type {
+        background: linear-gradient(90deg, #9bec99 0%, #85cd83 100%);
+      }
     }
 
     .header_time {

@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-08-25 14:29:35
+ * @LastEditTime: 2020-08-25 14:38:40
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -20,21 +20,21 @@
     <view class="order_filter">
       <view class="filter_list">
         <view class="list_icon">
-          <image src="@/static/filter_time_active.png" mode="aspectFit" />
+          <image src="@/static/filter_time_active.png" mode="contain" />
         </view>
         <view class="list_title">预定(早-晚)</view>
       </view>
 
       <view class="filter_list">
         <view class="list_icon">
-          <image src="@/static/filter_setoff.png" mode="aspectFit" />
+          <image src="@/static/filter_setoff.png" mode="contain" />
         </view>
         <view class="list_title">出发(早-晚)</view>
       </view>
 
       <view class="filter_list">
         <view class="list_icon">
-          <image src="@/static/filter_btn_active.png" mode="aspectFit" />
+          <image src="@/static/filter_btn_active.png" mode="contain" />
         </view>
         <view class="list_title" @click="goFilter()">筛选</view>
       </view>

@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-08-25 12:07:32
+ * @LastEditTime: 2020-08-25 18:11:36
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -327,6 +327,8 @@ export default {
           color: "#FF3333",
         },
       },
+
+      chdinf_msg: {}, // 航司儿童婴儿携带数量
     };
   },
   methods: {
@@ -390,6 +392,9 @@ export default {
             title: res.data.air_line.title,
             url: res.data.air_line.url,
           };
+
+          this.chdinf_msg = res.data.chdinf_msg // 航司儿童婴儿携带数量组装
+
         } else {
           uni.showToast({
             title: res.data,
@@ -434,7 +439,7 @@ export default {
     // 添加乘机人按钮
     jumpPassengerPage() {
       uni.navigateTo({
-        url: "/pages/flightReservation/passengerList",
+        url: "/pages/flightReservation/passengerList?chdinfNumber=" + JSON.stringify(this.chdinf_msg),
       });
     },
 
@@ -590,8 +595,15 @@ export default {
       
       ticket.createOrder(data).then((res) => {
         if (res.errorcode === 10000) {
+          let orderId = []
+          let priceNumber = 0
+          res.data.forEach(item =>{
+            orderId.push(item.order_no)
+            priceNumber += item.need_pay_amount
+          })
+          
           uni.navigateTo({
-            url: "/pages/flightReservation/orderPay?orderId="+JSON.stringify(res.data) + "&flightData=" + JSON.stringify(this.flightData),
+            url: "/pages/flightReservation/orderPay?orderId="+JSON.stringify(orderId) + "&flightData=" + JSON.stringify(this.flightData) + '&price=' + priceNumber,
           });
           console.log(res.data,this.flightData);
         } else {

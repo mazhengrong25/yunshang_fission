@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-08-25 14:15:52
+ * @LastEditTime: 2020-08-25 17:26:54
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -21,9 +21,9 @@
 
       <view class="order_message box-shadow-style">
         <view class="message_list" v-for="(item, index) in payOrder" :key="index">
-          <view class="list_title">
-            {{payOrder.length> 1 && index === 0? '成人':'儿童'}}订单编号
-          </view>
+          <view
+            class="list_title"
+          >{{payOrder.length> 1 && index === 0? '成人': payOrder.length> 1 && index === 1?'儿童':''}}订单编号</view>
           <view class="list_text">{{item}}</view>
         </view>
         <view class="message_list">
@@ -57,8 +57,17 @@
         <text>{{remainingTime}}</text>
       </view>
       <view :class="['bottom_submit',{is_two_pay: payOrder.length> 1}]">
-        <view :class="['submit_pay',{is_disabled: !payBtnStatus}]" @click="jumpPay()">{{payOrder.length> 1? '成人支付':'立即支付'}}</view>
-        <view v-if="payOrder.length> 1" :class="['submit_pay child_pay',{is_disabled: childPayStatus}]"  @click="jumpPay('儿童')">儿童支付</view>
+        <button
+          :class="['submit_pay',{is_disabled: !payBtnStatus}]"
+          :disabled="!payBtnStatus"
+          @click="jumpPay()"
+        >{{payOrder.length> 1? '成人支付':'立即支付'}}</button>
+        <button
+          v-if="payOrder.length> 1"
+          :class="['submit_pay child_pay',{is_disabled: childPayStatus}]"
+          :disabled="childPayStatus"
+          @click="jumpPay('儿童')"
+        >儿童支付</button>
       </view>
     </view>
   </view>
@@ -80,14 +89,14 @@ export default {
       payOrder: "", // 订单号
       flightData: {}, // 航程信息
       payType: "钱包",
-      
+
       payData: {}, // 订单详情数据
       remainingTime: "00:00",
 
       _inter: {}, // 倒计时
 
       payBtnStatus: true, // 支付按钮
-      childPayStatus: false,  // 儿童票支付状态
+      childPayStatus: false, // 儿童票支付状态
     };
   },
   methods: {
@@ -162,19 +171,34 @@ export default {
 
     // 立即支付按钮
     jumpPay(type) {
-      if (this.payBtnStatus && !this.childPayStatus) {
+      if (this.payBtnStatus) {
         let data = {
           pay_type: this.payType === "钱包" ? 1 : "",
         };
-        let payType = type === '儿童'? 1: 0
+        let payType = type === "儿童" ? 1 : 0;
         ticket
-          .payOrder(uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])), data)
+          .payOrder(
+            uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])),
+            data
+          )
           .then((res) => {
             if (res.errorcode === 10000) {
-              if(payType === 1){
-                this.childPayStatus = true
-              }else{
-                this.payBtnStatus = false
+              if (payType === 1) {
+                this.childPayStatus = true;
+              } else {
+                this.payBtnStatus = false;
+              }
+              if (this.childPayStatus && !this.payBtnStatus) {
+                console.log("成人儿童支付成功");
+                let orderInfo = {
+                  payId: this.payOrde,
+                  payType: this.payType,
+                  price: this.price,
+                  payDate: moment().format("YYYY-MM-DD HH:mm:ss")
+                }
+                uni.reLaunch({
+                  url: "/pages/flightReservation/payResult?orderData="+ JSON.stringify(orderInfo),
+                });
               }
               uni.showToast({
                 title: "支付成功",
@@ -188,7 +212,6 @@ export default {
               });
             }
           });
-        
       }
     },
   },
@@ -197,9 +220,10 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.payOrder = JSON.parse(data.orderId)
     this.flightData = JSON.parse(data.flightData);
+    this.price = data.price
     // this.payOrder = [
-    //   "5000202008251131322238381000000006",
-    //   "5000202008251131332272295000000006",
+    //   "5000202008251650542636889000000006",
+    //   "5000202008251650552133258000000006",
     // ];
     // this.flightData = {
     //   airIcon: "/assets/airline/PN.png",
@@ -233,7 +257,7 @@ export default {
     display: flex;
     align-items: baseline;
     background: #0070e2;
-    padding: 32upx 20upx 0;
+    padding: 32upx 20upx;
     color: rgba(255, 255, 255, 1);
     box-sizing: border-box;
     > text {
@@ -254,6 +278,9 @@ export default {
   .order_pay_main {
     position: relative;
     flex: 1;
+    height: 100%;
+    overflow-y: auto;
+
     &::before {
       content: "";
       background: #0070e2;
@@ -362,26 +389,28 @@ export default {
       align-items: center;
       justify-content: center;
       border-top: 2upx solid #e5e5e5;
-      &.is_two_pay{
-        .submit_pay{
+      &.is_two_pay {
+        .submit_pay {
           width: 45%;
           border-top-right-radius: 0;
           border-bottom-right-radius: 0;
-          &.child_pay{
+          &.child_pay {
             border-radius: 80upx;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             background: linear-gradient(
-          90deg,
-          rgba(251,152,38,.6) 0%,
-          rgba(251,152,38,1)
-        );
+              90deg,
+              rgba(251, 152, 38, 0.6) 0%,
+              rgba(251, 152, 38, 1)
+            );
+            box-shadow: 0 6upx 12upx rgba(251, 152, 38, 0.3);
           }
         }
       }
       .submit_pay {
         width: 650upx;
         height: 90upx;
+        margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;

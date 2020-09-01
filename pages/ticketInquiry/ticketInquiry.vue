@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-08-25 12:02:37
+ * @LastEditTime: 2020-09-01 10:10:59
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -13,7 +13,7 @@
     <view class="ticket_header">
       <view class="ticket_time_list">
         <view
-          :class="['ticket_time_btn',{'active': item.number === activeTimeNumber}]"
+          :class="['ticket_time_btn',{'active': item.date === activeTimeNumber}]"
           @click="clickBtn(item)"
           v-for="(item, index) in ticketTimeList"
           :key="index"
@@ -108,27 +108,31 @@ export default {
       ticketType: "国内", // 机票查询默认值
       ticketAddress: {
         // 导航栏地址
-        to: "重庆",
-        from: "北京",
+        to: "",
+        from: "",
         departure: "", // 起飞机场三字码
         arrival: "",
       },
+
+      airMessage: {}, // 首页传参
+
+      file_key: "", // av key
 
       ticketTimeList: [],
       activeTimeNumber: "04-18", // 日期选择
       ticketList: [],
       ticketListData: [
         {
-          startTime: "08:00",
-          startAddress: "江北T3",
-          voyageTime: "2h30m",
-          endTime: "10:30",
-          endAddress: "大兴",
-          price: "390",
-          cabin: "经济舱",
-          reward: "20",
-          airline: "南航CZ2801",
-          model: "空客A320(中)",
+          startTime: "",
+          startAddress: "",
+          voyageTime: "",
+          endTime: "",
+          endAddress: "",
+          price: "",
+          cabin: "",
+          reward: "",
+          airline: "",
+          model: "",
         },
       ],
     };
@@ -138,12 +142,10 @@ export default {
     getTicketData(data) {
       this.ticketList = [];
       ticket.getTicket(data).then((res) => {
-        console.log(res); 
+        console.log(res);
         if (res.errorcode === 10000) {
-          // res.data.IBE.forEach((item) => {
-          //   item["nfd"] = {};
-          // });
-          this.ticketList = res.data.IBE;
+          this.file_key = res.data.IBE.file_key;
+          this.ticketList = res.data.IBE.list;
           console.log(this.ticketList);
           if (this.ticketList.length < 1) {
             uni.showToast({
@@ -151,7 +153,6 @@ export default {
               icon: "none",
             });
           }
-          // this.getNfdData();
         } else {
           uni.showToast({
             title: "查询航班失败，" + res.msg,
@@ -193,14 +194,14 @@ export default {
     // 选择日期
     clickBtn(val) {
       console.log(val);
-      this.activeTimeNumber = val.number;
-      let airMessage = {
+      this.activeTimeNumber = val.date;
+      this.airMessage = {
         departure: this.ticketData.to.city_code, // 起飞机场三字码
         arrival: this.ticketData.from.city_code, // 到达机场三字码
         departureTime: val.date, // 起飞时间
         airline: "", // 航司二字码
       };
-      this.getTicketData(airMessage);
+      this.getTicketData(this.airMessage);
     },
     // 时间列表处理
     getDateList() {
@@ -226,7 +227,7 @@ export default {
         });
         dayNumber += 1;
       }
-      this.activeTimeNumber = this.ticketTimeList[0].number;
+      this.activeTimeNumber = this.airMessage.departureTime;
     },
 
     // 返回日历选择
@@ -236,11 +237,31 @@ export default {
       });
     },
 
+    // 国内单程价格排序
+    priceSort(p) {
+      return (m, n) => {
+        var a = m.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice[p];
+        var b = n.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice[p];
+        return a - b; 
+      };
+    },
+
+    // 国内单程时间排序
+    timeSort(t) {
+      return (m, n) => {
+        var a = new Date(m.segments[0][t]).getTime();
+        var b = new Date(n.segments[0][t]).getTime();
+        return a - b; 
+      };
+    },
+
     // 列表筛选
     listFilter(val) {
       if (val === "price") {
+        this.ticketList.sort(this.priceSort('price'))
+      }else if(val === 'time'){
+        this.ticketList.sort(this.timeSort('depTime'))
       }
-      console.log(val);
     },
 
     // 打开筛选
@@ -260,9 +281,20 @@ export default {
       (data["departure"] = this.ticketData.to.city_code), // 起飞机场三字码
         (data["arrival"] = this.ticketData.from.city_code), // 到达机场三字码
         uni.navigateTo({
-          url: "/pages/flightInfo/flightInfo?airData=" + JSON.stringify(data),
+          url:
+            "/pages/flightInfo/flightInfo?airData=" +
+            JSON.stringify(data) +
+            "&fileKey=" +
+            this.file_key + '&pageType=false'
         });
     },
+  },
+  onHide() {
+    this.ticketList = [];
+  },
+  onShow() {
+    this.getTicketData(this.airMessage);
+    this.getDateList(); // 时间处理
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -314,7 +346,6 @@ export default {
         },
       };
     */
-    console.log(this.ticketData);
     // 组装数据
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
@@ -322,15 +353,12 @@ export default {
       departure: this.ticketData.to.city_code, // 起飞机场三字码
       arrival: this.ticketData.from.city_code, // 到达机场三字码
     };
-    let airMessage = {
+    this.airMessage = {
       departure: this.ticketData.to.city_code, // 起飞机场三字码
       arrival: this.ticketData.from.city_code, // 到达机场三字码
       departureTime: this.ticketData.toTime.date, // 起飞时间
       airline: "", // 航司二字码
     };
-    this.getTicketData(airMessage);
-
-    this.getDateList(); // 时间处理
   },
 };
 </script>
