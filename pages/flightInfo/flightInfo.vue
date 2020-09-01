@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-01 11:05:09
+ * @LastEditTime: 2020-09-01 11:34:23
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -165,6 +165,8 @@ export default {
       airNumber: null,  // 去程下标
       depNumber: null, // 返程下标
 
+      airHeader: '', // 去程类型
+
       flightData: {
         // 航班头部信息
         flightType: "", // 航程类型
@@ -246,10 +248,12 @@ export default {
     // 跳转预定页面 - 先验价再跳转
     jumpReservationBtn(type, data, dataIndex) {
       console.log(type, data, dataIndex);
+      let params
       if (this.roundTripBtnActive === 0) {  // 去程验价数据组装
         this.airNumber = dataIndex  // 去程下标
+        this.airHeader = data.type  // 去程类型
         this.airMessage["data"] = data;
-        let params = {
+        params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
           queryDate: this.airMessage.flightData.time,
@@ -277,7 +281,7 @@ export default {
                   res.data.price,
               });
             } else {
-              // 往返验价
+              // 往返验价 
               console.log("往返验价");
             }
           } else {
@@ -287,8 +291,9 @@ export default {
           }
         } else {
           uni.showToast({
-            title: "验价失败，请稍后重试，" + res.msg,
+            title: res.data,
             icon: "none",
+            duration: 3000
           });
         }
       });
@@ -312,6 +317,7 @@ export default {
         });
       } else {
         // 往返验价
+        console.log(this.depCabinList[this.airHeader][this.airNumber])
         console.log("往返验价");
         this.closeCheckPrice();
       }
