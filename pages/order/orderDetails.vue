@@ -9,7 +9,8 @@
   <view class="order_details">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="订单详情"></yun-header>
 
-    <view class="details_header">
+	<!-- 国际详情 -->
+    <view class="details_header" v-if="orderListType === 3">
       <view class="header_top">
         <view class="order_type">
           {{orderDetails.status === 1? '已预订':
@@ -177,8 +178,9 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      orderDetails: [], // 订单详情
+      orderDetails: [], // 订单详情 --国际
       flightData: {}, // 航班信息
+	  orderListType: '', // 订单列表页 类型
     };
   },
   methods: {
@@ -189,35 +191,42 @@ export default {
         order_no:val
       };
 	  
-      orderApi.orderInterDetails(data).then((res) => {
-        console.log(res);
-		if (res.errorcode === 10000) {
-		  this.orderDetails = res.data;
-		}else {
-		  uni.showToast({
-		    title: res.msg,
-		    icon: "none",
+	  if(this.orderListType === 3) {
+		  
+		  orderApi.orderInterDetails(data).then((res) => {
+		    console.log(res);
+		  		if (res.errorcode === 10000) {
+		  		  this.orderDetails = res.data;
+		  		}else {
+		  		  uni.showToast({
+		  		    title: res.msg,
+		  		    icon: "none",
+		  		  });
+		  		}
 		  });
-		}
-      });
+		  
+		  
+	  }else if( this.orderListType === 0){
+		  
+		  orderApi.orderDetails(data).then((res) => {
+		    console.log(res);
+		  		if (res.errorcode === 10000) {
+		  		  this.orderDetails = res.data.order_msg.order_msg;
+		  		}else {
+		  		  uni.showToast({
+		  		    title: res.msg,
+		  		    icon: "none",
+		  		  });
+		  		}
+		  });
+		  
+	  }
 	  
-	  // orderApi.orderDetails(data).then((res) => {
-	  //   console.log(res);
-	  // 		if (res.errorcode === 10000) {
-	  // 		  this.orderDetails = res.data;
-	  // 		}else {
-	  // 		  uni.showToast({
-	  // 		    title: res.msg,
-	  // 		    icon: "none",
-	  // 		  });
-	  // 		}
-	  // });
     },
 	
 	//点击退票跳转页面
 	// 跳转订单详情
 	getRefund(data) {
-	  console.log('退票',data)
 	  uni.navigateTo({
 	    url: "/pages/order/refund?orderData=" + JSON.stringify(data),
 	  });
@@ -227,9 +236,16 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 	let orderData = JSON.parse(data.orderData)
-	console.log('orderData',JSON.parse(data.orderData));
-    // this.orderDetails = JSON.parse(data.orderData);
+	this.orderListType = data.type
+	this.orderHeaderTitle = 
+		this.orderListType === '0'?'国内订单': 
+		this.orderListType === '1'?'国内退票订单': 
+		this.orderListType === '2'?'国内改签订单': 
+		this.orderListType === '3'?'国际订单':
+		this.orderListType === '4'?'国际退票订单':
+		this.orderListType === '5'?'国际改签订单':''
     this.getOrderDetails(orderData.order_no);
+	
   },
 };
 </script>

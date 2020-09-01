@@ -36,7 +36,7 @@
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="contain" />
         </view>
-        <view class="list_title">筛选</view>
+        <view class="list_title" @click="goFilter()">筛选</view>
       </view>
     </view>
 
@@ -204,6 +204,14 @@ export default {
 		this.innerList = [];
 		this.getOrderList();
     },
+	
+	//跳转到筛选页面
+	goFilter() {
+		
+		uni.navigateTo({
+			url:"/pages/order/filter",
+		})
+	},
 
     getOrderList() {
       this.orderPageStatus = true;
@@ -288,6 +296,7 @@ export default {
       uni.navigateTo({
         url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data),
       });
+	  console.log('123',JSON.stringify(data));
     },
   },
   onLoad(data) {
@@ -300,7 +309,7 @@ export default {
 		this.orderListType === '3'?'国际订单':
 		this.orderListType === '4'?'国际退票订单':
 		this.orderListType === '5'?'国际改签订单':''
-	console.log(this.orderHeaderTitle)
+	console.log('orderHeaderTitle',this.orderHeaderTitle)
 	this.getOrderList();
   },
   
@@ -369,6 +378,7 @@ export default {
         width: 30upx;
         height: 30upx;
         margin-right: 8upx;
+		display: flex;
         image {
           width: 100%;
           height: 100%;
