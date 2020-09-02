@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-02 10:56:19
+ * @LastEditTime: 2020-09-02 14:54:26
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -14,7 +14,13 @@
       <round-trip-header :timeData="timeData" @jumpDatePage="jumpDatePage"></round-trip-header>
     </view>
     <!-- 航班列表 -->
-    <scroll-view :enable-back-to-top="true" class="flight_list" :scroll-y="true">
+    <scroll-view
+      :enable-back-to-top="true"
+      class="flight_list"
+      :scroll-y="true"
+      @scrolltolower="getNewData"
+      lower-threshold="100"
+    >
       <view class="flight_content">
         <view class="left_flight">
           <view
@@ -62,6 +68,9 @@
                 <!-- <view class="price_mini">起</view> -->
               </view>
             </view>
+          </view>
+          <view class="no_data" v-if="dataListApplyType">
+            <text>到底啦</text>
           </view>
         </view>
 
@@ -112,6 +121,9 @@
               </view>
             </view>
           </view>
+          <view class="no_data" v-if="dataRoundListApplyType">
+            <text>到底啦</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -159,6 +171,10 @@ export default {
 
       flightList: [], // 航班信息
 
+      pageNumber: 1, // 分页页面
+      dataListApplyType: false, // 是否还有新page
+      dataRoundListApplyType: false, // 往返是否还有新page
+
       roundFlightList: [], // 往返航班信息
 
       checketFlightList: [], // 选中航程
@@ -167,11 +183,23 @@ export default {
 
       price: 0, // 往返总价
 
-      file_key: '', // 去程key
-      roundFlightKey: '', // 返程key
+      file_key: "", // 去程key
+      roundFlightKey: "", // 返程key
     };
   },
   methods: {
+    // 下拉加载
+    getNewData() {
+      if (!this.dataListApplyType || !this.dataRoundListApplyType) {
+        this.pageNumber += 1;
+        if (!this.dataListApplyType) {
+          this.getTicketData(this.airMessage);
+        }
+        if (!this.dataRoundListApplyType) {
+          this.getRoundTicketData(this.airMessage);
+        }
+      }
+    },
     // 获取去程航班信息
     getTicketData() {
       let data = {
@@ -179,15 +207,22 @@ export default {
         arrival: this.ticketAddress.arrival, // 到达机场三字码
         departureTime: this.ticketAddress.departureTime, // 起飞时间
         airline: "", // 航司二字码
-        file_key: this.file_key
+        file_key: this.file_key,
+        page: this.pageNumber,
+        per_page: 5,
       };
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
           this.file_key = res.data.IBE.file_key;
-          this.flightList = res.data.IBE.list;
-          this.price += this.flightList[this.toActive].ItineraryInfos[
-            "经济舱"
-          ][0].cabinPrices.ADT.rulePrice.price;
+          if (this.pageNumber > 1) {
+            this.flightList.push.apply(this.flightList, res.data.IBE.list);
+            this.dataListApplyType = res.data.IBE.list.length === 0;
+          } else {
+            this.flightList = res.data.IBE.list;
+            this.price += this.flightList[this.toActive].ItineraryInfos[
+              "经济舱"
+            ][0].cabinPrices.ADT.rulePrice.price;
+          }
           console.log(this.flightList);
           if (this.flightList.length < 1) {
             uni.showToast({
@@ -218,16 +253,26 @@ export default {
         arrival: this.ticketAddress.departure, // 到达机场三字码
         departureTime: this.ticketAddress.arrTime, // 起飞时间
         airline: "", // 航司二字码
-        file_key: this.roundFlightKey
+        file_key: this.roundFlightKey,
+        page: this.pageNumber,
+        per_page: 5,
       };
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
           this.roundFlightKey = res.data.IBE.file_key;
-          this.roundFlightList = res.data.IBE.list;
+          if (this.pageNumber > 1) {
+            this.roundFlightList.push.apply(
+              this.roundFlightList,
+              res.data.IBE.list
+            );
+            this.dataRoundListApplyType = res.data.IBE.list.length === 0;
+          } else {
+            this.roundFlightList = res.data.IBE.list;
+            this.price += this.roundFlightList[this.fromActive].ItineraryInfos[
+              "经济舱"
+            ][0].cabinPrices.ADT.rulePrice.price;
+          }
           console.log(this.roundFlightList);
-          this.price += this.roundFlightList[this.fromActive].ItineraryInfos[
-            "经济舱"
-          ][0].cabinPrices.ADT.rulePrice.price;
           if (this.roundFlightList.length < 1) {
             uni.showToast({
               title: "当日暂无返程航班信息，请切换其他日期",
@@ -314,29 +359,33 @@ export default {
       let data = {
         ticketMessage: this.ticketAddress,
         start: this.flightList[this.toActive],
-        end: this.roundFlightList[this.toActive]
-      }
+        end: this.roundFlightList[this.toActive],
+      };
       let roundTripKey = {
         start: this.file_key,
-        end: this.roundFlightKey
-      }
-      console.log(JSON.stringify(data))
-      console.log(JSON.stringify(roundTripKey))
+        end: this.roundFlightKey,
+      };
+      console.log(JSON.stringify(data));
+      console.log(JSON.stringify(roundTripKey));
       uni.navigateTo({
         url:
           "/pages/flightInfo/flightInfo?roundTripData=" +
           JSON.stringify(data) +
           "&roundTripKey=" +
-          JSON.stringify(roundTripKey) + '&pageType=true'
+          JSON.stringify(roundTripKey) +
+          "&pageType=true",
       });
     },
   },
-  onHide(){
-    this.flightList= []
-    this.roundFlightList= []
+  onHide() {
+    this.flightList = [];
+    this.roundFlightList = [];
+    this.pageNumber = 1;
+    this.dataListApplyType = false;
+    this.dataRoundListApplyType = false;
   },
   onShow() {
-    this.price = 0
+    this.price = 0;
     this.getTicketData();
     this.getRoundTicketData();
   },
@@ -515,6 +564,27 @@ export default {
             margin: 0 3upx;
           }
         }
+      }
+    }
+    .no_data {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20upx;
+      font-size: 28upx;
+      font-weight: 400;
+      color: rgba(175, 185, 196, 1);
+      margin-top: 30upx;
+      text {
+        flex-shrink: 0;
+        margin: 0 10upx;
+      }
+      &::after,
+      &::before {
+        content: "";
+        display: block;
+        border-bottom: 2upx dashed #d9e1ea;
+        flex: 1;
       }
     }
   }

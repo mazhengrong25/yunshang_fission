@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-08-25 18:11:36
+ * @LastEditTime: 2020-09-02 18:14:50
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -13,7 +13,7 @@
       :headerAddress="headerAddress"
     ></yun-header>
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="flight_reservation_main">
-      <flight-header :flightInfo="false" :flightData="flightData"></flight-header>
+      <flight-header :flightInfo="false" :flightData="flightData" :roundTripType="roundTripType" :roundTripFlightData="flightRoundData"></flight-header>
 
       <view class="passenger_box box-shadow-style">
         <view class="passenger_title">
@@ -261,7 +261,12 @@ export default {
     return {
       iStatusBarHeight: 0, // 状态栏高度
 
+      roundTripType: false, // 是否往返
+
       relatedKey: "", // 关联key
+      price: null, // 单程价格
+      roundRelatedKey: "", // 往返key
+      roundPrice: null, // 往返价格
 
       headerAddress: {
         // 导航栏信息
@@ -272,8 +277,25 @@ export default {
       disMessage: {}, // 分销商信息
 
       flightData: {
-        // 航班头部信息
+        // 单程航班信息
         flightType: "单程", // 航程类型
+        time: "2020-4-18", // 航程日期
+        week: "周六", // 航程星期
+        fromTime: "08:00", // 出发时间
+        fromAddress: "重庆江北机场T3", // 出发机场
+        duration: "2h30m", // 飞行时长
+        toTime: "10:32", // 到达时间
+        toAddress: "北京首都机场T3", // 到达机场
+        airIcon: "", // 航司图片
+        airline: "南航", // 航司
+        model: "空客A320(中)", // 机型
+        food: "有早餐", // 餐饮
+        cabin: "", // 舱位信息
+        baggage: "", // 行李额
+      },
+      flightRoundData: {
+        // 往返航班信息
+        flightType: "返程", // 航程类型
         time: "2020-4-18", // 航程日期
         week: "周六", // 航程星期
         fromTime: "08:00", // 出发时间
@@ -332,7 +354,7 @@ export default {
     };
   },
   methods: {
-    // 获取预定页面信息
+    // 单程预定
     getData() {
       ticket.getTicketInfo(this.relatedKey, this.price).then((res) => {
         if (res.errorcode === 10000) {
@@ -355,7 +377,7 @@ export default {
               segmentMessage.arrAirport_CN.air_port_name +
               "机场" +
               segmentMessage.arrTerminal, // 到达机场
-            airIcon: segmentMessage.airline_png, // 航司图片
+            airIcon: "https://fxxcx.ystrip.cn/" + segmentMessage.airline_png, // 航司图片
             airline: segmentMessage.airline_CN + segmentMessage.flightNumber, // 航司
             model: segmentMessage.aircraftCode, // 机型
             food: "有早餐", // 餐饮
@@ -393,20 +415,137 @@ export default {
             url: res.data.air_line.url,
           };
 
-          this.chdinf_msg = res.data.chdinf_msg // 航司儿童婴儿携带数量组装
-
+          this.chdinf_msg = res.data.chdinf_msg; // 航司儿童婴儿携带数量组装
         } else {
           uni.showToast({
             title: res.data,
             icon: "none",
-            mask: true
+            mask: true,
           });
-          setTimeout(() =>{
+          setTimeout(() => {
             uni.navigateBack();
-          },2500)
+          }, 2500);
         }
       });
     },
+
+    // 往返预定
+    getRoundData() {
+      let data = {
+        dep_price: this.price,
+        arr_price: this.roundPrice,
+      };
+      ticket
+        .getRoundTicketInfo(this.relatedKey, this.roundRelatedKey, data)
+        .then((res) => {
+          if (res.errorcode === 10000) {
+            let segmentMessage = res.data.depSegment; // 去程航班信息
+            let segmentRoundMessage = res.data.arrSegment; // 返程航班信息
+            this.flightData = {
+              // 组装航班信息
+              flightType: "去程", // 航程类型
+              time: moment(segmentMessage.depTime).format("YYYY-MM-DD"), // 航程日期
+              week: segmentMessage.week, // 航程星期
+              fromTime: segmentMessage.departureTime, // 出发时间
+              fromAddress:
+                segmentMessage.depAirport_CN.city_name +
+                segmentMessage.depAirport_CN.air_port_name +
+                "机场" +
+                segmentMessage.depTerminal, // 出发机场
+              duration: segmentMessage.duration, // 飞行时长
+              toTime: segmentMessage.arrivalTime, // 到达时间
+              toAddress:
+                segmentMessage.arrAirport_CN.city_name +
+                segmentMessage.arrAirport_CN.air_port_name +
+                "机场" +
+                segmentMessage.arrTerminal, // 到达机场
+              airIcon: "https://fxxcx.ystrip.cn/" + segmentMessage.airline_png, // 航司图片
+              airline: segmentMessage.airline_CN + segmentMessage.flightNumber, // 航司
+              model: segmentMessage.aircraftCode, // 机型
+              food: "有早餐", // 餐饮
+              cabin:
+                res.data.depCabinInfo.cabinCode + res.data.depCabinInfo.cabinDesc, // 舱位信息
+              baggage: res.data.depCabinInfo.baggage, // 行李额
+            };
+
+            this.flightRoundData = {
+              // 组装航班信息
+              flightType: "返程", // 航程类型
+              time: moment(segmentRoundMessage.depTime).format("YYYY-MM-DD"), // 航程日期
+              week: segmentRoundMessage.week, // 航程星期
+              fromTime: segmentRoundMessage.departureTime, // 出发时间
+              fromAddress:
+                segmentRoundMessage.depAirport_CN.city_name +
+                segmentRoundMessage.depAirport_CN.air_port_name +
+                "机场" +
+                segmentRoundMessage.depTerminal, // 出发机场
+              duration: segmentRoundMessage.duration, // 飞行时长
+              toTime: segmentRoundMessage.arrivalTime, // 到达时间
+              toAddress:
+                segmentRoundMessage.arrAirport_CN.city_name +
+                segmentRoundMessage.arrAirport_CN.air_port_name +
+                "机场" +
+                segmentRoundMessage.arrTerminal, // 到达机场
+              airIcon: "https://fxxcx.ystrip.cn/" + segmentRoundMessage.airline_png, // 航司图片
+              airline: segmentRoundMessage.airline_CN + segmentRoundMessage.flightNumber, // 航司
+              model: segmentRoundMessage.aircraftCode, // 机型
+              food: "有早餐", // 餐饮
+              cabin:
+                res.data.arrCabinInfo.cabinCode + res.data.arrCabinInfo.cabinDesc, // 舱位信息
+              baggage: res.data.arrCabinInfo.baggage, // 行李额
+            };
+
+            // 组装分销商数据
+            this.disMessage = res.data.dis_msg;
+
+            let insurance_list = res.data.insurance_list; // 组装保险信息
+            insurance_list.forEach((item) => {
+              item["is_insure"] = false;
+              item["type"] = item.insure_desc.indexOf("电子") === -1;
+              item.insure_desc = item.insure_desc.slice(
+                0,
+                item.insure_desc.indexOf("元") + 1
+              );
+            });
+            this.insuranceList = insurance_list;
+
+            this.priceInfo = {
+              // 组装金额数据
+              totalPrice: 0, // 总价
+              adtPrice: res.data.depAdtPrice.settle_price, // 成人票价
+              chdPrice: res.data.depChdPrice.price, // 儿童票价
+              infPrice: res.data.depInfPrice.price, // 婴儿票价
+              buildPrice: Number(res.data.depAdtPrice.build), // 机建燃油费
+              reward: res.data.depAdtPrice.rulePrice.reward, // 奖励金额
+
+              roundAdtPrice: res.data.arrAdtPrice.settle_price, // 返程成人票价
+              roundChdPrice: res.data.arrChdPrice.price, // 返程儿童票价
+              roundInfPrice: res.data.arrInfPrice.price, // 返程婴儿票价
+              roundBuildPrice: Number(res.data.arrAdtPrice.build), // 返程机建燃油费
+              roundReward: res.data.arrAdtPrice.rulePrice.reward, // 返程奖励金额
+            };
+
+            this.statement = {
+              // 组装免责声明
+              title: res.data.air_line.title,
+              url: res.data.air_line.url,
+            };
+
+            this.chdinf_msg = res.data.departure_chdinf_msg; // 航司儿童婴儿携带数量组装
+            this.round_chdinf_msg = res.data.arrive_chdinf_msg; // 航司儿童婴儿携带数量组装
+          } else {
+            uni.showToast({
+              title: res.data,
+              icon: "none",
+              mask: true,
+            });
+            setTimeout(() => {
+              uni.navigateBack();
+            }, 2500);
+          }
+        });
+    },
+    
 
     // 保险选择
     changeInsurance(val) {
@@ -439,7 +578,9 @@ export default {
     // 添加乘机人按钮
     jumpPassengerPage() {
       uni.navigateTo({
-        url: "/pages/flightReservation/passengerList?chdinfNumber=" + JSON.stringify(this.chdinf_msg),
+        url:
+          "/pages/flightReservation/passengerList?chdinfNumber=" +
+          JSON.stringify(this.chdinf_msg),
       });
     },
 
@@ -592,20 +733,26 @@ export default {
         insurance_id: this.insuranceActive.id || 0, // 保险id
         contacts: this.orderPassenger, // 联系人信息
       };
-      
+
       ticket.createOrder(data).then((res) => {
         if (res.errorcode === 10000) {
-          let orderId = []
-          let priceNumber = 0
-          res.data.forEach(item =>{
-            orderId.push(item.order_no)
-            priceNumber += item.need_pay_amount
-          })
-          
-          uni.navigateTo({
-            url: "/pages/flightReservation/orderPay?orderId="+JSON.stringify(orderId) + "&flightData=" + JSON.stringify(this.flightData) + '&price=' + priceNumber,
+          let orderId = [];
+          let priceNumber = 0;
+          res.data.forEach((item) => {
+            orderId.push(item.order_no);
+            priceNumber += item.need_pay_amount;
           });
-          console.log(res.data,this.flightData);
+
+          uni.navigateTo({
+            url:
+              "/pages/flightReservation/orderPay?orderId=" +
+              JSON.stringify(orderId) +
+              "&flightData=" +
+              JSON.stringify(this.flightData) +
+              "&price=" +
+              priceNumber,
+          });
+          console.log(res.data, this.flightData);
         } else {
           uni.showToast({
             title: res.msg,
@@ -631,14 +778,26 @@ export default {
     }
   },
   onLoad(data) {
+    console.log(data);
     // this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     // let airData = JSON.parse(data.data);
-    console.log(data);
-    this.relatedKey = data.key;
-    this.price = data.price;
 
-    this.getData();
+    this.roundTripType = data.type ? JSON.parse(data.type) : false;
+    if (this.roundTripType) {
+      // 获取往返key和价格
+      this.relatedKey = data.key;
+      this.price = data.price;
+      this.roundRelatedKey = data.roundKey;
+      this.roundPrice = data.roundPrice;
+      this.getRoundData();
+    } else {
+      // 获取单程key和价格
+      this.relatedKey = data.key;
+      this.price = data.price;
+      this.getData();
+    }
+
     // this.headerAddress = airData.ticketAddress;
     // this.flightData = airData.flightData;
   },

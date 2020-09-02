@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-02 14:10:56
+ * @LastEditTime: 2020-09-02 15:37:23
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -28,7 +28,13 @@
       </view>
     </view>
 
-    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="ticket_content">
+    <scroll-view
+      :enable-back-to-top="true"
+      :scroll-y="true"
+      class="ticket_content"
+      @scrolltolower="getNewData"
+      lower-threshold="100"
+    >
       <view
         class="ticket_list"
         v-for="(item, index) in ticketList"
@@ -81,6 +87,9 @@
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>
       </view>
+      <view class="no_data" v-if="dataListApplyType">
+        <text>到底啦</text>
+      </view>
     </scroll-view>
 
     <view class="footer_box">
@@ -119,6 +128,10 @@ export default {
       file_key: "", // av key
 
       ticketTimeList: [],
+
+      pageNumber: 1, // 分页页面
+      dataListApplyType: false, // 是否还有新page
+
       activeTimeNumber: "04-18", // 日期选择
       ticketList: [],
       ticketListData: [
@@ -138,14 +151,29 @@ export default {
     };
   },
   methods: {
+    // 下拉加载
+    getNewData() {
+      if (!this.dataListApplyType) {
+        this.pageNumber += 1;
+        this.airMessage["page"] = this.pageNumber;
+        this.airMessage["per_page"] = 5;
+        this.getTicketData(this.airMessage);
+      } 
+    },
+
     // 获取航班信息
     getTicketData(data) {
-      data['file_key'] = this.file_key
+      data["file_key"] = this.file_key;
       ticket.getTicket(data).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.file_key = res.data.IBE.file_key;
-          this.ticketList = res.data.IBE.list;
+          if (this.pageNumber > 1) {
+            this.ticketList.push.apply(this.ticketList, res.data.IBE.list);
+              this.dataListApplyType = res.data.IBE.list.length === 0;
+          } else {
+            this.ticketList = res.data.IBE.list;
+          }
           console.log(this.ticketList);
           if (this.ticketList.length < 1) {
             uni.showToast({
@@ -240,27 +268,26 @@ export default {
     // 国内单程价格排序
     priceSort(p) {
       return (m, n) => {
-        var a = m.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice[p];
-        var b = n.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice[p];
-        return a - b; 
+        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
+        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
+        return a - b;
       };
     },
-
     // 国内单程时间排序
     timeSort(t) {
       return (m, n) => {
         var a = new Date(m.segments[0][t]).getTime();
         var b = new Date(n.segments[0][t]).getTime();
-        return a - b; 
+        return a - b;
       };
     },
 
     // 列表筛选
     listFilter(val) {
       if (val === "price") {
-        this.ticketList.sort(this.priceSort('price'))
-      }else if(val === 'time'){
-        this.ticketList.sort(this.timeSort('depTime'))
+        this.ticketList.sort(this.priceSort("price"));
+      } else if (val === "time") {
+        this.ticketList.sort(this.timeSort("depTime"));
       }
     },
 
@@ -285,12 +312,16 @@ export default {
             "/pages/flightInfo/flightInfo?airData=" +
             JSON.stringify(data) +
             "&fileKey=" +
-            this.file_key + '&pageType=false'
+            this.file_key +
+            "&pageType=false",
         });
     },
   },
   onHide() {
     this.ticketList = [];
+    this.pageNumber = 1;
+    this.dataListApplyType = false;
+    this.airMessage["page"] = this.pageNumber;
   },
   onShow() {
     this.getTicketData(this.airMessage);
@@ -299,53 +330,6 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.ticketData = JSON.parse(data.data);
-    /**
-      this.ticketData = {
-        from: {
-          air_port: "SYX",
-          air_port_ename: "Phoenix International Airport",
-          air_port_name: "凤凰国际机场",
-          chan_chird: "东亚",
-          chau: "亚洲",
-          city_code: "BJS",
-          city_ename: "SANYA",
-          city_name: "三亚",
-          city_pinyin: "sanya",
-          country: "中国",
-          country_code: "CN",
-          id: 1963,
-          province: "海南",
-          province_pinyin: "hainan",
-          province_py: "hn",
-        },
-
-        to: {
-          air_port: "CKG",
-          air_port_ename: "Jiangbei International Airport",
-          air_port_name: "江北国际机场",
-          chan_chird: "东亚",
-          chau: "亚洲",
-          city_code: "CKG",
-          city_ename: "CHONGQING",
-          city_name: "重庆",
-          city_pinyin: "",
-          country: "中国",
-          country_code: "CN",
-          id: 1353,
-          province: "重庆",
-          province_pinyin: "chongqing",
-          province_py: "cq",
-        },
-
-        toTime: {
-          date: "2020-08-31",
-          month: "8月31日",
-          status: "start",
-          type: "time",
-          week: "周一",
-        },
-      };
-    */
     // 组装数据
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
@@ -359,7 +343,6 @@ export default {
       departureTime: this.ticketData.toTime.date, // 起飞时间
       airline: "", // 航司二字码
     };
-    
   },
 };
 </script>
@@ -484,7 +467,10 @@ export default {
       border-radius: 20upx;
       padding: 26upx 20upx;
       margin: 10upx 20upx;
-     
+      &:first-child{
+        margin-top: 20upx;
+      }
+
       .ticket_left {
         width: 60%;
         .ticket_message {
@@ -611,6 +597,27 @@ export default {
           display: inline-flex;
           align-items: center;
         }
+      }
+    }
+    .no_data {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20upx;
+      font-size: 28upx;
+      font-weight: 400;
+      color: rgba(175, 185, 196, 1);
+      margin: 30upx 0;
+      text {
+        flex-shrink: 0;
+        margin: 0 10upx;
+      }
+      &::after,
+      &::before {
+        content: "";
+        display: block;
+        border-bottom: 2upx dashed #d9e1ea;
+        flex: 1;
       }
     }
   }

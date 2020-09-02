@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-02 10:22:56
+ * @LastEditTime: 2020-09-02 18:27:25
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -19,7 +19,7 @@
           <view class="address">{{flightData.fromAddress}}</view>
         </view>
         <view class="center_message">
-          <view 
+          <view
             class="duration"
           >{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[0]):flightData.duration}}h{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[1]):flightData.duration}}m</view>
           <view class="arrow_icon"></view>
@@ -31,25 +31,20 @@
       </view>
 
       <view class="bottom_message">
-        <image
-          class="bottom_message_icon"
-          :src="flightData.airIcon"
-          mode="contain"
-        />
+        <image class="bottom_message_icon" :src="flightData.airIcon" mode="contain" />
         {{flightData.airline}}{{flightData.model?' | '+ flightData.model: ''}} {{flightData.food? ' | 有餐食': ''}}
       </view>
 
-      <view class="flight_reservation_box" v-if="!flightInfo">
+      <view class="flight_reservation_box" v-if="!flightInfo && !roundTripType">
         {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
     </view>
-    <view class="fight_list" v-if="roundTripType">
+    <view class="fight_list found_fight_list" v-if="roundTripType">
       <view class="header_message">
         <view class="header_type round_trip_type">{{roundTripFlightData.flightType}}</view>
         <view class="header_time">{{roundTripFlightData.time}} {{roundTripFlightData.week}}</view>
       </view>
-
       <view class="content_message">
         <view class="left_message address_message">
           <view class="time">{{roundTripFlightData.fromTime}}</view>
@@ -68,14 +63,14 @@
       </view>
 
       <view class="bottom_message">
-        <image
-          class="bottom_message_icon"
-          :src="roundTripFlightData.airIcon"
-          mode="contain"
-        />
+        <image class="bottom_message_icon" :src="roundTripFlightData.airIcon" mode="contain" />
         {{roundTripFlightData.airline}}{{roundTripFlightData.model?' | '+ roundTripFlightData.model: ''}} {{roundTripFlightData.food? ' | 有餐食': ''}}
       </view>
 
+      <view class="flight_reservation_box" v-if="!flightInfo">
+        {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
+        <view class="message_more_btn"></view>
+      </view>
       <view class="flight_reservation_box" v-if="!flightInfo">
         {{roundTripFlightData.cabin?roundTripFlightData.cabin+' | ': ''}}退改签规则 {{roundTripFlightData.baggage?' | '+ roundTripFlightData.baggage: ''}}
         <view class="message_more_btn"></view>
@@ -97,15 +92,17 @@ export default {
       type: Object,
       default: () => {},
     },
-    roundTripFlightData: {  // 往返数据
+    roundTripFlightData: {
+      // 往返数据
       // 返程数据
       type: Object,
       default: () => {},
     },
-    roundTripType: {  // 是否往返
+    roundTripType: {
+      // 是否往返
       type: Boolean,
-      default: () => false
-    }
+      default: () => false,
+    },
   },
   data() {
     return {};
@@ -125,6 +122,43 @@ export default {
       margin-top: 30upx;
       padding-top: 30upx;
       border-top: 2upx dashed #d9e1ea;
+    }
+    &.found_fight_list {
+      .flight_reservation_box {
+        border: unset;
+        margin-top: 18rpx;
+        padding-top: 0;
+        justify-content: flex-start;
+        padding-left: 6rpx;
+        &::before {
+          content: "";
+          display: inline-flex;
+          width: 24upx;
+          height: 24upx;
+          border-radius: 50%;
+          align-items: center;
+          justify-content: center;
+          margin-right: 12upx;
+          font-size: 16upx;
+          font-weight: 400;
+          color: #ffffff;
+        }
+        &:nth-last-child(2) {
+          padding-top: 28upx;
+          margin-top: 20upx;
+          border-top: 2upx solid #D9E1EA;
+          &::before {
+            content: "去";
+            background: #bfdfff;
+          }
+        }
+        &:last-child {
+          &::before {
+            content: "返";
+            background: #c2efc1;
+          }
+        }
+      }
     }
   }
 

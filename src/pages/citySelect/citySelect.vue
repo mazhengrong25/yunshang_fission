@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-08-12 09:57:11
+ * @LastEditTime: 2020-09-02 15:43:41
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -91,7 +91,7 @@
             :key="oindex"
           >
             <view class="city_airport">{{oitem.air_port_name}}</view>
-            <view class="city_code">{{oitem.city_code}}</view>
+            <view class="city_code">{{oitem.air_port}}</view>
             <view class="city_name">{{oitem.city_name}}</view>
           </view>
         </view>

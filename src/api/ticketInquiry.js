@@ -2,7 +2,7 @@
  * @Description: AV查询 获取航班信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-08-21 18:08:05
+ * @LastEditTime: 2020-09-02 17:50:49
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -37,11 +37,21 @@ function checkPrice(data){
 }
 
 
-// 获取预定信息
+// 单程预定
 function getTicketInfo(key,data){
 	return request({
 		method: "GET",
 		url: '/api/inland/entry/'+key +'?price='+data,
+	})
+}
+
+
+// 往返预定
+function getRoundTicketInfo(key,roundKey,data){
+	return request({
+		method: "GET",
+		url: '/api/inland/roundentry/'+key +'/'+roundKey,
+		data: data
 	})
 }
 
@@ -76,6 +86,7 @@ export default{
 	getNfd,
 	checkPrice,
 	getTicketInfo,
+	getRoundTicketInfo,
 	createOrder,
 	getPayInfo,
 	payOrder

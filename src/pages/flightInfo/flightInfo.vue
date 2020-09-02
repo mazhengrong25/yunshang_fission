@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-02 10:24:30
+ * @LastEditTime: 2020-09-02 17:09:29
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -14,11 +14,33 @@
       :statusType="roundTripType"
     ></yun-header>
     <view class="main_content">
-      <flight-header :flightData="flightData" :roundTripFlightData="roundTripFlightData" :roundTripType="roundTripType"></flight-header>
+      <flight-header
+        :flightData="flightData"
+        :roundTripFlightData="roundTripFlightData"
+        :roundTripType="roundTripType"
+      ></flight-header>
 
       <view class="round_trip_message" v-if="roundTripType && roundTripCheckList.length > 0">
-        <view class="flight_list"></view>
-        <button class="">预定</button>
+        <view class="flight_list">
+          <view class="list_item" v-for="(item, index) in roundTripCheckList" :key="index">
+            <view class="item_main" v-if="item.type">
+              <view :class="['item_type',{'start': index === 0}]">{{index === 0?'已选去程':'已选返程'}}</view>
+              <view class="item_info">
+                <text class="info_title">舱位</text>
+                <text class="info_text">{{item.type}}</text>
+              </view>
+              <view class="item_info">
+                <text class="info_title">票面价</text>
+                <text class="info_text">{{index === 0?checkPrice:checkRoundPrice}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <button
+          class="roundTrip_pay_order_btn"
+          v-if="roundTripCheckList.length === 2"
+          @click="roundTripCheckedBtn()"
+        >预定</button>
       </view>
 
       <view class="round_trip_checked" v-if="roundTripType">
@@ -156,6 +178,7 @@ export default {
     return {
       iStatusBarHeight: 0, // 导航栏高度
       airMessage: {}, // 原始数据
+      depMessage: {}, // 返程原始数据
       roundTripType: false, // 是否往返
 
       ticketAddress: {
@@ -166,7 +189,7 @@ export default {
       fileKey: "", // av 查询key
       roundTripFileKey: "", // 返程av查询key
 
-      roundTripCheckList: [],
+      roundTripCheckList: [], // 选中往返列表
 
       airActiveInfo: {}, // 去程预定
       depActiveInfo: {}, // 返程预定
@@ -212,6 +235,12 @@ export default {
       ruleInfos: {}, // 退改签信息
 
       newPrice: "", // 验价新价格
+
+      checkPrice: null, // 去程验价价格
+      checkPriceKey: "", // 去程验价key
+
+      checkRoundPrice: null, // 返程验价价格
+      checkRoundPriceKey: "", // 返程验价key
     };
   },
   methods: {
@@ -248,48 +277,55 @@ export default {
       this.popupCurrent = e.detail.current;
     },
 
-
     // 处理往返选中列表
-    getRoundTrip(){
-      if(this.roundTripType && this.roundTripBtnActive === 0){
-        this.cabinHeader.forEach(item =>{
-          this.cabinList[item].forEach((oitem,oindex) =>{
-            this.$set(this.cabinList[item][oindex],"active",false);
-          })
-        })
-        this.cabinList[this.airActiveInfo.type].forEach((item, index) =>{
-          if(item.cabin === this.airActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.airActiveInfo.price){
-            this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
-            this.roundTripCheckList[this.roundTripBtnActive] = item
+    getRoundTrip() {
+      if (this.roundTripType && this.roundTripBtnActive === 0) {
+        // this.cabinHeader.forEach(item =>{
+        //   this.cabinList[item].forEach((oitem,oindex) =>{
+        //     this.$set(this.cabinList[item][oindex],"active",false);
+        //   })
+        // })
+        this.cabinList[this.airActiveInfo.type].forEach((item, index) => {
+          if (
+            item.cabin === this.airActiveInfo.cabin &&
+            item.data.cabinPrices.ADT.price === this.airActiveInfo.price
+          ) {
+            // this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
+            this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
-        })
-      }else if(this.roundTripType && this.roundTripBtnActive === 1){
-        this.depCabinHeader.forEach(item =>{
-          this.depCabinList[item].forEach((oitem,oindex) =>{
-            this.$set(this.depCabinList[item][oindex],"active",false);
-          })
-        })
-        this.depCabinList[this.depActiveInfo.type].forEach((item, index) =>{
-          if(item.cabin === this.depActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.depActiveInfo.price){
-            this.$set(this.depCabinList[this.depActiveInfo.type][index],"active",true);
-            this.roundTripCheckList[this.roundTripBtnActive] = item
+        });
+      } else if (this.roundTripType && this.roundTripBtnActive === 1) {
+        // this.depCabinHeader.forEach(item =>{
+        //   this.depCabinList[item].forEach((oitem,oindex) =>{
+        //     this.$set(this.depCabinList[item][oindex],"active",false);
+        //   })
+        // })
+        this.depCabinList[this.depActiveInfo.type].forEach((item, index) => {
+          if (
+            item.cabin === this.depActiveInfo.cabin &&
+            item.data.cabinPrices.ADT.price === this.depActiveInfo.price
+          ) {
+            // this.$set(this.depCabinList[this.depActiveInfo.type][index],"active",true);
+            this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
-        })
+        });
       }
-      
-      console.log(this.roundTripCheckList)
+
+      console.log("往返选中列表", this.roundTripCheckList);
+      this.$forceUpdate();
     },
 
     // 跳转预定页面 - 先验价再跳转
     jumpReservationBtn(type, data) {
       console.log(type, data);
-      let params
-      if (this.roundTripBtnActive === 0) {  // 去程验价数据组装
+      let params;
+      if (this.roundTripBtnActive === 0) {
+        // 去程验价数据组装
         this.airActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
-          type: data.type
-        }
+          type: data.type,
+        };
         this.airMessage["data"] = data;
         params = {
           sourceCode: "IBE",
@@ -302,46 +338,79 @@ export default {
           ItineraryInfo: this.airMessage.data.data,
           relatedKey: "11",
         };
-      } else {  // 返程验价数据组装
+      } else {
+        // 返程验价数据组装
         this.depActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
-          type: data.type
-        }
+          type: data.type,
+        };
+        this.depMessage["data"] = data;
+        params = {
+          sourceCode: "IBE",
+          file_key: this.roundTripFileKey,
+          queryDate: this.depMessage.flightData.time,
+          departure: this.depMessage.ticketAddress.departure,
+          destination: this.depMessage.ticketAddress.arrival,
+          systemMsg: "",
+          segments: this.depMessage.airSegments,
+          ItineraryInfo: this.depMessage.data.data,
+          relatedKey: "11",
+        };
       }
 
-      this.getRoundTrip()
+      ticket.checkPrice(params).then((res) => {
+        if (res.errorcode === 10000) {
+          if (res.data.check_price_status) {
+            // 价格没有修改 直接进行操作
+            if (!this.roundTripType) {
+              this.checkPrice = res.data.price; // 获取验价价格
+              this.checkPriceKey = res.data.keys; // 获取验价key
+              // 单程验价
+              uni.navigateTo({
+                url:
+                  "/pages/flightReservation/flightReservation?key=" +
+                  res.data.keys +
+                  "&price=" +
+                  res.data.price,
+              });
+            } else {
+              // 往返验价
+              if (this.roundTripBtnActive === 0) {
+                this.checkPrice = res.data.price; // 获取验价价格
+                this.checkPriceKey = res.data.keys; // 获取验价key
+              } else {
+                this.checkRoundPrice = res.data.price; // 获取验价价格
+                this.checkRoundPriceKey = res.data.keys; // 获取验价key
+              }
+              console.log("往返验价");
+              this.getRoundTrip();
+            }
+          } else {
+            // 价格有修改 弹出提示框
+            this.newPrice = res.data.price;
+            this.relatedKey = res.data.keys;
+            if (this.roundTripType) {
+              if (this.roundTripBtnActive === 0) {
+                this.checkPrice = res.data.price; // 获取验价价格
+                this.checkPriceKey = res.data.keys; // 获取验价key
+              } else {
+                this.checkRoundPrice = res.data.price; // 获取验价价格
+                this.checkRoundPriceKey = res.data.keys; // 获取验价key
+              }
+              console.log("往返验价");
+            }
 
-      
-      // ticket.checkPrice(params).then((res) => {
-      //   if (res.errorcode === 10000) {
-      //     if (res.data.check_price_status) {
-      //       if (!this.roundTripType) {
-      //         // 单程验价
-      //         uni.navigateTo({
-      //           url:
-      //             "/pages/flightReservation/flightReservation?key=" +
-      //             res.data.keys +
-      //             "&price=" +
-      //             res.data.price,
-      //         });
-      //       } else {
-      //         // 往返验价 
-      //         console.log("往返验价");
-      //       }
-      //     } else {
-      //       this.newPrice = res.data.price;
-      //       this.relatedKey = res.data.keys;
-      //       this.$refs.checkPricePopup.open();
-      //     }
-      //   } else {
-      //     uni.showToast({
-      //       title: res.data,
-      //       icon: "none",
-      //       duration: 3000
-      //     });
-      //   }
-      // });
+            this.$refs.checkPricePopup.open();
+          }
+        } else {
+          uni.showToast({
+            title: res.data,
+            icon: "none",
+            duration: 3000,
+          });
+        }
+      });
     },
 
     // 关闭验价弹窗
@@ -363,15 +432,7 @@ export default {
       } else {
         // 往返验价
         console.log("往返验价");
-        console.log(this.airActiveInfo)
-        console.log(this.cabinList[this.airActiveInfo.type])
-        this.cabinList[this.airActiveInfo.type].forEach(item =>{
-          if(item.cabin === this.airActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.airActiveInfo.price){
-            console.log(item)
-            this.$set(this.cabinList[this.airActiveInfo.type],"active",true);
-          }
-        })
-
+        this.getRoundTrip();
         // this.airActiveInfo = {
         //   cabin: data.cabin,
         //   price: data.data.cabinPrices.ADT.price,
@@ -380,11 +441,25 @@ export default {
         this.closeCheckPrice();
       }
     },
+
+    // 往返预定跳转
+    roundTripCheckedBtn() {
+      uni.navigateTo({
+        url:
+          "/pages/flightReservation/flightReservation?type="+this.roundTripType+"&key=" +
+          this.checkPriceKey +
+          "&price=" +
+          this.checkPrice+ "&roundKey=" +
+          this.checkRoundPriceKey +
+          "&roundPrice=" +
+          this.checkRoundPrice,
+      });
+    },
   },
   onLoad(data) {
     console.log(data);
     this.roundTripType = JSON.parse(data.pageType);
-    console.log(this.roundTripType)
+    console.log(this.roundTripType);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     // 组装单程航班数据
     if (!this.roundTripType) {
@@ -417,9 +492,7 @@ export default {
           airData.segments[0].arrAirport_CN.air_port_name +
           "机场" +
           airData.segments[0].arrTerminal, // 到达机场
-        airIcon:
-          "https://fxxcx.ystrip.cn/" +
-          airData.segments[0].image,
+        airIcon: "https://fxxcx.ystrip.cn/" + airData.segments[0].image,
         airline:
           airData.segments[0].airline_CN + airData.segments[0].flightNumber, // 航司
         model: airData.segments[0].aircraftCode, // 机型
@@ -466,7 +539,7 @@ export default {
       let airData = JSON.parse(data.roundTripData).start;
       let depData = JSON.parse(data.roundTripData).end;
       let ticketData = JSON.parse(data.roundTripData).ticketMessage;
-      console.log(airData,depData,ticketData)
+      console.log(airData, depData, ticketData);
 
       this.fileKey = JSON.parse(data.roundTripKey).start;
 
@@ -497,9 +570,7 @@ export default {
           airData.segments[0].arrAirport_CN.air_port_name +
           "机场" +
           airData.segments[0].arrTerminal, // 到达机场
-        airIcon:
-          "https://fxxcx.ystrip.cn/" +
-          airData.segments[0].image,
+        airIcon: "https://fxxcx.ystrip.cn/" + airData.segments[0].image,
         airline:
           airData.segments[0].airline_CN + airData.segments[0].flightNumber, // 航司
         model: airData.segments[0].aircraftCode, // 机型
@@ -524,20 +595,30 @@ export default {
           depData.segments[0].arrAirport_CN.air_port_name +
           "机场" +
           depData.segments[0].arrTerminal, // 到达机场
-        airIcon:
-          "https://fxxcx.ystrip.cn/" +
-          depData.segments[0].image,
+        airIcon: "https://fxxcx.ystrip.cn/" + depData.segments[0].image,
         airline:
           depData.segments[0].airline_CN + depData.segments[0].flightNumber, // 航司
         model: depData.segments[0].aircraftCode, // 机型
         food: depData.segments[0].hasMeal, // 餐饮
       };
 
-      // 组装原始数据
+      // 组装去程原始数据
       this.airMessage = {
         ticketAddress: this.ticketAddress,
         airSegments: airData.segments,
         flightData: this.flightData,
+      };
+
+      // 组装返程原始数据
+      this.depMessage = {
+        ticketAddress: {
+          to: ticketData.from,
+          from: ticketData.to,
+          departure: ticketData.arrival, // 起飞机场三字码
+          arrival: ticketData.departure,
+        },
+        airSegments: depData.segments,
+        flightData: this.roundTripFlightData,
       };
 
       // 组装去程航班列表信息
@@ -614,6 +695,74 @@ export default {
   .main_content {
     overflow-y: auto;
     height: calc(100vh - 88upx - var(--status-bar-height));
+
+    .round_trip_message {
+      display: flex;
+      align-items: center;
+      padding: 0 20upx;
+      margin-bottom: 35upx;
+      .flight_list {
+        .list_item {
+          &:not(:last-child) {
+            margin-bottom: 20upx;
+          }
+          .item_main {
+            display: flex;
+            align-items: center;
+          }
+          .item_type {
+            width: 108upx;
+            height: 44upx;
+            background: #c2efc1;
+            border-radius: 10upx;
+            margin-right: 16upx;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22upx;
+            font-weight: 400;
+            color: #5ab957;
+            &.start {
+              color: #0070e2;
+              background: #bfdfff;
+            }
+          }
+          .item_info {
+            display: inline-flex;
+            &:not(:last-child) {
+              margin-right: 30upx;
+            }
+            .info_title {
+              font-size: 24upx;
+              font-weight: 400;
+              color: #afb9c4;
+              margin-right: 8upx;
+            }
+            .info_text {
+              font-size: 26upx;
+              font-weight: 400;
+              color: #333333;
+            }
+          }
+        }
+      }
+      .roundTrip_pay_order_btn {
+        padding: 0;
+        margin: 0 0 0 auto;
+        width: 160upx;
+        height: 80upx;
+        background: linear-gradient(90deg, #fb9826 0%, #ffca61 100%);
+        box-shadow: 0 6upx 12upx rgba(255, 202, 97, 0.3);
+        border-radius: 90upx;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32upx;
+        font-weight: 400;
+        color: #ffffff;
+        letter-spacing: 4upx;
+      }
+    }
   }
 
   .round_trip_checked {
