@@ -28,7 +28,7 @@
           <view class="order_icon">
             <image src="@/static/order_2.png" mode="aspectFit" />
           </view>
-          <view class="order_title">国际机票</view>
+          <view class="order_title">国际机票</view> 
         </view>
         <view class="order_right">
           <view class="list_item" @click="jumpOrderList('3')">国际订单</view>
