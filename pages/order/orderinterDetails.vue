@@ -13,15 +13,15 @@
     <view class="details_header" >
       <view class="header_top">
         <view class="order_type">
-          {{orderDetails.status === 1? '已预订':
-          orderDetails.status === 2? '待出票':
+          {{
+          orderDetails.status === 1? '待出票':
           orderDetails.status === 3? '已出票':
           orderDetails.status === 5? '已取消': ''}}
           </view>
 
         <view class="order_price">
           <text class="price_text">总价&yen;</text>
-          <text>{{orderDetails.need_pay_amount || '金额数据错误'}}</text>
+          <text>{{orderDetails.ticket_price || '金额数据错误'}}</text>
         </view>
       </view>
 
@@ -32,24 +32,25 @@
       </view>
 
       <view class="order_option">
-        <view class="option_btn" v-if="orderDetails.status === 1">取消订单</view>
-        <view class="option_btn important_btn" v-if="orderDetails.status === 1">去支付</view>
+        <view class="option_btn" v-if="orderDetails.status === 1">发送短信</view>
+       <!-- <view class="option_btn important_btn" v-if="orderDetails.status === 1">去支付</view> -->
 		<view class="option_btn" v-if="orderDetails.status === 3">报销凭证</view>
+		<view class="option_btn" v-if="orderDetails.status === 3">发送短信</view>
 		<view class="option_btn" v-if="orderDetails.status === 3" 
 		@click="getRefund(item)">退票</view>
 		<view class="option_btn" v-if="orderDetails.status === 3">改签</view>
-		<view class="option_btn" v-if="orderDetails.status === 5">查看退废单</view>
+		<!-- <view class="option_btn" v-if="orderDetails.status === 5">查看退废单</view> -->
 		<view class="option_btn" v-if="orderDetails.status === 5">再次预定</view>
       </view>
     </view>
 
     <view class="details_main">
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
-        <view class="main_list filght_info" v-for="(item, index) in orderDetails.routes" :key="index">
+        <view class="main_list filght_info" v-for="(item, index) in orderDetails.ticket_segments" :key="index">
           <view class="info_header">
-            <view class="header_type">{{orderDetails.routing_type === 1?'单程':
-										orderDetails.routing_type === 2?'往返':
-										orderDetails.routing_type === 3?'多程':''}}</view>
+            <view class="header_type">{{orderDetails.segment_type === 1?'单程':
+										orderDetails.segment_type === 2?'往返':
+										orderDetails.segment_type === 3?'多程':''}}</view>
             <view class="header_time">
               {{item.departure_time.substring(0,10)}}
               <text>{{$dateTool(item.departure_time,"ddd")}}</text>
@@ -57,18 +58,18 @@
           </view>
           <view class="info_message">
             <view class="message_box">
-              <view class="date">{{item.departure_time.substring(10,16)}}</view>
+              <view class="date">{{item.departure_time.substring(11,16)}}</view>
               <view class="address">{{item.departure}}</view>
             </view>
 
             <view class="message_center">
-              <view class="date">{{(item.duration.replace(":","h"))}}m</view>
+              <!-- <view class="date">{{(item.duration.replace(":","h"))}}m</view> -->
               <view class="center_icon"></view>
               <view class="type">直飞</view>
             </view>
 
             <view class="message_box">
-              <view class="date">{{item.arrive_time.substring(10,16)}}</view>
+              <view class="date">{{item.arrive_time.substring(11,16)}}</view>
               <view class="address">{{item.arrive}}</view>
             </view>
           </view>
@@ -92,30 +93,30 @@
         <view class="main_list passenger">
           <view class="main_list_title">出行信息</view>
           <view class="passenger_list">
-            <view class="list_item" v-for="(item, index) in orderDetails.passengers" :key="index">
+            <view class="list_item" v-for="(item, index) in orderDetails.ticket_passenger" :key="index">
               <view class="list_info">
-                <view class="info_type">{{item.passenger_type === 'ADT'?'成人':item.passenger_type === 'CNN'?'儿童':item.passenger_type === 'INF'?'婴儿':''}}票</view>
-                <view class="info_name">{{item.en_first_name}} {{item.en_last_name}}</view>
+                <view class="info_type">{{item.PassengerType === 'ADT'?'成人':item.PassengerType === 'CNN'?'儿童':item.PassengerType === 'INF'?'婴儿':''}}票</view>
+                <view class="info_name">{{item.PassengerName}}</view>
                 <view class="is_insurance" v-if="item.insure_count > 0"></view>
                 <view class="group_type">员工</view>
               </view>
 
               <view class="list_message">
-                <view class="message_title">{{item.credential === '0'? '身份证':
-											  item.credential === '1'? '护照':
-											  item.credential === '2'? '港澳通行证':
-											  item.credential === '3'? '其它证件':
-											  item.credential === '4'? '台胞证':
-											  item.credential === '5'? '台湾通行证':''}}</view>
-                <view class="message_number">{{item.credential_no}}</view>	<!-- 身份证号码 -->
+                <view class="message_title">{{item.Credential === '0'? '身份证':
+											  item.Credential === '1'? '护照':
+											  item.Credential === '2'? '港澳通行证':
+											  item.Credential === '3'? '其它证件':
+											  item.Credential === '4'? '台胞证':
+											  item.Credential === '5'? '台湾通行证':''}}</view>
+                <view class="message_number">{{item.CredentialNo}}</view>	<!-- 身份证号码 -->
               </view>
             </view>
           </view>
 
-          <view class="contact"	v-for="(item, index) in orderDetails.passengers" :key="index">
+          <view class="contact"	v-for="(item, index) in orderDetails.ticket_passenger" :key="index">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{item.en_first_name}}{{item.en_last_name}}</view>
+              <view class="list_message">{{item.PassengerName}}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
@@ -123,7 +124,7 @@
             </view>
             <view class="contact_list">
               <view class="list_title">已购保险</view>
-              <view class="list_message">{{item.insure_price}}元{{item.insure_count}}份</view>
+              <view class="list_message">{{orderDetails.insurance_total}}元</view>
             </view>
           </view>
         </view>
@@ -163,7 +164,7 @@
             </view>
             <view class="list_item">
               <view class="item_title">备注</view>
-              <view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
+              <view class="item_message input-right-arrow">{{orderDetails.remark}}</view>
             </view>
           </view>
         </view>
@@ -174,11 +175,12 @@
 
 <script>
 import orderApi from "@/api/order.js";
+import moment from '../../moment';
 export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      orderDetails: [], // 订单详情 --国际
+      orderDetails: [], // 订单详情 
       flightData: {}, // 航班信息
 	  orderListType: '', // 订单列表页 类型
     };
@@ -186,39 +188,29 @@ export default {
   methods: {
     // 获取订单详情
     getOrderDetails(val) {
-		console.log('订单详情',val,this.orderListType);
+		console.log('国内订单详情',val,this.orderListType);
       let data = {
         order_no:val
       };
 	    
-	  orderApi.orderInterDetails(data).then((res) => {
-		console.log(res);
-			if (res.errorcode === 10000) {
-				
-				 this.orderDetails = res.data;
-
-			}else {
-			  uni.showToast({
-				title: res.msg,
-				icon: "none",
-			  });
-			} 
-	  });	    
-    },
-	
-	//点击退票跳转页面
-	// 跳转订单详情
-	getRefund(data) {
-	  uni.navigateTo({
-	    url: "/pages/order/refund?orderData=" + JSON.stringify(data),
-	  });
-	},
+	  orderApi.orderDetails(data).then((res) => {
+	  			if (res.result === 10000) {
+					
+	  				 this.orderDetails = res.data.order_msg.order_msg;
+					
+	  			}else {
+	  			  uni.showToast({
+	  				title: res.msg,
+	  				icon: "none",
+	  			  });
+	  			} 
+	  });	  
 
   },
   
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-	let orderData = JSON.parse(data.orderData)
+	let listData = JSON.parse(data.listData)
 	console.log(data)
 	this.orderListType = data.type;
 	this.orderHeaderTitle = 
@@ -228,10 +220,12 @@ export default {
 		this.orderListType === '3'?'国际订单':
 		this.orderListType === '4'?'国际退票订单':
 		this.orderListType === '5'?'国际改签订单':''
-    this.getOrderDetails(orderData.order_no);
+    this.getOrderDetails(listData.order_no);
 	
   },
-};
+ },
+ 
+ }
 </script>
 
 <style lang="less" scoped>
