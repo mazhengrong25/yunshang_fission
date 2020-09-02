@@ -9,7 +9,7 @@
   <view class="order_details">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="订单详情"></yun-header>
 
-	<!-- 国际详情 -->
+	<!-- 国际详情 --> 
     <view class="details_header" >
       <view class="header_top">
         <view class="order_type">
@@ -176,6 +176,7 @@
 <script>
 import orderApi from "@/api/order.js";
 import moment from '../../moment';
+moment.locale("zh-cn");
 export default {
   data() {
     return {
