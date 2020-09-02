@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-01 16:16:32
+ * @LastEditTime: 2020-09-02 10:56:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -28,7 +28,7 @@
                 <view class="time">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
                 <view
                   class="address"
-                >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+                >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
               </view>
               <view class="flight_line">
                 <view
@@ -40,7 +40,7 @@
                 <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
                 <view
                   class="address"
-                >{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+                >{{item.segments[0].arrAirport_CN.air_port_name}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
               </view>
             </view>
             <view class="total_price_message">
@@ -50,10 +50,10 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0].image"
                   mode="contain"
                 />
-                {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}}
+                {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}}
               </view>
               <view class="price">
                 <view class="price_mini">&yen;</view>
@@ -77,7 +77,7 @@
                 <view class="time">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
                 <view
                   class="address"
-                >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+                >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
               </view>
               <view class="flight_line">
                 <view
@@ -89,7 +89,7 @@
                 <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
                 <view
                   class="address"
-                >{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+                >{{item.segments[0].arrAirport_CN.air_port_name}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
               </view>
             </view>
             <view class="total_price_message">
@@ -99,10 +99,10 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0].image"
                   mode="contain"
                 />
-                {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}}
+                {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}}
               </view>
               <view class="price">
                 <!-- <view class="price_mini">补</view> -->
@@ -174,12 +174,12 @@ export default {
   methods: {
     // 获取去程航班信息
     getTicketData() {
-      this.flightList = [];
       let data = {
         departure: this.ticketAddress.departure, // 起飞机场三字码
         arrival: this.ticketAddress.arrival, // 到达机场三字码
         departureTime: this.ticketAddress.departureTime, // 起飞时间
         airline: "", // 航司二字码
+        file_key: this.file_key
       };
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
@@ -213,12 +213,12 @@ export default {
     },
     // 获取返程航班信息
     getRoundTicketData() {
-      this.roundFlightList = [];
       let data = {
         departure: this.ticketAddress.arrival, // 起飞机场三字码
         arrival: this.ticketAddress.departure, // 到达机场三字码
         departureTime: this.ticketAddress.arrTime, // 起飞时间
         airline: "", // 航司二字码
+        file_key: this.roundFlightKey
       };
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
@@ -330,6 +330,10 @@ export default {
           JSON.stringify(roundTripKey) + '&pageType=true'
       });
     },
+  },
+  onHide(){
+    this.flightList= []
+    this.roundFlightList= []
   },
   onShow() {
     this.price = 0

@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-01 10:10:59
+ * @LastEditTime: 2020-09-02 09:58:59
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -41,7 +41,7 @@
               <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
               <view
                 class="ticket_address"
-              >{{item.segments[0].depAirportName}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+              >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
             </view>
             <view class="ticket_arrow">
               <view>{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
@@ -54,17 +54,17 @@
               </view>
               <view
                 class="ticket_address"
-              >{{item.segments[0].arrAirportName}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+              >{{item.segments[0].arrAirport_CN.air_port_name}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
             </view>
           </view>
 
           <view class="ticket_details">
             <image
               class="ticket_details_icon"
-              :src="'https://fxxcx.ystrip.cn/'+ item.segments[0][item.segments[0].flightNumber.slice(0,2)].image"
+              :src="'https://fxxcx.ystrip.cn/'+ item.segments[0].image"
               mode="contain"
             />
-            {{item.segments[0][item.segments[0].flightNumber.slice(0,2)].air_name}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode}}
+            {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode}}
           </view>
         </view>
 
@@ -140,7 +140,7 @@ export default {
   methods: {
     // 获取航班信息
     getTicketData(data) {
-      this.ticketList = [];
+      data['file_key'] = this.file_key
       ticket.getTicket(data).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
@@ -359,6 +359,7 @@ export default {
       departureTime: this.ticketData.toTime.date, // 起飞时间
       airline: "", // 航司二字码
     };
+    
   },
 };
 </script>

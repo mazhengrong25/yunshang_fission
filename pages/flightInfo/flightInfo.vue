@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-01 15:05:55
+ * @LastEditTime: 2020-09-02 10:24:30
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -16,8 +16,9 @@
     <view class="main_content">
       <flight-header :flightData="flightData" :roundTripFlightData="roundTripFlightData" :roundTripType="roundTripType"></flight-header>
 
-      <view class="round_trip_message" v-if="roundTripType">
-        <view class></view>
+      <view class="round_trip_message" v-if="roundTripType && roundTripCheckList.length > 0">
+        <view class="flight_list"></view>
+        <button class="">预定</button>
       </view>
 
       <view class="round_trip_checked" v-if="roundTripType">
@@ -50,6 +51,8 @@
                 v-for="(item, index) in cabinList[header]"
                 :key="index"
                 :flightData="item"
+                :flightType="roundTripBtnActive"
+                :roundTripType="roundTripType"
                 @openExpDialog="openExp"
                 @jumpReservation="jumpReservationBtn"
               ></flight-item>
@@ -77,6 +80,8 @@
               <flight-item
                 v-for="(item, index) in depCabinList[header]"
                 :key="index"
+                :flightType="roundTripBtnActive"
+                :roundTripType="roundTripType"
                 :flightData="item"
                 @openExpDialog="openExp"
                 @jumpReservation="jumpReservationBtn"
@@ -161,7 +166,10 @@ export default {
       fileKey: "", // av 查询key
       roundTripFileKey: "", // 返程av查询key
 
+      roundTripCheckList: [],
+
       airActiveInfo: {}, // 去程预定
+      depActiveInfo: {}, // 返程预定
 
       flightData: {
         // 航班头部信息
@@ -240,6 +248,38 @@ export default {
       this.popupCurrent = e.detail.current;
     },
 
+
+    // 处理往返选中列表
+    getRoundTrip(){
+      if(this.roundTripType && this.roundTripBtnActive === 0){
+        this.cabinHeader.forEach(item =>{
+          this.cabinList[item].forEach((oitem,oindex) =>{
+            this.$set(this.cabinList[item][oindex],"active",false);
+          })
+        })
+        this.cabinList[this.airActiveInfo.type].forEach((item, index) =>{
+          if(item.cabin === this.airActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.airActiveInfo.price){
+            this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
+            this.roundTripCheckList[this.roundTripBtnActive] = item
+          }
+        })
+      }else if(this.roundTripType && this.roundTripBtnActive === 1){
+        this.depCabinHeader.forEach(item =>{
+          this.depCabinList[item].forEach((oitem,oindex) =>{
+            this.$set(this.depCabinList[item][oindex],"active",false);
+          })
+        })
+        this.depCabinList[this.depActiveInfo.type].forEach((item, index) =>{
+          if(item.cabin === this.depActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.depActiveInfo.price){
+            this.$set(this.depCabinList[this.depActiveInfo.type][index],"active",true);
+            this.roundTripCheckList[this.roundTripBtnActive] = item
+          }
+        })
+      }
+      
+      console.log(this.roundTripCheckList)
+    },
+
     // 跳转预定页面 - 先验价再跳转
     jumpReservationBtn(type, data) {
       console.log(type, data);
@@ -263,38 +303,45 @@ export default {
           relatedKey: "11",
         };
       } else {  // 返程验价数据组装
-        this.depNumber = dataIndex  // 返程下标
+        this.depActiveInfo = {
+          cabin: data.cabin,
+          price: data.data.cabinPrices.ADT.price,
+          type: data.type
+        }
       }
 
-      ticket.checkPrice(params).then((res) => {
-        if (res.errorcode === 10000) {
-          if (res.data.check_price_status) {
-            if (!this.roundTripType) {
-              // 单程验价
-              uni.navigateTo({
-                url:
-                  "/pages/flightReservation/flightReservation?key=" +
-                  res.data.keys +
-                  "&price=" +
-                  res.data.price,
-              });
-            } else {
-              // 往返验价 
-              console.log("往返验价");
-            }
-          } else {
-            this.newPrice = res.data.price;
-            this.relatedKey = res.data.keys;
-            this.$refs.checkPricePopup.open();
-          }
-        } else {
-          uni.showToast({
-            title: res.data,
-            icon: "none",
-            duration: 3000
-          });
-        }
-      });
+      this.getRoundTrip()
+
+      
+      // ticket.checkPrice(params).then((res) => {
+      //   if (res.errorcode === 10000) {
+      //     if (res.data.check_price_status) {
+      //       if (!this.roundTripType) {
+      //         // 单程验价
+      //         uni.navigateTo({
+      //           url:
+      //             "/pages/flightReservation/flightReservation?key=" +
+      //             res.data.keys +
+      //             "&price=" +
+      //             res.data.price,
+      //         });
+      //       } else {
+      //         // 往返验价 
+      //         console.log("往返验价");
+      //       }
+      //     } else {
+      //       this.newPrice = res.data.price;
+      //       this.relatedKey = res.data.keys;
+      //       this.$refs.checkPricePopup.open();
+      //     }
+      //   } else {
+      //     uni.showToast({
+      //       title: res.data,
+      //       icon: "none",
+      //       duration: 3000
+      //     });
+      //   }
+      // });
     },
 
     // 关闭验价弹窗
@@ -321,7 +368,7 @@ export default {
         this.cabinList[this.airActiveInfo.type].forEach(item =>{
           if(item.cabin === this.airActiveInfo.cabin && item.data.cabinPrices.ADT.price === this.airActiveInfo.price){
             console.log(item)
-            item['active'] = true
+            this.$set(this.cabinList[this.airActiveInfo.type],"active",true);
           }
         })
 
@@ -360,23 +407,21 @@ export default {
         fromTime: moment(airData.segments[0].depTime).format("HH:mm"), // 出发时间
         fromAddress:
           airData.to +
-          airData.segments[0].depAirportName +
+          airData.segments[0].depAirport_CN.air_port_name +
           "机场" +
           airData.segments[0].depTerminal, // 出发机场
         duration: airData.segments[0].duration, // 飞行时长
         toTime: moment(airData.segments[0].arrTime).format("HH:mm"), // 到达时间
         toAddress:
           airData.from +
-          airData.segments[0].arrAirportName +
+          airData.segments[0].arrAirport_CN.air_port_name +
           "机场" +
           airData.segments[0].arrTerminal, // 到达机场
         airIcon:
           "https://fxxcx.ystrip.cn/" +
-          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
-            .image,
+          airData.segments[0].image,
         airline:
-          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
-            .air_name + airData.segments[0].flightNumber, // 航司
+          airData.segments[0].airline_CN + airData.segments[0].flightNumber, // 航司
         model: airData.segments[0].aircraftCode, // 机型
         food: airData.segments[0].hasMeal, // 餐饮
       };
@@ -421,6 +466,7 @@ export default {
       let airData = JSON.parse(data.roundTripData).start;
       let depData = JSON.parse(data.roundTripData).end;
       let ticketData = JSON.parse(data.roundTripData).ticketMessage;
+      console.log(airData,depData,ticketData)
 
       this.fileKey = JSON.parse(data.roundTripKey).start;
 
@@ -441,23 +487,21 @@ export default {
         fromTime: moment(airData.segments[0].depTime).format("HH:mm"), // 出发时间
         fromAddress:
           ticketData.to +
-          airData.segments[0].depAirportName +
+          airData.segments[0].depAirport_CN.air_port_name +
           "机场" +
           airData.segments[0].depTerminal, // 出发机场
         duration: airData.segments[0].duration, // 飞行时长
         toTime: moment(airData.segments[0].arrTime).format("HH:mm"), // 到达时间
         toAddress:
           ticketData.from +
-          airData.segments[0].arrAirportName +
+          airData.segments[0].arrAirport_CN.air_port_name +
           "机场" +
           airData.segments[0].arrTerminal, // 到达机场
         airIcon:
           "https://fxxcx.ystrip.cn/" +
-          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
-            .image,
+          airData.segments[0].image,
         airline:
-          airData.segments[0][airData.segments[0].flightNumber.slice(0, 2)]
-            .air_name + airData.segments[0].flightNumber, // 航司
+          airData.segments[0].airline_CN + airData.segments[0].flightNumber, // 航司
         model: airData.segments[0].aircraftCode, // 机型
         food: airData.segments[0].hasMeal, // 餐饮
       };
@@ -470,23 +514,21 @@ export default {
         fromTime: moment(depData.segments[0].depTime).format("HH:mm"), // 出发时间
         fromAddress:
           ticketData.from +
-          depData.segments[0].arrAirportName +
+          depData.segments[0].depAirport_CN.air_port_name +
           "机场" +
-          depData.segments[0].arrTerminal, // 到达机场
+          depData.segments[0].depTerminal, // 出发机场
         duration: depData.segments[0].duration, // 飞行时长
         toTime: moment(depData.segments[0].arrTime).format("HH:mm"), // 到达时间
         toAddress:
           ticketData.to +
-          depData.segments[0].depAirportName +
+          depData.segments[0].arrAirport_CN.air_port_name +
           "机场" +
-          depData.segments[0].depTerminal, // 出发机场
+          depData.segments[0].arrTerminal, // 到达机场
         airIcon:
           "https://fxxcx.ystrip.cn/" +
-          depData.segments[0][depData.segments[0].flightNumber.slice(0, 2)]
-            .image,
+          depData.segments[0].image,
         airline:
-          depData.segments[0][depData.segments[0].flightNumber.slice(0, 2)]
-            .air_name + depData.segments[0].flightNumber, // 航司
+          depData.segments[0].airline_CN + depData.segments[0].flightNumber, // 航司
         model: depData.segments[0].aircraftCode, // 机型
         food: depData.segments[0].hasMeal, // 餐饮
       };

@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-09-01 12:00:37
+ * @LastEditTime: 2020-09-01 17:10:15
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -21,7 +21,7 @@
           :disabled="flightData.active"
           :class="['header_right_btn',{active: flightData.active}]"
           @click="jumpReservation"
-        ></button>
+        >{{!roundTripType?'预定': flightType === 0? '选为去程': '选为返程'}}</button>
         <view
           class="header_right_voteNumber"
           v-if="flightData.voteNumber !== 'A'"
@@ -48,6 +48,14 @@ export default {
       type: Object,
       default: () => {},
     },
+    roundTripType: {  // 是否往返 true开启往返
+      type: Boolean,
+      default: () => false
+    },
+    flightType: {  // 往返状态 0 去程， 1返程
+      type: Number,
+      default: () => null
+    }
   },
   data() {
     return {};
@@ -133,18 +141,14 @@ export default {
         // letter-spacing:20px;
 				padding: 18upx 46upx;
 				line-height: unset;
-        &::before {
-          content: "预 定";
-        }
+
         &.active {
-          &::before {
-            content: "已选择";
-          }
+          opacity: .4;
         }
       }
 
       .header_right_voteNumber {
-        font-size: 18upx;
+        font-size: 22upx;
         font-weight: 400;
         color: rgba(255, 0, 0, 1);
         text-align: center;

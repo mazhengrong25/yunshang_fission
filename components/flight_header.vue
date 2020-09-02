@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-01 10:12:21
+ * @LastEditTime: 2020-09-02 10:22:56
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
