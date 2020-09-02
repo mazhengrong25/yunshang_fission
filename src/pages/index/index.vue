@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-26 14:15:08
+ * @LastEditTime: 2020-09-02 12:07:26
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -14,7 +14,7 @@
       <view class="modal_tabs">
         <view class="swiper-tab">
           <view
-            v-for="(item, index) in tabsList"
+            v-for="(item, index) in tabsList" 
             :key="index"
             :class="['swiper-tab-item',{'active': currentTab === index}]"
             @click="clickTab(index)"

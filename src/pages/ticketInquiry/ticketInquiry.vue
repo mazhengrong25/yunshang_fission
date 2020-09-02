@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-02 09:58:59
+ * @LastEditTime: 2020-09-02 14:10:56
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -476,7 +476,6 @@ export default {
     flex: 1;
     overflow-y: auto;
     box-sizing: border-box;
-    padding: 20upx 0;
     .ticket_list {
       display: flex;
       justify-content: space-between;
@@ -484,10 +483,8 @@ export default {
       box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
       border-radius: 20upx;
       padding: 26upx 20upx;
-      margin: 0 20upx;
-      &:not(:last-child) {
-        margin-bottom: 20upx;
-      }
+      margin: 10upx 20upx;
+     
       .ticket_left {
         width: 60%;
         .ticket_message {
