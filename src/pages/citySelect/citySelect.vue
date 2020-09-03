@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-02 15:43:41
+ * @LastEditTime: 2020-09-03 17:53:23
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -70,7 +70,7 @@
             class="item_city"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
-            @click="getCityData(oitem)"
+            @click="getCityData(oitem,'city')"
           >
             <view class="city_info">{{oitem.city_name}}</view>
             <view class="city_code">{{oitem.city_code}}</view>
@@ -86,7 +86,7 @@
           </view>
           <view
             class="item_city"
-            @click="getCityData(oitem)"
+            @click="getCityData(oitem,'air')"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
           >
@@ -231,11 +231,11 @@ export default {
     },
 
     // 获取城市信息 填入地址信息
-    getCityData(val) {
+    getCityData(val,type) {
       let data = {
-        type: "city",
+        type: type,
         status: this.cityType,
-        data: val,
+        data: val
       };
       uni.setStorageSync("city", JSON.stringify(data));
       uni.switchTab({

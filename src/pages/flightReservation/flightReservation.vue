@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-02 18:14:50
+ * @LastEditTime: 2020-09-03 11:57:35
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -13,7 +13,12 @@
       :headerAddress="headerAddress"
     ></yun-header>
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="flight_reservation_main">
-      <flight-header :flightInfo="false" :flightData="flightData" :roundTripType="roundTripType" :roundTripFlightData="flightRoundData"></flight-header>
+      <flight-header
+        :flightInfo="false"
+        :flightData="flightData"
+        :roundTripType="roundTripType"
+        :roundTripFlightData="flightRoundData"
+      ></flight-header>
 
       <view class="passenger_box box-shadow-style">
         <view class="passenger_title">
@@ -189,10 +194,12 @@
           {{priceInfo.totalPrice}}
         </view>
       </view>
-      <view
-        :class="['right_btn',{is_true: passengerList.length > 0 && orderPassenger.name && orderPassenger.phone}]"
+      <button
+        :disabled="!trueSubmitOrder"
+        :class="['right_btn',{is_true: trueSubmitOrder}]"
+        type="default"
         @click="submitOrder()"
-      >去支付</view>
+      >去支付</button>
     </view>
 
     <web-view v-if="showStatementWeb" :webview-styles="webviewStyles" :src="statement.url"></web-view>
@@ -207,13 +214,31 @@
 
         <view class="info_content">
           <view class="info_list">
+            <view class="list_tag" v-if="roundTripType">去</view>
             <view class="list_title">成人票价</view>
             <view class="list_message">
               <text>&yen; {{priceInfo.adtPrice}}</text>
               <text>×{{passengerNumber.adt}}人</text>
             </view>
           </view>
+          <view class="info_list" v-if="roundTripType">
+            <view class="list_tag is_back">返</view>
+            <view class="list_title">成人票价</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.roundAdtPrice}}</text>
+              <text>×{{passengerNumber.adt}}人</text>
+            </view>
+          </view>
           <view class="info_list" v-if="passengerNumber.chd > 0">
+            <view class="list_tag" v-if="roundTripType">去</view>
+            <view class="list_title">儿童票价</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.chdPrice}}</text>
+              <text>×{{passengerNumber.chd}}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.chd > 0 && roundTripType">
+            <view class="list_tag is_back">返</view>
             <view class="list_title">儿童票价</view>
             <view class="list_message">
               <text>&yen; {{priceInfo.chdPrice}}</text>
@@ -221,6 +246,15 @@
             </view>
           </view>
           <view class="info_list" v-if="passengerNumber.inf > 0">
+            <view class="list_tag" v-if="roundTripType">去</view>
+            <view class="list_title">婴儿票价</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.infPrice}}</text>
+              <text>×{{passengerNumber.inf}}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.inf > 0 && roundTripType">
+            <view class="list_tag is_back">返</view>
             <view class="list_title">婴儿票价</view>
             <view class="list_message">
               <text>&yen; {{priceInfo.infPrice}}</text>
@@ -228,17 +262,30 @@
             </view>
           </view>
           <view class="info_list">
+            <view class="list_tag" v-if="roundTripType">去</view>
             <view class="list_title">机建+燃油</view>
             <view class="list_message">
               <text>&yen; {{priceInfo.buildPrice}}</text>
               <text>×{{passengerNumber.adt}}人</text>
             </view>
           </view>
+          <view class="info_list" v-if="roundTripType">
+            <view class="list_tag is_back">返</view>
+            <view class="list_title">机建+燃油</view>
+            <view class="list_message">
+              <text>&yen; {{priceInfo.roundBuildPrice}}</text>
+              <text>×{{passengerNumber.adt}}人</text>
+            </view>
+          </view>
           <view class="info_list" v-if="passengerNumber.ins > 0">
             <view class="list_title">保险</view>
-            <view class="list_message">
+            <view class="list_message" v-if="!roundTripType">
               <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice:0}}</text>
               <text>×{{passengerNumber.ins?passengerNumber.ins:0}}人</text>
+            </view>
+            <view class="list_message" v-else>
+              <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice * 2:0}}</text>
+              <text>×{{passengerNumber.ins?passengerNumber.ins * 2:0}}人</text>
             </view>
           </view>
         </view>
@@ -342,6 +389,8 @@ export default {
 
       statement: {}, // 免责声明
 
+      trueSubmitOrder: false, // 去支付按钮
+
       showStatementWeb: false, // 外部链接
       webviewStyles: {
         // 外部链接进度条样式
@@ -383,6 +432,11 @@ export default {
             food: "有早餐", // 餐饮
             cabin: res.data.cabinInfo.cabinCode + res.data.cabinInfo.cabinDesc, // 舱位信息
             baggage: res.data.cabinInfo.baggage, // 行李额
+          };
+
+          this.orderPassenger = {
+            name: res.data.dis_msg.contact,
+            phone: res.data.dis_msg.phone,
           };
 
           // 组装分销商数据
@@ -441,6 +495,13 @@ export default {
           if (res.errorcode === 10000) {
             let segmentMessage = res.data.depSegment; // 去程航班信息
             let segmentRoundMessage = res.data.arrSegment; // 返程航班信息
+
+            // 组装联系人信息
+            this.orderPassenger = {
+              name: res.data.dis_msg.contact,
+              phone: res.data.dis_msg.phone,
+            };
+
             this.flightData = {
               // 组装航班信息
               flightType: "去程", // 航程类型
@@ -464,7 +525,8 @@ export default {
               model: segmentMessage.aircraftCode, // 机型
               food: "有早餐", // 餐饮
               cabin:
-                res.data.depCabinInfo.cabinCode + res.data.depCabinInfo.cabinDesc, // 舱位信息
+                res.data.depCabinInfo.cabinCode +
+                res.data.depCabinInfo.cabinDesc, // 舱位信息
               baggage: res.data.depCabinInfo.baggage, // 行李额
             };
 
@@ -486,12 +548,16 @@ export default {
                 segmentRoundMessage.arrAirport_CN.air_port_name +
                 "机场" +
                 segmentRoundMessage.arrTerminal, // 到达机场
-              airIcon: "https://fxxcx.ystrip.cn/" + segmentRoundMessage.airline_png, // 航司图片
-              airline: segmentRoundMessage.airline_CN + segmentRoundMessage.flightNumber, // 航司
+              airIcon:
+                "https://fxxcx.ystrip.cn/" + segmentRoundMessage.airline_png, // 航司图片
+              airline:
+                segmentRoundMessage.airline_CN +
+                segmentRoundMessage.flightNumber, // 航司
               model: segmentRoundMessage.aircraftCode, // 机型
               food: "有早餐", // 餐饮
               cabin:
-                res.data.arrCabinInfo.cabinCode + res.data.arrCabinInfo.cabinDesc, // 舱位信息
+                res.data.arrCabinInfo.cabinCode +
+                res.data.arrCabinInfo.cabinDesc, // 舱位信息
               baggage: res.data.arrCabinInfo.baggage, // 行李额
             };
 
@@ -545,7 +611,6 @@ export default {
           }
         });
     },
-    
 
     // 保险选择
     changeInsurance(val) {
@@ -654,22 +719,54 @@ export default {
 
     // 计算金额总价
     getTotalPrice() {
-      let totalPrice =
-        Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
-        Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
-        Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
-        Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
-        Number(this.passengerNumber.ins || 0) *
-          Number(this.priceInfo.insPrice || 0);
+      console.log(this.priceInfo);
+      let totalPrice;
+      if (this.roundTripType) {
+        // 组装往返金额
+        totalPrice =
+          Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
+          Number(this.passengerNumber.adt) *
+            Number(this.priceInfo.roundBuildPrice) +
+          Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
+          Number(this.passengerNumber.adt) *
+            Number(this.priceInfo.roundAdtPrice) +
+          Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
+          Number(this.passengerNumber.chd) *
+            Number(this.priceInfo.roundChdPrice) +
+          Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
+          Number(this.passengerNumber.inf) *
+            Number(this.priceInfo.roundInfPrice) +
+          Number(this.passengerNumber.ins || 0) *
+            Number(this.priceInfo.insPrice || 0) *
+            2;
+        // 计算奖励金额
+        this.$set(
+          this.priceInfo,
+          "reward",
+          this.priceInfo.reward * this.passengerNumber.adt +
+            this.priceInfo.roundReward * this.passengerNumber.adt
+        );
+      } else {
+        // 组装单程金额
+        totalPrice =
+          Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
+          Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
+          Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
+          Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
+          Number(this.passengerNumber.ins || 0) *
+            Number(this.priceInfo.insPrice || 0);
+        // 计算奖励金额
+        this.$set(
+          this.priceInfo,
+          "reward",
+          this.priceInfo.reward * this.passengerNumber.adt
+        );
+      }
       // 组装金额数据
       this.$set(this.priceInfo, "totalPrice", totalPrice);
 
-      // 计算奖励金额
-      this.$set(
-        this.priceInfo,
-        "reward",
-        this.priceInfo.reward * this.passengerNumber.adt
-      );
+      this.trueSubmitOrder = this.passengerList.length > 0; // 判断去支付按钮是否禁用
+      this.$forceUpdate();
     },
     // 关闭金额明细弹窗
     closePriceInfo() {
@@ -678,16 +775,10 @@ export default {
 
     // 去支付按钮
     submitOrder() {
-      if (
-        this.passengerList.length < 1 ||
-        !this.orderPassenger.name ||
-        !this.orderPassenger.phone
-      ) {
+      if (!this.orderPassenger.name || !this.orderPassenger.phone) {
         return uni.showToast({
           title:
-            this.passengerList.length < 1
-              ? "请选择乘机人"
-              : !this.orderPassenger.name || !this.orderPassenger.phone
+            !this.orderPassenger.name || !this.orderPassenger.phone
               ? "请输入联系人信息"
               : "请完善下单信息",
           icon: "none",
@@ -725,41 +816,78 @@ export default {
           Gender: item.sex === 1 ? "M" : "F", // 性别 M: 男 F: 女
         });
       });
+      if (this.roundTripType) {
+        // 往返
+        let data = {
+          passengers: passengerData, // 乘客数据
+          arr_keys: this.relatedKey, // 去程key
+          dep_keys: this.roundRelatedKey, // 返程key
+          insurance_id: this.insuranceActive.id || 0, // 保险id
+          contacts: this.orderPassenger, // 联系人信息
+        };
+        ticket.createRoundOrder(data).then((res) => {
+          console.log(res);
+          // if (res.errorcode === 10000) {
+          //   let orderId = [];
+          //   let priceNumber = 0;
+          //   res.data.forEach((item) => {
+          //     orderId.push(item.order_no);
+          //     priceNumber += item.need_pay_amount;
+          //   });
 
-      // 单程下单
-      let data = {
-        passengers: passengerData, // 乘客数据
-        keys: this.relatedKey, // 航班key
-        insurance_id: this.insuranceActive.id || 0, // 保险id
-        contacts: this.orderPassenger, // 联系人信息
-      };
+          //   uni.navigateTo({
+          //     url:
+          //       "/pages/flightReservation/orderPay?orderId=" +
+          //       JSON.stringify(orderId) +
+          //       "&flightData=" +
+          //       JSON.stringify(this.flightData) +
+          //       "&price=" +
+          //       priceNumber,
+          //   });
+          //   console.log(res.data, this.flightData);
+          // } else {
+          //   uni.showToast({
+          //     title: res.msg,
+          //     icon: "none",
+          //   });
+          // }
+        });
+      } else {
+        // 单程下单
+        let data = {
+          passengers: passengerData, // 乘客数据
+          keys: this.relatedKey, // 航班key
+          insurance_id: this.insuranceActive.id || 0, // 保险id
+          contacts: this.orderPassenger, // 联系人信息
+        };
 
-      ticket.createOrder(data).then((res) => {
-        if (res.errorcode === 10000) {
-          let orderId = [];
-          let priceNumber = 0;
-          res.data.forEach((item) => {
-            orderId.push(item.order_no);
-            priceNumber += item.need_pay_amount;
-          });
+        ticket.createOrder(data).then((res) => {
+          if (res.errorcode === 10000) {
+            let orderId = [];
+            let priceNumber = 0;
+            res.data.forEach((item) => {
+              orderId.push(item.order_no);
+              priceNumber += item.need_pay_amount;
+            });
 
-          uni.navigateTo({
-            url:
-              "/pages/flightReservation/orderPay?orderId=" +
-              JSON.stringify(orderId) +
-              "&flightData=" +
-              JSON.stringify(this.flightData) +
-              "&price=" +
-              priceNumber,
-          });
-          console.log(res.data, this.flightData);
-        } else {
-          uni.showToast({
-            title: res.msg,
-            icon: "none",
-          });
-        }
-      });
+            uni.navigateTo({
+              url:
+                "/pages/flightReservation/orderPay?orderId=" +
+                JSON.stringify(orderId) +
+                "&flightData=" +
+                JSON.stringify(this.flightData) +
+                "&price=" +
+                priceNumber,
+            });
+            console.log(res.data, this.flightData);
+          } else {
+            uni.showToast({
+              title: res.msg,
+              icon: "none",
+            });
+          }
+        });
+      }
     },
   },
   onShow() {
@@ -1238,6 +1366,7 @@ export default {
       justify-content: center;
       width: 260upx;
       height: 90upx;
+      margin: 0;
       background: linear-gradient(
         90deg,
         rgba(0, 112, 226, 1) 0%,
@@ -1285,6 +1414,7 @@ export default {
         right: 44upx;
       }
     }
+
     .info_content {
       background: #fff;
       padding: 40upx;
@@ -1293,10 +1423,27 @@ export default {
         align-items: center;
         justify-content: space-between;
         margin-bottom: 40upx;
+        .list_tag {
+          width: 24upx;
+          height: 24upx;
+          background: #bfdfff;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16upx;
+          font-weight: 400;
+          color: #ffffff;
+          margin-right: 14upx;
+          &.is_back {
+            background: #c2efc1;
+          }
+        }
         .list_title {
           font-size: 28upx;
           font-weight: bold;
           color: rgba(51, 51, 51, 1);
+          margin-right: auto;
         }
         .list_message {
           font-size: 28upx;

@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-02 17:09:29
+ * @LastEditTime: 2020-09-03 10:30:54
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -280,32 +280,32 @@ export default {
     // 处理往返选中列表
     getRoundTrip() {
       if (this.roundTripType && this.roundTripBtnActive === 0) {
-        // this.cabinHeader.forEach(item =>{
-        //   this.cabinList[item].forEach((oitem,oindex) =>{
-        //     this.$set(this.cabinList[item][oindex],"active",false);
-        //   })
-        // })
+        this.cabinHeader.forEach(item =>{
+          this.cabinList[item].forEach((oitem,oindex) =>{
+            this.$set(this.cabinList[item][oindex],"active",false);
+          })
+        })
         this.cabinList[this.airActiveInfo.type].forEach((item, index) => {
           if (
             item.cabin === this.airActiveInfo.cabin &&
             item.data.cabinPrices.ADT.price === this.airActiveInfo.price
           ) {
-            // this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
+            this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
       } else if (this.roundTripType && this.roundTripBtnActive === 1) {
-        // this.depCabinHeader.forEach(item =>{
-        //   this.depCabinList[item].forEach((oitem,oindex) =>{
-        //     this.$set(this.depCabinList[item][oindex],"active",false);
-        //   })
-        // })
+        this.depCabinHeader.forEach(item =>{
+          this.depCabinList[item].forEach((oitem,oindex) =>{
+            this.$set(this.depCabinList[item][oindex],"active",false);
+          })
+        })
         this.depCabinList[this.depActiveInfo.type].forEach((item, index) => {
           if (
             item.cabin === this.depActiveInfo.cabin &&
             item.data.cabinPrices.ADT.price === this.depActiveInfo.price
           ) {
-            // this.$set(this.depCabinList[this.depActiveInfo.type][index],"active",true);
+            this.$set(this.depCabinList[this.depActiveInfo.type][index],"active",true);
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });

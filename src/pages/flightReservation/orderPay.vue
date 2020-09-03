@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-08-25 17:26:54
+ * @LastEditTime: 2020-09-03 17:36:48
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -87,7 +87,22 @@ export default {
       iStatusBarHeight: 0, // 导航栏高度
       price: 1920,
       payOrder: "", // 订单号
-      flightData: {}, // 航程信息
+      flightData: {
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        week: "", // 航程星期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
+        airIcon: "", // 航司图片
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
+        cabin: "", // 舱位信息
+        baggage: "", // 行李额
+      }, // 航程信息
       payType: "钱包",
 
       payData: {}, // 订单详情数据
@@ -183,28 +198,45 @@ export default {
           )
           .then((res) => {
             if (res.errorcode === 10000) {
-              if (payType === 1) {
-                this.childPayStatus = true;
-              } else {
+              if (this.payOrder.length > 1) {  // 携带儿童订单
+                if (payType === 1) {
+                  this.childPayStatus = true;
+                } else {
+                  this.payBtnStatus = false;
+                }
+                if (this.childPayStatus && !this.payBtnStatus) {
+                  console.log("成人儿童支付成功");
+                  let orderInfo = {
+                    payId: this.payOrde,
+                    payType: this.payType,
+                    price: this.price,
+                    payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                  };
+                  uni.reLaunch({
+                    url:
+                      "/pages/flightReservation/payResult?orderData=" +
+                      JSON.stringify(orderInfo),
+                  });
+                }
+                uni.showToast({
+                  title: "支付成功",
+                  icon: "none",
+                  mask: true,
+                });
+              } else {  // 单个成人订单
                 this.payBtnStatus = false;
-              }
-              if (this.childPayStatus && !this.payBtnStatus) {
-                console.log("成人儿童支付成功");
                 let orderInfo = {
                   payId: this.payOrde,
                   payType: this.payType,
                   price: this.price,
-                  payDate: moment().format("YYYY-MM-DD HH:mm:ss")
-                }
+                  payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                };
                 uni.reLaunch({
-                  url: "/pages/flightReservation/payResult?orderData="+ JSON.stringify(orderInfo),
+                  url:
+                    "/pages/flightReservation/payResult?orderData=" +
+                    JSON.stringify(orderInfo),
                 });
               }
-              uni.showToast({
-                title: "支付成功",
-                icon: "none",
-                mask: true,
-              });
             } else {
               uni.showToast({
                 title: res.data,
@@ -218,9 +250,9 @@ export default {
   onLoad(data) {
     console.log(data.flightData);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.payOrder = JSON.parse(data.orderId)
+    this.payOrder = JSON.parse(data.orderId);
     this.flightData = JSON.parse(data.flightData);
-    this.price = data.price
+    this.price = data.price;
     // this.payOrder = [
     //   "5000202008251650542636889000000006",
     //   "5000202008251650552133258000000006",

@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-02 12:07:26
+ * @LastEditTime: 2020-09-03 17:56:14
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -241,7 +241,6 @@ export default {
       },
     };
   },
-  onLoad() {},
   methods: {
     // 乘机人数弹窗导航栏状态
     childPopupStatus(e) {
@@ -409,13 +408,15 @@ export default {
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
       if (cityData.status === "to") {
-        this.addressForm.to = cityData.data.city_name;
+        this.addressForm.to = cityData.type === 'city'?cityData.data.city_name: cityData.data.air_port_name
         this.airMessage["to"] = cityData.data;
+        this.airMessage["to_type"] = cityData.type
       } else if (cityData.status === "from") {
-        this.addressForm.from = cityData.data.city_name;
+        this.addressForm.from = cityData.type === 'city'?cityData.data.city_name: cityData.data.air_port_name;
         this.airMessage["from"] = cityData.data;
+        this.airMessage["from_type"] = cityData.type
       }
-      console.log(cityData);
+      console.log(this.airMessage);
       uni.removeStorageSync("city");
     }
     // 获取时间日期

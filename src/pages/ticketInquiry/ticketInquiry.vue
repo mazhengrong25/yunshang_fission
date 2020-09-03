@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-02 15:37:23
+ * @LastEditTime: 2020-09-03 18:03:22
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -305,8 +305,8 @@ export default {
       console.log(data);
       data["to"] = this.ticketData.to.city_name;
       data["from"] = this.ticketData.from.city_name;
-      (data["departure"] = this.ticketData.to.city_code), // 起飞机场三字码
-        (data["arrival"] = this.ticketData.from.city_code), // 到达机场三字码
+       (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
+        (data["arrival"] = this.ticketAddress.arrival), // 到达机场三字码
         uni.navigateTo({
           url:
             "/pages/flightInfo/flightInfo?airData=" +
@@ -334,12 +334,12 @@ export default {
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
       from: this.ticketData.from.city_name,
-      departure: this.ticketData.to.city_code, // 起飞机场三字码
-      arrival: this.ticketData.from.city_code, // 到达机场三字码
+      departure: this.ticketData.to_type === 'air'?this.ticketData.to.air_port:this.ticketData.to.city_code, // 起飞机场三字码
+      arrival: this.ticketData.from_type === 'air'?this.ticketData.from.air_port:this.ticketData.from.city_code, // 到达机场三字码
     };
     this.airMessage = {
-      departure: this.ticketData.to.city_code, // 起飞机场三字码
-      arrival: this.ticketData.from.city_code, // 到达机场三字码
+      departure: this.ticketData.to_type === 'air'?this.ticketData.to.air_port:this.ticketData.to.city_code, // 起飞机场三字码
+      arrival: this.ticketData.from_type === 'air'?this.ticketData.from.air_port:this.ticketData.from.city_code, // 到达机场三字码
       departureTime: this.ticketData.toTime.date, // 起飞时间
       airline: "", // 航司二字码
     };

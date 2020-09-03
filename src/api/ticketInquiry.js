@@ -64,6 +64,15 @@ function createOrder(data){
 	})
 }
 
+// 往返下单
+function createRoundOrder(data){
+	return request({
+		method: "POST",
+		url: '/api/insert/orders',
+		data: data
+	})
+}
+
 // 获取支付信息
 function getPayInfo(data){
 	return request({
@@ -88,6 +97,7 @@ export default{
 	getTicketInfo,
 	getRoundTicketInfo,
 	createOrder,
+	createRoundOrder,
 	getPayInfo,
 	payOrder
 }
