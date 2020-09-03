@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-02 18:30:39
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-09-03 16:56:20
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_details">
@@ -101,23 +101,29 @@
               <view class="date">{{
                 item.departure_time.substring(11, 16)
               }}</view>
-              <view class="address">{{ item.departure }}</view>
+              <view class="address">{{item.departure_CN.city_name}}{{ item.departure_CN.air_port_name }}</view>
             </view>
 
-            <view class="message_center">
-              <!-- <view class="date">{{(item.duration.replace(":","h"))}}m</view> -->
+            <view class="message_center">  
+              <view class="date">{{Math.floor((item.duration / 3600))}}h{{Math.floor((item.duration / 60 % 60))}}m</view>
               <view class="center_icon"></view>
               <view class="type">直飞</view>
             </view>
 
             <view class="message_box">
               <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
-              <view class="address">{{ item.arrive }}</view>
+              <view class="address">{{item.arrive_CN.city_name}}{{ item.arrive_CN.air_port_name }}</view>
             </view>
           </view>
 
           <view class="filght_message">
-            <view class="message_icon"></view>
+            <!-- 航班图标 -->
+            <view class="message_icon">
+              <image class="message_icon"
+              :src="'https://fxxcx.ystrip.cn/'+ item.image"
+              mode="contain"
+            />
+            </view>
             <view class="message_list">{{item.flight_no}}</view>
             <view class="message_list">{{item.model}}</view>
             <view class="message_list">有早餐</view>
@@ -125,13 +131,13 @@
 
           <view class="filght_bottom">
             <view class="bottom_list"
-              >{{ item.inter_segments[0].cabin
+              >{{ item.cabin
               }}{{
-                item.inter_segments[0].cabin_level === "ECONOMY"
+                item.cabin_level === "ECONOMY"
                   ? "经济舱"
-                  : item.inter_segments[0].cabin_level === "FIRST"
+                  : item.cabin_level === "FIRST"
                   ? "头等舱"
-                  : item.inter_segments[0].cabin_level === "BUSINESS"
+                  : item.cabin_level === "BUSINESS"
                   ? "公务舱"
                   : ""
               }}</view
@@ -211,21 +217,6 @@
             </view>
           </view>
         </view>
-
-        <!--  <view class="main_list certificate" v-for="(item, index) in orderDetails.passengers" :key="index">
-          <view class="main_list_title">报销凭证</view>
-          <view class="certificate_message">
-            <view class="message_title">邮寄地址</view>
-            <view class="message_text">
-              <view>
-                <text>马冬梅</text>
-                <text>17600129126</text>
-              </view>
-              <view>重庆市渝中区长江一路</view>
-            </view>
-          </view>
-        </view> -->
-
         <view class="main_list order_message">
           <view class="main_list_title">订单信息</view>
           <view class="message_list">
@@ -272,7 +263,7 @@ export default {
       orderListType: "", // 订单列表页 类型
     };
   },
-  methods: {
+  methods: {   
     // 获取订单详情
     getOrderDetails(val) {
       console.log("国内订单详情", val, this.orderListType);
@@ -514,6 +505,7 @@ export default {
               height: 24upx;
               object-fit: contain;
               margin-right: 6upx;
+              display: flex;
             }
             .message_list {
               font-size: 22upx;

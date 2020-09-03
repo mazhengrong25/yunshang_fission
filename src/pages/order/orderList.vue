@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-02 17:32:42
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-09-03 17:30:34
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_list">
@@ -66,6 +66,20 @@
             ? "多程机票"
             : ""
         }}</view>
+        <!-- 往返行程 -->
+         <view class="multiple_trips_header" v-if="item.segment_type !== 1 && item.ticket_round_order_id !== '' "> 
+          <view class="header_title">{{
+            item.segment_type === 2
+              ? "往返总价"
+              : item.segment_type === 3
+              ? "多程总价"
+              : ""
+          }}</view>
+          <view class="header_price">
+            <text>&yen;</text>
+            {{ item.ticket_price || "金额错误" }}
+          </view>
+        </view>
         <view
           class="list_item"
           v-for="(oitem, oindex) in item.ticket_segments"
@@ -375,12 +389,13 @@ export default {
       if (this.orderPageStatus) {
         this.orderPageNumber = this.orderPageNumber + 1;
         this.getOrderList();
-      } else {
-        uni.showToast({
-          title: "到底啦",
-          icon: "none",
-        });
-      }
+      } 
+      // else {
+      //   uni.showToast({
+      //     title: "到底啦",
+      //     icon: "none",
+      //   });
+      // }
     },
 
     // 跳转国际订单详情
