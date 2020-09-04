@@ -54,10 +54,20 @@ function orderInterRefund(data) {
 	})
 }
 
+// 取消订单
+function cancleInterRefund(data) {
+	return request({
+		method:'POST',
+		url:'/api/cancle/orders',
+		data: data
+	})
+}
+
 export default{
   orderList,
   orderInterList,
   orderInterDetails,
   orderDetails,
-  orderInterRefund
+  orderInterRefund,
+  cancleInterRefund
 }
