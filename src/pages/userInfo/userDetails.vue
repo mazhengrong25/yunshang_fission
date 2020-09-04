@@ -2,12 +2,12 @@
  * @Description: 用户详细信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 15:05:48
- * @LastEditTime: 2020-08-03 16:15:31
+ * @LastEditTime: 2020-09-04 08:59:48
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="user_details">
-    <yun-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)" centerTitle="用户信息"></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="用户信息"></yun-header>
 
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="user_details_main">
       <view class="user_info box-shadow-style">
@@ -133,7 +133,9 @@ export default {
   height: 100vh;
   background: rgba(243, 245, 247, 1);
   .user_details_main {
-    height: calc(100% - (88upx + var(--status-bar-height)));
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 20upx;
     .box-shadow-style {
 			padding: 0 20upx;
 			&:not(:last-child){

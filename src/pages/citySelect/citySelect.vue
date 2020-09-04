@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-03 17:53:23
+ * @LastEditTime: 2020-09-04 11:47:48
  * @LastEditors: wish.WuJunLong
 --> 
 <template>

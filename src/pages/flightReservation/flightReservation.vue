@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-03 11:57:35
+ * @LastEditTime: 2020-09-04 09:44:03
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -325,35 +325,35 @@ export default {
 
       flightData: {
         // 单程航班信息
-        flightType: "单程", // 航程类型
-        time: "2020-4-18", // 航程日期
-        week: "周六", // 航程星期
-        fromTime: "08:00", // 出发时间
-        fromAddress: "重庆江北机场T3", // 出发机场
-        duration: "2h30m", // 飞行时长
-        toTime: "10:32", // 到达时间
-        toAddress: "北京首都机场T3", // 到达机场
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        week: "", // 航程星期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
         airIcon: "", // 航司图片
-        airline: "南航", // 航司
-        model: "空客A320(中)", // 机型
-        food: "有早餐", // 餐饮
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
         cabin: "", // 舱位信息
         baggage: "", // 行李额
       },
       flightRoundData: {
         // 往返航班信息
-        flightType: "返程", // 航程类型
-        time: "2020-4-18", // 航程日期
-        week: "周六", // 航程星期
-        fromTime: "08:00", // 出发时间
-        fromAddress: "重庆江北机场T3", // 出发机场
-        duration: "2h30m", // 飞行时长
-        toTime: "10:32", // 到达时间
-        toAddress: "北京首都机场T3", // 到达机场
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        week: "", // 航程星期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
         airIcon: "", // 航司图片
-        airline: "南航", // 航司
-        model: "空客A320(中)", // 机型
-        food: "有早餐", // 餐饮
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
         cabin: "", // 舱位信息
         baggage: "", // 行李额
       },
@@ -827,30 +827,33 @@ export default {
         };
         ticket.createRoundOrder(data).then((res) => {
           console.log(res);
-          // if (res.errorcode === 10000) {
-          //   let orderId = [];
-          //   let priceNumber = 0;
-          //   res.data.forEach((item) => {
-          //     orderId.push(item.order_no);
-          //     priceNumber += item.need_pay_amount;
-          //   });
+          if (res.errorcode === 10000) {
+            let orderId = [];
+            let priceNumber = 0;
+            res.data.forEach((item) => {
+              orderId.push(item.order_no);
+              priceNumber += item.need_pay_amount;
+            });
 
-          //   uni.navigateTo({
-          //     url:
-          //       "/pages/flightReservation/orderPay?orderId=" +
-          //       JSON.stringify(orderId) +
-          //       "&flightData=" +
-          //       JSON.stringify(this.flightData) +
-          //       "&price=" +
-          //       priceNumber,
-          //   });
-          //   console.log(res.data, this.flightData);
-          // } else {
-          //   uni.showToast({
-          //     title: res.msg,
-          //     icon: "none",
-          //   });
-          // }
+            uni.navigateTo({
+              url:
+                "/pages/flightReservation/orderPay?orderId=" +
+                JSON.stringify(orderId) +
+                "&flightData=" +
+                JSON.stringify(this.flightData) +
+                "&flightRoundData=" +
+                JSON.stringify(this.flightRoundData) +
+                "&price=" +
+                priceNumber + '&type=true'
+                
+            });
+            console.log(res.data, this.flightData);
+          } else {
+            uni.showToast({
+              title: res.msg,
+              icon: "none",
+            });
+          }
         });
       } else {
         // 单程下单
@@ -877,7 +880,7 @@ export default {
                 "&flightData=" +
                 JSON.stringify(this.flightData) +
                 "&price=" +
-                priceNumber,
+                priceNumber +'&type=false'
             });
             console.log(res.data, this.flightData);
           } else {

@@ -152,8 +152,6 @@ export default {
         font-weight: 400;
         color: rgba(255, 0, 0, 1);
         text-align: center;
-        position: absolute;
-        bottom: -6upx;
         width: 100%;
       }
     }

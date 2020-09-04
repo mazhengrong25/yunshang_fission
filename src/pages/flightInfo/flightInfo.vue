@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-03 10:30:54
+ * @LastEditTime: 2020-09-04 14:35:37
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -574,7 +574,7 @@ export default {
         airline:
           airData.segments[0].airline_CN + airData.segments[0].flightNumber, // 航司
         model: airData.segments[0].aircraftCode, // 机型
-        food: airData.segments[0].hasMeal, // 餐饮
+        food: airData.segments[0].MealCode, // 餐饮
       };
 
       // 组装返程信息
@@ -599,7 +599,7 @@ export default {
         airline:
           depData.segments[0].airline_CN + depData.segments[0].flightNumber, // 航司
         model: depData.segments[0].aircraftCode, // 机型
-        food: depData.segments[0].hasMeal, // 餐饮
+        food: depData.segments[0].MealCode, // 餐饮
       };
 
       // 组装去程原始数据
@@ -829,6 +829,7 @@ export default {
         height: 90upx;
         line-height: 90upx;
         position: relative;
+        word-wrap: nowrap;
         &:not(:last-child) {
           margin-right: 160upx;
         }

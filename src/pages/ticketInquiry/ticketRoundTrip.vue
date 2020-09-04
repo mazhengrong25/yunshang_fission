@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-02 14:54:26
+ * @LastEditTime: 2020-09-04 14:27:03
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -69,6 +69,16 @@
               </view>
             </view>
           </view>
+
+          <!-- 骨架屏 -->
+          <view class="flight_skeleton" v-for="i in flightList.length < 1?5:0" :key="i">
+            <view class="top">
+              <text></text>
+              <text></text>
+            </view>
+            <text></text>
+          </view>
+
           <view class="no_data" v-if="dataListApplyType">
             <text>到底啦</text>
           </view>
@@ -121,6 +131,16 @@
               </view>
             </view>
           </view>
+
+          <!-- 骨架屏 -->
+          <view class="flight_skeleton" v-for="i in roundFlightList.length < 1? 5 :0" :key="i">
+            <view class="top">
+              <text></text>
+              <text></text>
+            </view>
+            <text></text>
+          </view>
+
           <view class="no_data" v-if="dataRoundListApplyType">
             <text>到底啦</text>
           </view>
@@ -142,7 +162,11 @@
         </view>
         <view class="not_pass_message">往返总价</view>
       </view>
-      <view class="right_btn" @click="submitRoundTrip()">下一步</view>
+      <button
+        :disabled="submitBtnType"
+        :class="['right_btn',{'is_false': submitBtnType}]"
+        @click="submitRoundTrip()"
+      >下一步</button>
     </view>
   </view>
 </template>
@@ -185,6 +209,8 @@ export default {
 
       file_key: "", // 去程key
       roundFlightKey: "", // 返程key
+
+      submitBtnType: true, // 下一步按钮状态
     };
   },
   methods: {
@@ -223,6 +249,7 @@ export default {
               "经济舱"
             ][0].cabinPrices.ADT.rulePrice.price;
           }
+          this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
           console.log(this.flightList);
           if (this.flightList.length < 1) {
             uni.showToast({
@@ -272,6 +299,7 @@ export default {
               "经济舱"
             ][0].cabinPrices.ADT.rulePrice.price;
           }
+          this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
           console.log(this.roundFlightList);
           if (this.roundFlightList.length < 1) {
             uni.showToast({
@@ -309,6 +337,8 @@ export default {
           .ADT.rulePrice.price +
         this.roundFlightList[this.fromActive].ItineraryInfos["经济舱"][0]
           .cabinPrices.ADT.rulePrice.price;
+
+      this.$forceUpdate();
     },
 
     // 国内单程价格排序
@@ -396,8 +426,14 @@ export default {
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
       from: this.ticketData.from.city_name,
-      departure: this.ticketData.to.city_code, // 起飞机场三字码
-      arrival: this.ticketData.from.city_code, // 到达机场三字码
+      departure:
+        this.ticketData.to_type === "air"
+          ? this.ticketData.to.air_port
+          : this.ticketData.to.city_code, // 起飞机场三字码
+      arrival:
+        this.ticketData.from_type === "air"
+          ? this.ticketData.from.air_port
+          : this.ticketData.from.city_code, // 到达机场三字码
       departureTime: this.ticketData.toTime.date, // 起飞时间
       arrTime: this.ticketData.fromTime.date,
     };
@@ -566,6 +602,60 @@ export default {
         }
       }
     }
+
+    .flight_skeleton {
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
+      display: inline-flex;
+      flex-direction: column;
+      margin-bottom: 4upx;
+      height: 226upx;
+      padding: 28upx 16upx 16upx;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      &::before {
+        content: "";
+        display: block;
+        width: 44upx;
+        height: 200%;
+        position: absolute;
+        top: -30%;
+        transform: rotate(30deg);
+        background: #fff;
+        left: -30%;
+        animation: skeleton 3s infinite;
+        -webkit-animation: skeleton 3s infinite;
+      }
+      @keyframes skeleton {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 120%;
+        }
+      }
+      .top {
+        display: flex;
+        flex-direction: column;
+        text {
+          width: 80%;
+          height: 44upx;
+          background: #e5e9f2;
+          margin-bottom: 10upx;
+          &:last-child {
+            height: 33upx;
+          }
+        }
+      }
+      > text {
+        margin-top: auto;
+        width: 95%;
+        height: 44upx;
+        background: #e5e9f2;
+      }
+    }
+
     .no_data {
       display: flex;
       align-items: center;
@@ -647,6 +737,11 @@ export default {
       color: rgba(255, 255, 255, 1);
       letter-spacing: 10upx;
       border-radius: 80upx;
+      margin: 0;
+      opacity: 1;
+      &.is_false {
+        opacity: 0.4;
+      }
     }
   }
 }

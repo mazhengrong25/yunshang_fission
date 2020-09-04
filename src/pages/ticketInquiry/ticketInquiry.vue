@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-03 18:03:22
+ * @LastEditTime: 2020-09-04 11:51:18
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -87,6 +87,16 @@
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>
       </view>
+
+      <!-- 骨架屏 -->
+      <view class="flight_skeleton" v-for="i in ticketList.length < 1? 5 :0" :key="i">
+        <view class="top">
+          <text></text>
+          <text></text>
+        </view>
+        <text></text>
+      </view>
+
       <view class="no_data" v-if="dataListApplyType">
         <text>到底啦</text>
       </view>
@@ -158,7 +168,7 @@ export default {
         this.airMessage["page"] = this.pageNumber;
         this.airMessage["per_page"] = 5;
         this.getTicketData(this.airMessage);
-      } 
+      }
     },
 
     // 获取航班信息
@@ -170,7 +180,7 @@ export default {
           this.file_key = res.data.IBE.file_key;
           if (this.pageNumber > 1) {
             this.ticketList.push.apply(this.ticketList, res.data.IBE.list);
-              this.dataListApplyType = res.data.IBE.list.length === 0;
+            this.dataListApplyType = res.data.IBE.list.length === 0;
           } else {
             this.ticketList = res.data.IBE.list;
           }
@@ -305,7 +315,7 @@ export default {
       console.log(data);
       data["to"] = this.ticketData.to.city_name;
       data["from"] = this.ticketData.from.city_name;
-       (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
+      (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
         (data["arrival"] = this.ticketAddress.arrival), // 到达机场三字码
         uni.navigateTo({
           url:
@@ -334,12 +344,24 @@ export default {
     this.ticketAddress = {
       to: this.ticketData.to.city_name,
       from: this.ticketData.from.city_name,
-      departure: this.ticketData.to_type === 'air'?this.ticketData.to.air_port:this.ticketData.to.city_code, // 起飞机场三字码
-      arrival: this.ticketData.from_type === 'air'?this.ticketData.from.air_port:this.ticketData.from.city_code, // 到达机场三字码
+      departure:
+        this.ticketData.to_type === "air"
+          ? this.ticketData.to.air_port
+          : this.ticketData.to.city_code, // 起飞机场三字码
+      arrival:
+        this.ticketData.from_type === "air"
+          ? this.ticketData.from.air_port
+          : this.ticketData.from.city_code, // 到达机场三字码
     };
     this.airMessage = {
-      departure: this.ticketData.to_type === 'air'?this.ticketData.to.air_port:this.ticketData.to.city_code, // 起飞机场三字码
-      arrival: this.ticketData.from_type === 'air'?this.ticketData.from.air_port:this.ticketData.from.city_code, // 到达机场三字码
+      departure:
+        this.ticketData.to_type === "air"
+          ? this.ticketData.to.air_port
+          : this.ticketData.to.city_code, // 起飞机场三字码
+      arrival:
+        this.ticketData.from_type === "air"
+          ? this.ticketData.from.air_port
+          : this.ticketData.from.city_code, // 到达机场三字码
       departureTime: this.ticketData.toTime.date, // 起飞时间
       airline: "", // 航司二字码
     };
@@ -467,7 +489,7 @@ export default {
       border-radius: 20upx;
       padding: 26upx 20upx;
       margin: 10upx 20upx;
-      &:first-child{
+      &:first-child {
         margin-top: 20upx;
       }
 
@@ -599,6 +621,64 @@ export default {
         }
       }
     }
+
+    .flight_skeleton {
+      background: rgba(255, 255, 255, 1);
+      display: flex;
+      flex-direction: column;
+      height: 200upx;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
+      border-radius: 20upx;
+      padding: 26upx 20upx;
+      margin: 10upx 20upx;
+      &:first-child {
+        margin-top: 20upx;
+      }
+      &::before {
+        content: "";
+        display: block;
+        width: 44upx;
+        height: 200%;
+        position: absolute;
+        top: -30%;
+        transform: rotate(30deg);
+        background: #fff;
+        left: -30%;
+        animation: skeleton 3s infinite;
+        -webkit-animation: skeleton 3s infinite;
+      }
+      @keyframes skeleton {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 120%;
+        }
+      }
+      .top {
+        display: flex;
+        flex-direction: column;
+        text {
+          width: 80%;
+          height: 44upx;
+          background: #e5e9f2;
+          margin-bottom: 10upx;
+          &:last-child {
+            height: 33upx;
+          }
+        }
+      }
+      > text {
+        margin-top: auto;
+        width: 95%;
+        height: 22upx;
+        background: #e5e9f2;
+      }
+    }
+
     .no_data {
       display: flex;
       align-items: center;
