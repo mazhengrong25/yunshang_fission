@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-04 11:51:18
+ * @LastEditTime: 2020-09-04 16:37:22
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -239,6 +239,7 @@ export default {
         departureTime: val.date, // 起飞时间
         airline: "", // 航司二字码
       };
+      this.file_key = ''
       this.getTicketData(this.airMessage);
     },
     // 时间列表处理
@@ -312,11 +313,11 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      console.log(data);
       data["to"] = this.ticketData.to.city_name;
       data["from"] = this.ticketData.from.city_name;
       (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
         (data["arrival"] = this.ticketAddress.arrival), // 到达机场三字码
+        console.log('航程信息组装',data);
         uni.navigateTo({
           url:
             "/pages/flightInfo/flightInfo?airData=" +

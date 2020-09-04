@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-04 11:47:48
+ * @LastEditTime: 2020-09-04 16:27:44
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -196,8 +196,7 @@ export default {
             }
           });
         });
-
-        console.log(this.cityList);
+        console.log(this.cityList)
       });
     },
 

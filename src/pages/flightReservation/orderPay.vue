@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-04 09:46:41
+ * @LastEditTime: 2020-09-04 16:19:24
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -64,13 +64,13 @@
           :class="['submit_pay',{is_disabled: !payBtnStatus}]"
           :disabled="!payBtnStatus"
           @click="jumpPay()"
-        >{{payOrder.length> 1? '成人支付':'立即支付'}}</button>
+        >{{payOrder.length> 1? '成人支付 &yen;' + priceList[0] :'立即支付'}}</button>
         <button
           v-if="payOrder.length> 1"
           :class="['submit_pay child_pay',{is_disabled: childPayStatus}]"
           :disabled="childPayStatus"
           @click="jumpPay('儿童')"
-        >儿童支付</button>
+        >儿童支付 &yen;{{priceList[1]}}</button>
       </view>
     </view>
   </view>
@@ -88,7 +88,8 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0, // 导航栏高度
-      price: 1920,
+      price: 0,
+      priceList: [] ,// 金额列表
       orderType: false,
       payOrder: "", // 订单号
       flightData: {
@@ -273,30 +274,12 @@ export default {
     this.payOrder = JSON.parse(data.orderId);
     this.flightData = JSON.parse(data.flightData);
     this.price = data.price;
+    this.priceList = JSON.parse(data.priceList)
+    console.log('金额列表', this.priceList)
     this.orderType = JSON.parse(data.type)
     if(this.orderType){
       this.flightRoundData = JSON.parse(data.flightRoundData)
     }
-    // this.payOrder = [
-    //   "5000202008251650542636889000000006",
-    //   "5000202008251650552133258000000006",
-    // ];
-    // this.flightData = {
-    //   airIcon: "/assets/airline/PN.png",
-    //   airline: "西部PN6403",
-    //   baggage: "行李额0KG",
-    //   cabin: "T经济舱",
-    //   duration: "2:10",
-    //   flightType: "单程",
-    //   food: "有早餐",
-    //   fromAddress: "重庆江北机场T2",
-    //   fromTime: "06:40",
-    //   model: "空中客车320",
-    //   time: "2020-08-27",
-    //   toAddress: "西双版纳嘎洒机场--",
-    //   toTime: "08:50",
-    //   week: "周四",
-    // };
     this.getOrderDetails();
   },
 };

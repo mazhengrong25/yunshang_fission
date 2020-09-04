@@ -829,9 +829,11 @@ export default {
           console.log(res);
           if (res.errorcode === 10000) {
             let orderId = [];
+            let priceList = []
             let priceNumber = 0;
             res.data.forEach((item) => {
               orderId.push(item.order_no);
+              priceList.push(item.need_pay_amount)
               priceNumber += item.need_pay_amount;
             });
 
@@ -843,6 +845,7 @@ export default {
                 JSON.stringify(this.flightData) +
                 "&flightRoundData=" +
                 JSON.stringify(this.flightRoundData) +
+                "&priceList=" + JSON.stringify(priceList) +
                 "&price=" +
                 priceNumber + '&type=true'
                 
@@ -867,9 +870,11 @@ export default {
         ticket.createOrder(data).then((res) => {
           if (res.errorcode === 10000) {
             let orderId = [];
+            let priceList = []
             let priceNumber = 0;
             res.data.forEach((item) => {
               orderId.push(item.order_no);
+              priceList.push(item.need_pay_amount);
               priceNumber += item.need_pay_amount;
             });
 
@@ -879,6 +884,7 @@ export default {
                 JSON.stringify(orderId) +
                 "&flightData=" +
                 JSON.stringify(this.flightData) +
+                "&priceList=" + JSON.stringify(priceList) +
                 "&price=" +
                 priceNumber +'&type=false'
             });
