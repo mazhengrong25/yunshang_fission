@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-08-20 15:29:22
+ * @LastEditTime: 2020-09-07 15:29:03
  * @LastEditors: wish.WuJunLong
  */
 import Vue from 'vue'
@@ -30,6 +30,9 @@ Vue.component('yunHeader', yunHeader);
 
 import yunSelector from "@/components/global/yun_selector.vue"; // 弹窗选择器组件
 Vue.component('yunSelector', yunSelector);
+
+import yunConfig from "@/components/global/yun_config.vue"; // 确认信息框
+Vue.component('yunConfig', yunConfig);
 
 App.mpType = 'app'
 

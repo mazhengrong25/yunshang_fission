@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-08-26 14:09:57
+ * @LastEditTime: 2020-09-06 09:29:03
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -169,7 +169,7 @@ export default {
         flex-shrink: 0;
         left: -30upx;
         margin-right: 12upx;
-        margin-top: 17upx;
+        margin-top: 35upx;
         position: absolute;
       }
       .ticket_address {
@@ -187,7 +187,7 @@ export default {
   }
   .ticket_address {
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
     .address_input {
       height: 65upx;
       line-height: 50upx;
@@ -199,6 +199,7 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      padding-top: 20upx;
 
       &.from_input {
         text-align: right;
@@ -229,6 +230,9 @@ export default {
     border-bottom: 2upx solid #dfdfdf;
 
     .time_box {
+      height: 60upx;
+      display: flex;
+      align-items: center;
       .time_true {
         display: flex;
         align-items: center;

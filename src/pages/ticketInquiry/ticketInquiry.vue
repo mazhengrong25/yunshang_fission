@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-04 16:37:22
+ * @LastEditTime: 2020-09-07 11:34:01
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -271,8 +271,12 @@ export default {
 
     // 返回日历选择
     backCalendar() {
+      let data = {
+        type: false,
+        data: this.airMessage.departureTime
+      }
       uni.navigateTo({
-        url: "/pages/dateSelect/dateSelect",
+        url: "/pages/dateSelect/dateSelect?ticketType="+JSON.stringify(data),
       });
     },
 

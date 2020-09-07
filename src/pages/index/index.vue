@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-03 17:56:14
+ * @LastEditTime: 2020-09-07 15:37:28
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -69,7 +69,7 @@
         @click="openMultiPassProblem"
       >至少选择一个国际城市</view>
 
-      <view class="submit_btn" @click="submitTicket">飞机票查询</view>
+      <view class="submit_btn" @click="openConfig">飞机票查询</view>
     </view>
 
     <!-- 公告版块 -->
@@ -171,6 +171,9 @@
     <uni-popup ref="messageDialog" type="center" :maskClick="false" @change="childPopupStatus">
       <messageDialog @closeDialog="closeMessageDialog"></messageDialog>
     </uni-popup>
+
+
+    <yun-config ref="yunConfig"></yun-config>
   </view>
 </template>
 
@@ -242,6 +245,9 @@ export default {
     };
   },
   methods: {
+    openConfig(){
+       this.$refs.yunConfig.openConfigPopup(); 
+    },
     // 乘机人数弹窗导航栏状态
     childPopupStatus(e) {
       if (e.show) {
@@ -458,7 +464,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 68upx;
+        margin-bottom: 48upx;
 
         .swiper-tab-item {
           width: 160upx;

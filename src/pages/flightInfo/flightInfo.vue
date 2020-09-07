@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-04 18:14:47
+ * @LastEditTime: 2020-09-07 14:53:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -54,7 +54,7 @@
         >选择返程</button>
       </view>
       <view class="flight_cabin" v-if="roundTripBtnActive === 0">
-        <view :class="['cabin_header',{'isDisplay':cabinHeader.length > 1}]">
+        <view :class="['cabin_header',{'is_display': headerDiaplay}]">
           <view
             :class="['cabin_header_box',{'is_active': current === index}]"
             @click="checkedHeader(index)"
@@ -84,7 +84,7 @@
       </view>
 
       <view class="flight_cabin" v-else>
-        <view :class="['cabin_header',{'isDisplay':depCabinHeader.length > 1}]">
+        <view :class="['cabin_header',{'is_display': depHeaderDiaplay}]">
           <view
             :class="['cabin_header_box',{'is_active': current === index}]"
             @click="checkedHeader(index)"
@@ -226,6 +226,8 @@ export default {
       cabinHeader: [], // 舱位选择列表
       current: 0, // 轮播图下标
       cabinList: {},
+      headerDiaplay: false, // 舱位头部样式状态
+      depHeaderDiaplay: false, // 返程舱位状态
 
       depCabinHeader: [], // 返程切换头部
       depCabinList: {}, // 返程数据
@@ -446,10 +448,13 @@ export default {
     roundTripCheckedBtn() {
       uni.navigateTo({
         url:
-          "/pages/flightReservation/flightReservation?type="+this.roundTripType+"&key=" +
+          "/pages/flightReservation/flightReservation?type=" +
+          this.roundTripType +
+          "&key=" +
           this.checkPriceKey +
           "&price=" +
-          this.checkPrice+ "&roundKey=" +
+          this.checkPrice +
+          "&roundKey=" +
           this.checkRoundPriceKey +
           "&roundPrice=" +
           this.checkRoundPrice,
@@ -508,9 +513,9 @@ export default {
 
       // 组装航班列表信息
       let airDataName = Object.keys(airData.ItineraryInfos);
-
       // 组装经济舱/公务舱数据
-      airDataName.forEach((item) => {
+      airDataName.forEach((item, index) => {
+        let headerNumber = index;
         if (item !== "NFD") {
           this.cabinHeader.push(item);
           this.cabinList[item] = [];
@@ -535,6 +540,7 @@ export default {
           });
         }
       });
+      this.headerDiaplay = this.cabinHeader.length !== 2
     } else {
       let airData = JSON.parse(data.roundTripData).start;
       let depData = JSON.parse(data.roundTripData).end;
@@ -623,9 +629,8 @@ export default {
 
       // 组装去程航班列表信息
       let airDataName = Object.keys(airData.ItineraryInfos);
-
       // 组装去程经济舱/公务舱数据
-      airDataName.forEach((item) => {
+      airDataName.forEach((item, index) => {
         if (item !== "NFD") {
           this.cabinHeader.push(item);
           this.cabinList[item] = [];
@@ -651,11 +656,12 @@ export default {
         }
       });
 
+      this.headerDiaplay = this.cabinHeader.length !== 2
+
       // 组装返程航班列表信息
       let depDataName = Object.keys(depData.ItineraryInfos);
-
       // 组装去程经济舱/公务舱数据
-      depDataName.forEach((item) => {
+      depDataName.forEach((item, index) => {
         if (item !== "NFD") {
           this.depCabinHeader.push(item);
           this.depCabinList[item] = [];
@@ -680,6 +686,8 @@ export default {
           });
         }
       });
+
+      this.depHeaderDiaplay = this.depCabinHeader.length !== 2
     }
   },
 };
@@ -815,10 +823,12 @@ export default {
       border-radius: 20upx 20upx 0 0;
       padding: 0 60upx;
       margin: 0 20upx;
-      &.isDisplay {
-        // justify-content: space-between;
+      &.is_display {
+        justify-content: space-between;
         .cabin_header_box {
-          margin-right: 0;
+          &:not(:last-child) {
+            margin-right: 0 !important;
+          }
         }
       }
 
@@ -829,10 +839,11 @@ export default {
         height: 90upx;
         line-height: 90upx;
         position: relative;
-        word-wrap: nowrap;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         &:not(:last-child) {
-          margin-right: 160upx;
-        }
+            margin-right: 160upx;
+          }
 
         &.is_active {
           font-weight: bold;

@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-01 17:36:26
+ * @LastEditTime: 2020-09-07 15:06:45
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -151,7 +151,6 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.timeStatus = data.type;
-    console.log(data.type)
     if (data.status) {
       this.roundTripStatus = {
         status: true,
@@ -165,6 +164,12 @@ export default {
       for (let index = 0; index < 2; index++) {
         this.getDateList();
       }
+    }
+
+    // 组装单程日期更换
+    console.log(data.ticketType)
+    if(data.ticketType){
+      
     }
   },
 };

@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-08-25 18:10:09
+ * @LastEditTime: 2020-09-07 11:30:55
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -34,7 +34,9 @@
               <view class="item_info">
                 <view class="info_top">
                   <view class="type">{{item.type}}</view>
-                  <view class="user_name">{{item.name}}</view>
+                  <view
+                    class="user_name"
+                  >{{item.name || item.en_first_name + '/' + item.en_last_name}}</view>
                   <view class="position">{{item.group?item.group:'未分组'}}</view>
                 </view>
                 <view class="info_bottom">
@@ -59,7 +61,12 @@
     </view>
 
     <!-- 筛选弹窗 -->
-    <yun-selector ref="groupPopup" :dataItem="'group_name'" :dataList="groupList" @submitDialog="groupPopupSelecctBtn()"></yun-selector>
+    <yun-selector
+      ref="groupPopup"
+      :dataItem="'group_name'"
+      :dataList="groupList"
+      @submitDialog="groupPopupSelecctBtn()"
+    ></yun-selector>
 
     <view class="submit_box" v-if="!passengerType">
       <button class="submit_btn" @click="returnBtn">确认</button>
@@ -84,6 +91,9 @@ export default {
       passengerList: [], // 乘机人列表
 
       checkePassenger: [], // 已选择乘客列表
+
+      chdinfNumber: {}, // 航司规定乘客数量
+      flightPassengerList: [], // 预定页面切换乘机人
     };
   },
   methods: {
@@ -107,13 +117,24 @@ export default {
           this.passengerList.forEach((item) => {
             item["type"] =
               moment().diff(item.birthday, "years") < 12 &&
-              moment().diff(item.birthday, "years") > 2
+              moment().diff(item.birthday, "years") >= 2
                 ? "儿童"
                 : moment().diff(item.birthday, "years") < 2
                 ? "婴儿"
                 : "成人";
           });
-          this.getGroupList()
+          this.getGroupList();
+
+          if (this.flightPassengerList.length > 0) {
+            this.checkePassenger = this.flightPassengerList;
+            this.flightPassengerList.forEach((item, index) => {
+              this.passengerList.forEach((oitem, oindex) => {
+                if (item.id === oitem.id) {
+                  this.passengerList[oindex].checked = true;
+                }
+              });
+            });
+          }
         }
       });
     },
@@ -122,28 +143,29 @@ export default {
     jumpEditUserInfo(val) {
       console.log(val);
       uni.navigateTo({
-        url: "/pages/flightReservation/addPassenger?type=edit&data="+JSON.stringify(val),
+        url:
+          "/pages/flightReservation/addPassenger?type=edit&data=" +
+          JSON.stringify(val),
       });
     },
 
     // 删除乘机人
-    removePassenger(val,i){
-      console.log(val)
-      passenger.removePassenger(val.id)
-        .then(res =>{
-          if(res.errorcode === 10000){
-            this.getPassengerData()
-            uni.showToast({
-              title: '删除成功',
-              icon: "success",
-            });
-          }else{
-            uni.showToast({
-              title: res.msg,
-              icon: "none",
-            });
-          }
-        })
+    removePassenger(val, i) {
+      console.log(val);
+      passenger.removePassenger(val.id).then((res) => {
+        if (res.errorcode === 10000) {
+          this.getPassengerData();
+          uni.showToast({
+            title: "删除成功",
+            icon: "success",
+          });
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
     },
 
     // 获取分组列表
@@ -151,13 +173,13 @@ export default {
       passenger.getGroup().then((res) => {
         if (res.errorcode === 10000) {
           this.groupList = res.data.data;
-          this.groupList.forEach(item =>{
-            this.passengerList.forEach(oitem =>{
-              if(oitem.group_id === item.id){
-                oitem['group'] = item.group_name
+          this.groupList.forEach((item) => {
+            this.passengerList.forEach((oitem) => {
+              if (oitem.group_id === item.id) {
+                oitem["group"] = item.group_name;
               }
-            })
-          })
+            });
+          });
         } else {
           uni.showToast({
             title: "分组列表获取失败，" + res.msg,
@@ -178,29 +200,80 @@ export default {
 
     // 选中乘机人
     checkedPassenger(data, index) {
+
       this.passengerList[index].checked = !this.passengerList[index].checked;
-      if(this.passengerList[index].checked){
-        let info = this.passengerList[index]
-        this.checkePassenger.push(info)
-      }else{
-        this.checkePassenger.splice(this.checkePassenger.findIndex(item => item.id === data.id), 1)
+      if (this.passengerList[index].checked) {
+        let info = this.passengerList[index];
+        this.checkePassenger.push(info);
+      } else {
+        this.checkePassenger.splice(
+          this.checkePassenger.findIndex((item) => item.id === data.id),
+          1
+        );
       }
     },
 
     // 确认乘机人
     returnBtn() {
-      console.log(this.checkePassenger)
-      uni.setStorageSync('passengerList', JSON.stringify(this.checkePassenger))
-      uni.navigateBack()
+      if(this.checkePassenger.length < 1){
+        return uni.showToast({
+            title: '请选择乘机人',
+            icon: 'none',
+            duration: 2000
+          });
+      }
+
+      let atdNumber = 0
+      let chdNumber = 0
+      let infNumber = 0
+
+      this.checkePassenger.forEach(item => {
+        atdNumber = item.type === '成人'? atdNumber+ 1 : atdNumber
+        chdNumber = item.type === '儿童'? chdNumber+ 1 : chdNumber
+        infNumber = item.type === '婴儿'? infNumber+ 1 : infNumber
+      })
+      if(atdNumber === 0 && chdNumber >0 || infNumber> 0){
+        return uni.showToast({
+            title: '请至少选择一个成人',
+            icon: 'none',
+            duration: 2000
+          });
+      }
+      if(JSON.stringify(this.chdinfNumber) !== "{}"){
+        if(chdNumber !== 0 && atdNumber * this.chdinfNumber.has_inf_cnn_number < chdNumber){
+          return uni.showToast({
+            title: '超出航司规定儿童人数',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+        if(infNumber !== 0 && infNumber * this.chdinfNumber.has_inf_inf_number < infNumber){
+          return uni.showToast({
+            title: '超出航司规定婴儿人数',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      }
+      uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
+      uni.navigateBack();
     },
   },
-  onShow(){
+  onShow() {
     this.getPassengerData();
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.passengerType = data.type === "userInfo";
-    this.chdinfNumber = data.chdinfNumber?JSON.parse(data.chdinfNumber): {}
+    this.chdinfNumber = data.chdinfNumber ? JSON.parse(data.chdinfNumber) : {};
+    this.flightPassengerList = data.editPassengerList?JSON.parse(data.editPassengerList):[];
+    
+      this.chdinfNumber= {
+          air_line: "CA",
+          cnn_number: 2,
+          has_inf_cnn_number: 1,
+          has_inf_inf_number: 1
+       }
     console.log(this.chdinfNumber)
   },
 };

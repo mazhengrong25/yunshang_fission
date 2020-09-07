@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-08-17 16:23:54
+ * @LastEditTime: 2020-09-07 11:10:49
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -269,12 +269,6 @@ export default {
       addPassengerType: false, // 旅客状态 true国际， false国内
 
       passenger: {
-        // 乘机人信息
-        name: "", // 用户名
-        en_first_name: "", // 拼音姓
-        en_last_name: "", // 拼音名
-        phone: "", // 手机号
-        birthday: "",
         sex: "男",
       },
       certificateList: [
@@ -334,7 +328,8 @@ export default {
     // 确认出生日期
     birthdaySelecctBtn(e) {
       console.log(e);
-      this.passenger.birthday = e.year + "-" + e.month + "-" + e.day;
+      let birthday = e.year + "-" + e.month + "-" + e.day
+      this.$set(this.passenger, 'birthday',birthday)
     },
 
     // 打开证件类型选择框
@@ -416,6 +411,7 @@ export default {
     },
     // 确认分组
     groupPopupSelecctBtn(e) {
+      console.log(e)
       this.group = e;
     },
 
@@ -483,6 +479,10 @@ export default {
         data["cert_no"] = item.cert_no;
         data["group_id"] = this.group.id;
         data["nationality"] = "CN";
+        if (item.cert_type !== "护照") {
+          delete data.en_first_name;
+          delete data.en_last_name;
+        }
 
         if (this.pageType) {
           // 编辑乘机人
@@ -532,6 +532,7 @@ export default {
     if (val.type === "edit") {
       this.pageType = val.type === "edit";
       this.pageData = JSON.parse(val.data);
+      this.addPassengerType = this.pageData.cert_type === "护照";
       this.passenger = {
         name: this.pageData.name, // 用户名
         en_first_name: this.pageData.en_first_name, // 拼音姓
@@ -546,10 +547,10 @@ export default {
       };
       this.group = {
         group_name: this.pageData.group,
-        group_id: this.pageData.group_id,
+        id: this.pageData.group_id,
       };
     }
-    console.log(this.pageType, this.pageData);
+    console.log(this.pageType, this.pageData,this.group);
 
     this.getGroupList(); // 获取分组列表
   },

@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-04 09:44:03
+ * @LastEditTime: 2020-09-07 10:42:48
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -38,7 +38,7 @@
               <view class="message_info">
                 <view class="info_left">
                   <view class="type">{{item.type}}票</view>
-                  <view class="user_name">{{item.name}}</view>
+                  <view class="user_name">{{item.name || item.en_first_name + '/' + item.en_last_name}}</view>
                   <view class="position">{{item.group?item.group:'未分组'}}</view>
                 </view>
                 <view class="edit_btn"></view>
@@ -645,7 +645,7 @@ export default {
       uni.navigateTo({
         url:
           "/pages/flightReservation/passengerList?chdinfNumber=" +
-          JSON.stringify(this.chdinf_msg),
+          JSON.stringify(this.chdinf_msg) + '&editPassengerList=' + JSON.stringify(this.passengerList),
       });
     },
 
