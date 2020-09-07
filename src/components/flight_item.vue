@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-09-01 17:10:15
+ * @LastEditTime: 2020-09-07 17:16:33
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -11,17 +11,24 @@
       <view class="box_header_left">
         <view class="left_prcie">
           <text class="unit">&yen;</text>
-          {{flightData.data.cabinPrices.ADT.rulePrice.price}}
+          <text v-if="flightData.data.cabinPrices.ADT.rulePrice.price !== 0">{{flightData.data.cabinPrices.ADT.rulePrice.price}}</text>
+          <text class="not_price" v-else>待获取</text>
           <!-- <view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view> -->
         </view>
         <view class="left_reward" v-if="flightData.reward > 0">奖励金 &yen;{{flightData.reward}}</view>
       </view>
       <view class="box_header_right">
         <button
+          v-if="flightData.data.cabinPrices.ADT.rulePrice.price !== 0"
           :disabled="flightData.active"
           :class="['header_right_btn',{active: flightData.active}]"
           @click="jumpReservation"
         >{{!roundTripType?'预定': flightType === 0? '选为去程': '选为返程'}}</button>
+        <button
+          v-else
+          class="get_price"
+          @click="getPriceBtn"
+        >立即获取</button>
         <view
           class="header_right_voteNumber"
           v-if="flightData.voteNumber !== 'A'"
@@ -55,6 +62,18 @@ export default {
     flightType: {  // 往返状态 0 去程， 1返程
       type: Number,
       default: () => null
+    },
+    flightIndex: {  // 数据下标
+      type: Number,
+      default: () => null
+    },
+    flightHeader: {  // 数据类型头
+      type: String,
+      default: () => ''
+    },
+    type: {
+      type: Boolean,
+      default: () => false
     }
   },
   data() {
@@ -65,6 +84,11 @@ export default {
     openFlightPopop() {
       this.$emit("openExpDialog", true, this.flightData.ruleInfos);
       // this.$parent.$refs.flightExplanation.open()
+    },
+
+    // 获取运价信息
+    getPriceBtn(){
+      this.$emit("getPriceData", this.flightData, this.flightHeader,this.flightIndex,this.type);
     },
 
     // 跳转预定页面
@@ -106,6 +130,9 @@ export default {
           font-size: 28upx;
           margin-right: 6upx;
         }
+        .not_price{
+          font-size: 40upx;
+        }
 
         .price_message {
           font-size: 20upx;
@@ -145,6 +172,21 @@ export default {
         &.active {
           opacity: .4;
         }
+      }
+      .get_price{
+        background: linear-gradient(
+          90deg,
+          rgba(255, 165, 0, 1) 0%,
+          rgba(255, 165, 0, .6) 100%
+        );
+        box-shadow: 0 6upx 12upx rgba(255, 165, 0, .3);
+        border-radius: 90upx;
+        font-size: 32upx;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 1);
+        // letter-spacing:20px;
+				padding: 18rpx 14rpx;
+				line-height: unset;
       }
 
       .header_right_voteNumber {

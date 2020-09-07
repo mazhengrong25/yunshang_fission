@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-07 14:53:02
+ * @LastEditTime: 2020-09-07 18:20:58
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -38,7 +38,7 @@
         </view>
         <button
           class="roundTrip_pay_order_btn"
-          v-if="roundTripCheckList.length === 2"
+          v-if="roundTripCheckList.length === 2 && roundTripCheckList[0]"
           @click="roundTripCheckedBtn()"
         >预定</button>
       </view>
@@ -75,8 +75,11 @@
                 :flightData="item"
                 :flightType="roundTripBtnActive"
                 :roundTripType="roundTripType"
+                :flightIndex="index"
+                :flightHeader="header"
                 @openExpDialog="openExp"
                 @jumpReservation="jumpReservationBtn"
+                @getPriceData="getPriceData"
               ></flight-item>
             </view>
           </swiper-item>
@@ -105,8 +108,12 @@
                 :flightType="roundTripBtnActive"
                 :roundTripType="roundTripType"
                 :flightData="item"
+                :flightIndex="index"
+                :flightHeader="header"
+                :type="true"
                 @openExpDialog="openExp"
                 @jumpReservation="jumpReservationBtn"
+                @getPriceData="getPriceData"
               ></flight-item>
             </view>
           </swiper-item>
@@ -315,6 +322,71 @@ export default {
 
       console.log("往返选中列表", this.roundTripCheckList);
       this.$forceUpdate();
+    },
+
+    // 获取价格信息 - 验价
+    getPriceData(data, header,index,type){
+      console.log(data, header,index)
+      let params
+      if(type){
+        this.depActiveInfo = {
+          cabin: data.cabin,
+          price: data.data.cabinPrices.ADT.price,
+          type: data.type,
+        };
+        this.depMessage["data"] = data;
+        params = {
+          sourceCode: "IBE",
+          file_key: this.roundTripFileKey,
+          queryDate: this.depMessage.flightData.time,
+          departure: this.depMessage.ticketAddress.departure,
+          destination: this.depMessage.ticketAddress.arrival,
+          systemMsg: "",
+          segments: this.depMessage.airSegments,
+          ItineraryInfo: this.depMessage.data.data,
+          relatedKey: "11",
+        };
+      }else{
+        this.airActiveInfo = {
+          cabin: data.cabin,
+          price: data.data.cabinPrices.ADT.price,
+          type: data.type,
+        };
+        this.airMessage["data"] = data;
+        params = {
+          sourceCode: "IBE",
+          file_key: this.fileKey,
+          queryDate: this.airMessage.flightData.time,
+          departure: this.airMessage.ticketAddress.departure,
+          destination: this.airMessage.ticketAddress.arrival,
+          systemMsg: "",
+          segments: this.airMessage.airSegments,
+          ItineraryInfo: this.airMessage.data.data,
+          relatedKey: "11",
+        };
+      }
+      
+
+
+        ticket.checkPrice(params).then((res) => {
+        if (res.errorcode === 10000) {
+          if(type){
+            this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+          }else{  
+            this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+          }
+        } else{
+          uni.showToast({
+            title: '获取失败，请稍后重试',
+            icon: "none",
+            duration: 3000,
+          });
+        }
+        console.log(this.cabinList)
+
+        this.$forceUpdate()
+      });
+
     },
 
     // 跳转预定页面 - 先验价再跳转

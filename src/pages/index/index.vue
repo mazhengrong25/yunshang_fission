@@ -2,79 +2,82 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-06 09:21:01
+ * @LastEditTime: 2020-09-07 16:36:40
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="index">
-    <view class="header">
-      <model-swiper :swiperList="swiperList"></model-swiper>
-      <view class="index_interval" style="margin-top: 50upx;"></view>
+    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="云上航空"></yun-header>
+    <view class="index_main">
+      <view class="header">
+        <model-swiper :swiperList="swiperList"></model-swiper>
+        <view class="index_interval" style="margin-top: 50upx;"></view>
 
-      <view class="modal_tabs">
-        <view class="swiper-tab">
-          <view
-            v-for="(item, index) in tabsList" 
-            :key="index"
-            :class="['swiper-tab-item',{'active': currentTab === index}]"
-            @click="clickTab(index)"
-          >{{item}}</view>
+        <view class="modal_tabs">
+          <view class="swiper-tab">
+            <view
+              v-for="(item, index) in tabsList"
+              :key="index"
+              :class="['swiper-tab-item',{'active': currentTab === index}]"
+              @click="clickTab(index)"
+            >{{item}}</view>
+          </view>
+
+          <swiper
+            class="tabs_main"
+            :current="currentTab"
+            duration="300"
+            :style="{'height':swiperHeight+'px'}"
+            @change="swiperTab"
+          >
+            <swiper-item v-for="(item, index) in tabsList" :key="index">
+              <view class="tabs_center">
+                <ticket-input
+                  :ticketType="item"
+                  :addressForm="addressForm"
+                  @checkTicked="checkTicked"
+                  @closeFromBtn="closeFromBtn"
+                ></ticket-input>
+              </view>
+            </swiper-item>
+          </swiper>
         </view>
+        <view class="child_box" v-if="currentTab !== 0">
+          <view class="cabin">经济舱</view>
 
-        <swiper
-          class="tabs_main"
-          :current="currentTab"
-          duration="300"
-          :style="{'height':swiperHeight+'px'}"
-          @change="swiperTab"
-        >
-          <swiper-item v-for="(item, index) in tabsList" :key="index">
-            <view class="tabs_center">
-              <ticket-input
-                :ticketType="item"
-                :addressForm="addressForm"
-                @checkTicked="checkTicked"
-                @closeFromBtn="closeFromBtn"
-              ></ticket-input>
+          <view class="passenger_message">
+            <view class="child_message" @click="openChildMessageBtn"></view>
+            <view class="passenger_message_main" @click="openPassengerNumber">
+              <view class="passenger_list">
+                <text>成人</text>
+                <text class="number">{{passengerForm.adultNumber}}</text>
+              </view>
+              <view class="passenger_list">
+                <text>儿童</text>
+                <text class="number">{{passengerForm.childNumber}}</text>
+              </view>
+              <view class="passenger_list">
+                <text>婴儿</text>
+                <text class="number">{{passengerForm.babyNumber}}</text>
+              </view>
+              <image class="open_number_more" src="@/static/number_more_btn.png" mode="contain" />
             </view>
-          </swiper-item>
-        </swiper>
-      </view>
-      <view class="child_box" v-if="currentTab !== 0">
-        <view class="cabin">经济舱</view>
-
-        <view class="passenger_message">
-          <view class="child_message" @click="openChildMessageBtn"></view>
-          <view class="passenger_message_main" @click="openPassengerNumber">
-            <view class="passenger_list">
-              <text>成人</text>
-              <text class="number">{{passengerForm.adultNumber}}</text>
-            </view>
-            <view class="passenger_list">
-              <text>儿童</text>
-              <text class="number">{{passengerForm.childNumber}}</text>
-            </view>
-            <view class="passenger_list">
-              <text>婴儿</text>
-              <text class="number">{{passengerForm.babyNumber}}</text>
-            </view>
-            <image class="open_number_more" src="@/static/number_more_btn.png" mode="contain" />
           </view>
         </view>
+
+        <view
+          class="multi_pass_message"
+          v-if="currentTab === 2"
+          @click="openMultiPassProblem"
+        >至少选择一个国际城市</view>
+
+        <view class="submit_btn" @click="submitTicket">飞机票查询</view>
       </view>
 
-      <view
-        class="multi_pass_message"
-        v-if="currentTab === 2"
-        @click="openMultiPassProblem"
-      >至少选择一个国际城市</view>
-
-      <view class="submit_btn" @click="submitTicket">飞机票查询</view>
-    </view>
-
-    <!-- 公告版块 -->
-    <view class="notice">
-      <model-notice :modelType="true"></model-notice>
+      <!-- 公告版块 -->
+      <view class="notice">
+        <model-notice :modelType="true"></model-notice>
+      </view>
     </view>
 
     <!-- 乘客数量选择弹窗 -->
@@ -192,6 +195,8 @@ export default {
   },
   data() {
     return {
+      iStatusBarHeight: 0,
+
       swiperList: [
         {
           // 轮播图数据
@@ -288,7 +293,7 @@ export default {
     closeFromBtn() {
       this.addressForm.fromTime = "";
       this.addressForm.fromDay = "";
-      delete this.airMessage["fromTime"]
+      delete this.airMessage["fromTime"];
     },
 
     // 获取当前swiper-item高度
@@ -387,20 +392,19 @@ export default {
         };
       }
       console.log(this.airMessage);
-      let jumpUrl
+      let jumpUrl;
       if (this.currentTab === 0 && !this.airMessage.fromTime) {
         jumpUrl = "/pages/ticketInquiry/ticketInquiry";
       } else if (this.currentTab === 0 && this.airMessage.fromTime) {
         jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
       }
       uni.navigateTo({
-        url:
-          jumpUrl + "?data=" +
-          JSON.stringify(this.airMessage),
+        url: jumpUrl + "?data=" + JSON.stringify(this.airMessage),
       });
     },
   },
   onLoad() {
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.setSwiperHeight();
   },
   onShow() {
@@ -408,13 +412,19 @@ export default {
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
       if (cityData.status === "to") {
-        this.addressForm.to = cityData.type === 'city'?cityData.data.city_name: cityData.data.air_port_name
+        this.addressForm.to =
+          cityData.type === "city"
+            ? cityData.data.city_name
+            : cityData.data.air_port_name;
         this.airMessage["to"] = cityData.data;
-        this.airMessage["to_type"] = cityData.type
+        this.airMessage["to_type"] = cityData.type;
       } else if (cityData.status === "from") {
-        this.addressForm.from = cityData.type === 'city'?cityData.data.city_name: cityData.data.air_port_name;
+        this.addressForm.from =
+          cityData.type === "city"
+            ? cityData.data.city_name
+            : cityData.data.air_port_name;
         this.airMessage["from"] = cityData.data;
-        this.airMessage["from_type"] = cityData.type
+        this.airMessage["from_type"] = cityData.type;
       }
       console.log(this.airMessage);
       uni.removeStorageSync("city");
@@ -448,6 +458,13 @@ export default {
 <style lang="less" scoped>
 .index {
   background: #f3f5f7;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  .index_main{
+    flex: 1;
+    overflow-y: auto;
+  }
 
   .header {
     padding: 20upx;

@@ -2,7 +2,7 @@
  * @Description: 首页公告版块组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 18:03:52
- * @LastEditTime: 2020-07-30 11:26:53
+ * @LastEditTime: 2020-09-07 16:56:05
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -40,22 +40,6 @@
 		data() {
 			return {
 				noticeList: [{
-					title: '4月29日',  // 公告时间
-					time: '周三',  // 公告星期
-					message: '关于强调正确录入旅客电话号码通知' // 公告标题
-				},{
-					title: '4月29日',  // 公告时间
-					time: '周三',  // 公告星期
-					message: '关于强调正确录入旅客电话号码通知' // 公告标题
-				},{
-					title: '4月29日',  // 公告时间
-					time: '周三',  // 公告星期
-					message: '关于强调正确录入旅客电话号码通知' // 公告标题
-				},{
-					title: '4月29日',  // 公告时间
-					time: '周三',  // 公告星期
-					message: '关于强调正确录入旅客电话号码通知' // 公告标题
-				},{
 					title: '4月29日',  // 公告时间
 					time: '周三',  // 公告星期
 					message: '关于强调正确录入旅客电话号码通知' // 公告标题

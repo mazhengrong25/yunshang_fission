@@ -3,7 +3,7 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "云上航空"
+        "navigationStyle": "custom"
       }
     },
     {

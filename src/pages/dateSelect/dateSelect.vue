@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-07 15:06:45
+ * @LastEditTime: 2020-09-07 16:19:53
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -65,6 +65,8 @@ export default {
       checkedDay: {}, // 选中日期
 
       roundTripStatus: {},
+
+      ticketData: {}, // 已选日期数据
     };
   },
   methods: {
@@ -82,6 +84,7 @@ export default {
         nextList.push({
           day: i + 1,
           time: moment().add(this.nextIndex, "M").format("YYYY-MM"),
+          date: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)),
           status:
             currentDate === nextDate
               ? i + 1 > Number(moment().format("D"))
@@ -90,7 +93,7 @@ export default {
             currentDate === nextDate
               ? i + 1 === Number(moment().format("D"))
               : false,
-          checked: false,
+          checked: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)) === this.ticketData.data,
         });
       }
       this.dateList.push({
@@ -151,6 +154,13 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.timeStatus = data.type;
+
+  
+    // 组装单程日期更换
+    this.ticketData = data.ticketType?JSON.parse(data.ticketType):{}
+    console.log(this.ticketData)
+   
+
     if (data.status) {
       this.roundTripStatus = {
         status: true,
@@ -166,11 +176,8 @@ export default {
       }
     }
 
-    // 组装单程日期更换
-    console.log(data.ticketType)
-    if(data.ticketType){
-      
-    }
+     console.log(this.dateList)
+
   },
 };
 </script>

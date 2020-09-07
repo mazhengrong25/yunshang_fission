@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-07 11:34:01
+ * @LastEditTime: 2020-09-07 16:26:50
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -244,6 +244,7 @@ export default {
     },
     // 时间列表处理
     getDateList() {
+      this.ticketTimeList = []
       let day = moment(this.ticketData.toTime.date).format("YYYY-MM-DD");
       let dayNumber = 0;
       for (let index = 0; index < 7; index++) {
@@ -339,6 +340,14 @@ export default {
     this.airMessage["page"] = this.pageNumber;
   },
   onShow() {
+    // 获取时间日期
+    if (uni.getStorageSync("time")) {
+      let timeData = JSON.parse(uni.getStorageSync("time"));
+      this.airMessage.departureTime = timeData.date
+      this.ticketData.toTime.date = timeData.date
+
+      uni.removeStorageSync("time");
+    }
     this.getTicketData(this.airMessage);
     this.getDateList(); // 时间处理
   },
