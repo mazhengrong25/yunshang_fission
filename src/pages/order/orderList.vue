@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-04 15:31:28
+ * @LastEditTime: 2020-09-07 16:03:41
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -56,35 +56,37 @@
         v-for="(item, index) in innerList"
         :key="index"
       >
+        <!--单程  往返  多程 -->
         <view class="list_tyle">{{
           item.segment_type === 1
             ? "单程机票"
-            : item.ticket_round_order_id !== ''
+            : item.ticket_round_order_id > 0
             ? "往返机票"
             : ""
         }}</view>
         <view
           @click.stop="jumpOrderDetails(item)"
-          :class="[
-            'list_item',
-            { multiple_trips_item: item.segment_type !== 1 },
-          ]"
+          class="list_item"
           v-for="(oitem, oindex) in item.ticket_segments"
           :key="oindex"
         >
           <view class="item_header">
             <view class="item_title">
-              <view
-                :class="[
-                  'title_type',
-                  { return_trip: item.ticket_round_order_id !=='' },
-                ]"
-                ></view>
-              <view class="title"
-                >{{ oitem.departure_msg.city_name}} - {{ oitem.arrive_msg.city_name }}</view
-              >
+              <!-- 去程 返程 -->
+              <view>
+                <!-- {{
+                  oitem.direction_type === 1
+                    ? "去程"
+                    : oitem.direction_type === 2
+                    ? "回程"
+                    : item.direction_type === 3
+                    ? "第" + (oindex + 1) + "程"
+                    : ""
+                }} -->
+                </view>
+              <view class="title">{{ oitem.departure_msg.city_name}} - {{ oitem.arrive_msg.city_name }}</view>
             </view>
-            <view class="item_price" v-if="item.segment_type === 1">
+            <view class="item_price">
               <text>&yen;</text>
               {{ item.ticket_price || "金额错误" }}
             </view>
@@ -195,7 +197,7 @@
                   oitem.direction_type === 1
                     ? "去程"
                     : oitem.direction_type === 2
-                    ? "回程"
+                    ? "返程"
                     : item.direction_type === 3
                     ? "第" + (oindex + 1) + "程"
                     : ""
@@ -294,6 +296,7 @@ export default {
     };
   },
   methods: {
+   
     checkedHeaderActive(index) {
       this.headerActive = index;
       this.orderPageNumber = 1;
@@ -367,7 +370,7 @@ export default {
             } else {
               this.innerList = res.data.data;
             }
-            this.innerList.forEach(item =>{
+            this.innerList.forEach(item =>{ //剩余支付时间
               item.status = this.$timeDiff(
                   new Date(item.created_at).getTime() + 30 * 60 * 1000,
                   new Date(),
@@ -395,21 +398,9 @@ export default {
                   item.status !== 0 &&
                   item.status !== 5 &&
                   item.pay_status === 1 
-    
-                )
+              )
              
             }
-
-            //判断已取消
-            // if(this.headerActive === 4) {
-            //   this,this.innerList = this.innerList.filter(
-            //     (item) =>
-            //       item.status !== 0 &&
-            //       item.status !== 5 &&
-            //       item.pay_status ===1 
-                  
-            //   )
-            // }
 
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;

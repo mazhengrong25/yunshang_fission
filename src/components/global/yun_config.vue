@@ -2,17 +2,17 @@
  * @Description: 信息弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-09-07 15:24:39
- * @LastEditTime: 2020-09-07 15:54:13
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-07 18:13:14
+ * @LastEditors: mazhengrong
 -->
 <template>
   <uni-popup ref="configPopup" type="dialog">
     <view class="config_box">
-      <view class="box_title">{{configData.title || '标题'}}</view>
-      <view class="box_content">{{configData.content || '标题'}}</view>
+      <view class="box_title">{{title}}</view>  
+      <view class="box_content">{{content}}</view>
       <view class="box_bottom">
-        <view class="submit" @click="submitConfig()">确 定</view>
-        <view @click="closeConfig()">取 消</view>
+        <view class="submit_btn active" @click="submitConfig('left')">点 错 了</view>
+        <view class="submit_btn" @click="submitConfig('right')">确 认 取 消</view>
       </view>
     </view>
   </uni-popup>
@@ -20,10 +20,27 @@
 <script>
 export default {
   props: {
-    configData: {
-      type: Object,
-      default: () => {}
-    }
+    // configData: {
+    //   type: Object,
+    //   default: () => {}
+    // },
+
+      title: {
+      // 居中文字标题
+      type: String,
+      default: () => "",
+    },
+     content: {
+      // 内容摘要
+      type: String,
+      default: () => "",
+    },
+    submitIndex: {
+      // 确认按钮位置
+      type: String,
+      default: () => 'left'
+    },
+
   },
   data() {
     return {}
@@ -39,8 +56,10 @@ export default {
     },
 
     // 确认按钮
-    submitConfig() {
-      this.$emit("submitConfig");
+    submitConfig(type) {
+      if(this.submitIndex === type){
+         this.$emit("submitConfig",true);
+      }
       this.closeConfig()
     },
   },
@@ -64,17 +83,19 @@ export default {
     margin-bottom: 18upx;
   }
   .box_content {
+    font-size: 26upx;
     height: 80upx;
-    margin: 0 20upx;
-    padding: 0 22upx;
-    padding: 0 20upx 20upx;
+    letter-spacing: 2px;
+    margin-left: 122upx;
+    padding: 30upx 50upx 30upx 20upx;
+    color: rgba(42, 42, 42, 1);
   }
   .box_bottom {
     margin-top: auto;
     display: flex;
     align-items: center;
     height: 90upx;
-    view {
+    .submit_btn {
       flex: 1;
       background: rgba(0, 112, 226, 0.1);
       font-size: 28upx;
@@ -84,7 +105,7 @@ export default {
       align-items: center;
       justify-content: center;
       height: 100%;
-      &.submit {
+      &.active {
         background: rgba(0, 112, 226, 1);
         color: rgba(255, 255, 255, 1);
       }

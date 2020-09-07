@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-03 16:56:20
+ * @LastEditTime: 2020-09-07 18:27:03
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -12,18 +12,22 @@
       centerTitle="订单详情"
     ></yun-header>
 
-    <!-- 国际详情 -->
+    <!-- 国内详情 -->
     <view class="details_header">
       <view class="header_top">
         <view class="order_type">
           {{
-            orderDetails.status === 1
+            orderDetails.status !== 0 &&
+            orderDetails.status !== 5 &&
+            orderDetails.pay_status === 1
+              ? "已预订"
+              : orderDetails.status === 1
               ? "待出票"
               : orderDetails.status === 3
               ? "已出票"
               : orderDetails.status === 5
               ? "已取消"
-              : ''
+              : ""
           }}
         </view>
 
@@ -32,8 +36,15 @@
           <text>{{ orderDetails.ticket_price || "金额数据错误" }}</text>
         </view>
       </view>
- 
-      <view class="remaining_time" v-if="orderDetails.status === 1">
+      <!-- 剩余时间  已预订 -->
+      <view
+        class="remaining_time"
+        v-if="
+          orderDetails.status !== 0 &&
+            orderDetails.status !== 5 &&
+            orderDetails.pay_status === 1
+        "
+      >
         <image
           class="time_icon"
           src="@/static/order_remaining_time.png"
@@ -46,14 +57,33 @@
               new Date(),
               "minutes"
             )
-          }}分钟</text>
+          }}分钟</text
+        >
       </view>
 
       <view class="order_option">
         <view class="option_btn" v-if="orderDetails.status === 1"
           >发送短信</view
         >
-        <!-- <view class="option_btn important_btn" v-if="orderDetails.status === 1">去支付</view> -->
+        <view
+          class="option_btn"
+          v-if="
+            orderDetails.status !== 0 &&
+              orderDetails.status !== 5 &&
+              orderDetails.pay_status === 1
+          "
+          @click="getCancel(item)"
+          >取消订单</view
+        >
+        <view
+          class="option_btn important_btn"
+          v-if="
+            orderDetails.status !== 0 &&
+              orderDetails.status !== 5 &&
+              orderDetails.pay_status === 1
+          "
+          >去支付</view
+        >
         <view class="option_btn" v-if="orderDetails.status === 3"
           >报销凭证</view
         >
@@ -101,31 +131,42 @@
               <view class="date">{{
                 item.departure_time.substring(11, 16)
               }}</view>
-              <view class="address">{{item.departure_CN.city_name}}{{ item.departure_CN.air_port_name }}</view>
+              <view class="address"
+                >{{ item.departure_CN.city_name
+                }}{{ item.departure_CN.air_port_name }}</view
+              >
             </view>
 
-            <view class="message_center">  
-              <view class="date">{{Math.floor((item.duration / 3600))}}h{{Math.floor((item.duration / 60 % 60))}}m</view>
+            <view class="message_center">
+              <view class="date"
+                >{{ Math.floor(item.duration / 3600) }}h{{
+                  Math.floor((item.duration / 60) % 60)
+                }}m</view
+              >
               <view class="center_icon"></view>
               <view class="type">直飞</view>
             </view>
 
             <view class="message_box">
               <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
-              <view class="address">{{item.arrive_CN.city_name}}{{ item.arrive_CN.air_port_name }}</view>
+              <view class="address"
+                >{{ item.arrive_CN.city_name
+                }}{{ item.arrive_CN.air_port_name }}</view
+              >
             </view>
           </view>
 
           <view class="filght_message">
             <!-- 航班图标 -->
             <view class="message_icon">
-              <image class="message_icon"
-              :src="'https://fxxcx.ystrip.cn/'+ item.image"
-              mode="contain"
-            />
+              <image
+                class="message_icon"
+                :src="'https://fxxcx.ystrip.cn/' + item.image"
+                mode="contain"
+              />
             </view>
-            <view class="message_list">{{item.flight_no}}</view>
-            <view class="message_list">{{item.model}}</view>
+            <view class="message_list">{{ item.flight_no }}</view>
+            <view class="message_list">{{ item.model }}</view>
             <view class="message_list">有早餐</view>
           </view>
 
@@ -188,7 +229,7 @@
                     ? "台湾通行证"
                     : item.Credential === "8"
                     ? "其他证件"
-                    :""
+                    : ""
                 }}</view>
                 <view class="message_number">{{ item.CredentialNo }}</view>
                 <!-- 身份证号码 -->
@@ -247,6 +288,14 @@
         </view>
       </scroll-view>
     </view>
+    <!-- 取消订单弹窗 -->
+    <yun-config
+      ref="yunConfig"
+      @submitConfig="getSubmit"
+      title="温馨提示"
+      content="您是否要取消此订单"
+      submitIndex="right"
+    ></yun-config>
   </view>
 </template>
 
@@ -261,14 +310,40 @@ export default {
       orderDetails: [], // 订单详情
       flightData: {}, // 航班信息
       orderListType: "", // 订单列表页 类型
+
+      orderId: "", // 订单号
     };
   },
-  methods: {   
-    // 获取订单详情
-    getOrderDetails(val) {
-      console.log("国内订单详情", val, this.orderListType);
+  methods: {
+    // 已预订 取消订单弹窗
+    getCancel() {
+      this.$refs.yunConfig.openConfigPopup();
+    },
+
+    //取消订单弹窗 确认取消
+    getSubmit(type) {
+      console.log(type);
       let data = {
-        order_no: val,
+        order_no: this.orderId,
+      };
+      console.log(data);
+      orderApi.cancleInterRefund(data).then((res) => {
+        if (res.result === 10000) {
+          this.getOrderDetails();
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
+    },
+
+    // 获取订单详情
+    getOrderDetails() {
+      console.log("国内订单详情",  this.orderListType);
+      let data = {
+        order_no: this.orderId,
       };
 
       orderApi.orderDetails(data).then((res) => {
@@ -286,6 +361,7 @@ export default {
     onLoad(data) {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       let listData = JSON.parse(data.listData);
+      this.orderId = listData.order_no;
       console.log(data);
       this.orderListType = data.type;
       this.orderHeaderTitle =
@@ -302,7 +378,7 @@ export default {
           : this.orderListType === "5"
           ? "国际改签订单"
           : "";
-      this.getOrderDetails(listData.order_no);
+      this.getOrderDetails();
     },
   },
 };
