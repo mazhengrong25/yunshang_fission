@@ -2,7 +2,7 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-07-30 11:20:46
+ * @LastEditTime: 2020-09-08 09:30:05
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -11,7 +11,7 @@
       <view class="filter_title">
         <view class="close_dialog" @click="closeFilterDialog">取消</view>
         <view class="close_filter" @click="closeFilterList">清空筛选</view>
-        <view class="submit_filter">确定</view>
+        <view class="submit_filter" @click="submitFilterBtn">确定</view>
       </view>
 
       <view v-if="directFlight" class="direct_flight">
@@ -109,6 +109,11 @@ export default {
     takeoffTimeActive(val, index) {
       this.takeoffTimeName = index;
       this.filterDataList[this.activeFilterIndex] = val;
+    },
+
+    // 确认筛选数据
+    submitFilterBtn(){
+      this.$emit('ticketFilterData')
     },
   },
 };

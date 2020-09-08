@@ -106,7 +106,7 @@
       <flight-filter @openFilter="openFilter" @filterType="listFilter"></flight-filter>
     </view>
 
-    <flight-filter-dialog ref="filterDialog"></flight-filter-dialog>
+    <flight-filter-dialog ref="filterDialog" @ticketFilterData="ticketFilter"></flight-filter-dialog>
   </view>
 </template>
 
@@ -305,6 +305,11 @@ export default {
       } else if (val === "time") {
         this.ticketList.sort(this.timeSort("depTime"));
       }
+    },
+
+    // 航班信息筛选
+    ticketFilter(){
+      
     },
 
     // 打开筛选
