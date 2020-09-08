@@ -2,8 +2,8 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-08-17 18:10:12
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-08 17:51:47
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="filter">
@@ -38,10 +38,12 @@
         <view class="item_content item_dialog">
           <view
             :class="['dialog_view',{input_placeholder: !timeLimit.start}]"
+            @click="openlimitdaySelector('start')"
           >{{timeLimit.start?timeLimit.start:'预定日始'}}</view>
           <view class="dialog_line">—</view>
           <view
             :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
+            @click="openlimitdaySelector('end')"
           >{{timeLimit.end?timeLimit.end:'预定日止'}}</view>
         </view>
       </view>
@@ -51,10 +53,12 @@
         <view class="item_content item_dialog">
           <view
             :class="['dialog_view',{input_placeholder: !citySelect.start}]"
+            @click="whereToBtn()"
           >{{citySelect.start?citySelect.start:'出发城市'}}</view>
           <view class="dialog_line">—</view>
           <view
             :class="['dialog_view',{input_placeholder: !citySelect.end}]"
+            @click="whereFromBtn()"
           >{{citySelect.end?citySelect.end:'到达城市'}}</view>
         </view>
       </view>
@@ -91,10 +95,13 @@
       </view>
       <view class="list_item list_input">
         <view class="item_title">订票员</view>
-        <view class="item_input">{{booker}}</view>
+        <view class="item_input input-right-arrow">请选择</view>
       </view>
     </scroll-view>
 
+    <!-- 选择日期 -->
+    <yun-selector ref="limitdayPopup" selectType="date" @submitDialog="limitdaySelecctBtn()"></yun-selector>
+    <!-- 按钮组 -->
     <view class="filter_bottom">
       <view class="bottom_btn reset_btn" @click="resetBtn">重置</view>
 
@@ -145,17 +152,19 @@ export default {
       ],
       timeLimit: {
         // 时间范围
-        start: "2020-08-17",
-        end: "2020-08-18",
+        start: "",
+        end: "",
       },
       citySelect: {
-        start: "重庆",
+        start: "",
         end: "",
       },
       pnr: "", // pnr
       orderNumber: "", // 订单号
       flightNumber: "", // 航班号
-      booker: "", // 订票员
+      // booker: "", // 订票员
+
+      dateType: '', // 日期选择类型
     };
   },
   methods: {
@@ -191,12 +200,66 @@ export default {
       this.pnr = "";
       this.orderNumber = "";
       this.flightNumber = "";
-      this.booker = "";
+      // this.booker = "";
     },
+
+    // 打开时间范围日期选择框
+    openlimitdaySelector(type) {
+      this.dateType = type
+      this.$refs.limitdayPopup.openDialog();
+    },
+
+    // 确认时间范围
+    limitdaySelecctBtn(e) {
+      console.log(e);
+      let start = e.year + "-" + e.month +"-" + e.day 
+      this.$set(this.timeLimit,this.dateType,start)
+    },
+
+    //城市选择  出发城市
+    whereToBtn() {
+      //  跳转到城市选择页面
+       uni.navigateTo({
+        url: "/pages/citySelect/citySelect?type=to",
+      });
+    },
+
+    //城市选择  到达城市
+    whereFromBtn() {
+      //  跳转到城市选择页面
+       uni.navigateTo({
+        url: "/pages/citySelect/citySelect?type=from",
+      });
+    }
+
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
   },
+
+  onShow() {
+  // 获取城市信息
+  // if (uni.getStorageSync("city")) {
+  //   let cityData = JSON.parse(uni.getStorageSync("city"));
+  //   if (cityData.status === "to") {
+  //     this.addressForm.to =
+  //       cityData.type === "city"
+  //         ? cityData.data.city_name
+  //         : cityData.data.air_port_name;
+  //     this.airMessage["to"] = cityData.data;
+  //     this.airMessage["to_type"] = cityData.type;
+  //   } else if (cityData.status === "from") {
+  //     this.addressForm.from =
+  //       cityData.type === "city"
+  //         ? cityData.data.city_name
+  //         : cityData.data.air_port_name;
+  //     this.airMessage["from"] = cityData.data;
+  //     this.airMessage["from_type"] = cityData.type;
+  //   }
+  //   console.log(this.airMessage);
+  //   uni.removeStorageSync("city");
+  // }
+},
 };
 </script>
 
@@ -224,7 +287,8 @@ export default {
         .item_input {
           text-align: right;
           margin-left: 50upx;
-          flex: 1;
+          font-size: 28upx;
+          color: rgba(175, 185, 196, 1);
         }
       }
     }
