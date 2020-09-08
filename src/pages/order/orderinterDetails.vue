@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-07 18:27:03
+ * @LastEditTime: 2020-09-08 11:01:39
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -244,7 +244,7 @@
           >
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{ item.PassengerName }}</view>
+              <view class="list_message">{{ orderDetails.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>

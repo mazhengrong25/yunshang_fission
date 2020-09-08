@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-08-06 14:55:35
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-08 17:58:39
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_details">
@@ -112,7 +112,7 @@
             </view>
           </view>
 
-          <view class="contact"	v-for="(item, index) in orderDetails.passengers" :key="index">
+          <view class="contact"	v-for="(item, index) in orderDetails.disinfo" :key="index">
             <view class="contact_list">
               <view class="list_title">联系人</view>
               <view class="list_message">{{item.en_first_name}}{{item.en_last_name}}</view>
