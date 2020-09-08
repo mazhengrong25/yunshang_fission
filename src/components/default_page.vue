@@ -1,0 +1,65 @@
+<!--
+ * @Description: 缺省页
+ * @Author: wish.WuJunLong
+ * @Date: 2020-09-08 14:41:53
+ * @LastEditTime: 2020-09-08 15:46:50
+ * @LastEditors: wish.WuJunLong
+-->
+<template>
+  <view class="default_main">
+    <image class="default_image" src="@/static/not_flight.png" mode="contain" />
+
+    <view class="default_text">抱歉，没有查询到符合条件的航班</view>
+
+    <view v-if="showReturn" class="default_btn" @click="returnBtn">重新查询</view>
+  </view>
+</template>
+<script>
+export default {
+  props: {
+    showReturn: {
+      type: Boolean,
+      default: () => false
+    }
+  },
+  data() {
+    return {};
+  },
+  methods: {
+    returnBtn(){
+      this.$emit('returnBtn')
+    },
+  }
+};
+</script>
+<style lang="less" scoped>
+.default_main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f3f5f7;
+  height: 100%;
+  width: 100%;
+  .default_image {
+    width: 463upx;
+    height: 374upx;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+  .default_text {
+    font-size: 32upx;
+    font-weight: 400;
+    color: #666666;
+    letter-spacing: 4upx;
+    margin-top: 100upx;
+  }
+  .default_btn {
+    font-size: 32upx;
+    font-weight: 400;
+    color: #0070e2;
+    letter-spacing: 4upx;
+    margin-top: 64upx;
+  }
+}
+</style>

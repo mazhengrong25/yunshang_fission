@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-07 16:26:50
+ * @LastEditTime: 2020-09-08 15:46:19
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -89,7 +89,7 @@
       </view>
 
       <!-- 骨架屏 -->
-      <view class="flight_skeleton" v-for="i in ticketList.length < 1? 5 :0" :key="i">
+      <view class="flight_skeleton" v-for="i in ticketList.length < 1? skeletonNumber :0" :key="i">
         <view class="top">
           <text></text>
           <text></text>
@@ -97,12 +97,14 @@
         <text></text>
       </view>
 
+      <default-page v-if="showDefault" :showReturn="showReturnBtn" @returnBtn="getTicketData()"></default-page>
+
       <view class="no_data" v-if="dataListApplyType">
         <text>到底啦</text>
       </view>
     </scroll-view>
 
-    <view class="footer_box">
+    <view class="footer_box" v-if="!showDefault">
       <flight-filter @openFilter="openFilter" @filterType="listFilter"></flight-filter>
     </view>
 
@@ -134,6 +136,10 @@ export default {
       },
 
       airMessage: {}, // 首页传参
+
+      skeletonNumber: 5, // 骨架屏数量
+      showDefault: false,
+      showReturnBtn: false,
 
       file_key: "", // av key
 
@@ -172,9 +178,9 @@ export default {
     },
 
     // 获取航班信息
-    getTicketData(data) {
-      data["file_key"] = this.file_key;
-      ticket.getTicket(data).then((res) => {
+    getTicketData() {
+      this.airMessage["file_key"] = this.file_key;
+      ticket.getTicket(this.airMessage).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.file_key = res.data.IBE.file_key;
@@ -186,22 +192,14 @@ export default {
           }
           console.log(this.ticketList);
           if (this.ticketList.length < 1) {
-            uni.showToast({
-              title: "当日暂无航班信息，请切换其他日期",
-              icon: "none",
-            });
+            this.showDefault = true;
+            this.showReturnBtn = true;
+            this.skeletonNumber = 0;
           }
         } else {
-          uni.showToast({
-            title: "查询航班失败，" + res.msg,
-            icon: "none",
-            mask: true,
-          });
-          setTimeout(() => {
-            uni.switchTab({
-              url: "/pages/index/index",
-            });
-          }, 1000);
+          this.showDefault = true;
+          this.showReturnBtn = false;
+          this.skeletonNumber = 0;
         }
       });
       console.log(this.ticketList);
@@ -239,12 +237,12 @@ export default {
         departureTime: val.date, // 起飞时间
         airline: "", // 航司二字码
       };
-      this.file_key = ''
+      this.file_key = "";
       this.getTicketData(this.airMessage);
     },
     // 时间列表处理
     getDateList() {
-      this.ticketTimeList = []
+      this.ticketTimeList = [];
       let day = moment(this.ticketData.toTime.date).format("YYYY-MM-DD");
       let dayNumber = 0;
       for (let index = 0; index < 7; index++) {
@@ -274,10 +272,10 @@ export default {
     backCalendar() {
       let data = {
         type: false,
-        data: this.airMessage.departureTime
-      }
+        data: this.airMessage.departureTime,
+      };
       uni.navigateTo({
-        url: "/pages/dateSelect/dateSelect?ticketType="+JSON.stringify(data),
+        url: "/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data),
       });
     },
 
@@ -308,9 +306,7 @@ export default {
     },
 
     // 航班信息筛选
-    ticketFilter(){
-      
-    },
+    ticketFilter() {},
 
     // 打开筛选
     openFilter() {
@@ -327,15 +323,15 @@ export default {
       data["from"] = this.ticketData.from.city_name;
       (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
         (data["arrival"] = this.ticketAddress.arrival), // 到达机场三字码
-        console.log('航程信息组装',data);
-        uni.navigateTo({
-          url:
-            "/pages/flightInfo/flightInfo?airData=" +
-            JSON.stringify(data) +
-            "&fileKey=" +
-            this.file_key +
-            "&pageType=false",
-        });
+        console.log("航程信息组装", data);
+      uni.navigateTo({
+        url:
+          "/pages/flightInfo/flightInfo?airData=" +
+          JSON.stringify(data) +
+          "&fileKey=" +
+          this.file_key +
+          "&pageType=false",
+      });
     },
   },
   onHide() {
@@ -348,12 +344,12 @@ export default {
     // 获取时间日期
     if (uni.getStorageSync("time")) {
       let timeData = JSON.parse(uni.getStorageSync("time"));
-      this.airMessage.departureTime = timeData.date
-      this.ticketData.toTime.date = timeData.date
+      this.airMessage.departureTime = timeData.date;
+      this.ticketData.toTime.date = timeData.date;
 
       uni.removeStorageSync("time");
     }
-    this.getTicketData(this.airMessage);
+    this.getTicketData();
     this.getDateList(); // 时间处理
   },
   onLoad(data) {

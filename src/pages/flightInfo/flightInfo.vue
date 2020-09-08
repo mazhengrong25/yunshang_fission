@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-07 18:20:58
+ * @LastEditTime: 2020-09-08 18:30:39
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -13,7 +13,7 @@
       :headerBottom="Number(10)"
       :statusType="roundTripType"
     ></yun-header>
-    <view class="main_content">
+    <view class="main_content" @click="openExpPupop">
       <flight-header
         :flightData="flightData"
         :roundTripFlightData="roundTripFlightData"
@@ -77,7 +77,8 @@
                 :roundTripType="roundTripType"
                 :flightIndex="index"
                 :flightHeader="header"
-                @openExpDialog="openExp"
+                
+                @openExpDialog="openExpPupop"
                 @jumpReservation="jumpReservationBtn"
                 @getPriceData="getPriceData"
               ></flight-item>
@@ -111,7 +112,7 @@
                 :flightIndex="index"
                 :flightHeader="header"
                 :type="true"
-                @openExpDialog="openExp"
+                @openExpDialog="openExpPupop"
                 @jumpReservation="jumpReservationBtn"
                 @getPriceData="getPriceData"
               ></flight-item>
@@ -121,40 +122,7 @@
       </view>
     </view>
 
-    <uni-popup ref="flightExplanation" type="bottom">
-      <view class="flight_explanation">
-        <view class="title">
-          <view class="close_btn" @click="closePopup"></view>
-          <view class="explanation_header">
-            <view
-              @click="checkedExplanationBtn(0)"
-              :class="['header_btn',{'is_active': popupCurrent === 0}]"
-            >产品说明</view>
-            <view
-              @click="checkedExplanationBtn(1)"
-              :class="['header_btn',{'is_active': popupCurrent === 1}]"
-            >退改签</view>
-            <view
-              @click="checkedExplanationBtn(2)"
-              :class="['header_btn',{'is_active': popupCurrent === 2}]"
-            >行李额</view>
-          </view>
-        </view>
-        <view class="flight_explanation_main">
-          <swiper class="explanation_content" @change="popupChange" :current="popupCurrent">
-            <swiper-item>
-              <view class="popup_content_item">{{ruleInfos.back_msg}}</view>
-            </swiper-item>
-            <swiper-item>
-              <view class="popup_content_item">经济舱</view>
-            </swiper-item>
-            <swiper-item>
-              <view class="popup_content_item">公务头等舱</view>
-            </swiper-item>
-          </swiper>
-        </view>
-      </view>
-    </uni-popup>
+    <flight-explanation ref="flightExplanation"></flight-explanation>
 
     <!-- 验价弹窗 -->
     <uni-popup ref="checkPricePopup" type="dialog">
@@ -173,13 +141,15 @@
 <script>
 import moment from "moment";
 moment.locale("zh-cn");
-import flightHeader from "@/components/flight_header.vue";
-import flightItem from "@/components/flight_item.vue";
+import flightHeader from "@/components/flight_header.vue";  // 航程信息
+import flightItem from "@/components/flight_item.vue"; // 舱位信息
+import flightExplanation from "@/components/flight_explanation.vue"; // 舱位信息
 import ticket from "@/api/ticketInquiry.js";
 export default {
   components: {
     flightHeader,
     flightItem,
+    flightExplanation
   },
   data() {
     return {
@@ -239,8 +209,6 @@ export default {
       depCabinHeader: [], // 返程切换头部
       depCabinList: {}, // 返程数据
 
-      popupCurrent: 0, // 弹窗轮播下标
-
       ruleInfos: {}, // 退改签信息
 
       newPrice: "", // 验价新价格
@@ -268,22 +236,14 @@ export default {
     },
     // 关闭产品说明弹窗
     closePopup() {
-      this.$refs.flightExplanation.close();
+      this.$refs.flightExplanation.closeExp();
     },
 
     // 打开退改签说明弹窗
-    openExp(type, data) {
+    openExpPupop(data) {
       console.log(data);
-      this.ruleInfos = data;
-      this.$refs.flightExplanation.open();
-    },
-    // 弹窗轮播标题切换
-    checkedExplanationBtn(index) {
-      this.popupCurrent = index;
-    },
-    // 弹窗轮播切换
-    popupChange(e) {
-      this.popupCurrent = e.detail.current;
+      // this.ruleInfos = data;
+      this.$refs.flightExplanation.openExp();
     },
 
     // 处理往返选中列表
@@ -965,72 +925,6 @@ export default {
         padding: 0 20upx;
         flex: 1;
       }
-    }
-  }
-
-  .flight_explanation {
-    position: relative;
-    &::before {
-      content: "";
-      position: absolute;
-      bottom: -120upx;
-      width: 100%;
-      height: 120upx;
-      background-color: #fff;
-    }
-    .title {
-      height: 140upx;
-      background: rgba(255, 255, 255, 1);
-      border-radius: 80upx 80upx 0 0;
-      position: relative;
-      border-bottom: 2upx solid rgba(217, 225, 234, 1);
-      display: flex;
-      align-items: flex-end;
-      .explanation_header {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        padding: 0 120upx 0 90upx;
-
-        .header_btn {
-          font-size: 30upx;
-          font-weight: bold;
-          color: rgba(51, 51, 51, 1);
-          display: inline-flex;
-          flex-direction: column;
-          align-items: center;
-          &::after {
-            content: "";
-            width: 60upx;
-            height: 8upx;
-            background: rgba(0, 112, 226, 1);
-            opacity: 0;
-            border-radius: 4upx;
-            margin-top: 32upx;
-            transition: opacity 0.3s;
-          }
-          &.is_active {
-            &::after {
-              opacity: 1;
-            }
-            color: rgba(0, 112, 226, 1);
-          }
-        }
-      }
-
-      .close_btn {
-        position: absolute;
-        background: url(@/static/popup_close.png) no-repeat;
-        background-size: contain;
-        width: 30upx;
-        height: 30upx;
-        top: 54upx;
-        right: 44upx;
-      }
-    }
-    .flight_explanation_main {
-      background: rgba(255, 255, 255, 1);
-      padding: 20upx 20upx 60upx;
     }
   }
 

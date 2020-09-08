@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-09-07 17:16:33
+ * @LastEditTime: 2020-09-08 10:48:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -82,7 +82,7 @@ export default {
   methods: {
     // 打开说明弹窗
     openFlightPopop() {
-      this.$emit("openExpDialog", true, this.flightData.ruleInfos);
+      this.$emit("openExpDialog", this.flightData);
       // this.$parent.$refs.flightExplanation.open()
     },
 

@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-07 15:29:03
+ * @LastEditTime: 2020-09-08 15:09:14
  * @LastEditors: wish.WuJunLong
  */
 import Vue from 'vue'
@@ -33,6 +33,9 @@ Vue.component('yunSelector', yunSelector);
 
 import yunConfig from "@/components/global/yun_config.vue"; // 确认信息框
 Vue.component('yunConfig', yunConfig);
+
+import DefaultPage from "@/components/default_page.vue"; // 缺省页
+Vue.component('DefaultPage', DefaultPage);
 
 App.mpType = 'app'
 
