@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-09-01 16:15:45
+ * @LastEditTime: 2020-09-09 14:27:52
  * @LastEditors: wish.WuJunLong
  */
 
@@ -31,6 +31,7 @@ async function getToken() {
 }
 
 const request = async (config, type) => {
+  console.log(config)
   let loginInfo = uni.getStorageSync("loginInfo");
   let currentTime = new Date().getTime();
   let loginTime = new Date(loginInfo.loginTime).getTime();
@@ -38,9 +39,13 @@ const request = async (config, type) => {
     console.log("时间", currentTime, loginTime, currentTime > loginTime);
     await getToken();
   }
-  uni.showLoading({
-    title: "加载中",
-  });
+  if(!config.status){
+    uni.showLoading({
+      title: "加载中",
+      mask: true,
+    });
+  }
+  
   // 处理 apiUrl
   let baseUrl;
   if (type === "user") {
