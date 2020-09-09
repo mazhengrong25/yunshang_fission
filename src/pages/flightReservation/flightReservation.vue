@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-07 10:42:48
+ * @LastEditTime: 2020-09-09 15:59:30
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -61,7 +61,7 @@
             </view>
           </view>
 
-          <view class="add_child_btn">
+          <view class="add_child_btn" @click="jumpAddPassenger()">
             <image class="add_child_btn_icon" src="@/static/add_icon.png" mode="contain" />
             <text>添加儿童/婴儿</text>
           </view>
@@ -201,8 +201,6 @@
         @click="submitOrder()"
       >去支付</button>
     </view>
-
-    <web-view v-if="showStatementWeb" :webview-styles="webviewStyles" :src="statement.url"></web-view>
 
     <!-- 金额明细弹窗 -->
     <uni-popup ref="priceInfoDialog" type="bottom">
@@ -392,12 +390,6 @@ export default {
       trueSubmitOrder: false, // 去支付按钮
 
       showStatementWeb: false, // 外部链接
-      webviewStyles: {
-        // 外部链接进度条样式
-        progress: {
-          color: "#FF3333",
-        },
-      },
 
       chdinf_msg: {}, // 航司儿童婴儿携带数量
     };
@@ -664,6 +656,11 @@ export default {
       this.getTotalPrice();
     },
 
+    // 添加儿童按钮
+    jumpAddPassenger(){
+      uni.navigateTo({url: "/pages/flightReservation/addPassenger" });
+    },
+
     // 获取保险列表
     getPassInsData() {
       insurance.insuranceList().then((res) => {
@@ -706,7 +703,9 @@ export default {
 
     // 打开免责声明 外部链接
     openStatementWeb() {
-      this.showStatementWeb = true;
+     uni.navigateTo({
+        url: '/pages/flightReservation/webView?url='+this.statement.url + '&title='+this.statement.title
+     });
     },
 
     // 打开免责声明弹窗

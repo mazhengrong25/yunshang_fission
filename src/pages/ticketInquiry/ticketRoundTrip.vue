@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-04 14:27:03
+ * @LastEditTime: 2020-09-09 14:36:01
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -64,7 +64,7 @@
               <view class="price">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price}}</text>
+                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</text>
                 <!-- <view class="price_mini">起</view> -->
               </view>
             </view>
@@ -127,7 +127,7 @@
                 <!-- <view class="price_mini">补</view> -->
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price}}</text>
+                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</text>
               </view>
             </view>
           </view>
@@ -247,7 +247,7 @@ export default {
             this.flightList = res.data.IBE.list;
             this.price += this.flightList[this.toActive].ItineraryInfos[
               "经济舱"
-            ][0].cabinPrices.ADT.rulePrice.price;
+            ][0].cabinPrices.ADT.price;
           }
           this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
           console.log(this.flightList);
@@ -297,7 +297,7 @@ export default {
             this.roundFlightList = res.data.IBE.list;
             this.price += this.roundFlightList[this.fromActive].ItineraryInfos[
               "经济舱"
-            ][0].cabinPrices.ADT.rulePrice.price;
+            ][0].cabinPrices.ADT.price;
           }
           this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
           console.log(this.roundFlightList);
@@ -334,9 +334,9 @@ export default {
       }
       this.price =
         this.flightList[this.toActive].ItineraryInfos["经济舱"][0].cabinPrices
-          .ADT.rulePrice.price +
+          .ADT.price +
         this.roundFlightList[this.fromActive].ItineraryInfos["经济舱"][0]
-          .cabinPrices.ADT.rulePrice.price;
+          .cabinPrices.ADT.price;
 
       this.$forceUpdate();
     },
@@ -344,8 +344,8 @@ export default {
     // 国内单程价格排序
     priceSort(p) {
       return (m, n) => {
-        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
-        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
+        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
+        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
         return a - b;
       };
     },

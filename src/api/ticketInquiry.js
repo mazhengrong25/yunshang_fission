@@ -8,11 +8,12 @@
 import request from '@/api/request';
 
 // 获取航班信息
-function getTicket (data) {
+function getTicket (data,status) {
 	return request({
 		method: "POST",
     url: '/api/inland/air',
-    data: data
+		data: data,
+		status: status
 	})
 }
 

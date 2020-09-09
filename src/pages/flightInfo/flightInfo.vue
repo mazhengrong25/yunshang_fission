@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-08 18:30:39
+ * @LastEditTime: 2020-09-09 13:59:13
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -13,7 +13,7 @@
       :headerBottom="Number(10)"
       :statusType="roundTripType"
     ></yun-header>
-    <view class="main_content" @click="openExpPupop">
+    <view class="main_content">
       <flight-header
         :flightData="flightData"
         :roundTripFlightData="roundTripFlightData"
@@ -77,7 +77,6 @@
                 :roundTripType="roundTripType"
                 :flightIndex="index"
                 :flightHeader="header"
-                
                 @openExpDialog="openExpPupop"
                 @jumpReservation="jumpReservationBtn"
                 @getPriceData="getPriceData"
@@ -326,8 +325,6 @@ export default {
         };
       }
       
-
-
         ticket.checkPrice(params).then((res) => {
         if (res.errorcode === 10000) {
           if(type){
@@ -336,6 +333,11 @@ export default {
             this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
           }
         } else{
+          if(type){
+            this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price', '无运价')
+          }else{  
+            this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price', '无运价')
+          }
           uni.showToast({
             title: '获取失败，请稍后重试',
             icon: "none",
@@ -350,8 +352,8 @@ export default {
     },
 
     // 跳转预定页面 - 先验价再跳转
-    jumpReservationBtn(type, data) {
-      console.log(type, data);
+    jumpReservationBtn(data, header,index,type) {
+      console.log(data, header,index,type);
       let params;
       if (this.roundTripBtnActive === 0) {
         // 去程验价数据组装
@@ -371,6 +373,8 @@ export default {
           segments: this.airMessage.airSegments,
           ItineraryInfo: this.airMessage.data.data,
           relatedKey: "11",
+          // routing: JSON.stringify(this.airMessage.data.data.routing),
+          // standardPrice: this.airMessage.data.data.routing.ItineraryInfo.cabinPrices.ADT.standardPrice
         };
       } else {
         // 返程验价数据组装
@@ -390,6 +394,8 @@ export default {
           segments: this.depMessage.airSegments,
           ItineraryInfo: this.depMessage.data.data,
           relatedKey: "11",
+          // routing: JSON.stringify(this.airMessage.data.data.routing),
+          // standardPrice: this.airMessage.data.data.routing.ItineraryInfo.cabinPrices.ADT.standardPrice
         };
       }
 
@@ -400,6 +406,11 @@ export default {
             if (!this.roundTripType) {
               this.checkPrice = res.data.price; // 获取验价价格
               this.checkPriceKey = res.data.keys; // 获取验价key
+              if(type){
+                this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+              }else{  
+                this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+              }
               // 单程验价
               uni.navigateTo({
                 url:
@@ -434,6 +445,11 @@ export default {
               }
               console.log("往返验价");
             }
+             if(type){
+                this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+              }else{  
+                this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+              }
 
             this.$refs.checkPricePopup.open();
           }
@@ -542,6 +558,8 @@ export default {
         airSegments: airData.segments,
         flightData: this.flightData,
       };
+
+      console.log(this.airMessage)
 
       // 组装航班列表信息
       let airDataName = Object.keys(airData.ItineraryInfos);

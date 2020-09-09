@@ -93,7 +93,7 @@ export default {
 
     // 跳转预定页面
     jumpReservation() {
-      this.$emit("jumpReservation", true, this.flightData);
+      this.$emit("jumpReservation", this.flightData, this.flightHeader,this.flightIndex,this.type);
     },
   },
 };

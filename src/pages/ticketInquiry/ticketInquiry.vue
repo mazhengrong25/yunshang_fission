@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-08 15:46:19
+ * @LastEditTime: 2020-09-09 16:09:34
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -20,7 +20,6 @@
         >
           <view class="time_day">{{item.day}}</view>
           <view class="time_number">{{item.number}}</view>
-          <!-- <view class="time_price">&yen; {{item.price}}</view> -->
         </view>
       </view>
       <view class="calendar_btn" @click="backCalendar">
@@ -78,10 +77,10 @@
           <view class="ticket_price">
             <text class="currency">&yen;</text>
             <view
-              v-if="item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price"
-            >{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.rulePrice.price}}</view>
+              v-if="item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price"
+            >{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</view>
             <view v-else class="not_price"></view>
-          </view>
+          </view> 
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
           <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
@@ -97,7 +96,11 @@
         <text></text>
       </view>
 
-      <default-page v-if="showDefault" :showReturn="showReturnBtn" @returnBtn="getTicketData()"></default-page>
+      <default-page v-if="showDefault"  @returnBtn="getTicketData()"></default-page>
+
+      <!-- <view class="next_data" v-if="nextGetData">
+        <view class="next_text">加载中</view>
+      </view> -->
 
       <view class="no_data" v-if="dataListApplyType">
         <text>到底啦</text>
@@ -108,7 +111,7 @@
       <flight-filter @openFilter="openFilter" @filterType="listFilter"></flight-filter>
     </view>
 
-    <flight-filter-dialog ref="filterDialog" @ticketFilterData="ticketFilter"></flight-filter-dialog>
+    <flight-filter-dialog ref="filterDialog" @ticketFilterData="ticketFilter" :flightType="false"></flight-filter-dialog>
   </view>
 </template>
 
@@ -135,11 +138,13 @@ export default {
         arrival: "",
       },
 
+      nextGetData: false, // 下拉加载动画
+
       airMessage: {}, // 首页传参
 
       skeletonNumber: 5, // 骨架屏数量
       showDefault: false,
-      showReturnBtn: false,
+      // showReturnBtn: false,
 
       file_key: "", // av key
 
@@ -173,17 +178,21 @@ export default {
         this.pageNumber += 1;
         this.airMessage["page"] = this.pageNumber;
         this.airMessage["per_page"] = 5;
-        this.getTicketData(this.airMessage);
+        this.getTicketData();
       }
     },
 
     // 获取航班信息
-    getTicketData() {
+    getTicketData(status) {
+      if(status){
+        this.nextGetData = true
+      }
       this.airMessage["file_key"] = this.file_key;
-      ticket.getTicket(this.airMessage).then((res) => {
+      ticket.getTicket(this.airMessage,status).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.file_key = res.data.IBE.file_key;
+          this.showDefault = false;
           if (this.pageNumber > 1) {
             this.ticketList.push.apply(this.ticketList, res.data.IBE.list);
             this.dataListApplyType = res.data.IBE.list.length === 0;
@@ -193,12 +202,14 @@ export default {
           console.log(this.ticketList);
           if (this.ticketList.length < 1) {
             this.showDefault = true;
-            this.showReturnBtn = true;
+            // this.showReturnBtn = true;
             this.skeletonNumber = 0;
           }
+
+          this.nextGetData = false
         } else {
           this.showDefault = true;
-          this.showReturnBtn = false;
+          // this.showReturnBtn = false;
           this.skeletonNumber = 0;
         }
       });
@@ -282,8 +293,8 @@ export default {
     // 国内单程价格排序
     priceSort(p) {
       return (m, n) => {
-        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
-        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT.rulePrice[p];
+        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
+        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
         return a - b;
       };
     },
@@ -692,6 +703,17 @@ export default {
         height: 22upx;
         background: #e5e9f2;
       }
+    }
+
+    .next_data{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20upx;
+      font-size: 28upx;
+      font-weight: 400;
+      color: rgba(175, 185, 196, 1);
+      margin: 30upx 0;
     }
 
     .no_data {

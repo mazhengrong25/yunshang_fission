@@ -2,7 +2,7 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-09-08 09:30:05
+ * @LastEditTime: 2020-09-09 16:18:54
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -10,7 +10,7 @@
     <view class="filter_main">
       <view class="filter_title">
         <view class="close_dialog" @click="closeFilterDialog">取消</view>
-        <view class="close_filter" @click="closeFilterList">清空筛选</view>
+        <view v-if="flightType" class="close_filter" @click="closeFilterList">清空筛选</view>
         <view class="submit_filter" @click="submitFilterBtn">确定</view>
       </view>
 
@@ -20,7 +20,7 @@
       </view>
 
       <view class="filter_content">
-        <view class="content_name_list">
+        <view class="content_name_list" v-if="flightType">
           <view
             :class="['list_name',{'acitce': activeFilterIndex === index}]"
             v-for="(item, index) in filterList.listName"
@@ -33,10 +33,10 @@
           <view
             :class="['takeoff_time_list',{active: takeoffTimeName === index}]"
             @click="takeoffTimeActive(item,index)"
-            v-for="(item, index) in takeoffTime"
+            v-for="(item, index) in checkboxGroup"
             :key="index"
           >
-            <view class="list_name">{{item}}</view>
+            <view class="list_name">{{keyTitle?item[keyTitle]:item}}</view>
             <view class="list_click"></view>
           </view>
         </view>
@@ -53,6 +53,28 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    flightType: {
+      // 筛选状态 true为航班信息筛选弹窗 false为多选框组弹窗
+      type: Boolean,
+      default: () => true
+    },
+    checkboxGroup: {
+      // 多选框组数组
+      type: Array,
+      default: () => [
+        // 起飞时间段选择列表
+        "不限",
+        "上午00:00-12:00",
+        "中午12:00-14:00",
+        "下午14:00-18:00",
+        "晚上18:00-24:00",
+      ],
+    },
+    keyTitle: {
+      // 显示数据键
+      type: String,
+      default: () => ''
+    }
   },
   data() {
     return {
@@ -66,15 +88,6 @@ export default {
       },
 
       activeFilterIndex: 0, // 默认筛选列表名称下标
-
-      takeoffTime: [
-        // 起飞时间段选择列表
-        "不限",
-        "上午00:00-12:00",
-        "中午12:00-14:00",
-        "下午14:00-18:00",
-        "晚上18:00-24:00",
-      ],
 
       takeoffTimeName: 0, // 起飞时间段默认选择
     };
@@ -113,7 +126,9 @@ export default {
 
     // 确认筛选数据
     submitFilterBtn(){
-      this.$emit('ticketFilterData')
+      console.log(this.filterDataList)
+      this.$emit('ticketFilterData',this.filterDataList)
+      this.closeFilterDialog()
     },
   },
 };

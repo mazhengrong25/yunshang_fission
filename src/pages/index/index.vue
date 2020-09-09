@@ -2,8 +2,13 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
+<<<<<<< HEAD
  * @LastEditTime: 2020-09-09 14:18:19
  * @LastEditors: mazhengrong
+=======
+ * @LastEditTime: 2020-09-09 15:43:43
+ * @LastEditors: wish.WuJunLong
+>>>>>>> fad9f212e5f0d6605e9342e048df2645c844c7b3
 --> 
 <template>
   <view class="index">
@@ -30,7 +35,11 @@
             :style="{'height':swiperHeight+'px'}"
             @change="swiperTab"
           >
-            <swiper-item v-for="(item, index) in tabsList" :key="index">
+            <swiper-item
+              v-for="(item, index) in tabsList"
+              :key="index"
+              @touchmove.stop="stopTouchMove"
+            >
               <view class="tabs_center">
                 <ticket-input
                   :ticketType="item"
@@ -262,6 +271,11 @@ export default {
       }
     },
 
+    // 禁止滑动切换
+    stopTouchMove() {
+      return false;
+    },
+
     //滑动切换
     swiperTab(e) {
       this.currentTab = e.detail.current;
@@ -270,6 +284,10 @@ export default {
 
     //点击切换
     clickTab(index) {
+      return uni.showToast({
+        title: "功能开发中,敬请期待",
+        icon: "none",
+      });
       if (this.currentTab === index) {
         return false;
       } else {
@@ -461,7 +479,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  .index_main{
+  .index_main {
     flex: 1;
     overflow-y: auto;
   }

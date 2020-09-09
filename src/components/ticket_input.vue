@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-09-06 09:29:03
+ * @LastEditTime: 2020-09-09 11:12:49
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -140,6 +140,12 @@ export default {
     },
     // 跳转日历
     jumpDate(val){
+      console.log(this.addressForm)
+      // let data = {
+      //   type: false,
+      //   data: this.airMessage.departureTime,
+      // };
+      //  + '&ticketType='  + JSON.stringify(data)
       uni.navigateTo({
         url: "/pages/dateSelect/dateSelect?type="+val,
       });
