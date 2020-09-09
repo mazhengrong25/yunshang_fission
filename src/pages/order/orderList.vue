@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-07 16:03:41
+ * @LastEditTime: 2020-09-09 15:11:30
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -344,6 +344,7 @@ export default {
             } else {
               this.orderList = res.data.data;
             }
+            //  this.orderList.filter(item => fi)
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }

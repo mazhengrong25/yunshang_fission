@@ -2,8 +2,13 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
+<<<<<<< HEAD
+ * @LastEditTime: 2020-09-09 14:18:19
+ * @LastEditors: mazhengrong
+=======
  * @LastEditTime: 2020-09-09 15:43:43
  * @LastEditors: wish.WuJunLong
+>>>>>>> fad9f212e5f0d6605e9342e048df2645c844c7b3
 --> 
 <template>
   <view class="index">
@@ -439,7 +444,7 @@ export default {
         this.airMessage["from"] = cityData.data;
         this.airMessage["from_type"] = cityData.type;
       }
-      console.log(this.airMessage);
+      console.log('airMessage',this.airMessage);
       uni.removeStorageSync("city");
     }
     // 获取时间日期

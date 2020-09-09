@@ -2,8 +2,13 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
+<<<<<<< HEAD
  * @LastEditTime: 2020-09-09 18:28:46
  * @LastEditors: wish.WuJunLong
+=======
+ * @LastEditTime: 2020-09-09 18:24:24
+ * @LastEditors: mazhengrong
+>>>>>>> b2a7fad691d697e8c775874470260dfec1fd8733
 -->
 <template>
   <view class="order_details">
