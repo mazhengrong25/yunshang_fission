@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-09 16:09:34
+ * @LastEditTime: 2020-09-09 17:31:23
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -11,17 +11,18 @@
     <yun-header :statusHeight="iStatusBarHeight" :headerAddress="ticketAddress"></yun-header>
 
     <view class="ticket_header">
-      <view class="ticket_time_list">
-        <view
-          :class="['ticket_time_btn',{'active': item.date === activeTimeNumber}]"
-          @click="clickBtn(item)"
-          v-for="(item, index) in ticketTimeList"
-          :key="index"
-        >
-          <view class="time_day">{{item.day}}</view>
-          <view class="time_number">{{item.number}}</view>
-        </view>
-      </view>
+      <scroll-view scroll-x="true" class="ticket_time_list" :scroll-into-view="timeIndex">
+        <block v-for="(item, index) in ticketTimeList" :key="index">
+          <view
+            :id="item.id"
+            :class="['ticket_time_btn',{'active': item.date === activeTimeNumber},{'is_before': !item.status}]"
+            @click="clickBtn(item,item.status)"
+          >
+            <view class="time_day">{{item.day}}</view>
+            <view class="time_number">{{item.number}}</view>
+          </view>
+        </block>
+      </scroll-view>
       <view class="calendar_btn" @click="backCalendar">
         <image class="calendar_btn_icon" src="@/static/flight_time.png" mode="contain" />日历
       </view>
@@ -80,7 +81,7 @@
               v-if="item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price"
             >{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</view>
             <view v-else class="not_price"></view>
-          </view> 
+          </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
           <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
@@ -96,11 +97,11 @@
         <text></text>
       </view>
 
-      <default-page v-if="showDefault"  @returnBtn="getTicketData()"></default-page>
+      <default-page v-if="showDefault" @returnBtn="getTicketData()"></default-page>
 
       <!-- <view class="next_data" v-if="nextGetData">
         <view class="next_text">加载中</view>
-      </view> -->
+      </view>-->
 
       <view class="no_data" v-if="dataListApplyType">
         <text>到底啦</text>
@@ -111,7 +112,7 @@
       <flight-filter @openFilter="openFilter" @filterType="listFilter"></flight-filter>
     </view>
 
-    <flight-filter-dialog ref="filterDialog" @ticketFilterData="ticketFilter" :flightType="false"></flight-filter-dialog>
+    <flight-filter-dialog ref="filterDialog" @ticketFilterData="ticketFilter"></flight-filter-dialog>
   </view>
 </template>
 
@@ -137,6 +138,8 @@ export default {
         departure: "", // 起飞机场三字码
         arrival: "",
       },
+
+      timeIndex: null, // 日期选择下标
 
       nextGetData: false, // 下拉加载动画
 
@@ -184,11 +187,11 @@ export default {
 
     // 获取航班信息
     getTicketData(status) {
-      if(status){
-        this.nextGetData = true
+      if (status) {
+        this.nextGetData = true;
       }
       this.airMessage["file_key"] = this.file_key;
-      ticket.getTicket(this.airMessage,status).then((res) => {
+      ticket.getTicket(this.airMessage, status).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.file_key = res.data.IBE.file_key;
@@ -206,7 +209,7 @@ export default {
             this.skeletonNumber = 0;
           }
 
-          this.nextGetData = false
+          this.nextGetData = false;
         } else {
           this.showDefault = true;
           // this.showReturnBtn = false;
@@ -239,32 +242,40 @@ export default {
     },
 
     // 选择日期
-    clickBtn(val) {
-      console.log(val);
-      this.activeTimeNumber = val.date;
-      this.airMessage = {
-        departure: this.ticketData.to.city_code, // 起飞机场三字码
-        arrival: this.ticketData.from.city_code, // 到达机场三字码
-        departureTime: val.date, // 起飞时间
-        airline: "", // 航司二字码
-      };
-      this.file_key = "";
-      this.getTicketData(this.airMessage);
+    clickBtn(val, status) {
+      if (status) {
+        console.log(val);
+        this.activeTimeNumber = val.date;
+        this.airMessage = {
+          departure: this.ticketData.to.city_code, // 起飞机场三字码
+          arrival: this.ticketData.from.city_code, // 到达机场三字码
+          departureTime: val.date, // 起飞时间
+          airline: "", // 航司二字码
+        };
+        this.file_key = "";
+        this.getTicketData();
+      }
     },
     // 时间列表处理
     getDateList() {
       this.ticketTimeList = [];
-      let day = moment(this.ticketData.toTime.date).format("YYYY-MM-DD");
+      let day = moment(this.ticketData.toTime.date)
+        .subtract(7, "days")
+        .format("YYYY-MM-DD");
       let dayNumber = 0;
-      for (let index = 0; index < 7; index++) {
+      for (let index = 0; index < 14; index++) {
         this.ticketTimeList.push({
+          id: "id_" + index,
           day: moment(day).add(dayNumber, "d").calendar(null, {
+            lastDay: "昨天",
             sameDay: "今天",
             nextDay: "明天",
             nextWeek: "ddd",
-            sameElse: "dddd",
+            lastWeek: "ddd",
+            sameElse: "ddd",
           }),
           date: moment(this.ticketData.toTime.date)
+            .subtract(7, "days")
             .add(dayNumber, "d")
             .format("YYYY-MM-DD"),
           number:
@@ -273,9 +284,24 @@ export default {
                 "-" +
                 moment(day).add(dayNumber, "d").format("DD")
               : moment(day).add(dayNumber, "d").format("DD"),
+          status:
+            moment().format("YYYY-MM") ===
+            moment(this.ticketData.toTime.date)
+              .subtract(7, "days")
+              .add(dayNumber, "d")
+              .format("YYYY-MM")
+              ? moment().format("DD") <
+                moment(day).add(dayNumber, "d").format("DD")
+              : false,
         });
         dayNumber += 1;
       }
+      this.$nextTick(() => {
+        this.timeIndex = this.ticketTimeList[7].id;
+      });
+
+      this.timeIndex = "";
+      console.log(this.timeIndex, this.ticketTimeList);
       this.activeTimeNumber = this.airMessage.departureTime;
     },
 
@@ -447,9 +473,14 @@ export default {
       text-align: center;
       flex: 1;
       overflow-x: auto;
+      width: 100%;
       height: 100%;
+      padding-top: 18upx;
+      white-space: nowrap;
+      box-sizing: border-box;
+
       .ticket_time_btn {
-        display: flex;
+        display: inline-flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
@@ -466,6 +497,9 @@ export default {
           .time_price {
             color: rgba(255, 0, 0, 1);
           }
+        }
+        &.is_before{
+          opacity: .5;
         }
         .time_day {
           font-size: 18upx;
@@ -705,7 +739,7 @@ export default {
       }
     }
 
-    .next_data{
+    .next_data {
       display: flex;
       align-items: center;
       justify-content: center;

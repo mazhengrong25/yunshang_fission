@@ -2,7 +2,7 @@
  * @Description: 支付结果页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-25 15:35:17
- * @LastEditTime: 2020-08-25 17:45:15
+ * @LastEditTime: 2020-09-09 18:30:27
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -22,7 +22,7 @@
 
           <view class="order_info">
             <view class="info_list" v-for="(item, index) in orderInfo.payId" :key="index">
-              <view class="list_title">{{orderInfo.payId.length > 1 && index === 0? '成人': orderInfo.payId.length > 1 && index === 1? '儿童': ''}}订单编号</view>
+              <view class="list_title">{{orderInfo.payId.length > 1 && index === 0? '成人': orderInfo.payId.length > 1 && index === 1? '儿童': ''}}订单号</view>
               <view class="list_text">{{item}}</view>
             </view>
             <view class="info_list">
@@ -66,11 +66,12 @@ export default {
     },
     // 跳转订单详情页
     jumpOrderDetails() {
-			let data = {
-				order_no: this.orderInfo.payId[0]
-			}
+			let data ={
+        order_no: this.orderInfo.payId[0]
+      }
+			
       uni.reLaunch({
-        url: "/pages/order/orderDetails?orderData=" + JSON.stringify(data),
+        url: "/pages/order/orderinterDetails?listData=" + JSON.stringify(data),
       });
     },
   },

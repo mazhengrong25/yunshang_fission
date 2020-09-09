@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-04 16:19:24
+ * @LastEditTime: 2020-09-09 18:00:11
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -61,8 +61,8 @@
       </view>
       <view :class="['bottom_submit',{is_two_pay: payOrder.length> 1}]">
         <button
-          :class="['submit_pay',{is_disabled: !payBtnStatus}]"
-          :disabled="!payBtnStatus"
+          :class="['submit_pay',{is_disabled: !payPayStatus}]"
+          :disabled="!payPayStatus"
           @click="jumpPay()"
         >{{payOrder.length> 1? '成人支付 &yen;' + priceList[0] :'立即支付'}}</button>
         <button
@@ -132,6 +132,7 @@ export default {
       _inter: {}, // 倒计时
 
       payBtnStatus: true, // 支付按钮
+      payPayStatus: true,
       childPayStatus: false, // 儿童票支付状态
     };
   },
@@ -148,6 +149,7 @@ export default {
             // this.payData.second = 10;
             if (this.payData.second <= 0) {
               this.payBtnStatus = false;
+              this.payPayStatus = false
               uni.showToast({
                 title: "支付超时",
                 time: 2000,
@@ -196,6 +198,7 @@ export default {
         clearInterval(this._inter);
         console.log("结束");
         this.payBtnStatus = false;
+        this.payPayStatus = false
       }
     },
 
@@ -223,12 +226,12 @@ export default {
                 if (payType === 1) {
                   this.childPayStatus = true;
                 } else {
-                  this.payBtnStatus = false;
+                  this.payPayStatus = false;
                 }
-                if (this.childPayStatus && !this.payBtnStatus) {
+                if (this.childPayStatus && !this.payPayStatus) {
                   console.log("成人儿童支付成功");
                   let orderInfo = {
-                    payId: this.payOrde,
+                    payId: this.payOrder,
                     payType: this.payType,
                     price: this.price,
                     payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
@@ -245,9 +248,9 @@ export default {
                   mask: true,
                 });
               } else {  // 单个成人订单
-                this.payBtnStatus = false;
+                this.payPayStatus = false;
                 let orderInfo = {
-                  payId: this.payOrde,
+                  payId: this.payOrder,
                   payType: this.payType,
                   price: this.price,
                   payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
