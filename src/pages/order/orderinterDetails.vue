@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-08 11:01:39
+ * @LastEditTime: 2020-09-09 18:24:24
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -362,7 +362,7 @@ export default {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       let listData = JSON.parse(data.listData);
       this.orderId = listData.order_no;
-      console.log(data);
+      console.log(listData);
       this.orderListType = data.type;
       this.orderHeaderTitle =
         this.orderListType === "0"

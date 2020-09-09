@@ -2,8 +2,8 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-04 16:27:44
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-09 11:40:43
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <view class="city_select">
@@ -237,9 +237,7 @@ export default {
         data: val
       };
       uni.setStorageSync("city", JSON.stringify(data));
-      uni.switchTab({
-        url: "/pages/index/index",
-      });
+      uni.navigateBack();
     },
 
     // 筛选输入框状态

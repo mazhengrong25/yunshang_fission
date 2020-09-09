@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-08 17:51:47
+ * @LastEditTime: 2020-09-09 18:27:07
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -95,23 +95,39 @@
       </view>
       <view class="list_item list_input">
         <view class="item_title">订票员</view>
-        <view class="item_input input-right-arrow">请选择</view>
+        <view class="item_input input-right-arrow" @click="openGroupSelect">请选择</view>
       </view>
     </scroll-view>
 
     <!-- 选择日期 -->
     <yun-selector ref="limitdayPopup" selectType="date" @submitDialog="limitdaySelecctBtn()"></yun-selector>
+    <!-- 订票员选择 -->
+    <!-- <yun-selector
+      ref="groupPopup"
+      :dataList="groupList"
+      :dataItem="'group_name'"
+      @submitDialog="groupPopupSelecctBtn()"
+    ></yun-selector> -->
+    <flight-filter-dialog ref="filterDialog" 
+    @ticketFilterData="ticketFilter"
+    :flightType="false" 
+    :checkboxGroup="nameGroup"
+    ></flight-filter-dialog>
     <!-- 按钮组 -->
     <view class="filter_bottom">
       <view class="bottom_btn reset_btn" @click="resetBtn">重置</view>
 
-      <view class="bottom_btn submit_btn">确定</view>
+      <view class="bottom_btn submit_btn" @click="yesBtn">确定</view>
     </view>
   </view>
 </template>
 
 <script>
+// import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
 export default {
+   components: {
+    // flightFilterDialog,
+  },
   data() {
     return {
       iStatusBarHeight: 0,
@@ -156,15 +172,31 @@ export default {
         end: "",
       },
       citySelect: {
+        // 城市选择
         start: "",
         end: "",
       },
-      pnr: "", // pnr
-      orderNumber: "", // 订单号
-      flightNumber: "", // 航班号
-      // booker: "", // 订票员
 
-      dateType: '', // 日期选择类型
+      airMessage: {
+      to: {},
+      from: {},
+      toTime: {},
+    },
+
+    nameGroup: [
+       //订票员选择
+        "马冬梅",
+        "欧阳娜娜",
+        "Lisa",
+        "GD",
+    ],
+
+    pnr: "", // pnr
+    orderNumber: "", // 订单号
+    flightNumber: "", // 航班号
+    // booker: "", // 订票员
+
+    dateType: '', // 日期选择类型
     };
   },
   methods: {
@@ -203,6 +235,24 @@ export default {
       // this.booker = "";
     },
 
+    // 确定筛选
+    yesBtn() {
+      // 判断pnr 订票号 航班号 出发时间 结束时间
+        if (
+        !this.pnr ||
+        !this.orderNumber ||
+        !this.flightNumber ||
+        !this.timeLimit.start ||
+        !this.timeLimit.end 
+      ) {
+        return uni.showToast({
+          title: "请将信息填写完整",
+          icon: "none",
+        });
+      }
+
+    },
+
     // 打开时间范围日期选择框
     openlimitdaySelector(type) {
       this.dateType = type
@@ -230,7 +280,16 @@ export default {
        uni.navigateTo({
         url: "/pages/citySelect/citySelect?type=from",
       });
-    }
+    },
+
+    // 打开筛选
+    openFilterDialog() {
+      this.$refs.filterDialog.open();
+    },
+    // 关闭弹出框
+    closeFilterDialog() {
+      this.$refs.filterDialog.close();
+    },
 
   },
   onLoad() {
@@ -239,26 +298,27 @@ export default {
 
   onShow() {
   // 获取城市信息
-  // if (uni.getStorageSync("city")) {
-  //   let cityData = JSON.parse(uni.getStorageSync("city"));
-  //   if (cityData.status === "to") {
-  //     this.addressForm.to =
-  //       cityData.type === "city"
-  //         ? cityData.data.city_name
-  //         : cityData.data.air_port_name;
-  //     this.airMessage["to"] = cityData.data;
-  //     this.airMessage["to_type"] = cityData.type;
-  //   } else if (cityData.status === "from") {
-  //     this.addressForm.from =
-  //       cityData.type === "city"
-  //         ? cityData.data.city_name
-  //         : cityData.data.air_port_name;
-  //     this.airMessage["from"] = cityData.data;
-  //     this.airMessage["from_type"] = cityData.type;
-  //   }
-  //   console.log(this.airMessage);
-  //   uni.removeStorageSync("city");
-  // }
+  if (uni.getStorageSync("city")) {
+    let cityData = JSON.parse(uni.getStorageSync("city"));
+    console.log(JSON.parse(uni.getStorageSync("city")))
+    if (cityData.status === "to") {
+      this.citySelect.start =
+        cityData.type === "city"
+          ? cityData.data.city_name
+          : cityData.data.air_port_name;
+          this.airMessage["to"] = cityData.data;
+          this.airMessage["to_type"] = cityData.type;
+    } else if (cityData.status === "from") {
+      this.citySelect.end =
+        cityData.type === "city"
+          ? cityData.data.city_name
+          : cityData.data.air_port_name;
+          this.airMessage["from"] = cityData.data;
+          this.airMessage["from_type"] = cityData.type;
+    }
+    console.log(this.airMessage);
+    uni.removeStorageSync("city");
+  }
 },
 };
 </script>
