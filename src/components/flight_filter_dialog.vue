@@ -2,8 +2,8 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-09-09 16:18:54
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-10 11:28:40
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <uni-popup ref="filterPopup" type="bottom" class="filter_dialog">
@@ -127,7 +127,7 @@ export default {
     // 确认筛选数据
     submitFilterBtn(){
       console.log(this.filterDataList)
-      this.$emit('ticketFilterData',this.filterDataList)
+      this.$emit('ticketFilterData',this.flightType?this.filterDataList:this.checkboxGroup[this.takeoffTimeName])
       this.closeFilterDialog()
     },
   },
