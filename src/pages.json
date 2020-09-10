@@ -181,7 +181,10 @@
       }
     },
     {
-      "path": "pages/flightReservation/webView",
+      "path": "pages/flightReservation/webView"
+    },
+    {
+      "path": "pages/flightReservation/restrictedNotice",
       "style": {
         "navigationStyle": "custom"
       }

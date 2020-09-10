@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-07 16:19:53
+ * @LastEditTime: 2020-09-10 16:15:15
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -94,6 +94,7 @@ export default {
               ? i + 1 === Number(moment().format("D"))
               : false,
           checked: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)) === this.ticketData.data,
+          roundChecked: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)) === this.ticketData.roundData
         });
       }
       this.dateList.push({
@@ -158,7 +159,7 @@ export default {
   
     // 组装单程日期更换
     this.ticketData = data.ticketType?JSON.parse(data.ticketType):{}
-    console.log(this.ticketData)
+    console.log('数据',this.ticketData)
    
 
     if (data.status) {
@@ -169,14 +170,11 @@ export default {
         type: data.type
       };
     }
-    console.log(this.roundTripStatus);
     if (this.dateList.length < 2) {
       for (let index = 0; index < 2; index++) {
         this.getDateList();
       }
     }
-
-     console.log(this.dateList)
 
   },
 };

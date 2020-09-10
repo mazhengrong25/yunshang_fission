@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-09 15:59:30
+ * @LastEditTime: 2020-09-10 18:09:37
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -14,11 +14,17 @@
     ></yun-header>
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="flight_reservation_main">
       <flight-header
+        v-if="showData"
         :flightInfo="false"
         :flightData="flightData"
         :roundTripType="roundTripType"
         :roundTripFlightData="flightRoundData"
       ></flight-header>
+      <view v-else class="not_flight_data">
+        <text></text>
+        <text></text>
+        <view></view>
+      </view>
 
       <view class="passenger_box box-shadow-style">
         <view class="passenger_title">
@@ -31,17 +37,29 @@
           <view class="add_passenger_btn" @click="jumpPassengerPage">添加乘机人</view>
         </view>
 
-        <view class="passenger_main" v-if="passengerList.length > 0">
-          <view class="main_list" v-for="(item, index) in passengerList" :key="index">
+        <!-- <uni-swipe-action class="passenger_main" v-if="passengerList.length > 0">
+          <uni-swipe-action-item class="main_list" v-for="(item, index) in passengerList" :key="index">
+            
+          </uni-swipe-action-item>
+        </uni-swipe-action>-->
+
+        <uni-swipe-action class="passenger_main" v-if="passengerList.length > 0">
+          <uni-swipe-action-item
+            :class="['main_list',{show: item.show}]"
+            v-for="(item, index) in passengerList"
+            :key="index"
+          >
             <view class="remove_btn" @click="removePassenger(item)"></view>
             <view class="list_message">
               <view class="message_info">
                 <view class="info_left">
                   <view class="type">{{item.type}}票</view>
-                  <view class="user_name">{{item.name || item.en_first_name + '/' + item.en_last_name}}</view>
+                  <view
+                    class="user_name"
+                  >{{item.name || item.en_first_name + '/' + item.en_last_name}}</view>
                   <view class="position">{{item.group?item.group:'未分组'}}</view>
                 </view>
-                <view class="edit_btn"></view>
+                <view class="edit_btn" @click="flightEdit(item,index)"></view>
               </view>
 
               <view class="message_info">
@@ -59,13 +77,21 @@
                 </view>
               </view>
             </view>
-          </view>
+            <template v-slot:right>
+              <view class="option_box">
+                <view class="delete_btn" @click="removePassenger(item)">
+                  <image class="delete_btn_icon" src="@/static/delete_btn.png" mode="contain" />
+                  <text>删除</text>
+                </view>
+              </view>
+            </template>
+          </uni-swipe-action-item>
 
           <view class="add_child_btn" @click="jumpAddPassenger()">
             <image class="add_child_btn_icon" src="@/static/add_icon.png" mode="contain" />
             <text>添加儿童/婴儿</text>
           </view>
-        </view>
+        </uni-swipe-action>
       </view>
 
       <view class="order_passenger_message box-shadow-style">
@@ -180,9 +206,9 @@
 
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
-        <text @click="openDiscDialog()">《关于规范互联网机票销售行为的通知》</text>
+        <text @click="openDiscDialog(true)">《关于规范互联网机票销售行为的通知》</text>
         <text @click="openStatementWeb()">《{{statement.title}}》</text>
-        <text>《锂电池航空运输规范》</text>
+        <text @click="openDiscDialog(false)">《锂电池航空运输规范》</text>
       </view>
     </scroll-view>
 
@@ -313,6 +339,8 @@ export default {
       roundRelatedKey: "", // 往返key
       roundPrice: null, // 往返价格
 
+      showData: false, // 数据加载
+
       headerAddress: {
         // 导航栏信息
         to: "重庆",
@@ -358,6 +386,8 @@ export default {
 
       passengerList: [], // 乘机人列表
       passengerNumber: {}, // 乘机人数量
+
+      showRemove: "none", // 自动展开
 
       orderPassenger: {
         // 订单联系人信息
@@ -462,17 +492,21 @@ export default {
           };
 
           this.chdinf_msg = res.data.chdinf_msg; // 航司儿童婴儿携带数量组装
+
+          this.showData = true
         } else {
           uni.showToast({
             title: res.data,
             icon: "none",
             mask: true,
+            duration: 3000
           });
           setTimeout(() => {
             uni.navigateBack();
-          }, 2500);
+          }, 3000);
         }
       });
+      
     },
 
     // 往返预定
@@ -591,15 +625,18 @@ export default {
 
             this.chdinf_msg = res.data.departure_chdinf_msg; // 航司儿童婴儿携带数量组装
             this.round_chdinf_msg = res.data.arrive_chdinf_msg; // 航司儿童婴儿携带数量组装
+
+            this.showData = true
           } else {
             uni.showToast({
               title: res.data,
               icon: "none",
               mask: true,
+              duration: 3000
             });
             setTimeout(() => {
               uni.navigateBack();
-            }, 2500);
+            }, 3000);
           }
         });
     },
@@ -637,8 +674,21 @@ export default {
       uni.navigateTo({
         url:
           "/pages/flightReservation/passengerList?chdinfNumber=" +
-          JSON.stringify(this.chdinf_msg) + '&editPassengerList=' + JSON.stringify(this.passengerList),
+          JSON.stringify(this.chdinf_msg) +
+          "&editPassengerList=" +
+          JSON.stringify(this.passengerList),
       });
+    },
+
+    // 展开删除按钮
+    openDelete(data, index) {
+      // console.log(this.$refs.mainListItem[index]);
+      this.$set(this.passengerList[index], "show", true);
+      console.log(this.passengerList);
+      this.$forceUpdate();
+      // this.passengerList[index].show = true;
+      // this.$refs.mainListItem[index].autoClose = false;
+      // this.$refs.mainListItem[index].show = "right";
     },
 
     // 移除乘机人
@@ -656,9 +706,20 @@ export default {
       this.getTotalPrice();
     },
 
+    // 修改乘机人
+    flightEdit(data, index) {
+      uni.navigateTo({
+        url:
+          "/pages/flightReservation/addPassenger?type=edit&data=" +
+          JSON.stringify(data) +
+          "&status=true",
+      });
+      console.log(data, index);
+    },
+
     // 添加儿童按钮
-    jumpAddPassenger(){
-      uni.navigateTo({url: "/pages/flightReservation/addPassenger" });
+    jumpAddPassenger() {
+      uni.navigateTo({ url: "/pages/flightReservation/addPassenger" });
     },
 
     // 获取保险列表
@@ -703,13 +764,26 @@ export default {
 
     // 打开免责声明 外部链接
     openStatementWeb() {
-     uni.navigateTo({
-        url: '/pages/flightReservation/webView?url='+this.statement.url + '&title='+this.statement.title
-     });
+      uni.navigateTo({
+        url:
+          "/pages/flightReservation/webView?url=" +
+          this.statement.url +
+          "&title=" +
+          this.statement.title,
+      });
     },
 
     // 打开免责声明弹窗
-    openDiscDialog(type) {},
+    openDiscDialog(type) {
+      if(type){
+
+      }else {
+        uni.navigateTo({
+        url:
+          "/pages/flightReservation/restrictedNotice"
+      });
+      }
+    },
 
     // 打开金额明细弹窗
     openOrderInfo() {
@@ -828,11 +902,11 @@ export default {
           console.log(res);
           if (res.errorcode === 10000) {
             let orderId = [];
-            let priceList = []
+            let priceList = [];
             let priceNumber = 0;
             res.data.forEach((item) => {
               orderId.push(item.order_no);
-              priceList.push(item.need_pay_amount)
+              priceList.push(item.need_pay_amount);
               priceNumber += item.need_pay_amount;
             });
 
@@ -844,10 +918,11 @@ export default {
                 JSON.stringify(this.flightData) +
                 "&flightRoundData=" +
                 JSON.stringify(this.flightRoundData) +
-                "&priceList=" + JSON.stringify(priceList) +
+                "&priceList=" +
+                JSON.stringify(priceList) +
                 "&price=" +
-                priceNumber + '&type=true'
-                
+                priceNumber +
+                "&type=true",
             });
             console.log(res.data, this.flightData);
           } else {
@@ -869,7 +944,7 @@ export default {
         ticket.createOrder(data).then((res) => {
           if (res.errorcode === 10000) {
             let orderId = [];
-            let priceList = []
+            let priceList = [];
             let priceNumber = 0;
             res.data.forEach((item) => {
               orderId.push(item.order_no);
@@ -883,9 +958,11 @@ export default {
                 JSON.stringify(orderId) +
                 "&flightData=" +
                 JSON.stringify(this.flightData) +
-                "&priceList=" + JSON.stringify(priceList) +
+                "&priceList=" +
+                JSON.stringify(priceList) +
                 "&price=" +
-                priceNumber +'&type=false'
+                priceNumber +
+                "&type=false",
             });
             console.log(res.data, this.flightData);
           } else {
@@ -903,6 +980,7 @@ export default {
     let passenger = uni.getStorageSync("passengerList");
     if (passenger) {
       this.passengerList = JSON.parse(passenger);
+      // this.passengerList.forEach((item) => (item.show = false));
       this.passengerNumber = {
         adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量
         chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
@@ -911,6 +989,20 @@ export default {
 
       this.getTotalPrice();
       uni.removeStorageSync("passengerList");
+    }
+
+    let editPassenger = uni.getStorageSync("editPassengerList");
+    if (editPassenger) {
+      editPassenger = JSON.parse(editPassenger);
+      this.passengerList.forEach((item, index) => {
+        if (item.id === editPassenger.id) {
+          this.passengerList[index] = editPassenger;
+        }
+      });
+      uni.removeStorageSync("editPassengerList");
+      this.$forceUpdate();
+      console.log(editPassenger);
+      console.log(this.passengerList);
     }
   },
   onLoad(data) {
@@ -950,6 +1042,52 @@ export default {
   .flight_reservation_main {
     flex: 1;
     height: calc(100% - 400rpx);
+    .not_flight_data {
+      border-radius: 20rpx;
+      background: #ffffff;
+      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+      padding: 30rpx 20rpx 22rpx;
+      margin: 0 20rpx 20rpx;
+      height: 144upx;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      &::before {
+        content: "";
+        display: block;
+        width: 44upx;
+        height: 200%;
+        position: absolute;
+        top: -30%;
+        transform: rotate(30deg);
+        background: #fff;
+        left: -30%;
+        animation: skeleton 3s infinite;
+        -webkit-animation: skeleton 3s infinite;
+      }
+      @keyframes skeleton {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 120%;
+        }
+      }
+      text{
+        display: block;
+        width: 80%;
+        height: 28upx;
+        background: #e5e9f2;
+        margin-bottom: 10upx;
+      }
+      view{
+        width: 80%;
+        height: 40upx;
+        margin: auto auto 0;
+        background: #e5e9f2;
+      }
+    }
   }
 
   .box-shadow-style {
@@ -979,10 +1117,20 @@ export default {
       }
     }
     .passenger_main {
-      padding-top: 44upx;
+      width: 100%;
       .main_list {
         display: flex;
         align-items: center;
+        width: 100%;
+        position: relative;
+        box-sizing: border-box;
+        /deep/.uni-swipe {
+          width: 100%;
+        }
+
+        &:first-child {
+          margin-top: 44upx;
+        }
         &:not(:nth-last-child(2)) {
           margin-bottom: 40upx;
         }
@@ -992,9 +1140,9 @@ export default {
           background-size: contain;
           width: 36upx;
           height: 36upx;
-          margin-right: 16upx;
           flex-shrink: 0;
-          margin-top: -40upx;
+          margin-right: 16upx;
+          margin-top: 40upx;
         }
         .list_message {
           flex: 1;
@@ -1048,6 +1196,28 @@ export default {
                 font-weight: bold;
                 color: rgba(42, 42, 42, 1);
               }
+            }
+          }
+        }
+        .option_box {
+          width: 180upx;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .delete_btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 26upx;
+            font-weight: 400;
+            color: rgba(255, 0, 0, 1);
+            .delete_btn_icon {
+              width: 45upx;
+              height: 45upx;
+              object-fit: contain;
+              margin-bottom: 8upx;
             }
           }
         }

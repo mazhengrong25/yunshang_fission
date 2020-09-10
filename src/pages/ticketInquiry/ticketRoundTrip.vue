@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-09 14:36:01
+ * @LastEditTime: 2020-09-10 16:23:01
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -10,11 +10,12 @@
     <!-- 导航栏 -->
     <yun-header :statusHeight="iStatusBarHeight" :statusType="true" :headerAddress="ticketAddress"></yun-header>
     <!-- 往返时间 -->
-    <view class="header_time">
+    <view class="header_time" v-if="!showDefaultType">
       <round-trip-header :timeData="timeData" @jumpDatePage="jumpDatePage"></round-trip-header>
     </view>
     <!-- 航班列表 -->
     <scroll-view
+      v-if="!showDefaultType"
       :enable-back-to-top="true"
       class="flight_list"
       :scroll-y="true"
@@ -71,7 +72,7 @@
           </view>
 
           <!-- 骨架屏 -->
-          <view class="flight_skeleton" v-for="i in flightList.length < 1?5:0" :key="i">
+          <view class="flight_skeleton" v-for="i in flightList.length < 1?skeletonNumber:0" :key="i">
             <view class="top">
               <text></text>
               <text></text>
@@ -133,7 +134,7 @@
           </view>
 
           <!-- 骨架屏 -->
-          <view class="flight_skeleton" v-for="i in roundFlightList.length < 1? 5 :0" :key="i">
+          <view class="flight_skeleton" v-for="i in roundFlightList.length < 1? skeletonRoundNumber :0" :key="i">
             <view class="top">
               <text></text>
               <text></text>
@@ -148,13 +149,15 @@
       </view>
     </scroll-view>
 
-    <view class="filter">
+    <default-page style="flex: 1" v-if="showDefault" @returnBtn="getTicketData()" :defaultType="showDefaultType"></default-page>
+
+    <view class="filter" v-if="!showDefaultType">
       <flight-filter @openFilter="openFilter" :filterMini="true" @filterType="listFilter"></flight-filter>
     </view>
 
     <flight-filter-dialog ref="filterDialog" :directFlight="true"></flight-filter-dialog>
 
-    <view class="bottom_bar">
+    <view class="bottom_bar" v-if="!showDefaultType">
       <view class="left_message">
         <view class="price_box">
           <text>&yen;</text>
@@ -195,6 +198,9 @@ export default {
 
       flightList: [], // 航班信息
 
+      skeletonNumber: 5,
+      skeletonRoundNumber: 5,
+
       pageNumber: 1, // 分页页面
       dataListApplyType: false, // 是否还有新page
       dataRoundListApplyType: false, // 往返是否还有新page
@@ -211,6 +217,10 @@ export default {
       roundFlightKey: "", // 返程key
 
       submitBtnType: true, // 下一步按钮状态
+
+      
+      showDefault: false,  // 报错页面
+      showDefaultType: '', // 报错类型
     };
   },
   methods: {
@@ -264,11 +274,9 @@ export default {
             mask: true,
             duration: 4000,
           });
-          setTimeout(() => {
-            uni.switchTab({
-              url: "/pages/index/index",
-            });
-          }, 2000);
+          this.showDefault = true;
+          this.showDefaultType = '404';
+          this.skeletonNumber = 0;
         }
       });
       console.log("去程", this.flightList);
@@ -314,11 +322,9 @@ export default {
             mask: true,
             duration: 4000,
           });
-          setTimeout(() => {
-            uni.switchTab({
-              url: "/pages/index/index",
-            });
-          }, 2000);
+          this.showDefault = true;
+          this.showDefaultType = '404';
+          this.skeletonRoundNumber = 0;
         }
       });
       console.log("返程", this.roundFlightList);

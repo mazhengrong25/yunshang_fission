@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-09-07 11:10:49
+ * @LastEditTime: 2020-09-10 14:21:36
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -268,6 +268,8 @@ export default {
 
       addPassengerType: false, // 旅客状态 true国际， false国内
 
+      flightEdit: false, // 航程预定内修改
+
       passenger: {
         sex: "男",
       },
@@ -478,6 +480,7 @@ export default {
         data["cert_type"] = item.cert_type;
         data["cert_no"] = item.cert_no;
         data["group_id"] = this.group.id;
+        data["group"] = this.group.group_name
         data["nationality"] = "CN";
         if (item.cert_type !== "护照") {
           delete data.en_first_name;
@@ -495,6 +498,9 @@ export default {
               setTimeout(() => {
                 uni.navigateBack();
               }, 500);
+              if(this.flightEdit){
+                 uni.setStorageSync("editPassengerList", JSON.stringify(data));
+              }
             } else {
               uni.showToast({
                 title: res.msg,
@@ -527,7 +533,7 @@ export default {
 
   onLoad(val) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-
+    this.flightEdit = val.status?true:false
     console.log(val.type);
     if (val.type === "edit") {
       this.pageType = val.type === "edit";
@@ -540,6 +546,9 @@ export default {
         phone: this.pageData.phone, // 手机号
         birthday: this.pageData.birthday,
         sex: this.pageData.sex === 1 ? "男" : "女",
+        id: this.pageData.id,
+        type: this.pageData.type,
+        checked: this.pageData.checked || false
       };
       this.certificateList[0] = {
         cert_type: this.pageData.cert_type, // 证件类型
@@ -550,7 +559,7 @@ export default {
         id: this.pageData.group_id,
       };
     }
-    console.log(this.pageType, this.pageData,this.group);
+    console.log(this.passenger);
 
     this.getGroupList(); // 获取分组列表
   },

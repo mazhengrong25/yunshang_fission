@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-09 17:31:23
+ * @LastEditTime: 2020-09-10 15:26:51
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -10,7 +10,7 @@
   <view class="ticket_inquiry">
     <yun-header :statusHeight="iStatusBarHeight" :headerAddress="ticketAddress"></yun-header>
 
-    <view class="ticket_header">
+    <view class="ticket_header" v-if="!showDefaultType">
       <scroll-view scroll-x="true" class="ticket_time_list" :scroll-into-view="timeIndex">
         <block v-for="(item, index) in ticketTimeList" :key="index">
           <view
@@ -97,7 +97,7 @@
         <text></text>
       </view>
 
-      <default-page v-if="showDefault" @returnBtn="getTicketData()"></default-page>
+      <default-page v-if="showDefault" @returnBtn="getTicketData()" :defaultType="showDefaultType"></default-page>
 
       <!-- <view class="next_data" v-if="nextGetData">
         <view class="next_text">加载中</view>
@@ -146,7 +146,8 @@ export default {
       airMessage: {}, // 首页传参
 
       skeletonNumber: 5, // 骨架屏数量
-      showDefault: false,
+      showDefault: false,  // 报错页面
+      showDefaultType: '', // 报错类型
       // showReturnBtn: false,
 
       file_key: "", // av key
@@ -212,8 +213,9 @@ export default {
           this.nextGetData = false;
         } else {
           this.showDefault = true;
-          // this.showReturnBtn = false;
+          this.showDefaultType = '404';
           this.skeletonNumber = 0;
+          this.$forceUpdate()
         }
       });
       console.log(this.ticketList);

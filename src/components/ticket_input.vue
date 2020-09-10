@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-09-09 11:12:49
+ * @LastEditTime: 2020-09-10 16:17:05
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -91,7 +91,7 @@
   </view>
 </template>
 
-<script> 
+<script>
 export default {
   props: {
     ticketType: {
@@ -139,17 +139,30 @@ export default {
       this.$emit("closeFromBtn", true);
     },
     // 跳转日历
-    jumpDate(val){
-      console.log(this.addressForm)
-      // let data = {
-      //   type: false,
-      //   data: this.airMessage.departureTime,
-      // };
-      //  + '&ticketType='  + JSON.stringify(data)
+    jumpDate(val) {
+      console.log(this.addressForm);
+      let data;
+      if (val === "start") {
+        data = {
+          type: false,
+          data: this.addressForm.toDate,
+        };
+      } else {
+        data = {
+          type: true,
+          data: this.addressForm.toDate,
+          roundData: this.addressForm.fromDate
+        };
+      }
+
       uni.navigateTo({
-        url: "/pages/dateSelect/dateSelect?type="+val,
+        url:
+          "/pages/dateSelect/dateSelect?type=" +
+          val +
+          "&ticketType=" +
+          JSON.stringify(data),
       });
-    }
+    },
   },
 };
 </script>

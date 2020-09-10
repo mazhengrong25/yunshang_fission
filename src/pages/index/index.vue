@@ -2,13 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-09 14:18:19
- * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-09-09 15:43:43
+ * @LastEditTime: 2020-09-10 16:09:50
  * @LastEditors: wish.WuJunLong
->>>>>>> fad9f212e5f0d6605e9342e048df2645c844c7b3
 --> 
 <template>
   <view class="index">
@@ -234,8 +229,10 @@ export default {
         multi_pass_from: "武汉", // 多程到达地
         toTime: "", // 出发时间
         toDay: "明天",
+        toDate: '',
         fromTime: "", // 到达时间
         fromDay: "周三", // 到达日期
+        fromDate: ''
       },
 
       passengerForm: {
@@ -454,13 +451,17 @@ export default {
         this.addressForm.toTime = timeData.month;
         this.addressForm.toDay = timeData.week;
         this.airMessage["toTime"] = timeData;
+        this.addressForm["toDate"] = timeData.date;
       } else if (timeData.status === "end") {
         this.addressForm.fromTime = timeData.month;
         this.addressForm.fromDay = timeData.week;
         this.airMessage["fromTime"] = timeData;
+        this.addressForm["fromDate"] = timeData.date;
       }
 
-      console.log(this.addressForm);
+      this.$forceUpdate()
+
+      console.log('时间返回',timeData);
       uni.removeStorageSync("time");
     }
   },
