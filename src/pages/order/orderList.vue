@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-09 15:11:30
+ * @LastEditTime: 2020-09-10 18:31:29
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -293,6 +293,8 @@ export default {
       orderListType: "", // 订单列表页 类型
       orderHeaderTitle: "", // 订单列表页头部标题
       innerList: [], //国内列表
+
+      orderListFilter: {}, // 筛选条件
     };
   },
   methods: {
@@ -302,7 +304,9 @@ export default {
       this.orderPageNumber = 1;
       this.orderList = [];  //国外
       this.innerList = [];  //国内
-      this.getOrderList();
+      if(JSON.stringify(this.orderListFilter) !== '{}'){
+        this.getOrderList();
+      }
     },
 
     // 取消订单
@@ -344,7 +348,7 @@ export default {
             } else {
               this.orderList = res.data.data;
             }
-            //  this.orderList.filter(item => fi)
+              // this.orderList.filter(item => fi)
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
@@ -469,6 +473,50 @@ export default {
         : "";
     console.log("orderHeaderTitle", this.orderHeaderTitle);
     this.getOrderList();
+  },
+  onShow(){
+    this.orderListFilter = uni.getStorageSync('orderListFilter')
+    if(this.orderListFilter){
+      this.orderListFilter = JSON.parse(this.orderListFilter)
+      //pnr筛选
+      if(this.orderListFilter.pnr){ 
+        this.innerList = this.innerList.filter(item =>item.pnr_code === this.orderListFilter.pnr)
+      }
+      //订单编号筛选
+      if(this.orderListFilter.orderNumber){ 
+        this.innerList = this.innerList.filter(item =>item.order_no === this.orderListFilter.orderNumber)
+      }
+
+      //航班号筛选
+      if(this.orderListFilter.flightNumber){
+        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].flight_no === this.orderListFilter.flightNumber)
+      }
+
+      //订票员  选择框
+      if(this.orderListFilter.booker){
+        this.innerList = this.innerList.filter(item =>item.book_user === this.orderListFilter.booker)
+      }
+
+      //出发城市  
+      if(this.orderListFilter.Citystart){
+        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].arrive_msg.air_port_name === this.orderListFilter.Citystart)
+      }
+
+      //日始时间筛选
+      if(this.orderListFilter.Timestart){
+        this.innerList = this.innerList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timestart)
+      }
+
+       //日止时间筛选
+      if(this.orderListFilter.Timend){
+        this.innerList = this.innerList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timend)
+      }
+    
+
+
+      uni.removeStorageSync('orderListFilter')
+    }
+
   },
 };
 </script>

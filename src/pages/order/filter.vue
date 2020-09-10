@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-09 18:27:07
+ * @LastEditTime: 2020-09-10 17:51:02
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -95,42 +95,42 @@
       </view>
       <view class="list_item list_input">
         <view class="item_title">订票员</view>
-        <view class="item_input input-right-arrow" @click="openGroupSelect">请选择</view>
+        <view class="item_input input-right-arrow" @click="openFilterDialog">
+          <text v-if="booker">{{booker}}</text>
+          <text v-else>请选择</text>
+        </view> 
       </view>
     </scroll-view>
 
     <!-- 选择日期 -->
     <yun-selector ref="limitdayPopup" selectType="date" @submitDialog="limitdaySelecctBtn()"></yun-selector>
-    <!-- 订票员选择 -->
-    <!-- <yun-selector
-      ref="groupPopup"
-      :dataList="groupList"
-      :dataItem="'group_name'"
-      @submitDialog="groupPopupSelecctBtn()"
-    ></yun-selector> -->
+    <!-- 订票员选择   @ticketFilterData="ticketFilter"-->
     <flight-filter-dialog ref="filterDialog" 
-    @ticketFilterData="ticketFilter"
+    @ticketFilterData="submitFilterBtn"
     :flightType="false" 
     :checkboxGroup="nameGroup"
     ></flight-filter-dialog>
+
     <!-- 按钮组 -->
     <view class="filter_bottom">
       <view class="bottom_btn reset_btn" @click="resetBtn">重置</view>
 
-      <view class="bottom_btn submit_btn" @click="yesBtn">确定</view>
+      <button :class="['bottom_btn submit_btn',{disabled: submitBtnStatus}]" :disabled="submitBtnStatus" @click="yesBtn">确定</button>
     </view>
   </view>
 </template>
 
 <script>
-// import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
+import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
 export default {
    components: {
-    // flightFilterDialog,
+    flightFilterDialog,
   },
   data() {
     return {
       iStatusBarHeight: 0,
+
+      submitBtnStatus: false, // 确认按钮状态
 
       dateFilter: [
         // 日期条件筛选列表
@@ -176,25 +176,24 @@ export default {
         start: "",
         end: "",
       },
-
       airMessage: {
       to: {},
       from: {},
       toTime: {},
     },
-
-    nameGroup: [
-       //订票员选择
-        "马冬梅",
-        "欧阳娜娜",
-        "Lisa",
-        "GD",
+      nameGroup: [
+        //订票员选择
+          "马冬梅",
+          "欧阳娜娜",
+          "Lisa",
+          "GD",
     ],
 
+  
     pnr: "", // pnr
     orderNumber: "", // 订单号
     flightNumber: "", // 航班号
-    // booker: "", // 订票员
+    booker: "", // 订票员
 
     dateType: '', // 日期选择类型
     };
@@ -232,25 +231,24 @@ export default {
       this.pnr = "";
       this.orderNumber = "";
       this.flightNumber = "";
-      // this.booker = "";
+      this.booker = "";
     },
 
     // 确定筛选
     yesBtn() {
-      // 判断pnr 订票号 航班号 出发时间 结束时间
-        if (
-        !this.pnr ||
-        !this.orderNumber ||
-        !this.flightNumber ||
-        !this.timeLimit.start ||
-        !this.timeLimit.end 
-      ) {
-        return uni.showToast({
-          title: "请将信息填写完整",
-          icon: "none",
-        });
+       
+      let data = {
+        pnr: this.pnr, //pnr
+        orderNumber: this.orderNumber, //订单号
+        flightNumber: this.flightNumber, // 航班号
+        booker: this.booker,  //订票员
+        Citystart: this.citySelect.start, //出发城市
+        Timestart: this.timeLimit.start, //日始时间
+        Timend: this.timeLimit.end, //日止时间
       }
-
+    console.log(data)
+    uni.setStorageSync('orderListFilter',JSON.stringify(data));
+    uni.navigateBack();
     },
 
     // 打开时间范围日期选择框
@@ -262,7 +260,24 @@ export default {
     // 确认时间范围
     limitdaySelecctBtn(e) {
       console.log(e);
-      let start = e.year + "-" + e.month +"-" + e.day 
+      let start = e.year + "-" + (e.month<10?'0'+e.month:e.month) +"-" +(e.day<10?'0'+e.day:e.day)
+      
+      if(this.dateType === 'end' && this.timeLimit.start){
+        if(new Date(start).getTime() < new Date(this.timeLimit.start).getTime()){
+            return uni.showToast({
+          title: '请选择大于起始时间',
+          icon: 'none'
+        })
+        }
+      }else if(this.dateType === 'start' && this.timeLimit.end){
+        if(new Date(start).getTime() > new Date(this.timeLimit.end).getTime()){
+            return uni.showToast({
+          title: '请选择小于结束时间',
+          icon: 'none'
+        })
+        }
+      }
+
       this.$set(this.timeLimit,this.dateType,start)
     },
 
@@ -282,14 +297,24 @@ export default {
       });
     },
 
-    // 打开筛选
+    // 订票员选择
     openFilterDialog() {
-      this.$refs.filterDialog.open();
+      this.$refs.filterDialog.openFilterDialog();
     },
+
     // 关闭弹出框
     closeFilterDialog() {
-      this.$refs.filterDialog.close();
+      this.$refs.filterDialog.closeFilterDialog();
     },
+
+    // 确认订票员
+    submitFilterBtn(val) {
+      console.log('123',val)
+      this.booker = val
+      console.log(this.nameGroup)
+    },
+
+  
 
   },
   onLoad() {
@@ -432,6 +457,8 @@ export default {
       justify-content: center;
       font-size: 32upx;
       font-weight: 400;
+      margin: 0;
+      
       &.reset_btn {
         border-color: rgba(0, 112, 226, 1);
         color: rgba(0, 112, 226, 1);
@@ -444,6 +471,9 @@ export default {
         );
         box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
         color: rgba(255, 255, 255, 1);
+      }
+      &.disabled{
+        opacity: .4;
       }
     }
   }

@@ -2,8 +2,8 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-09-07 11:10:49
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-10 13:41:13
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <view class="add_passenger">
@@ -339,7 +339,7 @@ export default {
     },
     // 确认证件类型
     certificateSelecctBtn(e) {
-      console.log(e);
+      console.log('确认证件类型',e);
       this.certificateList[this.certificateIndex].cert_type = e;
       this.certificateList.forEach((item) => {
         if (item.cert_type === "护照") {
