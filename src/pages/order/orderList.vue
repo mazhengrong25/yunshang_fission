@@ -26,14 +26,14 @@
         <view class="list_icon">
           <image src="@/static/filter_time_active.png" mode="contain" />
         </view>
-        <view class="list_title">预定(早-晚)</view>
+        <view class="list_title" @click="sorTime('create')">预定(早-晚)</view>
       </view>
 
       <view class="filter_list">
         <view class="list_icon">
           <image src="@/static/filter_setoff.png" mode="contain" />
         </view>
-        <view class="list_title">出发(早-晚)</view>
+        <view class="list_title" @click="sorTime('depart')">出发(早-晚)</view>
       </view>
 
       <view class="filter_list">
@@ -327,6 +327,7 @@ export default {
       uni.navigateTo({
         url: "/pages/order/filter",
       });
+      this.getOrderList()
     },
     //获取国内外列表
     getOrderList() {
@@ -453,6 +454,37 @@ export default {
         });
       }
     },
+
+     // 起飞时间排序
+    departSort(d) {
+
+        return (m, n) => {
+        var a = new Date(m.ticket_segments[0][d]).getTime();
+        var b = new Date(n.ticket_segments[0][d]).getTime();
+        return a -b;   
+      };
+   
+    },
+
+    // 预定时间排序
+    createSort(t) {
+        
+        return (m, n) => {
+        var a = new Date(m[t]).getTime();
+        var b = new Date(n[t]).getTime();
+        return a - b;   
+      };
+    },
+
+    //时间排序
+    sorTime(val) {
+  
+      if (val === "create") {
+        this.innerList.sort(this.createSort("created_at"));
+      } else if (val === "depart") {
+        this.innerList.sort(this.departSort("departure_time"));
+      }
+    },
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -494,12 +526,17 @@ export default {
 
       //订票员  选择框
       if(this.orderListFilter.booker){
-        this.innerList = this.innerList.filter(item =>item.book_user === this.orderListFilter.booker)
+        this.innerList = this.innerList.filter(item =>item.book_user === this.created_at.booker)
       }
 
-      //出发城市  
+      //出发城市筛选  
       if(this.orderListFilter.Citystart){
-        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].arrive_msg.air_port_name === this.orderListFilter.Citystart)
+        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].departure_msg.province === this.orderListFilter.Citystart)
+      }
+
+      //到达城市筛选  
+      if(this.orderListFilter.Cityend){
+        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].arrive_msg.province === this.orderListFilter.Cityend)
       }
 
       //日始时间筛选
@@ -512,6 +549,16 @@ export default {
         this.innerList = this.innerList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timend)
       }
     
+      //预定日期排序
+      if(this.orderListFilter.date !== null){
+        this.sorTime(this.orderListFilter.date)
+      }
+      
+      //订单状态筛选
+      if(this.orderListFilter.status !== null){
+
+        this.checkedHeaderActive(this.orderListFilter.status)
+      }
 
 
       uni.removeStorageSync('orderListFilter')

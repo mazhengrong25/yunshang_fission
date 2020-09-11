@@ -337,6 +337,7 @@ export default {
 
     // 列表筛选
     listFilter(val) {
+      console.log(val)
       if (val === "price") {
         this.ticketList.sort(this.priceSort("price"));
       } else if (val === "time") {
