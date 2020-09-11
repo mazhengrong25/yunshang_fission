@@ -141,28 +141,28 @@ export default {
         {
           name: "起飞时间",
           active: false,
-        },
-        {
-          name: "出票日期",
-          active: false,
-        },
+        }
       ],
       orderStatus: [
-        // 订单状态筛选列表
+        // 订单状态筛选列表  id对应导航栏位置
         {
           name: "已预订",
+          id: 1,
           active: false,
         },
         {
           name: "待出票",
+          id: 2,
           active: false,
         },
         {
           name: "已出票",
+          id: 3,
           active: false,
         },
         {
           name: "已取消",
+          id: 4,
           active: false,
         },
       ],
@@ -196,6 +196,9 @@ export default {
     booker: "", // 订票员
 
     dateType: '', // 日期选择类型
+
+    activeStatus: null, // 订单状态
+    dateStatus: null, //  日期状态
     };
   },
   methods: {
@@ -204,6 +207,7 @@ export default {
       this.dateFilter.forEach((item) => {
         if (item.name === val.name) {
           item.active = !val.active;
+          this.dateStatus = item.active?val.id:null
         } else {
           item.active = false;
         }
@@ -214,6 +218,7 @@ export default {
       this.orderStatus.forEach((item) => {
         if (item.name === val.name) {
           item.active = !val.active;
+          this.activeStatus = item.active?val.id:null
         } else {
           item.active = false;
         }
@@ -243,10 +248,14 @@ export default {
         flightNumber: this.flightNumber, // 航班号
         booker: this.booker,  //订票员
         Citystart: this.citySelect.start, //出发城市
+        Cityend: this.citySelect.end, //到达城市
         Timestart: this.timeLimit.start, //日始时间
         Timend: this.timeLimit.end, //日止时间
+        destime: this.dateFilter[0].name, //预定日期
+        status: this.activeStatus, // 订单状态
+        date: this.dateStatus, //日期条件
+  
       }
-    console.log(data)
     uni.setStorageSync('orderListFilter',JSON.stringify(data));
     uni.navigateBack();
     },
@@ -329,14 +338,14 @@ export default {
     if (cityData.status === "to") {
       this.citySelect.start =
         cityData.type === "city"
-          ? cityData.data.city_name
+          ? cityData.data.province
           : cityData.data.air_port_name;
           this.airMessage["to"] = cityData.data;
           this.airMessage["to_type"] = cityData.type;
     } else if (cityData.status === "from") {
       this.citySelect.end =
         cityData.type === "city"
-          ? cityData.data.city_name
+          ? cityData.data.province
           : cityData.data.air_port_name;
           this.airMessage["from"] = cityData.data;
           this.airMessage["from_type"] = cityData.type;
