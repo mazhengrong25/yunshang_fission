@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-10 15:26:51
+ * @LastEditTime: 2020-09-11 17:40:49
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -76,11 +76,14 @@
 
         <view class="ticket_right">
           <view class="ticket_price">
-            <text class="currency">&yen;</text>
+            <text class="currency" v-if="item.ItineraryInfos.length > 0">&yen;</text>
             <view
               v-if="item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price"
             >{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</view>
-            <view v-else class="not_price"></view>
+            <view class="sold_out" v-if="item.ItineraryInfos.length < 1">
+              售罄
+            </view>
+            <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
           <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view>
@@ -195,6 +198,7 @@ export default {
       ticket.getTicket(this.airMessage, status).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
+           this.showDefaultType = ""
           this.file_key = res.data.IBE.file_key;
           this.showDefault = false;
           if (this.pageNumber > 1) {
@@ -246,6 +250,8 @@ export default {
     // 选择日期
     clickBtn(val, status) {
       if (status) {
+        this.skeletonNumber = 5
+        this.ticketList = []
         console.log(val);
         this.activeTimeNumber = val.date;
         this.airMessage = {
@@ -287,14 +293,7 @@ export default {
                 moment(day).add(dayNumber, "d").format("DD")
               : moment(day).add(dayNumber, "d").format("DD"),
           status:
-            moment().format("YYYY-MM") ===
-            moment(this.ticketData.toTime.date)
-              .subtract(7, "days")
-              .add(dayNumber, "d")
-              .format("YYYY-MM")
-              ? moment().format("DD") <
-                moment(day).add(dayNumber, "d").format("DD")
-              : false,
+            +moment() < +moment(day).add(dayNumber, "d"),
         });
         dayNumber += 1;
       }
@@ -358,6 +357,9 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
+      if(data.ItineraryInfos.length < 1){
+        return false
+      }
       data["to"] = this.ticketData.to.city_name;
       data["from"] = this.ticketData.from.city_name;
       (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
@@ -632,6 +634,10 @@ export default {
             font-size: 24upx;
             margin-right: 6upx;
           }
+        }
+        .sold_out{
+          color: rgba(255, 0, 0, 1);
+          font-size: 48upx;
         }
         .not_price {
           height: 40upx;

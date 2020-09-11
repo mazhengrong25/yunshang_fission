@@ -2,20 +2,20 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-07 11:30:55
+ * @LastEditTime: 2020-09-11 16:20:00
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="passenger">
     <yun-header :statusHeight="iStatusBarHeight" :centerTitle="passengerType?'旅客管理': '选择乘机人'"></yun-header>
-    <view class="header_box">
+    <view class="header_box" v-if="!showDefault">
       <view class="add_passenger_btn" @click="jumpAddPassenger()">
         <image class="add_icon" src="@/static/add_passenger_btn.png" mode="contain" />
         <text>{{ passengerType?'新增旅客':'新增乘机人' }}</text>
       </view>
     </view>
 
-    <view class="passenger_main">
+    <view class="passenger_main" v-if="!showDefault">
       <view class="mian_header">
         <view class="title">常用乘机人</view>
         <view class="filter" @click="openGroupSelect">
@@ -60,6 +60,8 @@
       </scroll-view>
     </view>
 
+    <default-page style="flex: 1" v-if="showDefault" @returnBtn="getTicketData()" :defaultType="showDefaultType"></default-page>
+
     <!-- 筛选弹窗 -->
     <yun-selector
       ref="groupPopup"
@@ -68,7 +70,7 @@
       @submitDialog="groupPopupSelecctBtn()"
     ></yun-selector>
 
-    <view class="submit_box" v-if="!passengerType">
+    <view class="submit_box" v-if="!passengerType && !showDefault">
       <button class="submit_btn" @click="returnBtn">确认</button>
     </view>
   </view>
@@ -82,6 +84,9 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度
+
+      showDefault: true, // 缺省页
+      showDefaultType: 'not_passenger',  // 报错类型
 
       passengerType: true, // true个人中心跳入 false添加联系人跳入
 
@@ -135,6 +140,7 @@ export default {
               });
             });
           }
+          this.showDefault = false
         }
       });
     },

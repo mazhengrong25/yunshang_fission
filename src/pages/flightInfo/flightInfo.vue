@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-09 13:59:13
+ * @LastEditTime: 2020-09-11 11:21:55
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -121,7 +121,7 @@
       </view>
     </view>
 
-    <flight-explanation ref="flightExplanation"></flight-explanation>
+    <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
 
     <!-- 验价弹窗 -->
     <uni-popup ref="checkPricePopup" type="dialog">
@@ -140,7 +140,7 @@
 <script>
 import moment from "moment";
 moment.locale("zh-cn");
-import flightHeader from "@/components/flight_header.vue";  // 航程信息
+import flightHeader from "@/components/flight_header.vue"; // 航程信息
 import flightItem from "@/components/flight_item.vue"; // 舱位信息
 import flightExplanation from "@/components/flight_explanation.vue"; // 舱位信息
 import ticket from "@/api/ticketInquiry.js";
@@ -148,7 +148,7 @@ export default {
   components: {
     flightHeader,
     flightItem,
-    flightExplanation
+    flightExplanation,
   },
   data() {
     return {
@@ -217,6 +217,9 @@ export default {
 
       checkRoundPrice: null, // 返程验价价格
       checkRoundPriceKey: "", // 返程验价key
+
+      airGuestInfo: {}, // 客规信息
+      depGuestInfo: {}, // 返程客规
     };
   },
   methods: {
@@ -238,10 +241,51 @@ export default {
       this.$refs.flightExplanation.closeExp();
     },
 
+    // 获取航司退改详情
+    getGaugeMessage() {
+      // this.airMessage.airSegments[0].airline
+      let data = {
+        air_line_code: [],
+      };
+      data.air_line_code.push(this.airMessage.airSegments[0].airline);
+      console.log("客规原始信息", this.airMessage, this.depMessage);
+      if (JSON.stringify(this.depMessage) !== "{}") {
+        data.air_line_code.push(this.depMessage.airSegments[0].airline);
+      }
+      ticket.getGaugetype(data).then((res) => {
+        this.airGuestInfo = res.data[this.airMessage.airSegments[0].airline];
+        if (JSON.stringify(this.depMessage) !== "{}") {
+          this.depGuestInfo = res.data[this.depMessage.airSegments[0].airline];
+        }
+
+        console.log("客规信息", this.airGuestInfo, this.depGuestInfo);
+      });
+    },
+
     // 打开退改签说明弹窗
     openExpPupop(data) {
-      console.log(data);
-      // this.ruleInfos = data;
+      console.log(data)
+
+      // 组装航班数据
+      let filghtMessage = {
+        time: moment(data.data.routing.segments[0].depTime).format('YYYY-MM-DD HH:mm:ss'),  // 起飞时间
+        code: data.data.routing.segments[0].flightNumber,  // 航班号
+        address: data.data.routing.segments[0].depAirport_CN.city_name+ ' ' + data.data.routing.segments[0].depAirport_CN.city_code + ' - ' +
+                 data.data.routing.segments[0].arrAirport_CN.city_name+ ' ' + data.data.routing.segments[0].arrAirport_CN.city_code,  // 行程
+        cabin: data.cabin, // 舱位
+        price: data.data.cabinPrices.ADT.rulePrice.price, // 票面价
+        baggage: data.baggage
+      }
+
+      // 组装退改信息
+      let gaugeMessage = this.airGuestInfo[data.cabinCode]
+
+      this.ruleInfos = {
+        filght: filghtMessage,
+        gauge: gaugeMessage
+
+      };
+      console.log('完整信息',this.ruleInfos)
       this.$refs.flightExplanation.openExp();
     },
 
@@ -284,10 +328,10 @@ export default {
     },
 
     // 获取价格信息 - 验价
-    getPriceData(data, header,index,type){
-      console.log(data, header,index)
-      let params
-      if(type){
+    getPriceData(data, header, index, type) {
+      console.log(data, header, index);
+      let params;
+      if (type) {
         this.depActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
@@ -305,7 +349,7 @@ export default {
           ItineraryInfo: this.depMessage.data.data,
           relatedKey: "11",
         };
-      }else{
+      } else {
         this.airActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
@@ -324,36 +368,51 @@ export default {
           relatedKey: "11",
         };
       }
-      
-        ticket.checkPrice(params).then((res) => {
+
+      ticket.checkPrice(params).then((res) => {
         if (res.errorcode === 10000) {
-          if(type){
-            this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
-          }else{  
-            this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+          if (type) {
+            this.$set(
+              this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,
+              "price",
+              res.data.price
+            );
+          } else {
+            this.$set(
+              this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+              "price",
+              res.data.price
+            );
           }
-        } else{
-          if(type){
-            this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price', '无运价')
-          }else{  
-            this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price', '无运价')
+        } else {
+          if (type) {
+            this.$set(
+              this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,
+              "price",
+              "无运价"
+            );
+          } else {
+            this.$set(
+              this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+              "price",
+              "无运价"
+            );
           }
           uni.showToast({
-            title: '获取失败，请稍后重试',
+            title: "获取失败，请稍后重试",
             icon: "none",
             duration: 3000,
           });
         }
-        console.log(this.cabinList)
+        console.log(this.cabinList);
 
-        this.$forceUpdate()
+        this.$forceUpdate();
       });
-
     },
 
     // 跳转预定页面 - 先验价再跳转
-    jumpReservationBtn(data, header,index,type) {
-      console.log(data, header,index,type);
+    jumpReservationBtn(data, header, index, type) {
+      console.log(data, header, index, type);
       let params;
       if (this.roundTripBtnActive === 0) {
         // 去程验价数据组装
@@ -406,10 +465,19 @@ export default {
             if (!this.roundTripType) {
               this.checkPrice = res.data.price; // 获取验价价格
               this.checkPriceKey = res.data.keys; // 获取验价key
-              if(type){
-                this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
-              }else{  
-                this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
+              if (type) {
+                this.$set(
+                  this.depCabinList[header][index].data.cabinPrices.ADT
+                    .rulePrice,
+                  "price",
+                  res.data.price
+                );
+              } else {
+                this.$set(
+                  this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                  "price",
+                  res.data.price
+                );
               }
               // 单程验价
               uni.navigateTo({
@@ -445,11 +513,19 @@ export default {
               }
               console.log("往返验价");
             }
-             if(type){
-                this.$set(this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
-              }else{  
-                this.$set(this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,'price',res.data.price)
-              }
+            if (type) {
+              this.$set(
+                this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                "price",
+                res.data.price
+              );
+            } else {
+              this.$set(
+                this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                "price",
+                res.data.price
+              );
+            }
 
             this.$refs.checkPricePopup.open();
           }
@@ -511,7 +587,7 @@ export default {
   },
   onLoad(data) {
     console.log(data);
-    this.roundTripType = JSON.parse(data.pageType);
+    this.roundTripType = data.pageType?JSON.parse(data.pageType): false;
     console.log(this.roundTripType);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     // 组装单程航班数据
@@ -559,7 +635,7 @@ export default {
         flightData: this.flightData,
       };
 
-      console.log(this.airMessage)
+      console.log(this.airMessage);
 
       // 组装航班列表信息
       let airDataName = Object.keys(airData.ItineraryInfos);
@@ -582,6 +658,7 @@ export default {
               priceMessage: true, // 是否包含燃油
               reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
               voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
+              cabinCode: oitem.cabinInfo.cabinCode,
               cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
               baggage: oitem.cabinInfo.baggage, // 行李额
               ruleInfos: oitem.ruleInfos, // 退改信息
@@ -590,7 +667,7 @@ export default {
           });
         }
       });
-      this.headerDiaplay = this.cabinHeader.length !== 2
+      this.headerDiaplay = this.cabinHeader.length !== 2;
     } else {
       let airData = JSON.parse(data.roundTripData).start;
       let depData = JSON.parse(data.roundTripData).end;
@@ -697,6 +774,7 @@ export default {
               priceMessage: true, // 是否包含燃油
               reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
               voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
+              cabinCode: oitem.cabinInfo.cabinCode,
               cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
               baggage: oitem.cabinInfo.baggage, // 行李额
               ruleInfos: oitem.ruleInfos, // 退改信息
@@ -706,7 +784,7 @@ export default {
         }
       });
 
-      this.headerDiaplay = this.cabinHeader.length !== 2
+      this.headerDiaplay = this.cabinHeader.length !== 2;
 
       // 组装返程航班列表信息
       let depDataName = Object.keys(depData.ItineraryInfos);
@@ -728,6 +806,7 @@ export default {
               priceMessage: true, // 是否包含燃油
               reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
               voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
+              cabinCode: oitem.cabinInfo.cabinCode,
               cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
               baggage: oitem.cabinInfo.baggage, // 行李额
               ruleInfos: oitem.ruleInfos, // 退改信息
@@ -737,8 +816,11 @@ export default {
         }
       });
 
-      this.depHeaderDiaplay = this.depCabinHeader.length !== 2
+      this.depHeaderDiaplay = this.depCabinHeader.length !== 2;
     }
+
+    // 获取航司退改信息
+    this.getGaugeMessage();
   },
 };
 </script>
@@ -892,8 +974,8 @@ export default {
         white-space: nowrap;
         text-overflow: ellipsis;
         &:not(:last-child) {
-            margin-right: 160upx;
-          }
+          margin-right: 160upx;
+        }
 
         &.is_active {
           font-weight: bold;

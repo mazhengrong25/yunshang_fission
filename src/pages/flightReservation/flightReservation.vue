@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-10 18:09:37
+ * @LastEditTime: 2020-09-11 09:19:47
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -206,9 +206,9 @@
 
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
-        <text @click="openDiscDialog(true)">《关于规范互联网机票销售行为的通知》</text>
-        <text @click="openStatementWeb()">《{{statement.title}}》</text>
-        <text @click="openDiscDialog(false)">《锂电池航空运输规范》</text>
+        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')">《关于规范互联网机票销售行为的通知》</text>
+        <text @click="openStatementWeb(statement.url)">《{{statement.title}}》</text>
+        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')">《锂电池航空运输规范》</text>
       </view>
     </scroll-view>
 
@@ -763,13 +763,12 @@ export default {
     },
 
     // 打开免责声明 外部链接
-    openStatementWeb() {
+    openStatementWeb(url) {
+      console.log(url)
       uni.navigateTo({
         url:
           "/pages/flightReservation/webView?url=" +
-          this.statement.url +
-          "&title=" +
-          this.statement.title,
+          url
       });
     },
 

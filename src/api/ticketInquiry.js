@@ -2,7 +2,7 @@
  * @Description: AV查询 获取航班信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-09-02 17:50:49
+ * @LastEditTime: 2020-09-11 09:59:50
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -56,6 +56,15 @@ function getRoundTicketInfo(key,roundKey,data){
 	})
 }
 
+// 获取客规信息
+function getGaugetype(data){
+	return request({
+		method: "POST",
+		url: '/api/gaugetype/search',
+		data: data,
+	})
+}
+
 // 单程下单
 function createOrder(data){
 	return request({
@@ -97,6 +106,7 @@ export default{
 	checkPrice,
 	getTicketInfo,
 	getRoundTicketInfo,
+	getGaugetype,
 	createOrder,
 	createRoundOrder,
 	getPayInfo,

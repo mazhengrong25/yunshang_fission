@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-10 16:15:15
+ * @LastEditTime: 2020-09-11 13:40:08
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -257,9 +257,11 @@ export default {
         text-align: center;
       }
       .list_item {
-        display: grid;
+        // display: grid;
         padding: 0 20upx;
-        grid-template-columns: repeat(7, 1fr);
+        // grid-template-columns: repeat(7, 1fr);
+        display: flex;
+        flex-wrap: wrap;
 
         .item_box {
           width: 84upx;
@@ -277,8 +279,11 @@ export default {
           font-weight: 500;
           color: rgba(42, 42, 42, 1);
           border: 4upx solid transparent;
-          flex: 7 0 auto;
-          &.not_day {
+          // flex: 7 0 auto;
+          &:not(:nth-child(7n)){
+            margin-right: 10upx;
+          }
+          &.not_day { 
             box-shadow: none;
           }
           &.active {

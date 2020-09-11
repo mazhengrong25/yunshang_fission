@@ -32,51 +32,52 @@
               <view class="main_table">
                 <view class="table_list">
                   <view class="list_title">起飞时间</view>
-                  <view class="list_content">2020-16-11T9:45:00</view>
+                  <view class="list_content">{{ruleInfos.filght.time}}</view>
                 </view>
                 <view class="table_list">
                   <view class="list_title">航班号</view>
-                  <view class="list_content">SC1155</view>
+                  <view class="list_content">{{ruleInfos.filght.code}}</view>
                 </view>
                 <view class="table_list">
                   <view class="list_title">行程</view>
-                  <view class="list_content">重庆 CKG -北京 PKX</view>
+                  <view class="list_content">{{ruleInfos.filght.address}}</view>
                 </view>
                 <view class="table_list">
                   <view class="list_title">舱位</view>
-                  <view class="list_content">经济舱</view>
+                  <view class="list_content">{{ruleInfos.filght.cabin}}</view>
                 </view>
                 <view class="table_list">
                   <view class="list_title">票面价</view>
-                  <view class="list_content">750（元）</view>
+                  <view class="list_content">{{ruleInfos.filght.price !== 0? (ruleInfos.filght.price + '（元）'): '无运价'}}</view>
                 </view>
               </view>
             </view>
             <view id="retreat" class="main_box">
               <view class="main_title">退票</view>
               <view class="main_table">
-                <view class="table_list">
-                  <view class="list_title">20%</view>
-                  <view class="list_content">离站时间前168小时（含）之前</view>
+                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.gauge_type_value.refund" :key="index">
+                  <view class="list_title">{{item.val}}</view>
+                  <view class="list_content">{{item.title}}</view>
                 </view>
-                <view class="table_list">
-                  <view class="list_title">40%</view>
-                  <view class="list_content">离站时间前168小时至72小时（含）之前</view>
+              </view>
+              <view class="main_title" style="margin-top: 20rpx">改签</view>
+              <view class="main_table">
+                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.gauge_type_value.change" :key="index">
+                  <view class="list_title">{{item.val}}</view>
+                  <view class="list_content">{{item.title}}</view>
                 </view>
-                <view class="table_list">
-                  <view class="list_title">70%</view>
-                  <view class="list_content">离站时间前72小时至4小时（含）之前</view>
-                </view>
-                <view class="table_list">
-                  <view class="list_title">90%</view>
-                  <view class="list_content">离站时间前4小时之后</view>
-                </view>
+              </view>
+            </view>
+            <view class="main_box">
+              <view class="main_title">退改信息</view>
+              <view class="main_message">
+                {{ruleInfos.gauge.back_msg}}
               </view>
             </view>
             <view id="cabin" class="main_box">
               <view class="main_title">行李额</view>
               <view class="main_message">
-                行李额行李额行李额行李额行李额行李额行李额行李额行李额
+                {{ruleInfos.filght.baggage}}
               </view>
             </view>
           </view>
@@ -87,6 +88,12 @@
 </template>
 <script>
 export default {
+  props: {
+    ruleInfos: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       popupCurrent: "info",
@@ -205,6 +212,7 @@ export default {
             font-size: 24upx;
             font-weight: 500;
             color: #333333;
+            flex-shrink: 0;
           }
           .list_content {
             height: 100%;

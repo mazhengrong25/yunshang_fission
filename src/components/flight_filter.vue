@@ -2,7 +2,7 @@
  * @Description: 航班筛选
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 10:50:47
- * @LastEditTime: 2020-07-22 14:42:01
+ * @LastEditTime: 2020-09-11 18:21:41
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -63,7 +63,7 @@ export default {
     openFilter() {
       this.$emit("openFilter", true);
     }
-  }
+  },
 };
 </script>
 

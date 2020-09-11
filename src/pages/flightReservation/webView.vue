@@ -2,12 +2,12 @@
  * @Description: 外部链接网页页面
  * @Author: wish.WuJunLong
  * @Date: 2020-09-09 15:50:49
- * @LastEditTime: 2020-09-09 16:05:42
+ * @LastEditTime: 2020-09-11 09:21:45
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="web_view">
-    <web-view class="view" :webview-styles="webviewStyles" :src="url"></web-view>
+    <web-view class="view" :src="url"></web-view>
   </view>
 </template>
 <script>
@@ -16,17 +16,11 @@ export default {
     return {
       url: '',
       title: '',
-      webviewStyles: {
-        // 外部链接进度条样式
-        progress: {
-          color: "#FF3333",
-        },
-      },
     };
   },
   onLoad(data){
     this.url = data.url
-    this.title = data.title
+    // this.title = data.title
   }
 };
 </script>
