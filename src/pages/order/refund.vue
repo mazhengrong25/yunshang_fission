@@ -2,99 +2,99 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-08-17 18:10:12
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-14 16:13:01
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="refund">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票"></yun-header>
 	<!-- 正文 -->
-	<scroll-view :enable-back-to-top="true" :scroll-y="true" class="content"
-	<!-- 退票信息 -->
-	<refundTop :dataList="list" @submitBtn="submit"></refundTop>
-	<!-- 特别提醒 -->
-	<view class="sep_list">
-		<view class="list_icon">
-			<image src="@/static/refund_warn.png" mode="aspectFit" />
+	<scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
+		<!-- 退票信息 -->
+		<refundTop :dataList="list" @submitBtn="submit"></refundTop>
+		<!-- 特别提醒 -->
+		<view class="sep_list">
+			<view class="list_icon">
+				<image src="@/static/refund_warn.png" mode="aspectFit" />
+			</view>
+			<view class="list_title">国际退票特别提醒</view>
+			<view class="list_right">
+				<image src="../../static/refund_right.png" mode="aspectFit"></image>
+			</view>
 		</view>
-		<view class="list_title">国际退票特别提醒</view>
-		<view class="list_right">
-			<image src="../../static/refund_right.png" mode="aspectFit"></image>
+		<!-- 航班信息 -->
+		<view class="main_list filght_info">
+		<view class="main_list_title">航班信息</view>
+		<view class="info_header">
+			<view class="header_type">{{orderDetails.routing_type === 1?'单程':
+										orderDetails.routing_type === 2?'往返':
+										orderDetails.routing_type === 3?'多程':''}}</view>
+			<view class="header_time">
+			{{item.departure_time.substring(0,10)}}
+			<text>{{$dateTool(item.departure_time,"ddd")}}</text>
+			</view>
 		</view>
-	</view>
-	<!-- 航班信息 -->
-	<view class="main_list filght_info">
-	<view class="main_list_title">航班信息</view>
-	 <view class="info_header">
-		<view class="header_type">{{orderDetails.routing_type === 1?'单程':
-									orderDetails.routing_type === 2?'往返':
-									orderDetails.routing_type === 3?'多程':''}}</view>
-		<view class="header_time">
-		  {{item.departure_time.substring(0,10)}}
-		  <text>{{$dateTool(item.departure_time,"ddd")}}</text>
+		<view class="info_message">
+			<view class="message_box">
+			<view class="date">{{item.departure_time.substring(10,16)}}</view>
+			<view class="address">{{item.departure}}</view>
+			</view>
+		
+			<view class="message_center">
+			<view class="date">{{(item.duration.replace(":","h"))}}m</view>
+			<view class="center_icon"></view>
+			<view class="type">直飞</view>
+			</view>
+		
+			<view class="message_box">
+			<view class="date">{{item.arrive_time.substring(10,16)}}</view>
+			<view class="address">{{item.arrive}}</view>
+			</view>
 		</view>
-	  </view>
-	  <view class="info_message">
-		<view class="message_box">
-		  <view class="date">{{item.departure_time.substring(10,16)}}</view>
-		  <view class="address">{{item.departure}}</view>
+		
+		<view class="filght_message">
+			<view class="message_icon"></view>
+			<view class="message_list">{{item.inter_segments[0].flight_no}}</view>
+			<view class="message_list">空客A320</view>
+			<view class="message_list">有早餐</view>
 		</view>
-	
-		<view class="message_center">
-		  <view class="date">{{(item.duration.replace(":","h"))}}m</view>
-		  <view class="center_icon"></view>
-		  <view class="type">直飞</view>
+		
+		<view class="filght_bottom">
+			<view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
+										item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
+										item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
+			<view class="bottom_list">退改签规则</view>
+			<view class="bottom_list">每人托运2件，每件23KG</view>
 		</view>
-	
-		<view class="message_box">
-		  <view class="date">{{item.arrive_time.substring(10,16)}}</view>
-		  <view class="address">{{item.arrive}}</view>
 		</view>
-	  </view>
-	
-	  <view class="filght_message">
-		<view class="message_icon"></view>
-		<view class="message_list">{{item.inter_segments[0].flight_no}}</view>
-		<view class="message_list">空客A320</view>
-		<view class="message_list">有早餐</view>
-	  </view>
-	
-	  <view class="filght_bottom">
-		<view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
-									item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
-									item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
-		<view class="bottom_list">退改签规则</view>
-		<view class="bottom_list">每人托运2件，每件23KG</view>
-	  </view>
-	</view>
-	<!-- 出行信息 -->
-	<refundSel ></refundSel>
-	<!-- 订单信息 -->
-	<view class="main_list order_message">
-	  <view class="main_list_title">订单信息</view>
-	  <view class="message_list">
-		<view class="list_item">
-		  <view class="item_title">订单编号</view>
-		  <view class="item_message">{{orderDetails.order_no}}</view>
+		<!-- 出行信息 -->
+		<refundSel ></refundSel>
+		<!-- 订单信息 -->
+		<view class="main_list order_message">
+		<view class="main_list_title">订单信息</view>
+		<view class="message_list">
+			<view class="list_item">
+			<view class="item_title">订单编号</view>
+			<view class="item_message">{{orderDetails.order_no}}</view>
+			</view>
+			<view class="list_item">
+			<view class="item_title">PNR</view>
+			<view class="item_message">{{orderDetails.pnr_code}}</view>
+			</view>
+			<view class="list_item">
+			<view class="item_title">订票员</view>
+			<view class="item_message">{{orderDetails.book_user}}</view>
+			</view>
+			<view class="list_item">
+			<view class="item_title">预定时间</view>
+			<view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
+			</view>
+			<view class="list_item">
+			<view class="item_title">备注</view>
+			<view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
+			</view>
 		</view>
-		<view class="list_item">
-		  <view class="item_title">PNR</view>
-		  <view class="item_message">{{orderDetails.pnr_code}}</view>
 		</view>
-		<view class="list_item">
-		  <view class="item_title">订票员</view>
-		  <view class="item_message">{{orderDetails.book_user}}</view>
-		</view>
-		<view class="list_item">
-		  <view class="item_title">预定时间</view>
-		  <view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
-		</view>
-		<view class="list_item">
-		  <view class="item_title">备注</view>
-		  <view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
-		</view>
-	  </view>
-	</view>
 	</scroll-view>
 	<!-- 提交申请按钮 -->
 	<view class="filter_bottom">
@@ -104,110 +104,111 @@
 </template>
 
 <script>
-	import refundTop from "@/components/refund_top.vue"
-	import refundSel from "@/components/refund_sel.vue"
+import refundTop from "@/components/refund_top.vue"
+import refundSel from "@/components/refund_sel.vue"
 export default {
+
 	components:{
 		refundTop,
 		refundSel
 	},
-  data() {
-    return {
-      iStatusBarHeight: 0,
-	  
-	   orderDetails: [], // 订单详情
+	data() {
+		return {
+		iStatusBarHeight: 0,
+		
+		orderDetails: [], // 订单详情
 
-      dateFilter: [
-        // 日期条件筛选列表
-        {
-          name: "预定日期",
-          active: false,
-        },
-        {
-          name: "起飞时间",
-          active: false,
-        },
-        {
-          name: "出票日期",
-          active: false,
-        },
-      ],
-      orderStatus: [
-        // 订单状态筛选列表
-        {
-          name: "已预订",
-          active: false,
-        },
-        {
-          name: "待出票",
-          active: false,
-        },
-        {
-          name: "已出票",
-          active: false,
-        },
-        {
-          name: "已取消",
-          active: false,
-        },
-      ],
-      timeLimit: {
-        // 时间范围
-        start: "2020-08-17",
-        end: "2020-08-18",
-      },
-      citySelect: {
-        start: "重庆",
-        end: "",
-      },
-      pnr: "", // pnr
-      orderNumber: "", // 订单号
-      flightNumber: "", // 航班号
-      booker: "", // 订票员
-    };
-  },
-  methods: {
-	  submit(val){
-		  console.log(val)
-	  },
-    // 日期条件选择
-    activeDate(val) {
-      this.dateFilter.forEach((item) => {
-        if (item.name === val.name) {
-          item.active = !val.active;
-        } else {
-          item.active = false;
-        }
-      });
-    },
-    // 订单状态选择
-    activeOrderStatus(val) {
-      this.orderStatus.forEach((item) => {
-        if (item.name === val.name) {
-          item.active = !val.active;
-        } else {
-          item.active = false;
-        }
-      });
-    },
+		dateFilter: [
+			// 日期条件筛选列表
+			{
+			name: "预定日期",
+			active: false,
+			},
+			{
+			name: "起飞时间",
+			active: false,
+			},
+			{
+			name: "出票日期",
+			active: false,
+			},
+		],
+		orderStatus: [
+			// 订单状态筛选列表
+			{
+			name: "已预订",
+			active: false,
+			},
+			{
+			name: "待出票",
+			active: false,
+			},
+			{
+			name: "已出票",
+			active: false,
+			},
+			{
+			name: "已取消",
+			active: false,
+			},
+		],
+		timeLimit: {
+			// 时间范围
+			start: "2020-08-17",
+			end: "2020-08-18",
+		},
+		citySelect: {
+			start: "重庆",
+			end: "",
+		},
+		pnr: "", // pnr
+		orderNumber: "", // 订单号
+		flightNumber: "", // 航班号
+		booker: "", // 订票员
+		};
+	},
+	methods: {
+		submit(val){
+			console.log(val)
+		},
+		// 日期条件选择
+		activeDate(val) {
+		this.dateFilter.forEach((item) => {
+			if (item.name === val.name) {
+			item.active = !val.active;
+			} else {
+			item.active = false;
+			}
+		});
+		},
+		// 订单状态选择
+		activeOrderStatus(val) {
+		this.orderStatus.forEach((item) => {
+			if (item.name === val.name) {
+			item.active = !val.active;
+			} else {
+			item.active = false;
+			}
+		});
+		},
 
-    // 重置筛选
-    resetBtn() {
-      this.dateFilter.forEach((item) => (item.active = false));
-      this.orderStatus.forEach((item) => (item.active = false));
-      this.timeLimit.start = "";
-      this.timeLimit.end = "";
-      this.citySelect.start = "";
-      this.citySelect.end = "";
-      this.pnr = "";
-      this.orderNumber = "";
-      this.flightNumber = "";
-      this.booker = "";
-    },
-  },
-  onLoad() {
-    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-  },
+		// 重置筛选
+		resetBtn() {
+		this.dateFilter.forEach((item) => (item.active = false));
+		this.orderStatus.forEach((item) => (item.active = false));
+		this.timeLimit.start = "";
+		this.timeLimit.end = "";
+		this.citySelect.start = "";
+		this.citySelect.end = "";
+		this.pnr = "";
+		this.orderNumber = "";
+		this.flightNumber = "";
+		this.booker = "";
+		},
+	},
+	onLoad() {
+		this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+	},
 };
 </script>
 
@@ -216,40 +217,48 @@ export default {
 	 background: rgba(243, 245, 247, 1);
 	 height: 100vh;
 	 position: relative;
+	 display: flex;
+	 flex-direction: column;
+	 .content{
+		 flex: 1;
+		 overflow-y: auto;
+	 }
 	 
 	 .sep_list {
-	 	 display: flex;
-	 	 align-items: center;
-	 	 justify-content: start;
+	 	display: flex;
+		align-items: center;
+		flex: 1;
+		justify-content: start;
+		box-sizing: border-box;
+		overflow-y: auto;
 	 	 border-radius: 10upx;
 	 	 width: 710upx;
 	 	 height: 60upx;
 	 	 background-color: RGBA(244, 236, 226, 1);
 	 	 z-index: 1;
-	 	 margin-left: 23upx;
+		  margin-left: 23upx;
+		  padding: 0 20rpx;
 	 	 .list_icon {
 	 	   width: 24upx;
-	 	   height: 24upx;
+			height: 24upx;
+			display: inline-flex;
+			margin-right: 10upx;
 	 	   image {
 	 		 width: 100%;
 	 		 height: 100%;
 	 		 object-fit: contain;
 	 	   }
-	 	  margin: 10upx 10upx;
-	 	  margin-bottom: 40upx;
-	 
 	 	 }
 	 	 .list_right {
 	 	   width: 24upx;
-	 	   height: 24upx;
+			height: 24upx;
+			margin-left: auto;
+			display: inline-flex;
 	 	   image {
 	 		 width: 100%;
 	 		 height: 100%;
 	 		 object-fit: contain;
 	 	   }
-	 	   margin-left: 439upx;
-	 	   margin-bottom: 30upx;
-	 	 
 	 	 }
 	 	 .list_title {
 	 	   font-size: 24upx;

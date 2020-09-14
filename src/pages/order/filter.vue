@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-10 17:51:02
+ * @LastEditTime: 2020-09-14 14:15:18
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -104,7 +104,7 @@
 
     <!-- 选择日期 -->
     <yun-selector ref="limitdayPopup" selectType="date" @submitDialog="limitdaySelecctBtn()"></yun-selector>
-    <!-- 订票员选择   @ticketFilterData="ticketFilter"-->
+    <!-- 订票员选择 -->
     <flight-filter-dialog ref="filterDialog" 
     @ticketFilterData="submitFilterBtn"
     :flightType="false" 
