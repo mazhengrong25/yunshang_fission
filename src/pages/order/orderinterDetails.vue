@@ -3,8 +3,8 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-09 18:28:46
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-14 10:33:57
+ * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
  * @LastEditors: mazhengrong
@@ -360,6 +360,13 @@ export default {
             icon: "none",
           });
         }
+      });
+    },
+
+    // 跳转退票
+    getRefund(data) {
+      uni.navigateTo({
+        url: "/pages/order/refund?orderData=" + JSON.stringify(data),
       });
     },
 
