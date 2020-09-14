@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-09-08 10:48:19
+ * @LastEditTime: 2020-09-14 10:32:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -20,8 +20,8 @@
       <view class="box_header_right">
         <button
           v-if="flightData.data.cabinPrices.ADT.rulePrice.price !== 0"
-          :disabled="flightData.active"
-          :class="['header_right_btn',{active: flightData.active}]"
+          :disabled="flightData.active || flightData.data.cabinPrices.ADT.rulePrice.price === '无运价'"
+          :class="['header_right_btn',{active: flightData.active || flightData.data.cabinPrices.ADT.rulePrice.price === '无运价'}]"
           @click="jumpReservation"
         >{{!roundTripType?'预定': flightType === 0? '选为去程': '选为返程'}}</button>
         <button

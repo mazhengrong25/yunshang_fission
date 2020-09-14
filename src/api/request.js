@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-09-09 14:27:52
+ * @LastEditTime: 2020-09-14 10:11:23
  * @LastEditors: wish.WuJunLong
  */
 
@@ -31,7 +31,6 @@ async function getToken() {
 }
 
 const request = async (config, type) => {
-  console.log(config)
   let loginInfo = uni.getStorageSync("loginInfo");
   let currentTime = new Date().getTime();
   let loginTime = new Date(loginInfo.loginTime).getTime();

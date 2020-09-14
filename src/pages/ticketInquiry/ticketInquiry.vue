@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-11 17:40:49
+ * @LastEditTime: 2020-09-14 16:29:52
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -76,13 +76,9 @@
 
         <view class="ticket_right">
           <view class="ticket_price">
-            <text class="currency" v-if="item.ItineraryInfos.length > 0">&yen;</text>
-            <view
-              v-if="item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price"
-            >{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</view>
-            <view class="sold_out" v-if="item.ItineraryInfos.length < 1">
-              售罄
-            </view>
+            <text class="currency" v-if="item.available_cabin > 0 && item.min_price !== 0">&yen;</text>
+            <view v-if="item.available_cabin > 0 && item.min_price !== 0">{{item.min_price}}</view>
+            <view class="sold_out" v-if="item.available_cabin < 1">售罄</view>
             <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
@@ -148,9 +144,9 @@ export default {
 
       airMessage: {}, // 首页传参
 
-      skeletonNumber: 5, // 骨架屏数量
-      showDefault: false,  // 报错页面
-      showDefaultType: '', // 报错类型
+      skeletonNumber: 6, // 骨架屏数量
+      showDefault: false, // 报错页面
+      showDefaultType: "", // 报错类型
       // showReturnBtn: false,
 
       file_key: "", // av key
@@ -179,79 +175,39 @@ export default {
     };
   },
   methods: {
-    // 下拉加载
-    getNewData() {
-      if (!this.dataListApplyType) {
-        this.pageNumber += 1;
-        this.airMessage["page"] = this.pageNumber;
-        this.airMessage["per_page"] = 5;
-        this.getTicketData();
-      }
-    },
-
     // 获取航班信息
     getTicketData(status) {
-      if (status) {
-        this.nextGetData = true;
-      }
-      this.airMessage["file_key"] = this.file_key;
+      this.airMessage["only_segment"] = 1;
       ticket.getTicket(this.airMessage, status).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
-           this.showDefaultType = ""
+          this.showDefaultType = "";
           this.file_key = res.data.IBE.file_key;
           this.showDefault = false;
-          if (this.pageNumber > 1) {
-            this.ticketList.push.apply(this.ticketList, res.data.IBE.list);
-            this.dataListApplyType = res.data.IBE.list.length === 0;
-          } else {
-            this.ticketList = res.data.IBE.list;
-          }
+          this.ticketList = res.data.IBE.list;
+          this.dataListApplyType = true;
           console.log(this.ticketList);
           if (this.ticketList.length < 1) {
             this.showDefault = true;
-            // this.showReturnBtn = true;
+            this.dataListApplyType = false;
             this.skeletonNumber = 0;
           }
 
           this.nextGetData = false;
         } else {
           this.showDefault = true;
-          this.showDefaultType = '404';
+          this.showDefaultType = "404";
           this.skeletonNumber = 0;
-          this.$forceUpdate()
+          this.$forceUpdate();
         }
-      });
-      console.log(this.ticketList);
-    },
-
-    // 获取票价舱位信息
-    getNfdData() {
-      this.ticketList.forEach((item, index) => {
-        let dataList = {
-          // sourceCode: 'IBE',
-          QueryDate: item.QueryDate,
-          Departure: item.Departure,
-          Destination: item.Destination,
-          SystemMsg: item.SystemMsg,
-          segments: item.segments,
-          // relatedKey: '',
-          cabins: item.ItineraryInfos.NFD.cabinInfo,
-        };
-        ticket.getNfd(dataList).then((res) => {
-          this.$nextTick(() => {
-            item["nfd"] = res;
-            res.ItineraryInfos[0].cabinPrices.ADT.rulePrice.price;
-          });
-        });
       });
     },
 
     // 选择日期
     clickBtn(val, status) {
       if (status) {
-        this.skeletonNumber = 5
-        this.ticketList = []
+        this.skeletonNumber = 6;
+        this.ticketList = [];
         console.log(val);
         this.activeTimeNumber = val.date;
         this.airMessage = {
@@ -292,8 +248,7 @@ export default {
                 "-" +
                 moment(day).add(dayNumber, "d").format("DD")
               : moment(day).add(dayNumber, "d").format("DD"),
-          status:
-            +moment() < +moment(day).add(dayNumber, "d"),
+          status: +moment() < +moment(day).add(dayNumber, "d"),
         });
         dayNumber += 1;
       }
@@ -302,7 +257,6 @@ export default {
       });
 
       this.timeIndex = "";
-      console.log(this.timeIndex, this.ticketTimeList);
       this.activeTimeNumber = this.airMessage.departureTime;
     },
 
@@ -320,8 +274,8 @@ export default {
     // 国内单程价格排序
     priceSort(p) {
       return (m, n) => {
-        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
-        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
+        var a = m[p];
+        var b = n[p];
         return a - b;
       };
     },
@@ -336,9 +290,9 @@ export default {
 
     // 列表筛选
     listFilter(val) {
-      console.log(val)
+      console.log(val);
       if (val === "price") {
-        this.ticketList.sort(this.priceSort("price"));
+        this.ticketList.sort(this.priceSort("min_price"));
       } else if (val === "time") {
         this.ticketList.sort(this.timeSort("depTime"));
       }
@@ -358,14 +312,10 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      if(data.ItineraryInfos.length < 1){
-        return false
+      console.log(data);
+      if (data.available_cabin < 1) {
+        return false;
       }
-      data["to"] = this.ticketData.to.city_name;
-      data["from"] = this.ticketData.from.city_name;
-      (data["departure"] = this.ticketAddress.ticketAddress), // 起飞机场三字码
-        (data["arrival"] = this.ticketAddress.arrival), // 到达机场三字码
-        console.log("航程信息组装", data);
       uni.navigateTo({
         url:
           "/pages/flightInfo/flightInfo?airData=" +
@@ -376,24 +326,7 @@ export default {
       });
     },
   },
-  onHide() {
-    this.ticketList = [];
-    this.pageNumber = 1;
-    this.dataListApplyType = false;
-    this.airMessage["page"] = this.pageNumber;
-  },
-  onShow() {
-    // 获取时间日期
-    if (uni.getStorageSync("time")) {
-      let timeData = JSON.parse(uni.getStorageSync("time"));
-      this.airMessage.departureTime = timeData.date;
-      this.ticketData.toTime.date = timeData.date;
-
-      uni.removeStorageSync("time");
-    }
-    this.getTicketData();
-    this.getDateList(); // 时间处理
-  },
+  onShow() {},
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.ticketData = JSON.parse(data.data);
@@ -422,6 +355,17 @@ export default {
       departureTime: this.ticketData.toTime.date, // 起飞时间
       airline: "", // 航司二字码
     };
+
+    // 获取时间日期
+    if (uni.getStorageSync("time")) {
+      let timeData = JSON.parse(uni.getStorageSync("time"));
+      this.airMessage.departureTime = timeData.date;
+      this.ticketData.toTime.date = timeData.date;
+
+      uni.removeStorageSync("time");
+    }
+    this.getTicketData();
+    this.getDateList(); // 时间处理
   },
 };
 </script>
@@ -503,8 +447,8 @@ export default {
             color: rgba(255, 0, 0, 1);
           }
         }
-        &.is_before{
-          opacity: .5;
+        &.is_before {
+          opacity: 0.5;
         }
         .time_day {
           font-size: 18upx;
@@ -636,7 +580,7 @@ export default {
             margin-right: 6upx;
           }
         }
-        .sold_out{
+        .sold_out {
           color: rgba(255, 0, 0, 1);
           font-size: 48upx;
         }
