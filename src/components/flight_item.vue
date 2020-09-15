@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-09-14 10:32:19
+ * @LastEditTime: 2020-09-15 10:42:45
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -10,7 +10,7 @@
     <view class="item_box_header">
       <view class="box_header_left">
         <view class="left_prcie">
-          <text class="unit">&yen;</text>
+          <text class="unit" v-if="!isNaN(flightData.data.cabinPrices.ADT.rulePrice.price)">&yen;</text>
           <text v-if="flightData.data.cabinPrices.ADT.rulePrice.price !== 0">{{flightData.data.cabinPrices.ADT.rulePrice.price}}</text>
           <text class="not_price" v-else>待获取</text>
           <!-- <view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view> -->

@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-08-13 09:31:20
+ * @LastEditTime: 2020-09-15 09:20:34
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -55,7 +55,7 @@
               </view>
             </view>
 
-            <view class="list_item wallet_info">
+            <!-- <view class="list_item wallet_info">
               <view class="wallet_title">国内IBE流量</view>
               <view class="wallet_number">
                 {{walletInfo.ibe_search || 0}}
@@ -69,7 +69,7 @@
                 {{0}}
                 <text class="wallet_unit">条</text>
               </view>
-            </view>
+            </view> -->
           </view>
         </view>
       </view>

@@ -2,8 +2,8 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-09-14 16:24:52
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-15 14:47:43
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <uni-popup ref="filterPopup" type="bottom" class="filter_dialog">
@@ -40,6 +40,17 @@
             <view class="list_click"></view>
           </view>
         </view>
+        <view class="content_list" v-if="activeFilterIndex === 1">
+          <view
+            :class="['takeoff_time_list',{active: airlineName === index}]"
+            @click="takeoffTimeActive(item,index)"
+            v-for="(item, index) in airlines"
+            :key="index"
+          >
+            <view class="list_name">{{keyTitle?item[keyTitle]:item}}</view>
+            <view class="list_click"></view>
+          </view>
+        </view>
       </view>
     </view>
   </uni-popup>
@@ -70,6 +81,10 @@ export default {
         "晚上18:00-24:00",
       ],
     },
+    airlines: {  // 航司列表
+      type: Array,
+      default: () => []
+    },
     keyTitle: {
       // 显示数据键
       type: String,
@@ -84,12 +99,13 @@ export default {
 
       filterList: {
         // 筛选列表名称
-        listName: ["起飞时间段", "航空公司", "舱位", "机场"],
+        listName: ["起飞时间段", "航空公司"],
       },
 
       activeFilterIndex: 0, // 默认筛选列表名称下标
 
       takeoffTimeName: 0, // 起飞时间段默认选择
+      airlineName: 0, // 航司默认选择
     };
   },
   methods: {
@@ -111,6 +127,8 @@ export default {
     closeFilterList() {
       this.filterDataList = [];
       this.takeoffTimeName = 0;
+      this.airlineName = 0
+      this.submitFilterBtn()
     },
 
     // 切换筛选盒子
@@ -120,13 +138,14 @@ export default {
 
     // 起飞时间段选择
     takeoffTimeActive(val, index) {
-      this.takeoffTimeName = index;
+      this.takeoffTimeName = this.activeFilterIndex === 0? index:this.takeoffTimeName;
+      this.airlineName = this.activeFilterIndex === 1? index: this.airlineName
       this.filterDataList[this.activeFilterIndex] = val;
     },
 
     // 确认筛选数据
     submitFilterBtn(){
-      console.log(this.filterDataList)
+      // console.log(this.filterDataList)
       this.$emit('ticketFilterData',this.flightType?this.filterDataList:this.checkboxGroup[this.takeoffTimeName])
       this.closeFilterDialog()
     },
@@ -214,6 +233,7 @@ export default {
       .content_list {
         flex: 1;
         padding: 32upx 40upx 32upx 30upx;
+        overflow-y: auto;
         .takeoff_time_list {
           display: flex;
           align-items: center;

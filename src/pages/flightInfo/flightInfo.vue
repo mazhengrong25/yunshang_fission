@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-14 17:13:38
+ * @LastEditTime: 2020-09-15 10:52:03
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -142,7 +142,7 @@ import moment from "moment";
 moment.locale("zh-cn");
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
 import flightItem from "@/components/flight_item.vue"; // 舱位信息
-import flightExplanation from "@/components/flight_explanation.vue"; // 舱位信息
+import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 import ticket from "@/api/ticketInquiry.js";
 export default {
   components: {
@@ -299,25 +299,23 @@ export default {
       let data = {
         air_line_code: [],
       };
-      data.air_line_code.push(this.airMessage.airSegments[0].airline);
+      data.air_line_code.push(this.airMessage.segments[0].airline);
       console.log("客规原始信息", this.airMessage, this.depMessage);
       if (JSON.stringify(this.depMessage) !== "{}") {
         data.air_line_code.push(this.depMessage.airSegments[0].airline);
       }
       ticket.getGaugetype(data).then((res) => {
-        this.airGuestInfo = res.data[this.airMessage.airSegments[0].airline];
+        this.airGuestInfo = res.data[this.airMessage.segments[0].airline];
         if (JSON.stringify(this.depMessage) !== "{}") {
-          this.depGuestInfo = res.data[this.depMessage.airSegments[0].airline];
+          this.depGuestInfo = res.data[this.depMessage.segments[0].airline];
         }
 
         console.log("客规信息", this.airGuestInfo, this.depGuestInfo);
       });
     },
 
-    // 打开退改签说明弹窗
-    openExpPupop(data) {
-      console.log(data);
-
+    // 组装退改信息
+    getGaugeInfo(data){
       // 组装航班数据
       let filghtMessage = {
         time: moment(data.data.routing.segments[0].depTime).format(
@@ -344,6 +342,13 @@ export default {
         filght: filghtMessage,
         gauge: gaugeMessage,
       };
+    },
+
+    // 打开退改签说明弹窗
+    openExpPupop(data) {
+      console.log(data);
+      this.getGaugeInfo(data)
+      
       console.log("完整信息", this.ruleInfos);
       this.$refs.flightExplanation.openExp();
     },
@@ -388,9 +393,9 @@ export default {
 
     // 获取价格信息 - 验价
     getPriceData(data, header, index, type) {
-      console.log(data, header, index);
+      console.log(data, header, index, type, this.airMessage);
       let params;
-      if (type) {
+      if (type) {  // 往返验价
         this.depActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
@@ -408,7 +413,7 @@ export default {
           ItineraryInfo: this.depMessage.data.data,
           relatedKey: "11",
         };
-      } else {
+      } else {  // 单程验价
         this.airActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
@@ -418,12 +423,12 @@ export default {
         params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
-          queryDate: this.airMessage.flightData.time,
-          departure: this.airMessage.ticketAddress.departure,
-          destination: this.airMessage.ticketAddress.arrival,
+          queryDate: this.airMessage.QueryDate,
+          departure: this.airMessage.Departure,
+          destination: this.airMessage.Destination,
           systemMsg: "",
-          segments: this.airMessage.airSegments,
-          ItineraryInfo: this.airMessage.data.data,
+          segments: this.airMessage.segments,
+          ItineraryInfo: data.data,
           relatedKey: "11",
         };
       }
@@ -471,7 +476,7 @@ export default {
 
     // 跳转预定页面 - 先验价再跳转
     jumpReservationBtn(data, header, index, type) {
-      console.log(data, header, index, type);
+      console.log(data, header, index, type, this.airMessage);
       let params;
       if (this.roundTripBtnActive === 0) {
         // 去程验价数据组装
@@ -481,18 +486,17 @@ export default {
           type: data.type,
         };
         this.airMessage["data"] = data;
+        data.data.productType = 'FD'?'SD': data.data.productType
         params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
-          queryDate: this.airMessage.flightData.time,
-          departure: this.airMessage.ticketAddress.departure,
-          destination: this.airMessage.ticketAddress.arrival,
+          queryDate: this.airMessage.QueryDate,
+          departure: this.airMessage.Departure,
+          destination: this.airMessage.Destination,
           systemMsg: "",
-          segments: this.airMessage.airSegments,
-          ItineraryInfo: this.airMessage.data.data,
+          segments: this.airMessage.segments,
+          ItineraryInfo: data.data,
           relatedKey: "11",
-          // routing: JSON.stringify(this.airMessage.data.data.routing),
-          // standardPrice: this.airMessage.data.data.routing.ItineraryInfo.cabinPrices.ADT.standardPrice
         };
       } else {
         // 返程验价数据组装
@@ -519,6 +523,7 @@ export default {
 
       ticket.checkPrice(params).then((res) => {
         if (res.errorcode === 10000) {
+          this.getGaugeInfo(data)
           if (res.data.check_price_status) {
             // 价格没有修改 直接进行操作
             if (!this.roundTripType) {
@@ -538,13 +543,15 @@ export default {
                   res.data.price
                 );
               }
+              
               // 单程验价
               uni.navigateTo({
                 url:
                   "/pages/flightReservation/flightReservation?key=" +
                   res.data.keys +
                   "&price=" +
-                  res.data.price,
+                  res.data.price + 
+                  "&gaugeData=" + JSON.stringify(this.ruleInfos),
               });
             } else {
               // 往返验价
@@ -586,6 +593,8 @@ export default {
               );
             }
 
+            this.$forceUpdate()
+
             this.$refs.checkPricePopup.open();
           }
         } else {
@@ -612,7 +621,8 @@ export default {
             "/pages/flightReservation/flightReservation?key=" +
             this.relatedKey +
             "&price=" +
-            this.newPrice,
+            this.newPrice +
+            "&gaugeData=" + JSON.stringify(this.ruleInfos),
         });
       } else {
         // 往返验价
@@ -652,6 +662,9 @@ export default {
     this.fileKey = data.fileKey;
     this.segmentsKey = data.segmentsKey;
 
+    // 获取航班详情
+    this.getDetailsData();
+
     // 组装航程信息
     this.flightData = {
       flightType: "单程", // 航程类型
@@ -678,10 +691,8 @@ export default {
       food: this.airMessage.segments[0].hasMeal, // 餐饮
     };
 
-    // 获取航班详情
-    this.getDetailsData();
     // 获取航司退改信息
-    // this.getGaugeMessage();
+    this.getGaugeMessage();
   },
 };
 </script>

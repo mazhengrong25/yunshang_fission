@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-14 16:29:52
+ * @LastEditTime: 2020-09-15 16:01:10
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -32,7 +32,6 @@
       :enable-back-to-top="true"
       :scroll-y="true"
       class="ticket_content"
-      @scrolltolower="getNewData"
       lower-threshold="100"
     >
       <view
@@ -111,7 +110,11 @@
       <flight-filter @openFilter="openFilter" @filterType="listFilter"></flight-filter>
     </view>
 
-    <flight-filter-dialog ref="filterDialog" @ticketFilterData="ticketFilter"></flight-filter-dialog>
+    <flight-filter-dialog
+      ref="filterDialog"
+      @ticketFilterData="ticketFilter"
+      :airlines="airlineList"
+    ></flight-filter-dialog>
   </view>
 </template>
 
@@ -172,19 +175,24 @@ export default {
           model: "",
         },
       ],
+
+      filterList: [], // 过滤数组
+
+      airlineList: ["不限"], // 航司列表
     };
   },
   methods: {
     // 获取航班信息
-    getTicketData(status) {
+    getTicketData() {
       this.airMessage["only_segment"] = 1;
-      ticket.getTicket(this.airMessage, status).then((res) => {
+      ticket.getTicket(this.airMessage).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.showDefaultType = "";
           this.file_key = res.data.IBE.file_key;
           this.showDefault = false;
-          this.ticketList = res.data.IBE.list;
+          this.oldTicketList = res.data.IBE.list
+          this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
           this.dataListApplyType = true;
           console.log(this.ticketList);
           if (this.ticketList.length < 1) {
@@ -192,9 +200,9 @@ export default {
             this.dataListApplyType = false;
             this.skeletonNumber = 0;
           }
-
           this.nextGetData = false;
         } else {
+          this.ticketList = [];
           this.showDefault = true;
           this.showDefaultType = "404";
           this.skeletonNumber = 0;
@@ -298,12 +306,91 @@ export default {
       }
     },
 
+    // 时段筛选
+    timeFilter(time, oldFilterList) {
+      if (time === "不限") {
+        this.ticketList = oldFilterList;
+      }
+      if (time.indexOf("上午") !== -1) {
+        this.ticketList = oldFilterList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 0 &&
+            new Date(item.segments[0].depTime).getHours() < 12
+        );
+      }
+      if (time.indexOf("中午") !== -1) {
+        this.ticketList = oldFilterList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 12 &&
+            new Date(item.segments[0].depTime).getHours() < 14
+        );
+      }
+      if (time.indexOf("下午") !== -1) {
+        this.ticketList = oldFilterList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 14 &&
+            new Date(item.segments[0].depTime).getHours() < 18
+        );
+      }
+      if (time.indexOf("晚上") !== -1) {
+        this.ticketList = oldFilterList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 18 &&
+            new Date(item.segments[0].depTime).getHours() < 24
+        );
+      }
+    },
+
+    // 航司筛选
+    airFilter(air, oldFilterList) {
+      if (air === "不限") {
+        return (this.ticketList = this.ticketList);
+      }
+      this.ticketList = oldFilterList.filter(
+        (item) => item.segments[0].airline_CN === air
+      );
+    },
+
     // 航班信息筛选
-    ticketFilter() {},
+    ticketFilter(val) {
+      this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
+      if (val.length > 0) {
+        if (val[0]) {
+          this.timeFilter(val[0], this.oldTicketList);
+        }
+        if (!val[0] && val[1]) {
+          this.airFilter(val[1], this.oldTicketList);
+        }
+        if (val[0] && val[1]) {
+          this.airFilter(val[1], this.ticketList);
+        }
+        if (val[0] === "不限" && val[1] === "不限") {
+          this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
+        }
+      } else {
+        this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
+      }
+      if (val.length > 0 && this.ticketList.length < 1) {
+        this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
+        uni.showToast({
+          title: "暂无该筛选类别，请更换其他条件",
+          duration: 2000,
+          icon: "none",
+          mask: true,
+        });
+        setTimeout(() => {
+          this.$refs.filterDialog.openFilterDialog();
+        }, 1000);
+      }
+    },
 
     // 打开筛选
     openFilter() {
       this.$refs.filterDialog.openFilterDialog();
+      this.ticketList.forEach((item) => {
+        this.airlineList.push(item.segments[0].airline_CN);
+      });
+      this.airlineList = [...new Set(this.airlineList)];
     },
     // 关闭弹出框
     closeFilterDialog() {
@@ -312,7 +399,7 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      console.log(data);
+      console.log("跳转");
       if (data.available_cabin < 1) {
         return false;
       }

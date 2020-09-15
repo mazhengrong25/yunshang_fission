@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-11 09:19:47
+ * @LastEditTime: 2020-09-15 11:13:06
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -19,6 +19,7 @@
         :flightData="flightData"
         :roundTripType="roundTripType"
         :roundTripFlightData="flightRoundData"
+        @openHeadExpPopup="openHeadExpPopup"
       ></flight-header>
       <view v-else class="not_flight_data">
         <text></text>
@@ -228,6 +229,9 @@
       >去支付</button>
     </view>
 
+    <!-- 航班退改信息 -->
+    <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
+
     <!-- 金额明细弹窗 -->
     <uni-popup ref="priceInfoDialog" type="bottom">
       <view class="price_info">
@@ -320,6 +324,7 @@
 
 <script>
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
+import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 import insurance from "@/api/insurance.js";
 import ticket from "@/api/ticketInquiry.js";
 import moment from "moment";
@@ -327,6 +332,7 @@ moment.locale("zh-cn");
 export default {
   components: {
     flightHeader,
+    flightExplanation,
   },
   data() {
     return {
@@ -422,6 +428,8 @@ export default {
       showStatementWeb: false, // 外部链接
 
       chdinf_msg: {}, // 航司儿童婴儿携带数量
+
+      ruleInfos: {}, // 航班退改信息
     };
   },
   methods: {
@@ -784,6 +792,15 @@ export default {
       }
     },
 
+    // 打开航班退改信息弹窗
+    openHeadExpPopup() {
+      this.$refs.flightExplanation.openExp();
+    },
+    // 关闭航班退改信息弹窗
+    closePopup() {
+      this.$refs.flightExplanation.closeExp();
+    },
+
     // 打开金额明细弹窗
     openOrderInfo() {
       this.$refs.priceInfoDialog.open();
@@ -1011,6 +1028,12 @@ export default {
     // let airData = JSON.parse(data.data);
 
     this.roundTripType = data.type ? JSON.parse(data.type) : false;
+
+    this.ruleInfos = data.gaugeData? JSON.parse(data.gaugeData): {}
+    console.log(this.ruleInfos)
+    if(this.ruleInfos.filght.price){
+      this.ruleInfos.filght.price = data.price
+    }
     if (this.roundTripType) {
       // 获取往返key和价格
       this.relatedKey = data.key;

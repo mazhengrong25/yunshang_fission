@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-02 18:27:25
+ * @LastEditTime: 2020-09-15 11:07:08
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -35,7 +35,7 @@
         {{flightData.airline}}{{flightData.model?' | '+ flightData.model: ''}} {{flightData.food? ' | 有餐食': ''}}
       </view>
 
-      <view class="flight_reservation_box" v-if="!flightInfo && !roundTripType">
+      <view class="flight_reservation_box" v-if="!flightInfo && !roundTripType"  @click="openHeadExp">
         {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
@@ -106,6 +106,13 @@ export default {
   },
   data() {
     return {};
+  },
+  methods: {
+    openHeadExp(){
+      console.log('打开弹窗')
+      this.$emit('openHeadExpPopup')
+      
+    },
   },
 };
 </script>

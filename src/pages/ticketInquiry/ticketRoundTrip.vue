@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-10 16:23:01
+ * @LastEditTime: 2020-09-15 11:16:53
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -65,7 +65,7 @@
               <view class="price">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</text>
+                <text>{{item.min_price}}</text>
                 <!-- <view class="price_mini">起</view> -->
               </view>
             </view>
@@ -128,7 +128,7 @@
                 <!-- <view class="price_mini">补</view> -->
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{item.ItineraryInfos['经济舱'][0].cabinPrices.ADT.price}}</text>
+                <text>{{item.min_price}}</text>
               </view>
             </view>
           </view>
@@ -224,18 +224,18 @@ export default {
     };
   },
   methods: {
-    // 下拉加载
-    getNewData() {
-      if (!this.dataListApplyType || !this.dataRoundListApplyType) {
-        this.pageNumber += 1;
-        if (!this.dataListApplyType) {
-          this.getTicketData(this.airMessage);
-        }
-        if (!this.dataRoundListApplyType) {
-          this.getRoundTicketData(this.airMessage);
-        }
-      }
-    },
+    // // 下拉加载
+    // getNewData() {
+    //   if (!this.dataListApplyType || !this.dataRoundListApplyType) {
+    //     this.pageNumber += 1;
+    //     if (!this.dataListApplyType) {
+    //       this.getTicketData(this.airMessage);
+    //     }
+    //     if (!this.dataRoundListApplyType) {
+    //       this.getRoundTicketData(this.airMessage);
+    //     }
+    //   }
+    // },
     // 获取去程航班信息
     getTicketData() {
       let data = {
@@ -243,9 +243,10 @@ export default {
         arrival: this.ticketAddress.arrival, // 到达机场三字码
         departureTime: this.ticketAddress.departureTime, // 起飞时间
         airline: "", // 航司二字码
-        file_key: this.file_key,
-        page: this.pageNumber,
-        per_page: 5,
+        // file_key: this.file_key,
+        only_segment: 1,
+        // page: this.pageNumber,
+        // per_page: 5,
       };
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
@@ -255,9 +256,7 @@ export default {
             this.dataListApplyType = res.data.IBE.list.length === 0;
           } else {
             this.flightList = res.data.IBE.list;
-            this.price += this.flightList[this.toActive].ItineraryInfos[
-              "经济舱"
-            ][0].cabinPrices.ADT.price;
+            this.price += this.flightList[this.toActive].min_price;
           }
           this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
           console.log(this.flightList);
@@ -288,9 +287,10 @@ export default {
         arrival: this.ticketAddress.departure, // 到达机场三字码
         departureTime: this.ticketAddress.arrTime, // 起飞时间
         airline: "", // 航司二字码
-        file_key: this.roundFlightKey,
-        page: this.pageNumber,
-        per_page: 5,
+        // file_key: this.roundFlightKey,
+        only_segment: 1,
+        // page: this.pageNumber,
+        // per_page: 5,
       };
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
@@ -303,9 +303,7 @@ export default {
             this.dataRoundListApplyType = res.data.IBE.list.length === 0;
           } else {
             this.roundFlightList = res.data.IBE.list;
-            this.price += this.roundFlightList[this.fromActive].ItineraryInfos[
-              "经济舱"
-            ][0].cabinPrices.ADT.price;
+            this.price += this.roundFlightList[this.fromActive].min_price;
           }
           this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
           console.log(this.roundFlightList);
@@ -339,10 +337,8 @@ export default {
         this.fromActive = index;
       }
       this.price =
-        this.flightList[this.toActive].ItineraryInfos["经济舱"][0].cabinPrices
-          .ADT.price +
-        this.roundFlightList[this.fromActive].ItineraryInfos["经济舱"][0]
-          .cabinPrices.ADT.price;
+        this.flightList[this.toActive].min_price +
+        this.roundFlightList[this.fromActive].min_price;
 
       this.$forceUpdate();
     },
@@ -350,8 +346,8 @@ export default {
     // 国内单程价格排序
     priceSort(p) {
       return (m, n) => {
-        var a = m.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
-        var b = n.ItineraryInfos["经济舱"][0].cabinPrices.ADT[p];
+        var a = m[p];
+        var b = n[p];
         return a - b;
       };
     },
@@ -368,8 +364,8 @@ export default {
     // 列表筛选
     listFilter(val) {
       if (val === "price") {
-        this.flightList.sort(this.priceSort("price"));
-        this.roundFlightList.sort(this.priceSort("price"));
+        this.flightList.sort(this.priceSort("min_price"));
+        this.roundFlightList.sort(this.priceSort("min_price"));
       } else if (val === "time") {
         this.flightList.sort(this.timeSort("depTime"));
         this.roundFlightList.sort(this.timeSort("depTime"));
