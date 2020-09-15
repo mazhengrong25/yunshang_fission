@@ -2,7 +2,7 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-09-15 14:47:43
+ * @LastEditTime: 2020-09-15 17:47:20
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -146,7 +146,7 @@ export default {
     // 确认筛选数据
     submitFilterBtn(){
       // console.log(this.filterDataList)
-      this.$emit('ticketFilterData',this.flightType?this.filterDataList:this.checkboxGroup[this.takeoffTimeName])
+      this.$emit('ticketFilterData',this.flightType?this.filterDataList:this.checkboxGroup[this.takeoffTimeName],this.directFlightStatus)
       this.closeFilterDialog()
     },
   },

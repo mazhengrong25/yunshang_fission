@@ -2,7 +2,7 @@
  * @Description: 往返日期状态栏组件
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:57:25
- * @LastEditTime: 2020-08-28 16:10:45
+ * @LastEditTime: 2020-09-15 18:31:58
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -38,7 +38,11 @@
 		methods: {
 			// 跳转日历
 			jumpDatePage(){
-				this.$emit('jumpDatePage',true)
+				console.log("跳转日历页面");
+				console.log(this.timeData)
+				uni.navigateTo({
+					 url: ''
+				})
 			},
 			// 跳转日历开始日期
 			jumpStartPage(){

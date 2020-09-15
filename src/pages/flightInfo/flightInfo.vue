@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-15 10:52:03
+ * @LastEditTime: 2020-09-15 17:10:28
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -662,6 +662,8 @@ export default {
     this.fileKey = data.fileKey;
     this.segmentsKey = data.segmentsKey;
 
+    console.log('舱位信息',this.airMessage)
+
     // 获取航班详情
     this.getDetailsData();
 
@@ -690,6 +692,8 @@ export default {
       model: this.airMessage.segments[0].aircraftCode, // 机型
       food: this.airMessage.segments[0].hasMeal, // 餐饮
     };
+
+    console.log('舱位信息航班详情',this.flightData)
 
     // 获取航司退改信息
     this.getGaugeMessage();

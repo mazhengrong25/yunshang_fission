@@ -2,8 +2,8 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-09 11:40:43
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-15 17:28:22
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="city_select">
@@ -20,10 +20,10 @@
       <view class="close_input" v-if="searchCity !== ''" @click="closeSearch">取消</view>
     </view>
 
-    <view class="city_swiper_header" v-if="!searchCity">
+    <!-- <view class="city_swiper_header" v-if="!searchCity">
       <view :class="['header_btn',{'acive': isCityActive}]" @click="checkedCityBtn(true)">国内</view>
       <view :class="['header_btn',{'acive': !isCityActive}]" @click="checkedCityBtn(false)">国际/中国港澳台</view>
-    </view>
+    </view> -->
 
     <scroll-view
       :enable-back-to-top="true"
@@ -38,18 +38,17 @@
         <view class="gps_address address_tag_list" v-if="isCityActive">
           <view class="address_title">当前定位</view>
           <view class="address_list_box">
-            <view class="address_tag address_tag_icon">{{Areaaddress.city || '获取定位中'}}</view>
+            <view class="address_tag address_tag_icon" @click="gpsGetAddress(Areaaddress.city)">{{Areaaddress.city || '获取定位中'}}</view>
           </view>
         </view>
 
         <view class="address_tag_list">
           <view class="address_title">热门城市</view>
           <view class="address_list_box">
-            <view class="address_tag">北京首都</view>
-            <view class="address_tag">重庆</view>
-            <view class="address_tag">成都</view>
-            <view class="address_tag">广州</view>
-            <view class="address_tag">上海虹桥</view>
+            <view class="address_tag" v-for="(item, index) in hotCity" :key="index" @click="getCityData(item,'hot')">
+              {{item.city_name === '上海'? item.city_name + item.air_port_name:
+              item.city_name === '北京'? item.city_name + '首都':item.city_name}}
+            </view>
           </view>
         </view>
       </view>
@@ -111,6 +110,9 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
+
+      hotCity: [], // 热门城市
+
       cityAirList: [], // 城市机场原始数据
 
       searchCity: "", // 城市搜索
@@ -177,6 +179,13 @@ export default {
       });
     },
 
+    // 定位数据查找相同城市
+    gpsGetAddress(val){
+      if(val){
+        this.getCityData(this.cityAirList.filter(item => val.indexOf(item.city_name) !== -1)[0],'city')
+      }
+    },
+
     // 获取城市机场列表
     getAirData() {
       let data = {
@@ -184,6 +193,21 @@ export default {
       };
       city.getAir(data).then((res) => {
         this.cityAirList = res;
+        // 热门城市组装
+        this.cityAirList.forEach(item =>{
+          if(
+            item.air_port_name === '首都'||
+            item.city_name === '重庆'||
+            item.city_name === '成都'||
+            item.city_name === '广州'||
+            item.city_name === '上海'||
+            item.city_name === '杭州'||
+            item.city_name === '乌鲁木齐'||
+            item.city_name === '深圳'
+            ){
+            this.hotCity.push(item)
+          }
+        })
         this.cityUnitList.forEach((item, index) => {
           this.cityList.push({
             unit: "",

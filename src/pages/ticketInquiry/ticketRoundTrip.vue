@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-15 11:16:53
+ * @LastEditTime: 2020-09-15 18:25:36
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -11,7 +11,7 @@
     <yun-header :statusHeight="iStatusBarHeight" :statusType="true" :headerAddress="ticketAddress"></yun-header>
     <!-- 往返时间 -->
     <view class="header_time" v-if="!showDefaultType">
-      <round-trip-header :timeData="timeData" @jumpDatePage="jumpDatePage"></round-trip-header>
+      <round-trip-header :timeData="timeData"></round-trip-header>
     </view>
     <!-- 航班列表 -->
     <scroll-view
@@ -19,7 +19,6 @@
       :enable-back-to-top="true"
       class="flight_list"
       :scroll-y="true"
-      @scrolltolower="getNewData"
       lower-threshold="100"
     >
       <view class="flight_content">
@@ -62,17 +61,22 @@
                 />
                 {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}}
               </view>
-              <view class="price">
+              <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
                 <text>{{item.min_price}}</text>
                 <!-- <view class="price_mini">起</view> -->
               </view>
+              <view v-else class="not_price">售罄</view>
             </view>
           </view>
 
           <!-- 骨架屏 -->
-          <view class="flight_skeleton" v-for="i in flightList.length < 1?skeletonNumber:0" :key="i">
+          <view
+            class="flight_skeleton"
+            v-for="i in flightList.length < 1?skeletonNumber:0"
+            :key="i"
+          >
             <view class="top">
               <text></text>
               <text></text>
@@ -124,17 +128,22 @@
                 />
                 {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}}
               </view>
-              <view class="price">
-                <!-- <view class="price_mini">补</view> -->
+              <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
                 <text>{{item.min_price}}</text>
+                <!-- <view class="price_mini">起</view> -->
               </view>
+              <view v-else class="not_price">售罄</view>
             </view>
           </view>
 
           <!-- 骨架屏 -->
-          <view class="flight_skeleton" v-for="i in roundFlightList.length < 1? skeletonRoundNumber :0" :key="i">
+          <view
+            class="flight_skeleton"
+            v-for="i in roundFlightList.length < 1? skeletonRoundNumber :0"
+            :key="i"
+          >
             <view class="top">
               <text></text>
               <text></text>
@@ -149,13 +158,23 @@
       </view>
     </scroll-view>
 
-    <default-page style="flex: 1" v-if="showDefault" @returnBtn="getTicketData()" :defaultType="showDefaultType"></default-page>
+    <default-page
+      style="flex: 1"
+      v-if="showDefault"
+      @returnBtn="getTicketData()"
+      :defaultType="showDefaultType"
+    ></default-page>
 
     <view class="filter" v-if="!showDefaultType">
       <flight-filter @openFilter="openFilter" :filterMini="true" @filterType="listFilter"></flight-filter>
     </view>
 
-    <flight-filter-dialog ref="filterDialog" :directFlight="true"></flight-filter-dialog>
+    <flight-filter-dialog
+      ref="filterDialog"
+      @ticketFilterData="ticketFilter"
+      :directFlight="true"
+      :airlines="airlineList"
+    ></flight-filter-dialog>
 
     <view class="bottom_bar" v-if="!showDefaultType">
       <view class="left_message">
@@ -218,24 +237,13 @@ export default {
 
       submitBtnType: true, // 下一步按钮状态
 
-      
-      showDefault: false,  // 报错页面
-      showDefaultType: '', // 报错类型
+      showDefault: false, // 报错页面
+      showDefaultType: "", // 报错类型
+
+      airlineList: [], // 航班列表
     };
   },
   methods: {
-    // // 下拉加载
-    // getNewData() {
-    //   if (!this.dataListApplyType || !this.dataRoundListApplyType) {
-    //     this.pageNumber += 1;
-    //     if (!this.dataListApplyType) {
-    //       this.getTicketData(this.airMessage);
-    //     }
-    //     if (!this.dataRoundListApplyType) {
-    //       this.getRoundTicketData(this.airMessage);
-    //     }
-    //   }
-    // },
     // 获取去程航班信息
     getTicketData() {
       let data = {
@@ -243,41 +251,37 @@ export default {
         arrival: this.ticketAddress.arrival, // 到达机场三字码
         departureTime: this.ticketAddress.departureTime, // 起飞时间
         airline: "", // 航司二字码
-        // file_key: this.file_key,
         only_segment: 1,
-        // page: this.pageNumber,
-        // per_page: 5,
       };
-      ticket.getTicket(data).then((res) => {
-        if (res.errorcode === 10000) {
-          this.file_key = res.data.IBE.file_key;
-          if (this.pageNumber > 1) {
-            this.flightList.push.apply(this.flightList, res.data.IBE.list);
-            this.dataListApplyType = res.data.IBE.list.length === 0;
-          } else {
-            this.flightList = res.data.IBE.list;
-            this.price += this.flightList[this.toActive].min_price;
-          }
-          this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
-          console.log(this.flightList);
-          if (this.flightList.length < 1) {
-            uni.showToast({
-              title: "当日暂无去程航班信息，请切换其他日期",
-              icon: "none",
-            });
-          }
-        } else {
-          uni.showToast({
-            title: "查询去程航班失败，" + res.msg,
-            icon: "none",
-            mask: true,
-            duration: 4000,
-          });
-          this.showDefault = true;
-          this.showDefaultType = '404';
-          this.skeletonNumber = 0;
-        }
-      });
+      // ticket.getTicket(data).then((res) => {
+      //   if (res.errorcode === 10000) {
+      // this.file_key = res.data.IBE.file_key;
+      // this.flightList = res.data.IBE.list;
+      this.flightList = uni.getStorageSync("flightList");
+      this.price += this.flightList[this.toActive].min_price;
+          this.dataListApplyType = true;
+    
+      this.submitBtnType =
+        this.flightList.length < 1 || this.roundFlightList.length < 1;
+      if (this.flightList.length < 1) {
+        uni.showToast({
+          title: "当日暂无去程航班信息，请切换其他日期",
+          icon: "none",
+        });
+      }
+      //   } else {
+      //     uni.showToast({
+      //       title: "查询去程航班失败，" + res.msg,
+      //       icon: "none",
+      //       mask: true,
+      //       duration: 4000,
+      //     });
+      //     this.showDefault = true;
+      //     this.showDefaultType = '404';
+      //     this.skeletonNumber = 0;
+      //     this.dataListApplyType = false;
+      //   }
+      // });
       console.log("去程", this.flightList);
     },
     // 获取返程航班信息
@@ -287,50 +291,47 @@ export default {
         arrival: this.ticketAddress.departure, // 到达机场三字码
         departureTime: this.ticketAddress.arrTime, // 起飞时间
         airline: "", // 航司二字码
-        // file_key: this.roundFlightKey,
         only_segment: 1,
-        // page: this.pageNumber,
-        // per_page: 5,
       };
-      ticket.getTicket(data).then((res) => {
-        if (res.errorcode === 10000) {
-          this.roundFlightKey = res.data.IBE.file_key;
-          if (this.pageNumber > 1) {
-            this.roundFlightList.push.apply(
-              this.roundFlightList,
-              res.data.IBE.list
-            );
-            this.dataRoundListApplyType = res.data.IBE.list.length === 0;
-          } else {
-            this.roundFlightList = res.data.IBE.list;
-            this.price += this.roundFlightList[this.fromActive].min_price;
-          }
-          this.submitBtnType = this.flightList.length < 1 || this.roundFlightList.length < 1
-          console.log(this.roundFlightList);
-          if (this.roundFlightList.length < 1) {
-            uni.showToast({
-              title: "当日暂无返程航班信息，请切换其他日期",
-              icon: "none",
-            });
-          }
-        } else {
-          uni.showToast({
-            title: "查询返程航班失败，" + res.msg,
-            icon: "none",
-            mask: true,
-            duration: 4000,
-          });
-          this.showDefault = true;
-          this.showDefaultType = '404';
-          this.skeletonRoundNumber = 0;
-        }
-      });
+      // ticket.getTicket(data).then((res) => {
+      //   if (res.errorcode === 10000) {
+      // this.roundFlightKey = res.data.IBE.file_key;
+      // this.roundFlightList = res.data.IBE.list;
+      this.roundFlightList = uni.getStorageSync("roundFlightList");
+      // uni.setStorageSync('roundFlightList', this.roundFlightList)
+
+      this.price += this.roundFlightList[this.fromActive].min_price;
+      this.dataRoundListApplyType = true;
+      this.submitBtnType =
+        this.flightList.length < 1 || this.roundFlightList.length < 1;
+      if (this.roundFlightList.length < 1) {
+        uni.showToast({
+          title: "当日暂无返程航班信息，请切换其他日期",
+          icon: "none",
+        });
+      }
+      //   } else {
+      //     uni.showToast({
+      //       title: "查询返程航班失败，" + res.msg,
+      //       icon: "none",
+      //       mask: true,
+      //       duration: 4000,
+      //     });
+      //     this.showDefault = true;
+      //     this.showDefaultType = '404';
+      //     this.skeletonRoundNumber = 0;
+      //     this.dataRoundListApplyType = false;
+      //   }
+      // });
       console.log("返程", this.roundFlightList);
     },
 
     // 选择航班
     checkedFlight(type, val, index) {
       console.log(type, val, index);
+      if(val.min_price === 0){
+        return false
+      }
       if (type === "to") {
         this.toActive = index;
       } else if (type === "from") {
@@ -343,7 +344,7 @@ export default {
       this.$forceUpdate();
     },
 
-    // 国内单程价格排序
+    // 价格排序
     priceSort(p) {
       return (m, n) => {
         var a = m[p];
@@ -352,7 +353,7 @@ export default {
       };
     },
 
-    // 国内单程时间排序
+    // 时间排序
     timeSort(t) {
       return (m, n) => {
         var a = new Date(m.segments[0][t]).getTime();
@@ -366,24 +367,36 @@ export default {
       if (val === "price") {
         this.flightList.sort(this.priceSort("min_price"));
         this.roundFlightList.sort(this.priceSort("min_price"));
+        this.price = this.flightList[this.toActive].min_price;
+        this.price += this.roundFlightList[this.fromActive].min_price;
       } else if (val === "time") {
         this.flightList.sort(this.timeSort("depTime"));
         this.roundFlightList.sort(this.timeSort("depTime"));
+        this.price = this.flightList[this.toActive].min_price;
+        this.price += this.roundFlightList[this.fromActive].min_price;
       }
-    },
-
-    // 跳转日历
-    jumpDatePage() {
-      console.log("跳转日历页面");
     },
 
     // 打开筛选
     openFilter() {
       this.$refs.filterDialog.openFilterDialog();
+      this.flightList.forEach((item) => {
+        this.airlineList.push(item.segments[0].airline_CN);
+      });
+      this.roundFlightList.forEach((item) => {
+        this.airlineList.push(item.segments[0].airline_CN);
+      });
+      this.airlineList = [...new Set(this.airlineList)];
+      console.log(this.airlineList);
     },
     // 关闭弹出框
     closeFilterDialog() {
       this.$refs.filterDialog.closeFilterDialog();
+    },
+
+    // 确认筛选
+    ticketFilter(val, status) {
+      console.log(val, status);
     },
 
     // 往返航班提交
@@ -409,19 +422,20 @@ export default {
       });
     },
   },
-  onHide() {
-    this.flightList = [];
-    this.roundFlightList = [];
-    this.pageNumber = 1;
-    this.dataListApplyType = false;
-    this.dataRoundListApplyType = false;
-  },
-  onShow() {
-    this.price = 0;
-    this.getTicketData();
-    this.getRoundTicketData();
-  },
-  onLoad(data) {
+  // onHide() {
+  //   this.flightList = [];
+  //   this.roundFlightList = [];
+  //   this.pageNumber = 1;
+  //   this.dataListApplyType = false;
+  //   this.dataRoundListApplyType = false;
+  // },
+  // onShow() {
+  //   this.price = 0;
+  //   this.getTicketData();
+  //   this.getRoundTicketData();
+  // },
+  onLoad() {
+    let data = uni.getStorageSync("data");
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.ticketData = data.data ? JSON.parse(data.data) : "";
     // 组装头部数据
@@ -449,6 +463,10 @@ export default {
         "days"
       ),
     };
+
+    this.price = 0;
+    this.getTicketData();
+    this.getRoundTicketData();
   },
 };
 </script>
@@ -601,6 +619,11 @@ export default {
             font-size: 22upx;
             margin: 0 3upx;
           }
+        }
+        .not_price {
+          font-size: 38rpx;
+          font-weight: bold;
+          color: #ff0000;
         }
       }
     }

@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-10 16:09:50
+ * @LastEditTime: 2020-09-15 16:56:55
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -229,10 +229,10 @@ export default {
         multi_pass_from: "武汉", // 多程到达地
         toTime: "", // 出发时间
         toDay: "明天",
-        toDate: '',
+        toDate: "",
         fromTime: "", // 到达时间
         fromDay: "周三", // 到达日期
-        fromDate: ''
+        fromDate: "",
       },
 
       passengerForm: {
@@ -431,6 +431,14 @@ export default {
           cityData.type === "city"
             ? cityData.data.city_name
             : cityData.data.air_port_name;
+        if (cityData.type === "hot") {
+          this.addressForm.to =
+            cityData.data.city_name === "上海"
+              ? cityData.data.city_name + cityData.data.air_port_name
+              : cityData.data.city_name === "北京"
+              ? cityData.data.city_name + "首都"
+              : cityData.data.city_name;
+        }
         this.airMessage["to"] = cityData.data;
         this.airMessage["to_type"] = cityData.type;
       } else if (cityData.status === "from") {
@@ -438,10 +446,18 @@ export default {
           cityData.type === "city"
             ? cityData.data.city_name
             : cityData.data.air_port_name;
+        if (cityData.type === "hot") {
+          this.addressForm.from =
+            cityData.data.city_name === "上海"
+              ? cityData.data.city_name + cityData.data.air_port_name
+              : cityData.data.city_name === "北京"
+              ? cityData.data.city_name + "首都"
+              : cityData.data.city_name;
+        }
         this.airMessage["from"] = cityData.data;
         this.airMessage["from_type"] = cityData.type;
       }
-      console.log('airMessage',this.airMessage);
+      console.log("airMessage", this.airMessage);
       uni.removeStorageSync("city");
     }
     // 获取时间日期
@@ -459,9 +475,9 @@ export default {
         this.addressForm["fromDate"] = timeData.date;
       }
 
-      this.$forceUpdate()
+      this.$forceUpdate();
 
-      console.log('时间返回',timeData);
+      console.log("时间返回", timeData);
       uni.removeStorageSync("time");
     }
   },
