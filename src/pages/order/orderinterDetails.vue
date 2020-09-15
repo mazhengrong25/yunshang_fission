@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-14 10:33:57
+ * @LastEditTime: 2020-09-15 14:21:06
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
@@ -98,7 +98,7 @@
         <view
           class="option_btn"
           v-if="orderDetails.status === 3"
-          @click="getRefund(item)"
+          @click="getRefund()"
           >退票</view
         >
         <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
@@ -365,13 +365,15 @@ export default {
 
     // 跳转退票
     getRefund(data) {
+      console.log("退票",this.orderDetails)
       uni.navigateTo({
-        url: "/pages/order/refund?orderData=" + JSON.stringify(data),
+        url: "/pages/order/refund?refundData=" + JSON.stringify(this.orderDetails),
+    
       });
     },
 
     onLoad(data) {
-      console.log(data)
+      console.log('国内',data)
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       let listData = JSON.parse(data.listData);
       this.orderId = listData.order_no;

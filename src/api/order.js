@@ -2,8 +2,8 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-08-05 14:36:24
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-15 12:05:40
+ * @LastEditors: mazhengrong
  */
 import request from '@/api/request';
 
@@ -49,7 +49,7 @@ function orderDetails(data) {
 function orderInterRefund(data) {
 	return request({
 		method:'POST',
-		url:'/api/interOrder/orderRfound',
+		url:'/api/refund/details',
 		data: data
 	})
 }

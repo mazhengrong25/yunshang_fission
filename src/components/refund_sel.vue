@@ -1,5 +1,5 @@
 <template>
-	<!-- <view class="refund_middle">
+	<view class="refund_middle">
 		<view class="top_message">出行信息</view>
 		<view class="select_right">
 			<Checkbox
@@ -7,14 +7,14 @@
 				:value="checkAll"
 				:color="'#0070E2'"
 				@click.prevent.native="handleCheckAll">全选</Checkbox>
-		</view> -->
-			<!-- <CheckboxGroup v-model="checkAllGroup" @on-change="checkAllGroupChange" :color="'#0070E2'">
+		</view> 
+			<CheckboxGroup v-model="checkAllGroup" @on-change="checkAllGroupChange" :color="'#0070E2'">
 			       <Checkbox label="香蕉"></Checkbox>
 			       <Checkbox label="苹果"></Checkbox>
 			       <Checkbox label="西瓜"></Checkbox>
-			</CheckboxGroup>	 -->
+			</CheckboxGroup>	
 		<!-- 分割线 -->
-		<!-- <view style="border-top: 2upx solid rgba(241, 243, 245, 1);"></view>
+	    <view style="border-top: 2upx solid rgba(241, 243, 245, 1);"></view>
 		<view class="middle_message">
 			<view class="message_first">联系人</view>
 			<view class="message_bottom">
@@ -31,7 +31,7 @@
 		</view>
 		
 		
-	</view> -->
+	</view>
 </template>
 
 <script>

@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-14 16:13:01
+ * @LastEditTime: 2020-09-15 17:21:06
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -23,12 +23,21 @@
 			</view>
 		</view>
 		<!-- 航班信息 -->
-		<view class="main_list filght_info">
+		<view class="main_list filght_info"
+		v-for="(item, index) in orderDetails.ticket_segments"
+        :key="index">
 		<view class="main_list_title">航班信息</view>
 		<view class="info_header">
-			<view class="header_type">{{orderDetails.routing_type === 1?'单程':
-										orderDetails.routing_type === 2?'往返':
-										orderDetails.routing_type === 3?'多程':''}}</view>
+			<view class="header_type">
+			{{
+              orderDetails.segment_type === 1
+                ? "单程"
+                : orderDetails.segment_type === 2
+                ? "往返"
+                : orderDetails.segment_type === 3
+                ? "多程"
+                : ""
+            }}</view>
 			<view class="header_time">
 			{{item.departure_time.substring(0,10)}}
 			<text>{{$dateTool(item.departure_time,"ddd")}}</text>
@@ -36,64 +45,103 @@
 		</view>
 		<view class="info_message">
 			<view class="message_box">
-			<view class="date">{{item.departure_time.substring(10,16)}}</view>
-			<view class="address">{{item.departure}}</view>
+			<view class="date">{{item.departure_time.substring(11,16)}}</view>
+			<view class="address">{{ item.departure_CN.city_name}}{{ item.departure_CN.air_port_name }}</view>
 			</view>
 		
 			<view class="message_center">
-			<view class="date">{{(item.duration.replace(":","h"))}}m</view>
+			<view class="date">
+				{{ Math.floor(item.duration / 3600) }}h{{Math.floor((item.duration / 60) % 60)}}m
+			</view>
 			<view class="center_icon"></view>
 			<view class="type">直飞</view>
 			</view>
 		
 			<view class="message_box">
-			<view class="date">{{item.arrive_time.substring(10,16)}}</view>
-			<view class="address">{{item.arrive}}</view>
+			<view class="date">{{item.arrive_time.substring(11,16)}}</view>
+			<view class="address">{{ item.arrive_CN.city_name }}{{ item.arrive_CN.air_port_name }}</view>
 			</view>
 		</view>
 		
 		<view class="filght_message">
-			<view class="message_icon"></view>
-			<view class="message_list">{{item.inter_segments[0].flight_no}}</view>
-			<view class="message_list">空客A320</view>
+			<!-- 航班图标 -->
+            <view class="message_icon">
+              <image
+                class="message_icon"
+                :src="'https://fxxcx.ystrip.cn/' + item.image"
+                mode="contain"/>
+            </view>
+			<view class="message_list">{{ item.flight_no }}</view>
+            <view class="message_list">{{ item.model }}</view>
 			<view class="message_list">有早餐</view>
 		</view>
 		
 		<view class="filght_bottom">
-			<view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
-										item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
-										item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
+			<view class="bottom_list">
+			{{ item.cabin}}{{
+                item.cabin_level === "ECONOMY"
+                  ? "经济舱"
+                  : item.cabin_level === "FIRST"
+                  ? "头等舱"
+                  : item.cabin_level === "BUSINESS"
+                  ? "公务舱"
+                  : ""
+            }}</view>
 			<view class="bottom_list">退改签规则</view>
 			<view class="bottom_list">每人托运2件，每件23KG</view>
 		</view>
 		</view>
 		<!-- 出行信息 -->
 		<refundSel ></refundSel>
-		<!-- 订单信息 -->
-		<view class="main_list order_message">
-		<view class="main_list_title">订单信息</view>
-		<view class="message_list">
-			<view class="list_item">
-			<view class="item_title">订单编号</view>
-			<view class="item_message">{{orderDetails.order_no}}</view>
+		<!-- 退票信息 金额参考/备注 -->
+		<view class="refund_top">
+			<view class="top_message">退票信息</view>
+			<view class="middle_message">
+				<view class="message_first">退票金额参考</view>
+				<view class="message_bottom input-right-arrow" @click="openGroupSelect">
+				<text v-if="group" class="group_message">{{ group }}</text>
+				<!-- <text v-else class="not_message">请选择</text> -->
+				</view>
 			</view>
-			<view class="list_item">
-			<view class="item_title">PNR</view>
-			<view class="item_message">{{orderDetails.pnr_code}}</view>
-			</view>
-			<view class="list_item">
-			<view class="item_title">订票员</view>
-			<view class="item_message">{{orderDetails.book_user}}</view>
-			</view>
-			<view class="list_item">
-			<view class="item_title">预定时间</view>
-			<view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
-			</view>
-			<view class="list_item">
-			<view class="item_title">备注</view>
-			<view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
+			<view class="middle_message">
+				<view class="message_first">退废票备注</view>
+				<view class="message_bottom input-right-arrow" @click="openGroupSelect">
+				<text v-if="group" class="group_message">{{ group }}</text>
+				<text v-else class="not_message">点开添加备注后显示在这...</text>
+				</view>
 			</view>
 		</view>
+    <!-- 退票理由选择 -->
+    <!-- <yun-selector
+      ref="groupPopup"
+      :dataList="reasonGroup"
+      @submitDialog="groupPopupSelecctBtn()"
+    ></yun-selector> -->
+		<!-- 订单信息 -->
+		<view class="main_list order_message">
+			<view class="main_list_title">订单信息</view>
+				<view class="message_list">
+					<view class="list_item">
+					<view class="item_title">订单编号</view>
+					<view class="item_message">{{orderDetails.order_no}}</view>
+					</view>
+					<view class="list_item">
+					<view class="item_title">PNR</view>
+					<view class="item_message">{{orderDetails.pnr_code}}</view>
+					</view>
+					<view class="list_item">
+					<view class="item_title">订票员</view>
+					<view class="item_message">{{orderDetails.book_user}}</view>
+					</view>
+					<view class="list_item">
+					<view class="item_title">预定时间</view>
+					<view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
+					</view>
+					<view class="list_item">
+					<view class="item_title">备注</view>
+					<view class="item_message input-right-arrow">无</view>
+					</view>
+				</view>
 		</view>
 	</scroll-view>
 	<!-- 提交申请按钮 -->
@@ -104,8 +152,11 @@
 </template>
 
 <script>
-import refundTop from "@/components/refund_top.vue"
-import refundSel from "@/components/refund_sel.vue"
+import orderApi from "@/api/order.js";
+import moment from "../../moment";
+moment.locale("zh-cn");
+import refundTop from "@/components/refund_top.vue";	//退票信息
+import refundSel from "@/components/refund_sel.vue";
 export default {
 
 	components:{
@@ -114,100 +165,26 @@ export default {
 	},
 	data() {
 		return {
-		iStatusBarHeight: 0,
-		
-		orderDetails: [], // 订单详情
-
-		dateFilter: [
-			// 日期条件筛选列表
-			{
-			name: "预定日期",
-			active: false,
-			},
-			{
-			name: "起飞时间",
-			active: false,
-			},
-			{
-			name: "出票日期",
-			active: false,
-			},
-		],
-		orderStatus: [
-			// 订单状态筛选列表
-			{
-			name: "已预订",
-			active: false,
-			},
-			{
-			name: "待出票",
-			active: false,
-			},
-			{
-			name: "已出票",
-			active: false,
-			},
-			{
-			name: "已取消",
-			active: false,
-			},
-		],
-		timeLimit: {
-			// 时间范围
-			start: "2020-08-17",
-			end: "2020-08-18",
-		},
-		citySelect: {
-			start: "重庆",
-			end: "",
-		},
-		pnr: "", // pnr
-		orderNumber: "", // 订单号
-		flightNumber: "", // 航班号
-		booker: "", // 订票员
+			
+			iStatusBarHeight: 0,
+			
+			orderDetails: {}, // 订单详情
+			
 		};
 	},
 	methods: {
+
+		// 是否自愿点击
 		submit(val){
 			console.log(val)
 		},
-		// 日期条件选择
-		activeDate(val) {
-		this.dateFilter.forEach((item) => {
-			if (item.name === val.name) {
-			item.active = !val.active;
-			} else {
-			item.active = false;
-			}
-		});
-		},
-		// 订单状态选择
-		activeOrderStatus(val) {
-		this.orderStatus.forEach((item) => {
-			if (item.name === val.name) {
-			item.active = !val.active;
-			} else {
-			item.active = false;
-			}
-		});
-		},
 
-		// 重置筛选
-		resetBtn() {
-		this.dateFilter.forEach((item) => (item.active = false));
-		this.orderStatus.forEach((item) => (item.active = false));
-		this.timeLimit.start = "";
-		this.timeLimit.end = "";
-		this.citySelect.start = "";
-		this.citySelect.end = "";
-		this.pnr = "";
-		this.orderNumber = "";
-		this.flightNumber = "";
-		this.booker = "";
-		},
 	},
-	onLoad() {
+	onLoad(data) {
 		this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+		let refundData = JSON.parse(data.refundData);
+		console.log('refund',refundData)
+		this.orderDetails =refundData
 	},
 };
 </script>
@@ -273,9 +250,11 @@ export default {
 	   margin: 20upx 20upx 20upx;
 	   padding: 24upx 20upx 20upx;
 	   .main_list_title {
-	     font-size: 32upx;
-	     font-weight: bold;
-	     color: rgba(42, 42, 42, 1);
+		font-size: 32upx;
+		font-weight: bold;
+		color: rgba(42, 42, 42, 1);
+		margin-bottom: 24rpx;
+		padding-top: 24rpx;
 	   }
 	   &.filght_info {
 	     .info_header {
@@ -359,7 +338,8 @@ export default {
 	         width: 24upx;
 	         height: 24upx;
 	         object-fit: contain;
-	         margin-right: 6upx;
+			 margin-right: 6upx;
+			 display: flex;
 	       }
 	       .message_list {
 	         font-size: 22upx;
@@ -538,6 +518,78 @@ export default {
 	     }
 	   }
 	 }	 
+
+	.refund_top {
+	border-radius: 20upx;
+	background: rgba(255, 255, 255, 1);
+	margin: 20upx 20upx 20upx;
+	padding: 24upx 20upx 20upx;
+
+	.top_message {
+	display: flex;
+	align-items: center;
+	margin-bottom: 24upx;
+	padding-top: 24upx;
+	color: rgba(42, 42, 42, 1);
+	font-size: 32upx;
+	font-weight: Bold;
+	}
+	.middle_message {
+
+	display: flex;
+	align-items: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	height: 100upx;
+	&:not(:last-child) {
+	border-bottom: 2upx solid #f1f3f5;
+	}
+	&:first-child {
+	padding-bottom: 34upx;
+	}
+	.message_first {
+	font-size: 28upx;
+	display: flex;
+	justify-content: start;
+	margin-right: 26upx;
+	line-height: 17px;
+	margin-right: 40upx;
+	}
+	.message_bottom_radio {
+	font-size: 28upx;
+	flex: 1;
+	display: flex;
+	justify-content: space-between;
+	.bottom_radio_list {
+		flex: 1;
+		display: flex;
+		justify-content: flex-start;
+		.radio:first-child {
+		margin-right: 100upx;
+		}
+	}
+	}
+	.message_bottom {
+	font-size: 28upx;
+	color: rgba(42, 42, 42, 1);
+	width: 240px;
+	display: inline-flex;
+	justify-content: flex-end;
+	flex: 1;
+	.group_message{
+		flex: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: right;
+	}
+	.not_message{
+
+		// margin-right: 20px;
+	}
+	}
+	}
+	}
 	.filter_bottom {
 	  display: flex;
 	  align-items: center;

@@ -20,7 +20,7 @@
       <view class="middle_message">
         <view class="message_first">退票理由</view>
         <view class="message_bottom input-right-arrow" @click="openGroupSelect">
-          <text v-if="group">{{ group }}</text>
+          <text v-if="group" class="group_message">{{ group }}</text>
           <text v-else class="not_message">请选择</text>
         </view>
       </view>
@@ -124,14 +124,13 @@ export default {
     font-weight: Bold;
   }
   .middle_message {
-    // margin-top: 26upx;
-    // padding-top: 25upx;
+
     display: flex;
     align-items: center;
     text-overflow: ellipsis;
     white-space: nowrap;
-	overflow: hidden;
-	height: 100upx;
+    overflow: hidden;
+    height: 100upx;
     &:not(:last-child) {
       border-bottom: 2upx solid #f1f3f5;
     }
@@ -163,16 +162,21 @@ export default {
     }
     .message_bottom {
       font-size: 28upx;
-	  color: rgba(42, 42, 42, 1);
-    }
-    .message_right {
-      width: 5upx;
-      height: 5upx;
-      image {
-        width: 100%;
-        height: 100%;
+      color: rgba(42, 42, 42, 1);
+      width: 240px;
+      display: inline-flex;
+      justify-content: flex-end;
+      flex: 1;
+      .group_message{
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: right;
       }
-      // margin: 30upx 30upx;
+      .not_message{
+
+        // margin-right: 20px;
+      }
     }
   }
 }

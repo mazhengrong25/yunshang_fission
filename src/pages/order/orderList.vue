@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-10 18:31:29
+ * @LastEditTime: 2020-09-15 14:10:08
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -349,7 +349,6 @@ export default {
             } else {
               this.orderList = res.data.data;
             }
-              // this.orderList.filter(item => fi)
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
@@ -434,8 +433,9 @@ export default {
       // }
     },
 
-    // 跳转国际订单详情
+    // 跳转订单详情
     jumpOrderDetails(data) {
+      console.log("详情",data)
       if (this.orderListType === "3") {
         uni.navigateTo({
           url:
