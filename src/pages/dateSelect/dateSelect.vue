@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-11 13:40:08
+ * @LastEditTime: 2020-09-16 18:30:02
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -118,7 +118,7 @@ export default {
 
     // 点击日期
     checkedDayBtn(month, day) {
-      console.log(month, day);
+      console.log('时间点击',month, day);
       if (day.status) {
         this.dateList.forEach((item) => {
           if (item.title === month) {
@@ -132,7 +132,7 @@ export default {
           }
         });
         let fromNow = moment(
-          moment(day.time + "-" + day.day).format("YYYY-MM-DD")
+          moment(day.date).format("YYYY-MM-DD")
         ).calendar(null, {
           nextDay: "[明天]",
           nextWeek: "ddd",
@@ -142,8 +142,8 @@ export default {
         this.checkedDay = {
           type: "time",
           status: this.timeStatus,
-          date: moment(day.time + "-" + day.day).format("YYYY-MM-DD"),
-          month: moment(day.time + "-" + day.day).format("M月DD日"),
+          date: moment(day.date).format("YYYY-MM-DD"),
+          month: moment(day.date).format("M月DD日"),
           week: fromNow,
         };
         console.log(this.checkedDay);
@@ -160,7 +160,10 @@ export default {
     // 组装单程日期更换
     this.ticketData = data.ticketType?JSON.parse(data.ticketType):{}
     console.log('数据',this.ticketData)
-   
+
+    // 组装往返日期
+    this.roundData = data.roundDate?JSON.parse(data.roundDate): {}
+    console.log(this.roundData)
 
     if (data.status) {
       this.roundTripStatus = {

@@ -105,6 +105,7 @@ export default {
     },
     // 打开退改签说明弹窗
     openExp() {
+      this.popupCurrent= "info"
       this.$refs.flightExplanation.open();
     },
     // 关闭产品说明弹窗

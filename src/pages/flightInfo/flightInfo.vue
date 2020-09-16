@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-15 17:10:28
+ * @LastEditTime: 2020-09-16 09:25:08
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -238,11 +238,10 @@ export default {
       ticket.getTicket(data).then((res) => {
         if (res.errorcode === 10000) {
           // 组装航班列表信息
-          let airData = res.data.IBE.list[0]
+          let airData = res.data.IBE.list[0];
           let airDataName = Object.keys(airData.ItineraryInfos);
           // 组装经济舱/公务舱数据
           airDataName.forEach((item, index) => {
-
             let headerNumber = index;
             if (item !== "NFD") {
               this.cabinHeader.push(item);
@@ -270,7 +269,6 @@ export default {
             }
           });
           this.headerDiaplay = this.cabinHeader.length !== 2;
-
         }
       });
     },
@@ -315,7 +313,7 @@ export default {
     },
 
     // 组装退改信息
-    getGaugeInfo(data){
+    getGaugeInfo(data) {
       // 组装航班数据
       let filghtMessage = {
         time: moment(data.data.routing.segments[0].depTime).format(
@@ -347,8 +345,8 @@ export default {
     // 打开退改签说明弹窗
     openExpPupop(data) {
       console.log(data);
-      this.getGaugeInfo(data)
-      
+      this.getGaugeInfo(data);
+
       console.log("完整信息", this.ruleInfos);
       this.$refs.flightExplanation.openExp();
     },
@@ -395,7 +393,8 @@ export default {
     getPriceData(data, header, index, type) {
       console.log(data, header, index, type, this.airMessage);
       let params;
-      if (type) {  // 往返验价
+      if (type) {
+        // 往返验价
         this.depActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
@@ -413,7 +412,8 @@ export default {
           ItineraryInfo: this.depMessage.data.data,
           relatedKey: "11",
         };
-      } else {  // 单程验价
+      } else {
+        // 单程验价
         this.airActiveInfo = {
           cabin: data.cabin,
           price: data.data.cabinPrices.ADT.price,
@@ -463,7 +463,7 @@ export default {
             );
           }
           uni.showToast({
-            title: "获取失败，请稍后重试",
+            title: res.data.Message || '获取失败，请稍后再试',
             icon: "none",
             duration: 3000,
           });
@@ -486,7 +486,7 @@ export default {
           type: data.type,
         };
         this.airMessage["data"] = data;
-        data.data.productType = 'FD'?'SD': data.data.productType
+        data.data.productType = "FD" ? "SD" : data.data.productType;
         params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
@@ -523,7 +523,7 @@ export default {
 
       ticket.checkPrice(params).then((res) => {
         if (res.errorcode === 10000) {
-          this.getGaugeInfo(data)
+          this.getGaugeInfo(data);
           if (res.data.check_price_status) {
             // 价格没有修改 直接进行操作
             if (!this.roundTripType) {
@@ -543,15 +543,16 @@ export default {
                   res.data.price
                 );
               }
-              
+
               // 单程验价
               uni.navigateTo({
                 url:
                   "/pages/flightReservation/flightReservation?key=" +
                   res.data.keys +
                   "&price=" +
-                  res.data.price + 
-                  "&gaugeData=" + JSON.stringify(this.ruleInfos),
+                  res.data.price +
+                  "&gaugeData=" +
+                  JSON.stringify(this.ruleInfos),
               });
             } else {
               // 往返验价
@@ -593,7 +594,7 @@ export default {
               );
             }
 
-            this.$forceUpdate()
+            this.$forceUpdate();
 
             this.$refs.checkPricePopup.open();
           }
@@ -622,7 +623,8 @@ export default {
             this.relatedKey +
             "&price=" +
             this.newPrice +
-            "&gaugeData=" + JSON.stringify(this.ruleInfos),
+            "&gaugeData=" +
+            JSON.stringify(this.ruleInfos),
         });
       } else {
         // 往返验价
@@ -662,7 +664,7 @@ export default {
     this.fileKey = data.fileKey;
     this.segmentsKey = data.segmentsKey;
 
-    console.log('舱位信息',this.airMessage)
+    console.log("舱位信息", this.airMessage);
 
     // 获取航班详情
     this.getDetailsData();
@@ -693,7 +695,7 @@ export default {
       food: this.airMessage.segments[0].hasMeal, // 餐饮
     };
 
-    console.log('舱位信息航班详情',this.flightData)
+    console.log("舱位信息航班详情", this.flightData);
 
     // 获取航司退改信息
     this.getGaugeMessage();

@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-15 18:25:36
+ * @LastEditTime: 2020-09-16 15:59:04
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -18,9 +18,23 @@
       v-if="!showDefaultType"
       :enable-back-to-top="true"
       class="flight_list"
+      :scroll-top="scrollTop"
+      @scroll="scroll"
       :scroll-y="true"
       lower-threshold="100"
     >
+      <view class="round_trip_header" v-if="showRoundTrip">
+        <view class="header_box">
+          <view class="box_tag">已选去程</view>
+          <text>{{showRoundTripData.toCode}}</text>
+          <text>{{showRoundTripData.toTime}}</text>
+        </view>
+        <view class="header_box">
+          <view class="box_tag">已选返程</view>
+          <text>{{showRoundTripData.fromCode}}</text>
+          <text>{{showRoundTripData.fromTime}}</text>
+        </view>
+      </view>
       <view class="flight_content">
         <view class="left_flight">
           <view
@@ -210,12 +224,20 @@ export default {
     return {
       iStatusBarHeight: 0, // 导航栏高度
 
+      scrollTop: 0, // 页面滚动高度
+      oldScrollTop: 0,
+
+      showRoundTrip: false, // 往返提示数据
+      showRoundTripData: {}, // 往返提示数据内容
+
       ticketData: {}, // 航班数据
       timeData: {}, // 日期数据
 
       ticketAddress: {}, // 导航栏地址
 
       flightList: [], // 航班信息
+
+      oldFlightList: [], // 备份单程数据
 
       skeletonNumber: 5,
       skeletonRoundNumber: 5,
@@ -240,10 +262,27 @@ export default {
       showDefault: false, // 报错页面
       showDefaultType: "", // 报错类型
 
-      airlineList: [], // 航班列表
+      airlineList: ["不限"], // 航班列表
     };
   },
   methods: {
+    // 页面滚动距离
+    scroll(e) {
+      this.oldScrollTop = e.detail.scrollTop;
+      this.getScrollData()
+    },
+
+    // 获取往返提示头部信息
+    getScrollData(){
+      this.showRoundTrip = this.oldScrollTop > 10;
+      this.showRoundTripData = {
+        toCode: this.flightList[this.toActive].segments[0].flightNumber,
+        fromCode: this.roundFlightList[this.fromActive].segments[0].flightNumber,
+        toTime: moment(this.flightList[this.toActive].segments[0].depTime).format('HH:mm')+ '-' +moment(this.flightList[this.toActive].segments[0].arrTime).format('HH:mm'),
+        fromTime: moment(this.roundFlightList[this.fromActive].segments[0].depTime).format('HH:mm')+ '-' +moment(this.roundFlightList[this.fromActive].segments[0].arrTime).format('HH:mm')
+      }
+    },
+
     // 获取去程航班信息
     getTicketData() {
       let data = {
@@ -258,9 +297,10 @@ export default {
       // this.file_key = res.data.IBE.file_key;
       // this.flightList = res.data.IBE.list;
       this.flightList = uni.getStorageSync("flightList");
+      this.oldFlightList = JSON.parse(JSON.stringify(this.flightList));
       this.price += this.flightList[this.toActive].min_price;
-          this.dataListApplyType = true;
-    
+      this.dataListApplyType = true;
+
       this.submitBtnType =
         this.flightList.length < 1 || this.roundFlightList.length < 1;
       if (this.flightList.length < 1) {
@@ -298,7 +338,9 @@ export default {
       // this.roundFlightKey = res.data.IBE.file_key;
       // this.roundFlightList = res.data.IBE.list;
       this.roundFlightList = uni.getStorageSync("roundFlightList");
-      // uni.setStorageSync('roundFlightList', this.roundFlightList)
+      this.oldRoundFlightList = JSON.parse(
+        JSON.stringify(this.roundFlightList)
+      );
 
       this.price += this.roundFlightList[this.fromActive].min_price;
       this.dataRoundListApplyType = true;
@@ -329,8 +371,8 @@ export default {
     // 选择航班
     checkedFlight(type, val, index) {
       console.log(type, val, index);
-      if(val.min_price === 0){
-        return false
+      if (val.min_price === 0) {
+        return false;
       }
       if (type === "to") {
         this.toActive = index;
@@ -340,7 +382,7 @@ export default {
       this.price =
         this.flightList[this.toActive].min_price +
         this.roundFlightList[this.fromActive].min_price;
-
+      this.getScrollData()
       this.$forceUpdate();
     },
 
@@ -397,6 +439,109 @@ export default {
     // 确认筛选
     ticketFilter(val, status) {
       console.log(val, status);
+      if (!status && val.length < 1) {
+        this.flightList = this.oldFlightList;
+        this.roundFlightList = this.oldRoundFlightList;
+        return false;
+      }
+      if (status) {
+        this.flightList = this.flightList.filter(
+          (item) => item.segments.length < 2
+        );
+        this.roundFlightList = this.roundFlightList.filter(
+          (item) => item.segments.length < 2
+        );
+      } else {
+        this.flightList = this.oldFlightList;
+        this.roundFlightList = this.oldRoundFlightList;
+      }
+
+      if (val[0]) {
+        if (val[0] === "不限") {
+          this.flightList = this.oldFlightList;
+          this.roundFlightList = this.oldRoundFlightList;
+        }
+        if (val[0].indexOf("上午") !== -1) {
+          this.flightList = this.flightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 0 &&
+              new Date(item.segments[0].depTime).getHours() < 12
+          );
+          this.roundFlightList = this.roundFlightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 0 &&
+              new Date(item.segments[0].depTime).getHours() < 12
+          );
+        }
+        if (val[0].indexOf("中午") !== -1) {
+          this.flightList = this.flightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 12 &&
+              new Date(item.segments[0].depTime).getHours() < 14
+          );
+          this.roundFlightList = this.roundFlightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 12 &&
+              new Date(item.segments[0].depTime).getHours() < 14
+          );
+        }
+        if (val[0].indexOf("下午") !== -1) {
+          this.flightList = this.flightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 14 &&
+              new Date(item.segments[0].depTime).getHours() < 18
+          );
+          this.roundFlightList = this.roundFlightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 14 &&
+              new Date(item.segments[0].depTime).getHours() < 18
+          );
+        }
+        if (val[0].indexOf("晚上") !== -1) {
+          this.flightList = this.flightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 18 &&
+              new Date(item.segments[0].depTime).getHours() < 24
+          );
+          this.roundFlightList = this.roundFlightList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 18 &&
+              new Date(item.segments[0].depTime).getHours() < 24
+          );
+        }
+      }
+      if (val[1]) {
+        if (val[1] === "不限") {
+          this.flightList = this.oldFlightList;
+          this.roundFlightList = this.oldRoundFlightList;
+        } else {
+          this.flightList = this.flightList.filter(
+            (item) => item.segments[0].airline_CN === val[1]
+          );
+          this.roundFlightList = this.roundFlightList.filter(
+            (item) => item.segments[0].airline_CN === val[1]
+          );
+        }
+      }
+
+      if (this.flightList.length < 1 || this.roundFlightList.length < 1) {
+        this.flightList = this.oldFlightList;
+        this.roundFlightList = this.oldRoundFlightList;
+        uni.showToast({
+          title:
+            (this.flightList.length < 1
+              ? "去程"
+              : this.roundFlightList.length < 1
+              ? "返程"
+              : "") + "暂无该筛选类别，请更换其他条件",
+          duration: 2000,
+          icon: "none",
+          mask: true,
+        });
+        setTimeout(() => {
+          this.$refs.filterDialog.openFilterDialog();
+        }, 1000);
+      }
     },
 
     // 往返航班提交
@@ -404,14 +549,12 @@ export default {
       let data = {
         ticketMessage: this.ticketAddress,
         start: this.flightList[this.toActive],
-        end: this.roundFlightList[this.toActive],
+        end: this.roundFlightList[this.fromActive],
       };
       let roundTripKey = {
         start: this.file_key,
         end: this.roundFlightKey,
       };
-      console.log(JSON.stringify(data));
-      console.log(JSON.stringify(roundTripKey));
       uni.navigateTo({
         url:
           "/pages/flightInfo/flightInfo?roundTripData=" +
@@ -422,18 +565,6 @@ export default {
       });
     },
   },
-  // onHide() {
-  //   this.flightList = [];
-  //   this.roundFlightList = [];
-  //   this.pageNumber = 1;
-  //   this.dataListApplyType = false;
-  //   this.dataRoundListApplyType = false;
-  // },
-  // onShow() {
-  //   this.price = 0;
-  //   this.getTicketData();
-  //   this.getRoundTicketData();
-  // },
   onLoad() {
     let data = uni.getStorageSync("data");
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -467,6 +598,7 @@ export default {
     this.price = 0;
     this.getTicketData();
     this.getRoundTicketData();
+    this.getScrollData()
   },
 };
 </script>
@@ -486,11 +618,59 @@ export default {
     flex: 1;
     width: 100%;
     overflow-y: auto;
+    padding-top: 20upx;
+    position: relative;
+    .round_trip_header {
+      position: fixed;
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      z-index: 3;
+      padding: 0 20upx;
+      box-sizing: border-box;
+      background: #f3f5f7;
+      .header_box {
+        display: flex;
+        align-items: center;
+        height: 60upx;
+        width: 350upx;
+        border-radius: 20upx 20upx 0 0;
+        box-sizing: border-box;
+        padding: 0 20upx;
+        &:first-child {
+          background: #bfdfff;
+          color: #0070e2;
+        }
+        &:last-child {
+          background: #c2efc1;
+          color: #5ab957;
+        }
+        .box_tag {
+          width: 80upx;
+          height: 30upx;
+          background: #ffffff;
+          border-radius: 10upx;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18upx;
+          font-weight: 400;
+          margin-right: 10upx;
+        }
+        text {
+          font-size: 20upx;
+          font-weight: 400;
+          &:not(:last-child){
+            margin-right: 15upx;
+          }
+        }
+      }
+    }
 
     .flight_content {
       display: flex;
       justify-content: space-between;
-      padding: 20upx;
+      padding: 0 20upx 20upx;
     }
     .left_flight,
     .right_flight {
@@ -505,6 +685,7 @@ export default {
       padding: 28upx 16upx 16upx;
       display: inline-flex;
       flex-direction: column;
+      height: 157upx;
       // width: 42%;
       margin-bottom: 4upx;
       position: relative;

@@ -2,19 +2,19 @@
  * @Description: 往返日期状态栏组件
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:57:25
- * @LastEditTime: 2020-09-15 18:31:58
+ * @LastEditTime: 2020-09-16 18:30:52
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
-	<view class="roundTrip_header" @click.stop="jumpDatePage">
-		<view class="time_box start_time" @click.stop="jumpStartPage">
+	<view class="roundTrip_header" @click.stop="jumpDatePage('all')">
+		<view class="time_box start_time" @click.stop="jumpDatePage('start')">
 			<view class="tiem">{{timeData.toTime.month}}</view>
 			<view class="week">{{timeData.toTime.week}}</view>
 		</view>
 		<view class="time_line">
 			{{timeData.jetLag}}天
 		</view>
-		<view class="time_box end_time" @click.stop="jumpEndPage">
+		<view class="time_box end_time" @click.stop="jumpDatePage('end')">
 			<view class="tiem">{{timeData.fromTime.month}}</view>
 			<view class="week">{{timeData.fromTime.week}}</view>
 		</view>
@@ -37,20 +37,11 @@
 		},
 		methods: {
 			// 跳转日历
-			jumpDatePage(){
-				console.log("跳转日历页面");
-				console.log(this.timeData)
+			jumpDatePage(type){
+				this.timeData['type'] = type
 				uni.navigateTo({
-					 url: ''
+					 url: '/pages/dateSelect/dateSelect?roundDate='+ JSON.stringify(this.timeData)
 				})
-			},
-			// 跳转日历开始日期
-			jumpStartPage(){
-				console.log('跳转开始日期')
-			},
-			// 跳转日期结束日期
-			jumpEndPage(){
-				console.log('跳转结束日期')
 			},
 		}
 	}
