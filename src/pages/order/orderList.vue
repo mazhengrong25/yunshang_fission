@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-15 14:10:08
+ * @LastEditTime: 2020-09-16 13:37:40
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -72,18 +72,6 @@
         >
           <view class="item_header">
             <view class="item_title">
-              <!-- 去程 返程 -->
-              <view>
-                <!-- {{
-                  oitem.direction_type === 1
-                    ? "去程"
-                    : oitem.direction_type === 2
-                    ? "回程"
-                    : item.direction_type === 3
-                    ? "第" + (oindex + 1) + "程"
-                    : ""
-                }} -->
-                </view>
               <view class="title">{{ oitem.departure_msg.city_name}} - {{ oitem.arrive_msg.city_name }}</view>
             </view>
             <view class="item_price">
@@ -269,6 +257,9 @@
         </view>
       </view>
 
+      <!-- 缺省页 -->
+      <default-page v-if="showDefault" defaultType="not_order"></default-page>
+
       <view class="no_data" v-if="!orderPageStatus">
         <text>到底啦</text>
       </view>
@@ -293,8 +284,9 @@ export default {
       orderListType: "", // 订单列表页 类型
       orderHeaderTitle: "", // 订单列表页头部标题
       innerList: [], //国内列表
-
       orderListFilter: {}, // 筛选条件
+
+      showDefault: false, // 报错页面
     };
   },
   methods: {
@@ -344,19 +336,20 @@ export default {
         };
         orderApi.orderInterList(data).then((res) => {
           if (res.errorcode === 10000) {
+            this.showDefault = false;
             if (this.orderList.length > 0) {
               this.orderList.push.apply(this.orderList, res.data.data);
             } else {
               this.orderList = res.data.data;
             }
+            if(this.orderList.length <1) {
+              this.showDefault = true;
+            }
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
           } else {
-            uni.showToast({
-              title: "res.msg",
-              icon: "none",
-            });
+            this.showDefault = true;
           }
         });
       } else if (this.orderListType === "0") {
@@ -370,6 +363,7 @@ export default {
         orderApi.orderList(data).then((res) => {
           console.log(res);
           if (res.result === 10000) {
+             this.showDefault = false;
             if (this.innerList.length > 0) {
               this.innerList.push.apply(this.innerList, res.data.data);
             } else {
@@ -382,7 +376,6 @@ export default {
                   "minutes"
                 ) > 0? item.status: 5
             })
-            console.log(this.innerList)
             if (this.headerActive !== 0 && this.headerActive !== 1) {
               let activeIndex =
                 this.headerActive === 2
@@ -404,17 +397,14 @@ export default {
                   item.status !== 5 &&
                   item.pay_status === 1 
               )
-             
             }
-
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
+            this.showDefault = this.innerList.length < 1;
+            console.log('缺省状态',this.showDefault,this.innerList)
           } else {
-            uni.showToast({
-              title: "res.msg",
-              icon: "none",
-            });
+            this.showDefault = true;
           }
         });
       }

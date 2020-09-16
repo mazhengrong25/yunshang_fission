@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-15 14:21:06
+ * @LastEditTime: 2020-09-16 17:52:15
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
@@ -242,18 +242,16 @@
             </view>
           </view>
 
-          <view
-            class="contact"
-            v-for="(item, index) in orderDetails.ticket_passenger"
-            :key="index"
-          >
+          <!-- v-for="(item, index) in orderDetails.ticket_passenger"
+            :key="index" -->
+          <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{ orderDetails.contact }}</view>
+              <view class="list_message">{{ orderDetails.out_ticket_name }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
-              <view class="list_message">{{ item.phone }}</view>
+              <view class="list_message">{{ orderDetails.phone }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">已购保险</view>
