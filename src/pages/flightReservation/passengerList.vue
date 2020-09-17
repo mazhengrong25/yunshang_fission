@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-11 16:20:00
+ * @LastEditTime: 2020-09-17 17:57:44
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -129,7 +129,7 @@ export default {
                 : "成人";
           });
           this.getGroupList();
-
+          console.log(this.flightPassengerList)
           if (this.flightPassengerList.length > 0) {
             this.checkePassenger = this.flightPassengerList;
             this.flightPassengerList.forEach((item, index) => {
@@ -266,7 +266,11 @@ export default {
     },
   },
   onShow() {
-    this.getPassengerData();
+    if(uni.getStorageSync('addPassenger')){
+      console.log('新增返回')
+      this.getPassengerData();
+      uni.removeStorageSync('addPassenger');
+    }
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -281,6 +285,7 @@ export default {
           has_inf_inf_number: 1
        }
     console.log(this.chdinfNumber)
+    this.getPassengerData();
   },
 };
 </script>
@@ -292,7 +297,7 @@ export default {
   height: 100vh;
   background: rgba(243, 245, 247, 1);
   .header_box {
-    height: 144upx;
+    padding: 27upx 0;
     background: rgba(0, 112, 226, 1);
     display: flex;
     align-items: center;
@@ -321,6 +326,7 @@ export default {
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
     .mian_header {
       padding: 0 40upx;
       margin: 40upx 0 30upx;
@@ -346,6 +352,7 @@ export default {
     }
     .mian_list {
       overflow-y: auto;
+      height: 100%;
       flex: 1;
       .list_item {
         background: rgba(255, 255, 255, 1);

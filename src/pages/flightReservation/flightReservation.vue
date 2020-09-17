@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-15 11:13:06
+ * @LastEditTime: 2020-09-17 16:46:34
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -391,7 +391,11 @@ export default {
       },
 
       passengerList: [], // 乘机人列表
-      passengerNumber: {}, // 乘机人数量
+      passengerNumber: {
+        adt: 0,
+        inf: 0,
+        cnd: 0
+      }, // 乘机人数量
 
       showRemove: "none", // 自动展开
 
@@ -464,6 +468,33 @@ export default {
             baggage: res.data.cabinInfo.baggage, // 行李额
           };
 
+          // 组装航班信息
+          let filghtMessage = {
+            time: moment(segmentMessage.depTime).format(
+              "YYYY-MM-DD HH:mm:ss"
+            ), // 起飞时间
+            code: segmentMessage.flightNumber, // 航班号
+            address:
+              segmentMessage.depAirport_CN.city_name +
+              " " +
+              segmentMessage.depAirport_CN.city_code +
+              " - " +
+              segmentMessage.arrAirport_CN.city_name +
+              " " +
+              segmentMessage.arrAirport_CN.city_code, // 行程
+            cabin: res.data.cabinInfo.cabinDesc, // 舱位
+            price: res.data.adtPrice.rulePrice.price, // 票面价
+            baggage: res.data.cabinInfo.baggage,
+          };
+
+          // 组装退改信息
+          let gaugeMessage = res.data.ruleInfos;
+
+          this.ruleInfos = {
+            filght: filghtMessage,
+            gauge: gaugeMessage,
+          };
+
           this.orderPassenger = {
             name: res.data.dis_msg.contact,
             phone: res.data.dis_msg.phone,
@@ -493,6 +524,8 @@ export default {
             reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
           };
 
+          this.oldReward = res.data.adtPrice.rulePrice.reward
+
           this.statement = {
             // 组装免责声明
             title: res.data.air_line.title,
@@ -504,7 +537,7 @@ export default {
           this.showData = true
         } else {
           uni.showToast({
-            title: res.data,
+            title: res.data || '数据获取错误，请稍后再试',
             icon: "none",
             mask: true,
             duration: 3000
@@ -624,6 +657,9 @@ export default {
               roundBuildPrice: Number(res.data.arrAdtPrice.build), // 返程机建燃油费
               roundReward: res.data.arrAdtPrice.rulePrice.reward, // 返程奖励金额
             };
+
+            this.oldReward = res.data.depAdtPrice.rulePrice.reward
+            this.oldRoundReward = res.data.arrAdtPrice.rulePrice.reward
 
             this.statement = {
               // 组装免责声明
@@ -808,7 +844,7 @@ export default {
 
     // 计算金额总价
     getTotalPrice() {
-      console.log(this.priceInfo);
+      console.log('奖励金计算',this.priceInfo.reward,this.passengerNumber.adt);
       let totalPrice;
       if (this.roundTripType) {
         // 组装往返金额
@@ -829,12 +865,15 @@ export default {
             Number(this.priceInfo.insPrice || 0) *
             2;
         // 计算奖励金额
-        this.$set(
+        if(this.passengerNumber.adt > 0){
+          this.$set(
           this.priceInfo,
           "reward",
-          this.priceInfo.reward * this.passengerNumber.adt +
-            this.priceInfo.roundReward * this.passengerNumber.adt
+          this.oldReward * this.passengerNumber.adt +
+            this.oldRoundReward * this.passengerNumber.adt
         );
+        }
+        
       } else {
         // 组装单程金额
         totalPrice =
@@ -845,11 +884,14 @@ export default {
           Number(this.passengerNumber.ins || 0) *
             Number(this.priceInfo.insPrice || 0);
         // 计算奖励金额
-        this.$set(
+        if(this.passengerNumber.adt> 0){
+          this.$set(
           this.priceInfo,
           "reward",
-          this.priceInfo.reward * this.passengerNumber.adt
+          this.oldReward * this.passengerNumber.adt
         );
+        }
+        
       }
       // 组装金额数据
       this.$set(this.priceInfo, "totalPrice", totalPrice);
@@ -1029,11 +1071,6 @@ export default {
 
     this.roundTripType = data.type ? JSON.parse(data.type) : false;
 
-    this.ruleInfos = data.gaugeData? JSON.parse(data.gaugeData): {}
-    console.log(this.ruleInfos)
-    if(this.ruleInfos.filght.price){
-      this.ruleInfos.filght.price = data.price
-    }
     if (this.roundTripType) {
       // 获取往返key和价格
       this.relatedKey = data.key;

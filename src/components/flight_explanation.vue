@@ -55,15 +55,15 @@
             <view id="retreat" class="main_box">
               <view class="main_title">退票</view>
               <view class="main_table">
-                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.gauge_type_value.refund" :key="index">
-                  <view class="list_title">{{item.val}}</view>
+                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.refund" :key="index">
+                  <view class="list_title">{{Number(item.value)}}%</view>
                   <view class="list_content">{{item.title}}</view>
                 </view>
               </view>
               <view class="main_title" style="margin-top: 20rpx">改签</view>
               <view class="main_table">
-                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.gauge_type_value.change" :key="index">
-                  <view class="list_title">{{item.val}}</view>
+                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.change" :key="index">
+                  <view class="list_title">{{Number(item.value)}}%</view>
                   <view class="list_content">{{item.title}}</view>
                 </view>
               </view>
@@ -71,13 +71,13 @@
             <view class="main_box">
               <view class="main_title">退改信息</view>
               <view class="main_message">
-                {{ruleInfos.gauge.back_msg}}
+                {{ruleInfos.gauge.back_msg || '暂无数据'}}
               </view>
             </view>
             <view id="cabin" class="main_box">
               <view class="main_title">行李额</view>
               <view class="main_message">
-                {{ruleInfos.filght.baggage}}
+                {{ruleInfos.filght.baggage || '暂无数据'}}
               </view>
             </view>
           </view>

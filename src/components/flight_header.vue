@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-15 11:07:08
+ * @LastEditTime: 2020-09-17 15:04:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -19,9 +19,11 @@
           <view class="address">{{flightData.fromAddress}}</view>
         </view>
         <view class="center_message">
-          <view
-            class="duration"
-          >{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[0]):flightData.duration}}h{{flightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[1]):flightData.duration}}m</view>
+          <view class="duration">
+            {{ Math.floor(flightData.duration / 60) }}h{{
+            Math.floor(flightData.duration % 60)
+            }}m
+          </view>
           <view class="arrow_icon"></view>
         </view>
         <view class="right_message address_message">
@@ -35,7 +37,11 @@
         {{flightData.airline}}{{flightData.model?' | '+ flightData.model: ''}} {{flightData.food? ' | 有餐食': ''}}
       </view>
 
-      <view class="flight_reservation_box" v-if="!flightInfo && !roundTripType"  @click="openHeadExp">
+      <view
+        class="flight_reservation_box"
+        v-if="!flightInfo && !roundTripType"
+        @click="openHeadExp"
+      >
         {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
@@ -108,10 +114,9 @@ export default {
     return {};
   },
   methods: {
-    openHeadExp(){
-      console.log('打开弹窗')
-      this.$emit('openHeadExpPopup')
-      
+    openHeadExp() {
+      console.log("打开弹窗");
+      this.$emit("openHeadExpPopup");
     },
   },
 };
@@ -153,7 +158,7 @@ export default {
         &:nth-last-child(2) {
           padding-top: 28upx;
           margin-top: 20upx;
-          border-top: 2upx solid #D9E1EA;
+          border-top: 2upx solid #d9e1ea;
           &::before {
             content: "去";
             background: #bfdfff;

@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-10 14:21:36
+ * @LastEditTime: 2020-09-17 15:57:33
  * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2020-09-10 13:41:13
@@ -305,8 +305,9 @@ export default {
     // 姓名转拼音
     switchPinyin() {
       let name = this.passenger.name;
-      this.passenger.en_first_name = pinyin.getFullChars(name[0]);
-      this.passenger.en_last_name = pinyin.getFullChars(name.substr(1));
+      this.$set(this.passenger,'en_first_name',pinyin.getFullChars(name[0]))
+      this.$set(this.passenger,'en_last_name',pinyin.getFullChars(name.substr(1)))
+      this.$forceUpdate()
       console.log(this.passenger);
     },
 
@@ -523,6 +524,7 @@ export default {
               });
               setTimeout(() => {
                 uni.navigateBack();
+                uni.setStorageSync('addPassenger', true)
               }, 500);
             } else {
               uni.showToast({
@@ -675,7 +677,6 @@ export default {
         }
       }
       .item_input {
-        flex: 1;
         font-size: 28upx;
         font-weight: 400;
         text-align: right;

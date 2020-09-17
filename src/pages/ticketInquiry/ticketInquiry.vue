@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-16 09:58:39
+ * @LastEditTime: 2020-09-17 16:48:33
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -51,7 +51,11 @@
               >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
             </view>
             <view class="ticket_arrow">
-              <view>{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
+              <view>
+                {{ Math.floor(item.segments[0].duration / 60) }}h{{
+                Math.floor(item.segments[0].duration % 60)
+                }}m
+              </view>
               <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
             </view>
             <view class="ticket_end ticket_time">
@@ -193,7 +197,7 @@ export default {
     },
 
     // 航班信息返回顶部
-    backScroll(){
+    backScroll() {
       this.scrollTop = this.oldScrollTop;
       this.$nextTick(() => {
         this.scrollTop = 0;
@@ -204,9 +208,11 @@ export default {
     getTicketData() {
       this.airMessage["only_segment"] = 1;
 
-      this.backScroll()
-
-      this.$refs.flightFilter.filterBtnActive = "time";
+      this.backScroll();
+      // if(this.$refs.flightFilter.filterBtnActive !== 'time'){
+      //   this.$refs.flightFilter.filterBtnActive = "time";
+      // }
+      
       ticket.getTicket(this.airMessage).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
@@ -327,10 +333,17 @@ export default {
 
       if (val === "price") {
         this.ticketList.sort(this.priceSort("min_price"));
+        let priceList = this.ticketList.filter((item) => item.min_price !== 0);
+        let notPriceList = this.ticketList.filter(
+          (item) => item.min_price === 0
+        );
+        this.ticketList = [...priceList, ...notPriceList];
+        console.log(this.ticketList);
+        this.oldTicketList = JSON.parse(JSON.stringify(this.ticketList));
       } else if (val === "time") {
         this.ticketList.sort(this.timeSort("depTime"));
       }
-      this.backScroll()
+      this.backScroll();
     },
 
     // 时段筛选
@@ -380,23 +393,53 @@ export default {
 
     // 航班信息筛选
     ticketFilter(val) {
-      this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
-      if (val.length > 0) {
-        if (val[0]) {
-          this.timeFilter(val[0], this.oldTicketList);
-        }
-        if (!val[0] && val[1]) {
-          this.airFilter(val[1], this.oldTicketList);
-        }
-        if (val[0] && val[1]) {
-          this.airFilter(val[1], this.ticketList);
-        }
-        if (val[0] === "不限" && val[1] === "不限") {
-          this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
-        }
-      } else {
-        this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
+      if (val.length < 1) {
+        this.ticketList = this.oldTicketList;
+        return false;
       }
+      if (val[0] === "不限") {
+        this.ticketList = this.oldTicketList;
+      }
+
+      if (val[0].indexOf("上午") !== -1) {
+        this.ticketList = this.oldTicketList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 0 &&
+            new Date(item.segments[0].depTime).getHours() < 12
+        );
+      }
+      if (val[0].indexOf("中午") !== -1) {
+        this.ticketList = this.oldTicketList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 12 &&
+            new Date(item.segments[0].depTime).getHours() < 14
+        );
+      }
+      if (val[0].indexOf("下午") !== -1) {
+        this.ticketList = this.oldTicketList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 14 &&
+            new Date(item.segments[0].depTime).getHours() < 18
+        );
+      }
+      if (val[0].indexOf("晚上") !== -1) {
+        this.ticketList = this.oldTicketList.filter(
+          (item) =>
+            new Date(item.segments[0].depTime).getHours() >= 18 &&
+            new Date(item.segments[0].depTime).getHours() < 24
+        );
+      }
+
+      if (val[1]) {
+        if (val[1] === "不限") {
+          this.ticketList = this.oldTicketList;
+        } else {
+          this.ticketList = this.oldTicketList.filter(
+            (item) => item.segments[0].airline_CN === val[1]
+          );
+        }
+      }
+
       if (val.length > 0 && this.ticketList.length < 1) {
         this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
         uni.showToast({
@@ -409,7 +452,7 @@ export default {
           this.$refs.filterDialog.openFilterDialog();
         }, 1000);
       }
-      this.backScroll()
+      this.backScroll();
     },
 
     // 打开筛选

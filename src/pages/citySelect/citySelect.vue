@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-15 17:28:22
+ * @LastEditTime: 2020-09-17 14:27:34
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -279,7 +279,6 @@ export default {
           }
         });
         [...new Set(provinceList)].forEach((item, index) => {
-          console.log(item);
           this.searchList.push({
             unit: item,
             type:
@@ -299,12 +298,8 @@ export default {
             data: [],
           });
           this.cityAirList.forEach((oitem) => {
-            if (
-              JSON.stringify(oitem)
-                .toLowerCase()
-                .indexOf(this.searchCity.toLowerCase()) !== -1 &&
-              this.searchList[index].unit === oitem.province
-            ) {
+            console.log(JSON.stringify(oitem).toLowerCase())
+            if (JSON.stringify(oitem).toLowerCase().indexOf(this.searchCity.toLowerCase()) !== -1 && this.searchList[index].unit === oitem.province) {
               this.searchList[index].data.push(oitem);
             }
           });
