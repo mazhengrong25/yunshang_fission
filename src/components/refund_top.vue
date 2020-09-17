@@ -5,7 +5,7 @@
       <view class="middle_message">
         <view class="message_first">是否自愿</view>
         <view class="message_bottom_radio">
-          <radio-group class="bottom_radio_list" @change="radioChange">
+          <radio-group class="bottom_radio_list" @click="radioChange(item)">
             <label
               class="radio"
               v-for="(item, index) in radioItems"
@@ -89,10 +89,12 @@ export default {
     };
   },
   methods: {
-    submit() {
-      this.$emit("submitBtn", true);
+   
+    // 单选点击
+    radioChange(e) {
+        console.log(e)
+        this.radioItems[checked] = e
     },
-
     // 打开理由选择弹窗
     openGroupSelect() {
       this.$refs.groupPopup.openDialog();

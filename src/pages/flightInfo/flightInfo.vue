@@ -2,8 +2,8 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-16 09:25:08
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-17 10:19:30
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">

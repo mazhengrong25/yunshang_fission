@@ -2,8 +2,8 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2020-08-05 10:55:30
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-17 12:01:22
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order">
@@ -19,7 +19,7 @@
         </view>
         <view class="order_right">
           <view class="list_item" @click="jumpOrderList('0')">国内订单</view>
-          <view class="list_item" @click="jumpOrderList('1')">国内退票订单</view>
+          <view class="list_item" @click="goRefundList()">国内退票订单</view>
           <view class="list_item" @click="jumpOrderList('2')">国内改签订单</view>
         </view>
       </view>
@@ -53,6 +53,12 @@ export default {
         url: "/pages/order/orderList?type="+type,
       });
     },
+    // 跳转到国内退票订单
+    goRefundList() {
+      uni.navigateTo({
+        url: "/pages/order/refundList",
+      })
+    }
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
