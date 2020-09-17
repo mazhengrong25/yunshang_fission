@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-14 14:15:18
+ * @LastEditTime: 2020-09-17 16:43:27
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -10,7 +10,7 @@
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="筛选"></yun-header>
 
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="filter_main">
-      <view class="list_item">
+      <view class="list_item" v-if="filterType === '0'">
         <view class="item_title">日期条件</view>
         <view class="item_content item_checkbox">
           <view
@@ -21,7 +21,19 @@
           >{{item.name}}</view>
         </view>
       </view>
-      <view class="list_item">
+
+      <view class="list_item" v-if="filterType === '1'">
+        <view class="item_title">退票状态</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in refundFilter"
+            :key="item"
+            @click="activeDate(item)"
+          >{{item.name}}</view>
+        </view>
+      </view>
+      <view class="list_item" v-if="filterType === '0'">
         <view class="item_title">订单状态</view>
         <view class="item_content item_checkbox">
           <view
@@ -36,19 +48,51 @@
       <view class="list_item">
         <view class="item_title">时间范围</view>
         <view class="item_content item_dialog">
-          <view
+          <view v-if="filterType === '0'"
             :class="['dialog_view',{input_placeholder: !timeLimit.start}]"
             @click="openlimitdaySelector('start')"
           >{{timeLimit.start?timeLimit.start:'预定日始'}}</view>
+          <view v-if="filterType === '1'"
+            :class="['dialog_view',{input_placeholder: !timeLimit.start}]"
+            @click="openlimitdaySelector('start')"
+          >{{timeLimit.start?timeLimit.start:'申请日始'}}</view>
           <view class="dialog_line">—</view>
-          <view
+          <view v-if="filterType === '0'"
             :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
             @click="openlimitdaySelector('end')"
           >{{timeLimit.end?timeLimit.end:'预定日止'}}</view>
+          <view v-if="filterType === '1'"
+            :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
+            @click="openlimitdaySelector('end')"
+          >{{timeLimit.end?timeLimit.end:'申请日止'}}</view>
         </view>
       </view>
 
-      <view class="list_item">
+       <view class="list_item" v-if="filterType === '1'">
+        <view class="item_title">乘客类型</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in passengerFilter"
+            :key="item"
+            @click="activeDate(item)"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="list_item" v-if="filterType === '1'">
+        <view class="item_title">订单类型</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in orderFilter"
+            :key="item"
+            @click="activeDate(item)"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="list_item" v-if="filterType === '0'">
         <view class="item_title">城市选择</view>
         <view class="item_content item_dialog">
           <view
@@ -130,6 +174,8 @@ export default {
     return {
       iStatusBarHeight: 0,
 
+      filterType:"", //筛选类型  国内外  和  国内退票
+
       submitBtnStatus: false, // 确认按钮状态
 
       dateFilter: [
@@ -142,6 +188,50 @@ export default {
           name: "起飞时间",
           active: false,
         }
+      ],
+
+      refundFilter: [
+        //退票状态筛选列表
+        {
+          name: "申请中",
+          active:false,
+        },
+        {
+          name: "成功",
+          active:false,
+        },
+        {
+          name: "已取消",
+          active:false,
+        }
+      ],
+
+      passengerFilter: [
+        //乘客类型筛选列表
+        {
+          name: "成人",
+          active:false,
+        },
+        {
+          name: "儿童",
+          active:false,
+        },
+        {
+          name: "婴儿",
+          active:false,
+        }
+      ],
+
+      orderFilter: [
+        // 订单类型筛选列表
+        {
+          name: "客户单",
+          active:false,
+        },
+        {
+          name: "手工单",
+          active:false,
+        },
       ],
       orderStatus: [
         // 订单状态筛选列表  id对应导航栏位置
@@ -199,19 +289,54 @@ export default {
 
     activeStatus: null, // 订单状态
     dateStatus: null, //  日期状态
+    refundStatus: null, // 退票状态
+    passengerStatus: null, //乘客状态
+    orderType: null, //订单状态
     };
   },
   methods: {
-    // 日期条件选择
+    // 条件选择
     activeDate(val) {
-      this.dateFilter.forEach((item) => {
-        if (item.name === val.name) {
-          item.active = !val.active;
-          this.dateStatus = item.active?val.id:null
-        } else {
-          item.active = false;
-        }
-      });
+      if(this.filterType === "0"){
+            // 日期选择
+            this.dateFilter.forEach((item) => {
+            if (item.name === val.name) {
+              item.active = !val.active;
+              this.dateStatus = item.active?val.id:null
+            } else {
+              item.active = false;
+            }
+          });
+      }else if(this.filterType === "1") {
+        // 退票状态
+         this.refundFilter.forEach((item) => {
+            if (item.name === val.name) {
+              item.active = !val.active;
+              this.refundStatus = item.active?val.id:null
+            } else {
+              item.active = false;
+            }
+          });
+          // 乘客状态
+          this.passengerFilter.forEach((item) => {
+            if (item.name === val.name) {
+              item.active = !val.active;
+              this.passengerStatus = item.active?val.id:null
+            } else {
+              item.active = false;
+            }
+          });
+          // 订单状态
+          this.orderFilter.forEach((item) => {
+            if (item.name === val.name) {
+              item.active = !val.active;
+              this.orderType = item.active?val.id:null
+            } else {
+              item.active = false;
+            }
+          });
+      }
+    
     },
     // 订单状态选择
     activeOrderStatus(val) {
@@ -326,8 +451,11 @@ export default {
   
 
   },
-  onLoad() {
+  onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.filterType = data.type
+
+    console.log('筛选类型',this.filterType)
   },
 
   onShow() {

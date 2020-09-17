@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-16 18:26:24
+ * @LastEditTime: 2020-09-17 11:19:17
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -112,9 +112,10 @@
       </view>
       <!-- 出行信息 -->
       <view class="main_list passenger">
-        <view :class="['main_list_first', { active }]">
+        <view class=main_list_first>
           <view class="main_list_title">出行信息</view>
-          <view class="main_content" @click="checkedAll()">全选</view>
+          <view :class="['main_content', {active:orderDetails.ticket_passenger }]" 
+          @click="checkedAll()">全选</view>
           <view class="list_click"></view>
         </view>
         <view class="passenger_list">
@@ -122,8 +123,7 @@
             :class="['list_item', { active: item.active }]"
             v-for="(item, index) in orderDetails.ticket_passenger"
             :key="index"
-            @click="checkedPassenger(item, index)"
-          >
+            @click="checkedPassenger(item, index)" >
             <view class="list_info">
               <view class="info_type"
                 >{{
@@ -166,18 +166,15 @@
         <view class="middle_message">
           <view class="message_first">退票金额参考</view>
           <view
-            class="message_bottom input-right-arrow"
-            @click="openGroupSelect">
-            <!-- <text v-if="group" class="group_message">{{ orderDetails.total_price }}</text> -->
+            class="message_bottom input-right-arrow">
             <text class="logo">&yen;</text>
-			<text class="total_price">{{ orderDetails.total_price }}</text>
+			      <text class="total_price">{{ orderDetails.total_price }}</text>
           </view>
         </view>
         <view class="middle_message">
           <view class="message_first">退废票备注</view>
           <view
-            class="message_bottom input-right-arrow"
-            @click="openGroupSelect">
+            class="message_bottom input-right-arrow">
             <text v-if="group" class="group_message">{{ group }}</text>
             <text v-else class="not_message">点开添加备注后显示在这...</text>
           </view>
@@ -210,10 +207,23 @@
           </view>
         </view>
       </view>
+
+      <!-- 退票申请提交弹框 -->
+      <uni-popup ref="checkPricePopup" type="dialog">
+        <view class="check_Price">
+          <view class="box_title">预定价格变更</view>
+          <view class="content_text">您的当前预定票价已变动至&yen;{{newPrice}}需要继续购买吗？</view>
+          <view class="box_bottom">
+            <view class="submit" @click="submitCheckPrice">确 定</view>
+            <view @click="closeCheckPrice">取 消</view>
+          </view>
+        </view>
+    </uni-popup>
     </scroll-view>
     <!-- 提交申请按钮 -->
     <view class="filter_bottom">
-      <view class="bottom_btn submit_btn">提交申请</view>
+      <view class="bottom_btn submit_btn"
+      @click="submitRefund(item)">提交申请</view>
     </view>
   </view>
 </template>
@@ -238,8 +248,24 @@ export default {
   },
   methods: {
     // 是否自愿点击
-    submit(val) {
-      console.log(val);
+    submit() {
+      console.log(单选);
+    },
+
+    // 提交申请
+    submitRefund(data) {
+      
+      // 联系人选择
+      // if(!checkedPassenger) {
+
+
+      // }
+
+      console.log('提交申请',data)
+      orderApi.refundSubmit()
+        .then(res =>{
+          console.log(res)
+        })
     },
 
     // 选择联系人
@@ -256,6 +282,7 @@ export default {
 		//   如果为false就从选中列表删除
 		  this.checkedPassengerlist.splice(this.checkedPassengerlist.findIndex(item => item.id === val.id),1)
       }
+
 
       console.log(this.checkedPassengerlist);
       // this.checkedPassengerList
@@ -358,6 +385,15 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      &.active {
+        .main_content {
+          .list_click {
+          background: url(@/static/selected_active.png) no-repeat;
+          background-size: contain;
+        }
+        }
+      }
+
       .main_list_title {
         font-size: 32upx;
         font-weight: bold;
@@ -367,12 +403,12 @@ export default {
         flex: 1;
         justify-content: flex-end;
       }
-      &.active {
-        .list_click {
-          background: url(@/static/selected_active.png) no-repeat;
-          background-size: contain;
-        }
-      }
+      // &.active {
+      //   .list_click {
+      //     background: url(@/static/selected_active.png) no-repeat;
+      //     background-size: contain;
+      //   }
+      // }
       .main_content {
         font-size: 14px;
         font-weight: 400;
@@ -717,9 +753,13 @@ export default {
           }
         }
 	  }
-	  .logo {
-		  margin-top: 10rpx;
-	  }
+      .logo {
+        
+        margin-top: 15rpx;
+        margin-right: 4rpx;
+        color: rgba(255, 0, 0, 1);
+        font-weight: bold;
+      }
       .message_bottom {
         font-size: 28upx;
         color: rgba(42, 42, 42, 1);

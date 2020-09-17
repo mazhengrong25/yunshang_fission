@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-16 13:37:40
+ * @LastEditTime: 2020-09-17 17:31:03
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -11,14 +11,14 @@
       :statusHeight="iStatusBarHeight"
       :centerTitle="orderHeaderTitle"
     ></yun-header>
+
     <view class="order_header">
       <view
         :class="['header_list', { active: headerActive === index }]"
         v-for="(item, index) in headerList"
         :key="index"
         @click="checkedHeaderActive(index)"
-        >{{ item }}</view
-      >
+        >{{ item }}</view>
     </view>
 
     <view class="order_filter">
@@ -40,7 +40,7 @@
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="contain" />
         </view>
-        <view class="list_title" @click="goFilter()">筛选</view>
+        <view class="list_title" @click="goFilter('0')">筛选</view>
       </view>
     </view>
 
@@ -315,9 +315,9 @@ export default {
     },
 
     //跳转到筛选页面
-    goFilter() {
+    goFilter(type) {
       uni.navigateTo({
-        url: "/pages/order/filter",
+        url: "/pages/order/filter?type="+type,
       });
       this.getOrderList()
     },
@@ -407,7 +407,7 @@ export default {
             this.showDefault = true;
           }
         });
-      }
+      } 
     },
     // 下一页数据
     nextPageData() {
@@ -415,12 +415,6 @@ export default {
         this.orderPageNumber = this.orderPageNumber + 1;
         this.getOrderList();
       } 
-      // else {
-      //   uni.showToast({
-      //     title: "到底啦",
-      //     icon: "none",
-      //   });
-      // }
     },
 
     // 跳转订单详情
@@ -479,6 +473,8 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.orderListType = data.type;
+    console.log(this.orderListType)
+    console.log(data)
     this.orderHeaderTitle =
       this.orderListType === "0"
         ? "国内订单"
