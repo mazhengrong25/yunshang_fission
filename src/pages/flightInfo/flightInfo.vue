@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-17 18:05:58
+ * @LastEditTime: 2020-09-18 15:48:44
  * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2020-09-17 10:19:30
@@ -215,7 +215,12 @@ export default {
       depCabinHeader: [], // 返程切换头部
       depCabinList: {}, // 返程数据
 
-      ruleInfos: {}, // 退改签信息
+      ruleInfos: { // 退改签信息
+        gauge: {
+          refund: [],
+          change: []
+        }
+      }, 
 
       newPrice: "", // 验价新价格
 
@@ -739,7 +744,6 @@ export default {
     this.cabinHeader = [];
     this.depCabinHeader = [];
     this.current = 0;
-    this.ruleInfos = {};
   },
   onLoad(data) {
     this.roundTripType = data.pageType ? JSON.parse(data.pageType) : false;

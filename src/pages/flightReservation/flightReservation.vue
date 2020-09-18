@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-17 16:46:34
+ * @LastEditTime: 2020-09-18 15:47:25
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -208,7 +208,7 @@
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
         <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')">《关于规范互联网机票销售行为的通知》</text>
-        <text @click="openStatementWeb(statement.url)">《{{statement.title}}》</text>
+        <text @click="openUrlDialog(statement)">《{{statement.title}}》</text>
         <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')">《锂电池航空运输规范》</text>
       </view>
     </scroll-view>
@@ -319,6 +319,8 @@
         </view>
       </view>
     </uni-popup>
+
+    
   </view>
 </template>
 
@@ -351,6 +353,13 @@ export default {
         // 导航栏信息
         to: "重庆",
         from: "北京",
+      },
+
+      ruleInfos: { // 退改签信息
+        gauge: {
+          refund: [],
+          change: []
+        }
       },
 
       disMessage: {}, // 分销商信息
@@ -432,8 +441,6 @@ export default {
       showStatementWeb: false, // 外部链接
 
       chdinf_msg: {}, // 航司儿童婴儿携带数量
-
-      ruleInfos: {}, // 航班退改信息
     };
   },
   methods: {
@@ -804,6 +811,11 @@ export default {
           : 0;
       this.getTotalPrice();
       // this.passengerList[index].is_insure = JSON.parse(JSON.stringify(e));
+    },
+
+    // 打开运输总条件弹窗
+    openUrlDialog(val){
+      console.log(val)
     },
 
     // 打开免责声明 外部链接

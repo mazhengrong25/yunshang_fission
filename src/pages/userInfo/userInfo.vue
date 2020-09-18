@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-09-15 09:20:34
+ * @LastEditTime: 2020-09-18 14:36:40
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -79,7 +79,7 @@
           <view class="list_icon">
             <image src="@/static/user_order.png" mode="contain" />
           </view>
-          <view class="list_message">
+          <view class="list_message" @click="jumpOrder()">
             <view class="message_title">全部订单</view>
             <view class="message">国内订单/国际订单</view>
           </view>
@@ -166,6 +166,13 @@ export default {
             icon: "none",
           });
         }
+      });
+    },
+
+    // 跳转订单页面
+    jumpOrder(){
+      uni.switchTab({
+         url: '/pages/order/order'
       });
     },
 

@@ -48,21 +48,31 @@
                 </view>
                 <view class="table_list">
                   <view class="list_title">票面价</view>
-                  <view class="list_content">{{ruleInfos.filght.price !== 0? (ruleInfos.filght.price + '（元）'): '无运价'}}</view>
+                  <view
+                    class="list_content"
+                  >{{ruleInfos.filght.price !== 0? (ruleInfos.filght.price + '（元）'): '无运价'}}</view>
                 </view>
               </view>
             </view>
             <view id="retreat" class="main_box">
               <view class="main_title">退票</view>
               <view class="main_table">
-                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.refund" :key="index">
+                <view
+                  class="table_list"
+                  v-for="(item, index) in ruleInfos.gauge.refund"
+                  :key="index"
+                >
                   <view class="list_title">{{Number(item.value)}}%</view>
                   <view class="list_content">{{item.title}}</view>
                 </view>
               </view>
               <view class="main_title" style="margin-top: 20rpx">改签</view>
               <view class="main_table">
-                <view class="table_list" v-for="(item, index) in ruleInfos.gauge.change" :key="index">
+                <view
+                  class="table_list"
+                  v-for="(item, index) in ruleInfos.gauge.change"
+                  :key="index"
+                >
                   <view class="list_title">{{Number(item.value)}}%</view>
                   <view class="list_content">{{item.title}}</view>
                 </view>
@@ -70,15 +80,11 @@
             </view>
             <view class="main_box">
               <view class="main_title">退改信息</view>
-              <view class="main_message">
-                {{ruleInfos.gauge.back_msg || '暂无数据'}}
-              </view>
+              <view class="main_message">{{ruleInfos.gauge.back_msg || '暂无数据'}}</view>
             </view>
             <view id="cabin" class="main_box">
               <view class="main_title">行李额</view>
-              <view class="main_message">
-                {{ruleInfos.filght.baggage || '暂无数据'}}
-              </view>
+              <view class="main_message">{{ruleInfos.filght.baggage || '暂无数据'}}</view>
             </view>
           </view>
         </scroll-view>
@@ -91,13 +97,16 @@ export default {
   props: {
     ruleInfos: {
       type: Object,
-      default: () => {}
-    }
+      default:() => ({})
+    },
   },
   data() {
     return {
       popupCurrent: "info",
     };
+  },
+  created() {
+    console.log("初始值", this.ruleInfos);
   },
   methods: {
     checkedExplanationBtn(val) {
@@ -105,7 +114,7 @@ export default {
     },
     // 打开退改签说明弹窗
     openExp() {
-      this.popupCurrent= "info"
+      this.popupCurrent = "info";
       this.$refs.flightExplanation.open();
     },
     // 关闭产品说明弹窗
