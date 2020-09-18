@@ -1,113 +1,202 @@
 <!--
- * @Description: 订单详情页面
- * @Author: wish.WuJunLong
- * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-18 15:58:56
+ * @Description: 退票单详情
+ * @Author: mazhengrong
+ * @Date: 2020-09-18 10:14:28
+ * @LastEditTime: 2020-09-18 18:11:29
  * @LastEditors: mazhengrong
 -->
+
 <template>
   <view class="order_details">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="订单详情"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      centerTitle="退票单详情"
+    ></yun-header>
 
-	<!-- 国际详情 -->
-    <view class="details_header" v-if="orderListType === '3'">
+    <view class="details_header">
       <view class="header_top">
         <view class="order_type">
-          {{orderDetails.status === 1? '已预订':
-          orderDetails.status === 2? '待出票':
-          orderDetails.status === 3? '已出票':
-          orderDetails.status === 5? '已取消': ''}}
-          </view>
-
-        <view class="order_price">
-          <text class="price_text">总价&yen;</text>
-          <text>{{orderDetails.need_pay_amount || '金额数据错误'}}</text>
+          {{
+           flightData.order_status === 1
+            ? "申请中"
+            : flightData.order_status === 2
+            ? "成功"
+            : flightData.order_status === 3
+            ? "已取消"
+            : ""
+          }}
         </view>
+
+        <!-- <view class="order_price">
+          <text class="price_text" v-if="flightData.order_status === 2">退票金额&yen;</text>
+          <text class="price_text" v-if="!flightData.order_status === 2">退票金额参考</text>
+          <text
+          v-for="(item, index) in flightData.ticket_refund_passenger"
+          :key="index"
+          >{{ item.refund_money }}</text>
+        </view> -->
+      </view>
+      <!-- 状态提示 -->
+      <view class="remaining_time">
+        <text class="time_text">{{
+             flightData.order_status === 1
+            ? "您的申请已提交，等待后台审核"
+            : flightData.order_status === 2
+            ? "您的订单已成功退款"
+            : flightData.order_status === 3
+            ? "您的申请已取消"
+            : ""
+        }}</text>
       </view>
 
-      <view class="remaining_time"
-	  v-if="orderDetails.status === 1" >
-        <image class="time_icon" src="@/static/order_remaining_time.png" mode="aspectFit" />
-        <text class="time_text">剩余支付时间：{{$timeDiff(new Date(orderDetails.created_at).getTime()+ (30*60*1000) , new Date(), 'minutes')}}分钟</text>
-      </view>
-
-      <view class="order_option">
-        <view class="option_btn" v-if="orderDetails.status === 1">取消订单</view>
-        <view class="option_btn important_btn" v-if="orderDetails.status === 1">去支付</view>
-		<view class="option_btn" v-if="orderDetails.status === 3">报销凭证</view>
-		<view class="option_btn" v-if="orderDetails.status === 3" 
-		@click="getRefund(item)">退票</view>
-		<view class="option_btn" v-if="orderDetails.status === 3">改签</view>
-		<view class="option_btn" v-if="orderDetails.status === 5">查看退废单</view>
-		<view class="option_btn" v-if="orderDetails.status === 5">再次预定</view>
-      </view>
+      <!-- <view class="order_option">
+        <view class="option_btn" v-if="orderDetails.status === 1"
+          >发送短信</view
+        >
+        <view
+          class="option_btn"
+          v-if="
+            orderDetails.status !== 0 &&
+              orderDetails.status !== 5 &&
+              orderDetails.pay_status === 1
+          "
+          @click="getCancel(item)"
+          >取消订单</view
+        >
+        <view
+          class="option_btn important_btn"
+          v-if="
+            orderDetails.status !== 0 &&
+              orderDetails.status !== 5 &&
+              orderDetails.pay_status === 1
+          "
+          >去支付</view
+        >
+        <view class="option_btn" v-if="orderDetails.status === 3"
+          >报销凭证</view
+        >
+        <view class="option_btn" v-if="orderDetails.status === 3"
+          >发送短信</view
+        >
+        <view
+          class="option_btn"
+          v-if="orderDetails.status === 3"
+          @click="getRefund()"
+          >退票</view
+        >
+        <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
+        <view class="option_btn" v-if="orderDetails.status === 5"
+          >再次预定</view
+        >
+      </view> -->
     </view>
 
     <view class="details_main">
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
-        <view class="main_list filght_info" v-for="(item, index) in orderDetails.routes" :key="index">
+        <view class="main_list filght_info">
           <view class="info_header">
-            <view class="header_type">{{orderDetails.routing_type === 1?'单程':
-										orderDetails.routing_type === 2?'往返':
-										orderDetails.routing_type === 3?'多程':''}}</view>
+            <view class="header_type">{{
+              flightData.segment_type === 1
+                ? "单程"
+                : flightData.segment_type === 2
+                ? "往返"
+                : flightData.segment_type === 3
+                ? "多程"
+                : ""
+            }}</view>
             <view class="header_time">
-              {{item.departure_time.substring(0,10)}}
-              <text>{{$dateTool(item.departure_time,"ddd")}}</text>
+              <!-- {{ item.departure_time.substring(0, 10) }} -->
+              <!-- <text>{{ $dateTool(item.ticket_segment.departure_time, "ddd") }}</text> -->
             </view>
           </view>
           <view class="info_message">
             <view class="message_box">
-              <view class="date">{{item.departure_time.substring(10,16)}}</view>
-              <view class="address">{{item.departure}}</view>
+              <!-- <view class="date">{{
+                item.departure_time.substring(11, 16)
+              }}</view> -->
+              <view class="address"
+                >{{ item.departure_CN.city_name
+                }}{{ item.departure_CN.air_port_name }}</view
+              >
             </view>
 
             <view class="message_center">
-              <view class="date">{{(item.duration.replace(":","h"))}}m</view>
+              <!-- <view class="date"
+                >{{ Math.floor(item.duration / 3600) }}h{{
+                  Math.floor((item.duration / 60) % 60)
+                }}m</view
+              > -->
               <view class="center_icon"></view>
               <view class="type">直飞</view>
             </view>
 
             <view class="message_box">
-              <view class="date">{{item.arrive_time.substring(10,16)}}</view>
-              <view class="address">{{item.arrive}}</view>
+              <!-- <view class="date">{{ item.arrive_time.substring(11, 16) }}</view> -->
+              <view class="address"
+                >{{ item.arrive_CN.city_name
+                }}{{ item.arrive_CN.air_port_name }}</view
+              >
             </view>
           </view>
 
           <view class="filght_message">
-            <view class="message_icon"></view>
-            <view class="message_list">{{item.inter_segments[0].flight_no}}</view>
-            <view class="message_list">空客A320</view>
+            <!-- 航班图标 -->
+            <view class="message_icon">
+              <!-- <image
+                class="message_icon"
+                :src="'https://fxxcx.ystrip.cn/' + item.image"
+                mode="contain"
+              /> -->
+            </view>
+            <view class="message_list">{{ item.flight_no }}</view>
+            <view class="message_list">{{ item.model }}</view>
             <view class="message_list">有早餐</view>
           </view>
 
           <view class="filght_bottom">
-            <view class="bottom_list">{{item.inter_segments[0].cabin}}{{item.inter_segments[0].cabin_level === 'ECONOMY'?'经济舱':
-										item.inter_segments[0].cabin_level === 'FIRST'?'头等舱':
-										item.inter_segments[0].cabin_level === 'BUSINESS'?'公务舱':''}}</view>
+            <view class="bottom_list"
+              >{{ item.cabin
+              }}{{
+                item.cabin_level === "ECONOMY"
+                  ? "经济舱"
+                  : item.cabin_level === "FIRST"
+                  ? "头等舱"
+                  : item.cabin_level === "BUSINESS"
+                  ? "公务舱"
+                  : ""
+              }}</view
+            >
             <view class="bottom_list">退改签规则</view>
-            <view class="bottom_list">每人托运2件，每件23KG</view>
+            <view class="bottom_list input-right-arrow">每人托运2件，每件23KG</view>
           </view>
         </view>
 
         <view class="main_list passenger">
           <view class="main_list_title">出行信息</view>
           <view class="passenger_list">
-            <view class="list_item" v-for="(item, index) in orderDetails.passengers" :key="index">
+            <view
+              class="list_item"
+              v-for="(oitem, oindex) in flightData.ticket_refund_passenger"
+              :key="oindex"
+            >
               <view class="list_info">
-                <view class="info_type">{{item.passenger_type === 'ADT'?'成人':item.passenger_type === 'CNN'?'儿童':item.passenger_type === 'INF'?'婴儿':''}}票</view>
-                <view class="info_name">{{item.en_first_name}} {{item.en_last_name}}</view>
-                <view class="is_insurance" v-if="item.insure_count > 0"></view>
-                <view class="group_type">员工</view>
-              </view>
-
-              <view class="list_message">
-                <view class="message_title">{{item.credential === '0'? '身份证':
-											  item.credential === '1'? '护照':
-											  item.credential === '2'? '港澳通行证':
-											  item.credential === '3'? '其它证件':
-											  item.credential === '4'? '台胞证':
-											  item.credential === '5'? '台湾通行证':''}}</view>
-                <view class="message_number">{{item.credential_no}}</view>	<!-- 身份证号码 -->
+                <view class="info_type"
+                  >{{
+                    oitem.ticket_passenger.PassengerType === "ADT"
+                      ? "成人"
+                      : oitem.ticket_passenger.PassengerType === "CNN"
+                      ? "儿童"
+                      : oitem.ticket_passenger.PassengerType === "INF"
+                      ? "婴儿"
+                      : ""
+                  }}票</view
+                >
+                <view class="info_name">{{ oitem.ticket_passenger.PassengerName }}</view>
+                <view class="is_insurance" v-if="oitem.insure_count !== 0">
+                    <image src="@/static/insurance_icon.png" mode="contain" />
+                </view>
+                <view class="group_type">票号</view>
+                <view class="group_number">{{ oitem.ticket_no }}</view>
               </view>
             </view>
           </view>
@@ -115,55 +204,38 @@
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{item.en_first_name}}{{item.en_last_name}}</view>
+              <view class="list_message">{{ flightData.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
-              <view class="list_message">{{item.phone}}</view>
-            </view>
-            <view class="contact_list">
-              <view class="list_title">已购保险</view>
-              <view class="list_message">{{item.insure_price}}元{{item.insure_count}}份</view>
+              <view class="list_message">{{ flightData.phone }}</view>
             </view>
           </view>
         </view>
-
-     <!--  <view class="main_list certificate" v-for="(item, index) in orderDetails.passengers" :key="index">
-          <view class="main_list_title">报销凭证</view>
-          <view class="certificate_message">
-            <view class="message_title">邮寄地址</view>
-            <view class="message_text">
-              <view>
-                <text>马冬梅</text>
-                <text>17600129126</text>
-              </view>
-              <view>重庆市渝中区长江一路</view>
-            </view>
-          </view>
-        </view> -->
-
-        <view class="main_list order_message">
+        <view class="main_list order_message"
+         v-for="(oitem, oindex) in flightData.ticket_refund_passenger"
+         :key="oindex">
           <view class="main_list_title">订单信息</view>
           <view class="message_list">
             <view class="list_item">
               <view class="item_title">订单编号</view>
-              <view class="item_message">{{orderDetails.order_no}}</view>
+              <view class="item_message">{{ flightData.order_no }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">PNR</view>
-              <view class="item_message">{{orderDetails.pnr_code}}</view>
+              <view class="item_message">{{ flightData.pnr_code }}</view>
             </view>
             <view class="list_item">
-              <view class="item_title">订票员</view>
-              <view class="item_message">{{orderDetails.book_user}}</view>
+              <view class="item_title">分销商</view>
+              <view class="item_message">{{ flightData.admin_name }}</view>
             </view>
             <view class="list_item">
-              <view class="item_title">预定时间</view>
-              <view class="item_message">{{orderDetails.created_at}}</view>	<!-- 时间 -->
+              <view class="item_title">申请时间</view>
+              <view class="item_message">{{ oitem.refund_time }}</view>
             </view>
             <view class="list_item">
-              <view class="item_title">备注</view>
-              <view class="item_message input-right-arrow">{{orderDetails.ext}}</view>
+              <view class="item_title">退废票备注</view>
+              <view class="item_message input-right-arrow">{{ flightData.remark }}</view>
             </view>
           </view>
         </view>
@@ -174,79 +246,47 @@
 
 <script>
 import orderApi from "@/api/order.js";
+import moment from "../../moment";
+moment.locale("zh-cn");
 export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      orderDetails: [], // 订单详情 --国际
-      flightData: {}, // 航班信息
-	  orderListType: '', // 订单列表页 类型
+    //   refundDetails: [], // 订单详情
+      flightData: [], // 航班信息
+      orderId: "", // 订单号
     };
   },
   methods: {
-    // 获取订单详情
-    getOrderDetails(val) {
-		console.log('订单详情',val,this.orderListType);
-      let data = {
-        order_no:val
-      };
-	  
-	  if(this.orderListType === '3') {
-		  
-		  orderApi.orderInterDetails(data).then((res) => {
-		    console.log(res);
-		  		if (res.errorcode === 10000) {
-		  		  this.orderDetails = res.data;
-		  		}else {
-		  		  uni.showToast({
-		  		    title: res.msg,
-		  		    icon: "none",
-		  		  });
-		  		} 
-		  });
-		  
-		  
-	  }else if( this.orderListType === '0'){
-		  
-		  orderApi.orderDetails(data).then((res) => {
-		    console.log(res);
-		  		if (res.errorcode === 10000) {
-		  		  this.orderDetails = res.data.order_msg.order_msg;
-		  		}else {
-		  		  uni.showToast({
-		  		    title: res.msg,
-		  		    icon: "none",
-		  		  });
-		  		}
-		  });
-		  
-	  }
-	  
-    },
-	
-	//点击退票跳转页面
-	// 跳转订单详情
-	getRefund(data) {
-	  uni.navigateTo({
-	    url: "/pages/order/refund?orderData=" + JSON.stringify(data),
-	  });
-	},
 
-  },
-  onLoad(data) {
-    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-	let orderData = JSON.parse(data.orderData)
-	console.log(data)
-	this.orderListType = data.type
-	this.orderHeaderTitle = 
-		this.orderListType === '0'?'国内订单': 
-		this.orderListType === '1'?'国内退票订单': 
-		this.orderListType === '2'?'国内改签订单': 
-		this.orderListType === '3'?'国际订单':
-		this.orderListType === '4'?'国际退票订单':
-		this.orderListType === '5'?'国际改签订单':''
-    this.getOrderDetails(orderData.order_no);
-	
+    // 获取订单详情
+    getOrderDetails() {
+     
+      let data = {
+        refund_no: this.orderId,
+      };
+
+      orderApi.orderInterRefund(data).then((res) => {
+        if (res.result === 10000) {
+          this.flightData = res.data.data;
+        } else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
+      });
+    },
+
+
+    onLoad(data) {
+      console.log('退票',data)
+      this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+      this.flightData = JSON.parse(data.refundData);
+      this.orderId = this.flightData.refund_no;
+      console.log('退票详情',this.flightData);
+      this.getOrderDetails();
+    },
   },
 };
 </script>
@@ -305,8 +345,9 @@ export default {
       }
       .time_text {
         font-size: 24upx;
-        font-weight: bold;
+        font-weight: 400;
         color: rgba(255, 255, 255, 1);
+        opacity: 0.8;
       }
     }
     .order_option {
@@ -448,6 +489,7 @@ export default {
               height: 24upx;
               object-fit: contain;
               margin-right: 6upx;
+              display: flex;
             }
             .message_list {
               font-size: 22upx;
@@ -529,17 +571,28 @@ export default {
                   margin-right: 8upx;
                 }
                 .is_insurance {
-                  background: url(@/static/insurance_icon.png) no-repeat center
-                    center;
-                  background-size: contain;
-                  width: 25upx;
-                  height: 30upx;
+                  
+                    width: 30upx;
+                    height: 30upx;
+                    margin-right: 8upx;
+                    display: flex;
+                    image {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
                 }
                 .group_type {
-                  margin-left: 28upx;
-                  font-size: 22upx;
-                  font-weight: 400;
-                  color: rgba(153, 153, 153, 1);
+                    margin-left: 28upx;
+                    font-size: 28upx;
+                    font-weight: 400;
+                    color: #333333;
+                    margin-right: 10px;
+                }
+                .group_number {
+                    font-weight: bold;
+                    font-size: 14px;
+                    color: #2a2a2a;
                 }
               }
               .list_message {
@@ -605,15 +658,15 @@ export default {
             margin-top: 40upx;
             .list_item {
               display: flex;
-              align-items: center; 
-              &:not(:last-child){
+              align-items: center;
+              &:not(:last-child) {
                 margin-bottom: 30upx;
               }
               .item_title {
                 font-size: 24upx;
                 font-weight: 400;
                 color: rgba(153, 153, 153, 1);
-                width: 100upx;
+                // width: 100upx;
               }
               .item_message {
                 flex: 1;

@@ -37,6 +37,12 @@
       }
     },
     {
+      "path": "pages/order/refundDetails",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/flightReservation/passengerList",
       "style": {
         "navigationStyle": "custom"

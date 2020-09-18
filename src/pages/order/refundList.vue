@@ -1,8 +1,8 @@
 <!--
- * @Description: 
+ * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-09-17 18:32:11
+ * @LastEditTime: 2020-09-18 11:58:36
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -18,7 +18,8 @@
         v-for="(item, index) in refundList"
         :key="index"
         @click="checkedHeaderActive(index)"
-        >{{ item }}</view>
+        >{{ item }}</view
+      >
     </view>
 
     <view class="order_filter">
@@ -28,7 +29,7 @@
         </view>
         <view class="list_title" @click="sorTime('create')">申请(早-晚)</view>
       </view>
-      
+
       <view class="filter_list">
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="contain" />
@@ -41,46 +42,60 @@
       :scroll-y="true"
       :enable-back-to-top="true"
       class="content"
-      @scrolltolower="nextPageData()">
-
-      <view class="content_list"
-      v-for="(item, index) in refundOrderList"
-      :key="index">
-      
+      @scrolltolower="nextPageData()"
+    >
+      <view
+        class="content_list"
+        v-for="(item, index) in refundOrderList"
+        :key="index"
+        @click="jumpOrderDetails(item)"
+      >
         <view class="list_item">
           <view class="item_header">
-            <view class="item_title">
-              <view class="title">重庆 - 首尔</view>
+            <view
+              class="item_title"
+              v-for="(oitem, oindex) in item.ticket_segments"
+              :key="oindex"
+            >
+              <view class="title"
+                >{{ oitem.arrive_CN.city_name }} -
+                {{ oitem.departure_CN.city_name }}</view
+              >
             </view>
             <view class="info_right">
-                <text>{{item.order_status === 1
-                        ? "申请中"
-                        :item.order_status === 2
-                        ? "成功"
-                        :item.order_status === 3
-                        ? "已取消"
-                        : ""}}
-                </text>
+              <text
+                >{{
+                  item.order_status === 1
+                    ? "申请中"
+                    : item.order_status === 2
+                    ? "成功"
+                    : item.order_status === 3
+                    ? "已取消"
+                    : ""
+                }}
+              </text>
             </view>
           </view>
           <view class="item_info">
-            <view class="info_left"
-            v-for="(oitem, oindex) in item.ticket_refund_passenger.ticket_passenger"
-             :key="oindex">
-              <text style="margin-right:10px">乘机人</text>
-              <text style="color:rgba(175, 185, 196, 1)">{{oitem.PassengerName}}</text>
-              <text></text>
+            <view class="info_left">
+              <text class="left_title">乘机人</text>
+              <view class="left_message">
+                <text
+                  class="message_passenger"
+                  v-for="(oitem, oindex) in item.ticket_refund_passenger"
+                  :key="oindex"
+                  >{{ oitem.ticket_passenger.PassengerName }}</text
+                >
+              </view>
             </view>
-            <view class="info_right">
-             
-            </view>
+            <view class="info_right"> </view>
           </view>
         </view>
       </view>
 
-    <view class="no_data" v-if="!orderPageStatus">
-    <text>到底啦</text>
-    </view>
+      <view class="no_data" v-if="!orderPageStatus">
+        <text>到底啦</text>
+      </view>
     </scroll-view>
   </view>
 </template>
@@ -93,7 +108,7 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      refundList: ["全部","申请中", "成功", "已取消"], // 退票列表类别
+      refundList: ["全部", "申请中", "成功", "已取消"], // 退票列表类别
       headerActive: 0, // 订单类别默认值 全部
       orderPageNumber: 1, // 当前订单页数
       orderPageStatus: true, // 是否允许加载下一页数据
@@ -102,16 +117,14 @@ export default {
       orderHeaderTitle: "国内退票单", // 订单列表页头部标题
       refundOrderList: [], //国内退票列表
       orderListFilter: {}, // 筛选条件
-
     };
   },
   methods: {
-   
     checkedHeaderActive(index) {
       this.headerActive = index;
       this.orderPageNumber = 1;
       this.refundOrderList = [];
-      if(JSON.stringify(this.orderListFilter) !== '{}'){
+      if (JSON.stringify(this.orderListFilter) !== "{}") {
         this.getOrderList();
       }
     },
@@ -119,104 +132,82 @@ export default {
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/pages/order/filter?type="+type,
+        url: "/pages/order/filter?type=" + type,
       });
-      this.getOrderList()
+      this.getOrderList();
     },
     //获取国内退票列表
     getOrderList() {
-
-        this.orderPageStatus = true;
-        let data = {
-            dis_id: uni.getStorageSync('userInfo').dis_id,
-            start_date: moment()
-                .subtract(7, "days")
-                .format("YYYY-MM-DD"),
-            end_date:  moment().format("YYYY-MM-DD"),
-            order_status:
-                this.headerActive === 0
-                ? ""
-                : this.headerActive === 1
-                ? "1"
-                : this.headerActive === 2
-                ? "2"
-                : this.headerActive
+      this.orderPageStatus = true;
+      let data = {
+        dis_id: uni.getStorageSync("userInfo").dis_id,
+        start_date: moment()
+          .subtract(7, "days")
+          .format("YYYY-MM-DD"),
+        end_date: moment().format("YYYY-MM-DD"),
+        order_status:
+          this.headerActive === 0
+            ? ""
+            : this.headerActive === 1
+            ? "1"
+            : this.headerActive === 2
+            ? "2"
+            : this.headerActive,
+      };
+      orderApi.orderRefundList(data).then((res) => {
+        console.log(res);
+        if (res.result === 10000) {
+          if (this.refundOrderList.length > 0) {
+            this.refundOrderList.push.apply(
+              this.refundOrderList,
+              res.data.data
+            );
+          } else {
+            this.refundOrderList = res.data.data;
+          }
+        } else {
+          //     uni.showToast({
+          // 	    title: res.msg,
+          // 	    icon: "none",
+          // });
         }
-        orderApi.orderRefundList(data).then((res) => {
-            console.log(res)
-            if (res.result === 10000) {
-            
-                if (this.refundOrderList.length > 0) {
-
-                    this.refundOrderList.push.apply(this.refundOrderList, res.data.data);
-                } else {
-
-                    this.refundOrderList = res.data.data;
-                }
-        
-            } else {
-            //     uni.showToast({
-		  	// 	    title: res.msg,
-		  	// 	    icon: "none",
-		  	// });
-            }
-        });
-    
+      });
     },
     // 下一页数据
     nextPageData() {
       if (this.orderPageStatus) {
         this.orderPageNumber = this.orderPageNumber + 1;
         this.getOrderList();
-      } 
+      }
     },
 
     // 跳转订单详情
     jumpOrderDetails(data) {
-      console.log("详情",data)
-      if (this.orderListType === "3") {
-        uni.navigateTo({
-          url:
-            "/pages/order/orderDetails?orderData=" +
-            JSON.stringify(data) +
-            "&type=" +
-            this.orderListType,
-        });
-      } else if (this.orderListType === "0") {
-        uni.navigateTo({
-          url:
-            "/pages/order/orderinterDetails?listData=" +
-            JSON.stringify(data) +
-            "&type=" +
-            this.orderListType,
-        });
-      }
+      uni.navigateTo({
+        url: "/pages/order/refundDetails?refundData=" + JSON.stringify(data),
+      });
     },
 
-     // 起飞时间排序
+    // 起飞时间排序
     departSort(d) {
-
-        return (m, n) => {
+      return (m, n) => {
         var a = new Date(m.ticket_segments[0][d]).getTime();
         var b = new Date(n.ticket_segments[0][d]).getTime();
-        return a -b;   
+        return a - b;
       };
-   
     },
 
     // 预定时间排序
     createSort(t) {
-        
-        return (m, n) => {
+      return (m, n) => {
         var a = new Date(m[t]).getTime();
         var b = new Date(n[t]).getTime();
-        return a - b;   
+        return a - b;
       };
     },
 
     //时间排序
     sorTime(val) {
-  
       if (val === "create") {
         this.refundOrderList.sort(this.createSort("created_at"));
       } else if (val === "depart") {
@@ -228,64 +219,89 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.getOrderList();
   },
-  onShow(){
-    this.orderListFilter = uni.getStorageSync('orderListFilter')
-    if(this.orderListFilter){
-      this.orderListFilter = JSON.parse(this.orderListFilter)
+  onShow() {
+    this.orderListFilter = uni.getStorageSync("orderListFilter");
+    if (this.orderListFilter) {
+      this.orderListFilter = JSON.parse(this.orderListFilter);
       //pnr筛选
-      if(this.orderListFilter.pnr){ 
-        this.refundOrderList = this.refundOrderList.filter(item =>item.pnr_code === this.orderListFilter.pnr)
+      if (this.orderListFilter.pnr) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) => item.pnr_code === this.orderListFilter.pnr
+        );
       }
       //订单编号筛选
-      if(this.orderListFilter.orderNumber){ 
-        this.refundOrderList = this.refundOrderList.filter(item =>item.order_no === this.orderListFilter.orderNumber)
+      if (this.orderListFilter.orderNumber) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) => item.order_no === this.orderListFilter.orderNumber
+        );
       }
 
       //航班号筛选
-      if(this.orderListFilter.flightNumber){
-        this.refundOrderList = this.refundOrderList.filter(item =>item.ticket_segments[0].flight_no === this.orderListFilter.flightNumber)
+      if (this.orderListFilter.flightNumber) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) =>
+            item.ticket_segments[0].flight_no ===
+            this.orderListFilter.flightNumber
+        );
       }
 
       //订票员  选择框
-      if(this.orderListFilter.booker){
-        this.refundOrderList = this.refundOrderList.filter(item =>item.book_user === this.created_at.booker)
+      if (this.orderListFilter.booker) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) => item.book_user === this.created_at.booker
+        );
       }
 
-      //出发城市筛选  
-      if(this.orderListFilter.Citystart){
-        this.refundOrderList = this.refundOrderList.filter(item =>item.ticket_segments[0].departure_msg.province === this.orderListFilter.Citystart)
+      //出发城市筛选
+      if (this.orderListFilter.Citystart) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) =>
+            item.ticket_segments[0].departure_msg.province ===
+            this.orderListFilter.Citystart
+        );
       }
 
-      //到达城市筛选  
-      if(this.orderListFilter.Cityend){
-        this.refundOrderList = this.refundOrderList.filter(item =>item.ticket_segments[0].arrive_msg.province === this.orderListFilter.Cityend)
+      //到达城市筛选
+      if (this.orderListFilter.Cityend) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) =>
+            item.ticket_segments[0].arrive_msg.province ===
+            this.orderListFilter.Cityend
+        );
       }
 
       //日始时间筛选
-      if(this.orderListFilter.Timestart){
-        this.refundOrderList = this.refundOrderList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timestart)
+      if (this.orderListFilter.Timestart) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) =>
+            moment(item.ticket_segments[0].departure_time).format(
+              "YYYY-MM-DD"
+            ) === this.orderListFilter.Timestart
+        );
       }
 
-       //日止时间筛选
-      if(this.orderListFilter.Timend){
-        this.refundOrderList = this.refundOrderList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timend)
+      //日止时间筛选
+      if (this.orderListFilter.Timend) {
+        this.refundOrderList = this.refundOrderList.filter(
+          (item) =>
+            moment(item.ticket_segments[0].departure_time).format(
+              "YYYY-MM-DD"
+            ) === this.orderListFilter.Timend
+        );
       }
-    
+
       //预定日期排序
-      if(this.orderListFilter.date !== null){
-        this.sorTime(this.orderListFilter.date)
+      if (this.orderListFilter.date !== null) {
+        this.sorTime(this.orderListFilter.date);
       }
-      
+
       //订单状态筛选
-      if(this.orderListFilter.status !== null){
-
-        this.checkedHeaderActive(this.orderListFilter.status)
+      if (this.orderListFilter.status !== null) {
+        this.checkedHeaderActive(this.orderListFilter.status);
       }
 
-
-      uni.removeStorageSync('orderListFilter')
+      uni.removeStorageSync("orderListFilter");
     }
-
   },
 };
 </script>
@@ -495,11 +511,24 @@ export default {
             font-size: 24upx;
             font-weight: 400;
             color: rgba(42, 42, 42, 1);
-            text {
-              display: inline-flex;
-              align-items: center;
-              &:first-child {
-                padding-left: 0;
+            display: flex;
+            align-items: center;
+            .left_title {
+              margin-right: 20upx;
+              flex-shrink: 0;
+            }
+            .left_message {
+              color: rgba(175, 185, 196, 1);
+              width: 50%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              .message_passenger {
+                &:not(:last-child) {
+                  &::after {
+                    content: "/";
+                  }
+                }
               }
             }
           }

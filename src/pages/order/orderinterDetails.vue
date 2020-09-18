@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-16 17:52:15
+ * @LastEditTime: 2020-09-18 18:27:29
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
@@ -214,7 +214,9 @@
                   }}票</view
                 >
                 <view class="info_name">{{ item.PassengerName }}</view>
-                <view class="is_insurance" v-if="item.insure_count > 0"></view>
+                <view class="is_insurance" v-if="orderDetails.insurance_total > 0">
+                    <image src="@/static/insurance_icon.png" mode="contain" />
+                </view>
                 <view class="group_type">员工</view>
               </view>
 
@@ -242,8 +244,7 @@
             </view>
           </view>
 
-          <!-- v-for="(item, index) in orderDetails.ticket_passenger"
-            :key="index" -->
+        
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
@@ -676,11 +677,16 @@ export default {
                   margin-right: 8upx;
                 }
                 .is_insurance {
-                  background: url(@/static/insurance_icon.png) no-repeat center
-                    center;
-                  background-size: contain;
-                  width: 25upx;
-                  height: 30upx;
+                  
+                    width: 30upx;
+                    height: 30upx;
+                    margin-right: 8upx;
+                    display: flex;
+                    image {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
                 }
                 .group_type {
                   margin-left: 28upx;
