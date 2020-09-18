@@ -2,11 +2,20 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-09-17 11:28:55
+ * @LastEditTime: 2020-09-18 11:56:26
  * @LastEditors: mazhengrong
  */
 import request from '@/api/request';
 
+
+//	获取航程信息
+function getFilghtData(data) {
+	return request({
+		method:'POST',
+		url:'/api/refund/details',
+		data: data
+	})
+}
 
 // 国内订单列表
 function orderList (data) {
@@ -45,7 +54,7 @@ function orderDetails(data) {
 	})
 }
 
-//点击退票
+//	退票详情
 function orderInterRefund(data) {
 	return request({
 		method:'POST',
@@ -89,5 +98,7 @@ export default{
   orderInterRefund,
   cancleInterRefund,
   refundSubmit,
-  orderRefundList
+  orderRefundList,
+  getFilghtData
+
 }

@@ -3,12 +3,15 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
 <<<<<<< HEAD
+<<<<<<< HEAD
  * @LastEditTime: 2020-09-18 15:48:44
  * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2020-09-17 10:19:30
+=======
+ * @LastEditTime: 2020-09-18 10:49:48
+>>>>>>> 24b6980e9355e697eae7b8ed4a9403c0c07eb9ed
  * @LastEditors: mazhengrong
->>>>>>> 791c60af01400daa5aaf69e2f1eadeb7a73b5b35
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
