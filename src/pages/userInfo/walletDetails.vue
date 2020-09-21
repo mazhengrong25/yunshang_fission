@@ -2,7 +2,7 @@
  * @Description: 流水详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 13:48:46
- * @LastEditTime: 2020-08-13 09:39:49
+ * @LastEditTime: 2020-09-21 17:15:43
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -122,25 +122,39 @@ export default {
       };
       if (Number(val[0]) >= 6) {
         userInfo.getOrderInterPay(data).then((res) => {
-          if (res.errorcode === 10000) {
-            this.payType = res.data.pay_type;
+          if (res.result === 10000) {
+            this.payType = res.data.order_msg.pay_type;
           } else {
             uni.showToast({
               title: res.msg,
               icon: "none",
             });
           }
+        }).catch(() =>{
+         setTimeout(() =>{
+            uni.showToast({
+              title: '获取数据错误，请稍后再试',
+              icon: "none",
+            });
+          },200)
         });
       } else if (Number(val[0]) <= 6) {
         userInfo.getOrderPay(data).then((res) => {
-          if (res.errorcode === 10000) {
-            this.payType = res.data.pay_type;
+          if (res.result === 10000) {
+            this.payType = res.data.order_msg.pay_type;
           } else {
             uni.showToast({
               title: res.msg,
               icon: "none",
             });
           }
+        }).catch(() =>{
+          setTimeout(() =>{
+            uni.showToast({
+              title: '获取数据错误，请稍后再试',
+              icon: "none",
+            });
+          },200)
         });
       }
     },

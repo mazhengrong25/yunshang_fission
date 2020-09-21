@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-17 16:48:33
+ * @LastEditTime: 2020-09-21 10:41:43
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -209,9 +209,9 @@ export default {
       this.airMessage["only_segment"] = 1;
 
       this.backScroll();
-      // if(this.$refs.flightFilter.filterBtnActive !== 'time'){
-      //   this.$refs.flightFilter.filterBtnActive = "time";
-      // }
+      if(this.$refs.flightFilter.filterBtnActive !== 'time'){
+        this.$refs.flightFilter.filterBtnActive = "time";
+      }
       
       ticket.getTicket(this.airMessage).then((res) => {
         console.log(res);
@@ -232,10 +232,17 @@ export default {
         } else {
           this.ticketList = [];
           this.showDefault = true;
-          this.showDefaultType = "404";
+          this.dataListApplyType = false;
+          this.showDefaultType = "";
           this.skeletonNumber = 0;
           this.$forceUpdate();
         }
+      }).catch(() =>{
+          this.ticketList = [];
+          this.showDefault = true;
+          this.showDefaultType = "404";
+          this.skeletonNumber = 0;
+          this.$forceUpdate();
       });
     },
 
@@ -397,14 +404,15 @@ export default {
         this.ticketList = this.oldTicketList;
         return false;
       }
-      if (val[0] === "不限") {
+      if(val[0]){
+        if (val[0] === "不限") {
         this.ticketList = this.oldTicketList;
       }
 
       if (val[0].indexOf("上午") !== -1) {
         this.ticketList = this.oldTicketList.filter(
           (item) =>
-            new Date(item.segments[0].depTime).getHours() >= 0 &&
+            new Date(item.segments[0].depTime).getHours() >= 0 && 
             new Date(item.segments[0].depTime).getHours() < 12
         );
       }
@@ -429,12 +437,14 @@ export default {
             new Date(item.segments[0].depTime).getHours() < 24
         );
       }
+      }
+      
 
       if (val[1]) {
         if (val[1] === "不限") {
-          this.ticketList = this.oldTicketList;
+          this.ticketList = this.ticketList;
         } else {
-          this.ticketList = this.oldTicketList.filter(
+          this.ticketList = this.ticketList.filter(
             (item) => item.segments[0].airline_CN === val[1]
           );
         }

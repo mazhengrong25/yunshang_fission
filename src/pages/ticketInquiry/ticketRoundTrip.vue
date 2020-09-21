@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-17 17:52:40
+ * @LastEditTime: 2020-09-21 16:43:18
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -53,7 +53,9 @@
               <view class="flight_line">
                 <view
                   class="time"
-                >{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
+                > {{ Math.floor(item.segments[0].duration / 60) }}h{{
+                Math.floor(item.segments[0].duration % 60)
+                }}m</view>
                 <view class="line_icon"></view>
               </view>
               <view class="top_time end_time">
@@ -120,7 +122,9 @@
               <view class="flight_line">
                 <view
                   class="time"
-                >{{Number(item.segments[0].duration.split(":")[0])}}h{{Number(item.segments[0].duration.split(":")[1])}}m</view>
+                > {{ Math.floor(item.segments[0].duration / 60) }}h{{
+                Math.floor(item.segments[0].duration % 60)
+                }}m</view>
                 <view class="line_icon"></view>
               </view>
               <view class="top_time end_time">
@@ -275,6 +279,7 @@ export default {
     // 获取往返提示头部信息
     getScrollData() {
       this.showRoundTrip = this.oldScrollTop > 10;
+      console.log(this.flightList,this.toActive)
       this.showRoundTripData = {
         toCode: this.flightList[this.toActive].segments[0].flightNumber,
         fromCode: this.roundFlightList[this.fromActive].segments[0]
@@ -424,6 +429,22 @@ export default {
       if (val === "price") {
         this.flightList.sort(this.priceSort("min_price"));
         this.roundFlightList.sort(this.priceSort("min_price"));
+
+
+        let priceList = this.flightList.filter((item) => item.min_price !== 0);
+        let notPriceList = this.flightList.filter(
+          (item) => item.min_price === 0
+        );
+        this.flightList = [...priceList, ...notPriceList];
+
+        let roundPriceList = this.roundFlightList.filter((item) => item.min_price !== 0);
+        let notRoundPriceList = this.roundFlightList.filter(
+          (item) => item.min_price === 0
+        );
+        this.roundFlightList = [...roundPriceList, ...notRoundPriceList];
+
+
+
         this.price = this.flightList[this.toActive].min_price;
         this.price += this.roundFlightList[this.fromActive].min_price;
       } else if (val === "time") {

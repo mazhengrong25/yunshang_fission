@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-09 18:00:11
+ * @LastEditTime: 2020-09-21 14:15:05
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -44,7 +44,7 @@
             </view>
             <radio value="钱包" color="#0070E2" checked="true" />
           </label>
-          <label class="type_group">
+          <label class="type_group" @click="notPayStatus">
             <view class="group_title">
               <image src="@/static/pay_yibao.png" mode="contain" />易宝支付
             </view>
@@ -206,6 +206,15 @@ export default {
     radioChange(val) {
       this.payType = val.detail.value;
       console.log(this.payType);
+    },
+
+    // 易宝支付
+    notPayStatus(){
+      uni.showToast({
+        title: '当前暂不支持此支付方式',
+        duration: 2000,
+        icon: 'none'
+      });
     },
 
     // 立即支付按钮

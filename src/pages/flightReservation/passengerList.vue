@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-17 17:57:44
+ * @LastEditTime: 2020-09-21 17:21:39
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -60,15 +60,30 @@
       </scroll-view>
     </view>
 
-    <default-page style="flex: 1" v-if="showDefault" @returnBtn="getTicketData()" :defaultType="showDefaultType"></default-page>
+    <default-page
+      style="flex: 1"
+      v-if="showDefault"
+      @returnBtn="getTicketData()"
+      :defaultType="showDefaultType"
+    ></default-page>
 
     <!-- 筛选弹窗 -->
     <yun-selector
       ref="groupPopup"
       :dataItem="'group_name'"
       :dataList="groupList"
+      :userSearch="true"
       @submitDialog="groupPopupSelecctBtn()"
+      @userSearchBtn="userSearchBtn()"
     ></yun-selector>
+
+    <!-- 姓名筛选弹窗 -->
+    <yun-config 
+    ref="yunConfig" 
+    :showInput="true"
+    :submitText="{left:'确认',right:'取消'}"
+    title="请输入姓名"
+    @submitConfig="submitConfig"></yun-config>
 
     <view class="submit_box" v-if="!passengerType && !showDefault">
       <button class="submit_btn" @click="returnBtn">确认</button>
@@ -86,12 +101,12 @@ export default {
       iStatusBarHeight: 0, // 状态栏高度
 
       showDefault: true, // 缺省页
-      showDefaultType: 'not_passenger',  // 报错类型
+      showDefaultType: "not_passenger", // 报错类型
 
       passengerType: true, // true个人中心跳入 false添加联系人跳入
 
-      group: "", // 分组筛选
-      groupList: [], // 分组列表
+      group: {}, // 分组筛选
+      groupList: ["不限"], // 分组列表
 
       passengerList: [], // 乘机人列表
 
@@ -99,6 +114,8 @@ export default {
 
       chdinfNumber: {}, // 航司规定乘客数量
       flightPassengerList: [], // 预定页面切换乘机人
+
+      searchUserName: '', // 用户名筛选
     };
   },
   methods: {
@@ -114,8 +131,15 @@ export default {
      * @author Wish
      * @date 2020/8/14
      */
-    getPassengerData() {
-      passenger.getPassenger().then((res) => {
+    getPassengerData(id) {
+      let data;
+      if (id) {
+        data = {
+          group_id: id,
+        };
+      }
+      console.log(data);
+      passenger.getPassenger(data).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.passengerList = res.data.data;
@@ -128,8 +152,6 @@ export default {
                 ? "婴儿"
                 : "成人";
           });
-          this.getGroupList();
-          console.log(this.flightPassengerList)
           if (this.flightPassengerList.length > 0) {
             this.checkePassenger = this.flightPassengerList;
             this.flightPassengerList.forEach((item, index) => {
@@ -140,7 +162,7 @@ export default {
               });
             });
           }
-          this.showDefault = false
+          this.showDefault = false;
         }
       });
     },
@@ -186,6 +208,7 @@ export default {
               }
             });
           });
+          this.groupList.unshift({ group_name: "不限" });
         } else {
           uni.showToast({
             title: "分组列表获取失败，" + res.msg,
@@ -195,18 +218,48 @@ export default {
       });
     },
 
+    // 打开用户名筛选弹窗
+    userSearchBtn(){
+      console.log('打开弹窗')
+      this.$refs.yunConfig.openConfigPopup()
+    },
+
+    // 用户名筛选
+    submitConfig(val){
+      console.log(val)
+      if(val){
+        let newArr = []
+        this.passengerList.forEach((item, index) =>{
+          let username = item.name + item.en_first_name + item.en_last_name
+          if(JSON.stringify(username).toLowerCase().indexOf(val.toLowerCase()) !== -1){
+            newArr.push(item)
+          }
+        })
+        this.passengerList = newArr
+      }else{
+        this.getPassengerData();
+      }
+    },
+
     // 打开分组弹窗
     openGroupSelect() {
       this.$refs.groupPopup.openDialog();
     },
     // 确认分组
     groupPopupSelecctBtn(e) {
-      this.group = e;
+      this.$refs.yunConfig.inputValue = ''
+      console.log(e);
+      if (e.group_name !== "不限") {
+        this.group = e;
+        this.getPassengerData(e.id);
+      } else {
+        this.group = {};
+        this.getPassengerData();
+      }
     },
 
     // 选中乘机人
     checkedPassenger(data, index) {
-
       this.passengerList[index].checked = !this.passengerList[index].checked;
       if (this.passengerList[index].checked) {
         let info = this.passengerList[index];
@@ -221,43 +274,49 @@ export default {
 
     // 确认乘机人
     returnBtn() {
-      if(this.checkePassenger.length < 1){
+      if (this.checkePassenger.length < 1) {
         return uni.showToast({
-            title: '请选择乘机人',
-            icon: 'none',
-            duration: 2000
-          });
+          title: "请选择乘机人",
+          icon: "none",
+          duration: 2000,
+        });
       }
 
-      let atdNumber = 0
-      let chdNumber = 0
-      let infNumber = 0
+      let atdNumber = 0;
+      let chdNumber = 0;
+      let infNumber = 0;
 
-      this.checkePassenger.forEach(item => {
-        atdNumber = item.type === '成人'? atdNumber+ 1 : atdNumber
-        chdNumber = item.type === '儿童'? chdNumber+ 1 : chdNumber
-        infNumber = item.type === '婴儿'? infNumber+ 1 : infNumber
-      })
-      if(atdNumber === 0 && chdNumber >0 || infNumber> 0){
+      this.checkePassenger.forEach((item) => {
+        atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
+        chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
+        infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
+      });
+      if ((atdNumber === 0 && chdNumber > 0) || infNumber > 0) {
         return uni.showToast({
-            title: '请至少选择一个成人',
-            icon: 'none',
-            duration: 2000
-          });
+          title: "请至少选择一个成人",
+          icon: "none",
+          duration: 2000,
+        });
       }
-      if(JSON.stringify(this.chdinfNumber) !== "{}"){
-        if(chdNumber !== 0 && atdNumber * this.chdinfNumber.has_inf_cnn_number < chdNumber){
+      if (JSON.stringify(this.chdinfNumber) !== "{}") {
+        if (
+          chdNumber !== 0 &&
+          atdNumber * this.chdinfNumber.has_inf_cnn_number < chdNumber
+        ) {
           return uni.showToast({
-            title: '超出航司规定儿童人数',
-            icon: 'none',
-            duration: 2000
+            title: "超出航司规定儿童人数",
+            icon: "none",
+            duration: 2000,
           });
         }
-        if(infNumber !== 0 && infNumber * this.chdinfNumber.has_inf_inf_number < infNumber){
+        if (
+          infNumber !== 0 &&
+          infNumber * this.chdinfNumber.has_inf_inf_number < infNumber
+        ) {
           return uni.showToast({
-            title: '超出航司规定婴儿人数',
-            icon: 'none',
-            duration: 2000
+            title: "超出航司规定婴儿人数",
+            icon: "none",
+            duration: 2000,
           });
         }
       }
@@ -266,26 +325,29 @@ export default {
     },
   },
   onShow() {
-    if(uni.getStorageSync('addPassenger')){
-      console.log('新增返回')
+    if (uni.getStorageSync("addPassenger")) {
+      console.log("新增返回");
       this.getPassengerData();
-      uni.removeStorageSync('addPassenger');
+      uni.removeStorageSync("addPassenger");
     }
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.passengerType = data.type === "userInfo";
     this.chdinfNumber = data.chdinfNumber ? JSON.parse(data.chdinfNumber) : {};
-    this.flightPassengerList = data.editPassengerList?JSON.parse(data.editPassengerList):[];
-    
-      this.chdinfNumber= {
-          air_line: "CA",
-          cnn_number: 2,
-          has_inf_cnn_number: 1,
-          has_inf_inf_number: 1
-       }
-    console.log(this.chdinfNumber)
+    this.flightPassengerList = data.editPassengerList
+      ? JSON.parse(data.editPassengerList)
+      : [];
+
+    this.chdinfNumber = {
+      air_line: "CA",
+      cnn_number: 2,
+      has_inf_cnn_number: 1,
+      has_inf_inf_number: 1,
+    };
+    console.log(this.chdinfNumber);
     this.getPassengerData();
+    this.getGroupList();
   },
 };
 </script>

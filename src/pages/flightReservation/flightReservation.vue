@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-18 15:47:25
+ * @LastEditTime: 2020-09-21 17:04:58
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -351,8 +351,8 @@ export default {
 
       headerAddress: {
         // 导航栏信息
-        to: "重庆",
-        from: "北京",
+        to: "",
+        from: "",
       },
 
       ruleInfos: { // 退改签信息
@@ -695,6 +695,13 @@ export default {
     // 保险选择
     changeInsurance(val) {
       console.log(val);
+      if(this.passengerList.filter((u) => u.is_insure === true).length < 1){
+        return uni.showToast({
+          title: '请打开需购买保险乘客的开关',
+          duration: 2000,
+          icon: 'none'
+        });
+      }
       this.insuranceActive = val.id !== this.insuranceActive.id ? val : "";
       this.priceInfo.insPrice = this.insuranceActive.default_dis_price
         ? Number(this.insuranceActive.default_dis_price)
@@ -811,6 +818,10 @@ export default {
           : 0;
       this.getTotalPrice();
       // this.passengerList[index].is_insure = JSON.parse(JSON.stringify(e));
+      if(this.passengerList.filter((u) => u.is_insure === true).length < 1){
+        this.insuranceActive = {}
+      }
+      
     },
 
     // 打开运输总条件弹窗
@@ -933,7 +944,7 @@ export default {
       passengerList.forEach((item) => {
         // 组装乘客数据
         passengerData.push({
-          PassengerName: item.name, // 乘客名称
+          PassengerName: item.name?item.name: item.en_first_name + "/" + item.en_last_name, // 乘客名称
           PassengerType:
             item.type === "成人"
               ? "ADT"
@@ -1079,7 +1090,7 @@ export default {
     console.log(data);
     // this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    // let airData = JSON.parse(data.data);
+    this.headerAddress = data.data?JSON.parse(data.data):{};
 
     this.roundTripType = data.type ? JSON.parse(data.type) : false;
 
@@ -1097,7 +1108,7 @@ export default {
       this.getData();
     }
 
-    // this.headerAddress = airData.ticketAddress;
+    
     // this.flightData = airData.flightData;
   },
 };

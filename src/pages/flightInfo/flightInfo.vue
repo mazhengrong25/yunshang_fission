@@ -2,16 +2,8 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
-<<<<<<< HEAD
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-18 15:48:44
+ * @LastEditTime: 2020-09-21 15:32:29
  * @LastEditors: wish.WuJunLong
-=======
- * @LastEditTime: 2020-09-17 10:19:30
-=======
- * @LastEditTime: 2020-09-18 10:49:48
->>>>>>> 24b6980e9355e697eae7b8ed4a9403c0c07eb9ed
- * @LastEditors: mazhengrong
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
@@ -167,8 +159,8 @@ export default {
 
       ticketAddress: {
         // 导航栏地址
-        to: "重庆",
-        from: "北京",
+        to: "",
+        from: "",
       },
       fileKey: "", // av 查询key
       roundTripFileKey: "", // 返程av查询key
@@ -458,7 +450,8 @@ export default {
         };
       }
 
-      ticket.checkPrice(params).then((res) => {
+      ticket.checkPrice(params)
+      .then((res) => {
         if (res.errorcode === 10000) {
           if (type) {
             this.$set(
@@ -508,7 +501,7 @@ export default {
             );
           }
           uni.showToast({
-            title: res.data.Message || "获取失败，请稍后再试",
+            title: res.data.Message || res.data.msg || "获取失败，请稍后再试",
             icon: "none",
             duration: 3000,
           });
@@ -516,6 +509,18 @@ export default {
         console.log(this.cabinList);
 
         this.$forceUpdate();
+      }).catch(() =>{
+        this.$set(
+              this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+              "price",
+              "无运价"
+            );
+            this.$forceUpdate()
+            uni.showToast({
+            title: "获取失败，请稍后再试",
+            icon: "none",
+            duration: 3000,
+          });
       });
     },
 
@@ -575,7 +580,8 @@ export default {
               "/pages/flightReservation/flightReservation?key=" +
               data.data.cabinPrices.ADT.rulePrice.key +
               "&price=" +
-              data.data.cabinPrices.ADT.rulePrice.price,
+              data.data.cabinPrices.ADT.rulePrice.price + 
+            "&data=" + JSON.stringify(this.ticketAddress),
           });
         } else {
           this.getRoundTrip();
@@ -611,7 +617,8 @@ export default {
                     "/pages/flightReservation/flightReservation?key=" +
                     res.data.keys +
                     "&price=" +
-                    res.data.price,
+                    res.data.price + 
+            "&data=" + JSON.stringify(this.ticketAddress),
                 });
               } else {
                 // 往返验价
@@ -705,7 +712,8 @@ export default {
             "/pages/flightReservation/flightReservation?key=" +
             this.relatedKey +
             "&price=" +
-            this.newPrice,
+            this.newPrice + 
+            "&data=" + JSON.stringify(this.ticketAddress),
         });
       } else {
         // 往返验价
@@ -750,13 +758,18 @@ export default {
   },
   onLoad(data) {
     this.roundTripType = data.pageType ? JSON.parse(data.pageType) : false;
-    console.log(this.roundTripType);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.airMessage = JSON.parse(data.airData);
     this.fileKey = data.fileKey;
     this.segmentsKey = data.segmentsKey;
 
     console.log("舱位信息", this.airMessage);
+
+    // 组装头部信息
+    this.ticketAddress = {
+        to: this.airMessage.segments[0].depAirport_CN.city_name,
+        from: this.airMessage.segments[0].arrAirport_CN.city_name,
+    }
 
     // 组装航程信息
     this.flightData = {
