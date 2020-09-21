@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-17 17:31:03
+ * @LastEditTime: 2020-09-21 15:15:08
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -96,7 +96,8 @@
             <view class="info_left">
               <text>{{ oitem.flight_no }}</text>
               <text>{{ $dateTool(oitem.departure_time, "MM月DD日") }}</text>
-              <text>{{ $dateTool(oitem.departure_time, "hh:mm") }}起飞</text>
+              <!-- HH:mm 24制   hh:mm 12制 -->
+              <text>{{ $dateTool(oitem.departure_time, "HH:mm") }}起飞</text> 
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
@@ -319,7 +320,9 @@ export default {
       uni.navigateTo({
         url: "/pages/order/filter?type="+type,
       });
-      this.getOrderList()
+      this.orderList = []
+      this.innerList = []  
+      this.getOrderList()  
     },
     //获取国内外列表
     getOrderList() {
@@ -462,6 +465,7 @@ export default {
 
     //时间排序
     sorTime(val) {
+      console.log(val)
   
       if (val === "create") {
         this.innerList.sort(this.createSort("created_at"));
@@ -517,12 +521,12 @@ export default {
 
       //出发城市筛选  
       if(this.orderListFilter.Citystart){
-        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].departure_msg.province === this.orderListFilter.Citystart)
+        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].departure_msg.city_name === this.orderListFilter.Citystart)
       }
 
       //到达城市筛选  
       if(this.orderListFilter.Cityend){
-        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].arrive_msg.province === this.orderListFilter.Cityend)
+        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].arrive_msg.city_name === this.orderListFilter.Cityend)
       }
 
       //日始时间筛选
@@ -535,8 +539,9 @@ export default {
         this.innerList = this.innerList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timend)
       }
     
-      //预定日期排序
+      //日期条件排序
       if(this.orderListFilter.date !== null){
+
         this.sorTime(this.orderListFilter.date)
       }
       
@@ -545,6 +550,9 @@ export default {
 
         this.checkedHeaderActive(this.orderListFilter.status)
       }
+
+
+      console.log('订单列表筛选',this.innerList)
 
 
       uni.removeStorageSync('orderListFilter')

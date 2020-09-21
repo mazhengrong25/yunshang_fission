@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-09-18 18:11:29
+ * @LastEditTime: 2020-09-21 10:29:32
  * @LastEditors: mazhengrong
 -->
 
@@ -27,14 +27,16 @@
           }}
         </view>
 
-        <!-- <view class="order_price">
-          <text class="price_text" v-if="flightData.order_status === 2">退票金额&yen;</text>
-          <text class="price_text" v-if="!flightData.order_status === 2">退票金额参考</text>
-          <text
+        <view class="order_price">
+          <view class="price_text" v-if="flightData.order_status === 2">退票金额&yen;</view>
+          <!-- <view class="price_text" v-if="!flightData.order_status === 2">退票金额参考</view> -->
+          <view
           v-for="(item, index) in flightData.ticket_refund_passenger"
           :key="index"
-          >{{ item.refund_money }}</text>
-        </view> -->
+          >{{ item.refund_money && item.refund_money === 0.00 
+              ? "退票金额参考"
+              :""}}</view>
+        </view>
       </view>
       <!-- 状态提示 -->
       <view class="remaining_time">
@@ -145,7 +147,7 @@
               <!-- <image
                 class="message_icon"
                 :src="'https://fxxcx.ystrip.cn/' + item.image"
-                mode="contain"
+                mode="aspectFill"
               /> -->
             </view>
             <view class="message_list">{{ item.flight_no }}</view>
@@ -239,6 +241,10 @@
             </view>
           </view>
         </view>
+
+        <!-- 产品说明  退改签   行李额 -->
+        <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
+
       </scroll-view>
     </view>
   </view>
@@ -247,19 +253,30 @@
 <script>
 import orderApi from "@/api/order.js";
 import moment from "../../moment";
+import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 moment.locale("zh-cn");
 export default {
+
+  components: {
+    flightExplanation,
+  },
+
   data() {
     return {
       iStatusBarHeight: 0,
-    //   refundDetails: [], // 订单详情
       flightData: [], // 航班信息
       orderId: "", // 订单号
+      ruleInfos: { // 退改签信息
+        gauge: {
+          refund: [],
+          change: []
+        }
+      },
     };
   },
   methods: {
 
-    // 获取订单详情
+     // 获取订单详情
     getOrderDetails() {
      
       let data = {
@@ -278,6 +295,50 @@ export default {
       });
     },
 
+    // 打开退改签说明弹窗
+    openExpPupop(data) {
+      console.log(data);
+      this.getGaugeInfo(data);
+
+      console.log("完整信息", this.ruleInfos);
+      this.$refs.flightExplanation.openExp();
+    },
+
+    // 关闭产品说明弹窗
+    closePopup() {
+      this.$refs.flightExplanation.closeExp();
+    },
+
+    // 组装退改信息
+    getGaugeInfo(data) {
+
+      // 组装航班数据
+      let filghtMessage = {
+        time: moment(data.data.routing.segments[0].depTime).format(
+          "YYYY-MM-DD HH:mm:ss"
+        ), // 起飞时间
+        code: data.data.routing.segments[0].flightNumber, // 航班号
+        address:
+          data.data.routing.segments[0].depAirport_CN.city_name +
+          " " +
+          data.data.routing.segments[0].depAirport_CN.city_code +
+          " - " +
+          data.data.routing.segments[0].arrAirport_CN.city_name +
+          " " +
+          data.data.routing.segments[0].arrAirport_CN.city_code, // 行程
+        cabin: data.cabin, // 舱位
+        price: data.data.cabinPrices.ADT.rulePrice.price, // 票面价
+        baggage: data.baggage,
+      };
+
+       // 组装退改信息
+      let gaugeMessage = data.ruleInfos;
+
+      this.ruleInfos = {
+        filght: filghtMessage,
+        gauge: gaugeMessage,
+      };
+    },
 
     onLoad(data) {
       console.log('退票',data)

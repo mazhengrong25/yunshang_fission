@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-18 18:27:29
+ * @LastEditTime: 2020-09-21 18:48:33
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
@@ -102,7 +102,6 @@
           >退票</view
         >
         <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
-        <!-- <view class="option_btn" v-if="orderDetails.status === 5">查看退废单</view> -->
         <view class="option_btn" v-if="orderDetails.status === 5"
           >再次预定</view
         >
@@ -163,19 +162,17 @@
 
           <view class="filght_message">
             <!-- 航班图标 -->
-            <view class="message_icon">
               <image
                 class="message_icon"
                 :src="'https://fxxcx.ystrip.cn/' + item.image"
-                mode="contain"
+                mode="aspectFill"
               />
-            </view>
             <view class="message_list">{{ item.flight_no }}</view>
             <view class="message_list">{{ item.model }}</view>
             <view class="message_list">有早餐</view>
           </view>
 
-          <view class="filght_bottom">
+          <view class="filght_bottom" @click="openExp">
             <view class="bottom_list"
               >{{ item.cabin
               }}{{
@@ -189,7 +186,7 @@
               }}</view
             >
             <view class="bottom_list">退改签规则</view>
-            <view class="bottom_list">每人托运2件，每件23KG</view>
+            <view class="bottom_list input-right-arrow">每人托运2件，每件23KG</view>
           </view>
         </view>
 
@@ -213,7 +210,7 @@
                       : ""
                   }}票</view
                 >
-                <view class="info_name">{{ item.PassengerName }}</view>
+                <view class="info_name">{{ item.PassengerName || '' }}</view>
                 <view class="is_insurance" v-if="orderDetails.insurance_total > 0">
                     <image src="@/static/insurance_icon.png" mode="contain" />
                 </view>
@@ -248,7 +245,7 @@
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{ orderDetails.out_ticket_name }}</view>
+              <view class="list_message">{{ orderDetails.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
@@ -280,7 +277,6 @@
             <view class="list_item">
               <view class="item_title">预定时间</view>
               <view class="item_message">{{ orderDetails.created_at }}</view>
-              <!-- 时间 -->
             </view>
             <view class="list_item">
               <view class="item_title">备注</view>
@@ -290,6 +286,9 @@
             </view>
           </view>
         </view>
+
+        <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
+
       </scroll-view>
     </view>
     <!-- 取消订单弹窗 -->
@@ -306,8 +305,12 @@
 <script>
 import orderApi from "@/api/order.js";
 import moment from "../../moment";
+import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 moment.locale("zh-cn");
 export default {
+  components: {
+    flightExplanation,
+  },
   data() {
     return {
       iStatusBarHeight: 0,
@@ -316,6 +319,13 @@ export default {
       orderListType: "", // 订单列表页 类型
 
       orderId: "", // 订单号
+
+      ruleInfos: { // 退改签信息
+          gauge: {
+            refund: [],
+            change: []
+          }
+    }, 
     };
   },
   methods: {
@@ -343,6 +353,56 @@ export default {
       });
     },
 
+     // 组装退改信息
+    getGaugeInfo() {
+     
+     console.log(this.orderDetails.ticket_segments[0].cabin_level)
+      // 组装航班数据
+      let filghtMessage = {
+        time: moment(this.orderDetails.ticket_segments[0].departure_time).format(
+          "YYYY-MM-DD HH:mm:ss"
+        ), // 起飞时间
+        code: this.orderDetails.ticket_segments[0].flight_no, // 航班号
+        address:
+          this.orderDetails.ticket_segments[0].departure_CN.city_name +
+          " " +
+          this.orderDetails.ticket_segments[0].departure_CN.city_code +
+          " - " +
+          this.orderDetails.ticket_segments[0].arrive_CN.city_name +
+          " " +
+          this.orderDetails.ticket_segments[0].arrive_CN.city_code, // 行程
+        cabin: this.orderDetails.ticket_segments[0].cabin + (this.orderDetails.ticket_segments[0].cabin_level === 'ECONOMY'?'经济舱'
+        :this.orderDetails.ticket_segments[0].cabin_level === 'FIRST'?'头等舱'
+        :this.orderDetails.ticket_segments[0].cabin_level === 'BUSINESS'?'公务舱':""), // 舱位
+        price: this.orderDetails.ticket_price, // 票面价
+        // baggage: data.baggage, 行李额
+      };
+
+      // 组装退改信息
+      let gaugeMessage = this.orderDetails.ticket_segments[0].gaugeType.gauge_type_value;
+      console.log("数据",gaugeMessage)
+
+      this.ruleInfos = {
+        filght: filghtMessage,
+        gauge: gaugeMessage,
+      };
+      this.ruleInfos.gauge['back_msg'] = this.orderDetails.ticket_segments[0].gaugeType.back_msg
+    },
+
+    // 打开退改签说明弹窗
+    openExp() {
+      
+      this.getGaugeInfo();
+      this.$refs.flightExplanation.openExp();
+    },
+
+    // 关闭产品说明弹窗
+    closeExp() {
+      this.$refs.flightExplanation.closeExp();
+    },
+
+
+
     // 获取订单详情
     getOrderDetails() {
       console.log("国内订单详情",  this.orderListType);
@@ -352,6 +412,7 @@ export default {
 
       orderApi.orderDetails(data).then((res) => {
         if (res.result === 10000) {
+         
           this.orderDetails = res.data.order_msg;
         } else {
           uni.showToast({

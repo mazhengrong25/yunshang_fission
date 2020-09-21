@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-17 16:43:27
+ * @LastEditTime: 2020-09-21 15:07:48
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -107,6 +107,17 @@
         </view>
       </view>
 
+      <view class="list_item list_input" v-if="filterType === '1'">
+        <view class="item_title">票号</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="pnr"
+          placeholder="请填写票号"
+          placeholder-class="input_placeholder"
+        />
+      </view>
+
       <view class="list_item list_input">
         <view class="item_title">PNR</view>
         <input
@@ -117,7 +128,7 @@
           placeholder-class="input_placeholder"
         />
       </view>
-      <view class="list_item list_input">
+      <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">订单号</view>
         <input
           type="text"
@@ -127,7 +138,7 @@
           placeholder-class="input_placeholder"
         />
       </view>
-      <view class="list_item list_input">
+      <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">航班号</view>
         <input
           type="text"
@@ -137,12 +148,34 @@
           placeholder-class="input_placeholder"
         />
       </view>
-      <view class="list_item list_input">
+      <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">订票员</view>
         <view class="item_input input-right-arrow" @click="openFilterDialog">
           <text v-if="booker">{{booker}}</text>
           <text v-else>请选择</text>
         </view> 
+      </view>
+
+      <view class="list_item list_input" v-if="filterType === '1'">
+        <view class="item_title">乘机人</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="flightNumber"
+          placeholder="请填写乘机人"
+          placeholder-class="input_placeholder"
+        />
+      </view>
+
+      <view class="list_item list_input" v-if="filterType === '1'">
+        <view class="item_title">申请人</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="flightNumber"
+          placeholder="请填写申请人"
+          placeholder-class="input_placeholder"
+        />
       </view>
     </scroll-view>
 
@@ -300,9 +333,10 @@ export default {
       if(this.filterType === "0"){
             // 日期选择
             this.dateFilter.forEach((item) => {
+              console.log(val)
             if (item.name === val.name) {
               item.active = !val.active;
-              this.dateStatus = item.active?val.id:null
+              this.dateStatus = item.active? item.name === '起飞时间'? 'depart':item.name === '预定日期'? 'create':'':null
             } else {
               item.active = false;
             }
@@ -376,7 +410,7 @@ export default {
         Cityend: this.citySelect.end, //到达城市
         Timestart: this.timeLimit.start, //日始时间
         Timend: this.timeLimit.end, //日止时间
-        destime: this.dateFilter[0].name, //预定日期
+        // destime: this.dateFilter[0].name, //预定日期
         status: this.activeStatus, // 订单状态
         date: this.dateStatus, //日期条件
   
@@ -466,14 +500,14 @@ export default {
     if (cityData.status === "to") {
       this.citySelect.start =
         cityData.type === "city"
-          ? cityData.data.province
+          ? cityData.data.city_name
           : cityData.data.air_port_name;
           this.airMessage["to"] = cityData.data;
           this.airMessage["to_type"] = cityData.type;
     } else if (cityData.status === "from") {
       this.citySelect.end =
         cityData.type === "city"
-          ? cityData.data.province
+          ? cityData.data.city_name
           : cityData.data.air_port_name;
           this.airMessage["from"] = cityData.data;
           this.airMessage["from_type"] = cityData.type;

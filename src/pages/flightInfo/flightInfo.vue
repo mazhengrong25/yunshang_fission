@@ -4,8 +4,8 @@
  * @Date: 2020-06-23 10:58:46
 <<<<<<< HEAD
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-18 15:48:44
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-21 17:50:28
+ * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-17 10:19:30
 =======
@@ -338,6 +338,7 @@ export default {
 
     // 组装退改信息
     getGaugeInfo(data) {
+      console.log("组装",data)
       // 组装航班数据
       let filghtMessage = {
         time: moment(data.data.routing.segments[0].depTime).format(
