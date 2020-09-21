@@ -2,17 +2,20 @@
  * @Description: 信息弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-09-07 15:24:39
- * @LastEditTime: 2020-09-07 18:13:14
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-21 15:27:32
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <uni-popup ref="configPopup" type="dialog">
     <view class="config_box">
       <view class="box_title">{{title}}</view>  
-      <view class="box_content">{{content}}</view>
+      <view class="box_content" v-if="content">{{content}}</view>
+      <view class="input_value" v-if="showInput">
+        <input type="text" v-model="inputValue" placeholder="请输入姓名" placeholder-class="input_placeholder">
+      </view>
       <view class="box_bottom">
-        <view class="submit_btn active" @click="submitConfig('left')">点 错 了</view>
-        <view class="submit_btn" @click="submitConfig('right')">确 认 取 消</view>
+        <view class="submit_btn active" @click="submitConfig('left')">{{submitText.left}}</view>
+        <view class="submit_btn" @click="submitConfig('right')">{{submitText.right}}</view>
       </view>
     </view>
   </uni-popup>
@@ -41,9 +44,24 @@ export default {
       default: () => 'left'
     },
 
+    showInput: {
+      type: Boolean,
+      default: () => false
+    },
+
+    submitText:{
+      type: Object,
+      default: () => ({
+        left: '点 错 了',
+        right: '确 认 取 消'
+      })
+    }
+
   },
   data() {
-    return {}
+    return {
+      inputValue: ''
+    }
   },
   methods: {
     // 打开弹窗
@@ -58,7 +76,7 @@ export default {
     // 确认按钮
     submitConfig(type) {
       if(this.submitIndex === type){
-         this.$emit("submitConfig",true);
+         this.$emit("submitConfig",this.inputValue);
       }
       this.closeConfig()
     },
@@ -89,6 +107,18 @@ export default {
     margin-left: 122upx;
     padding: 30upx 50upx 30upx 20upx;
     color: rgba(42, 42, 42, 1);
+  }
+  .input_value{
+    height: 80upx;
+    padding: 0 40upx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    input{
+      border: 2upx solid #F1F3F5;
+      width: 100%;
+      padding: 10upx 20upx;
+    }
   }
   .box_bottom {
     margin-top: auto;

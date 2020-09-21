@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-08-26 15:50:39
+ * @LastEditTime: 2020-09-21 10:05:07
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -67,13 +67,12 @@ export default {
     // 返回上一页按钮 如果上一页不存在 则返回主页
     goBack() {
       let pages = getCurrentPages();
-      let curPage = pages[pages.length - 2];
       if (pages.length <= 1) {
         uni.switchTab({
           url: "/pages/index/index",
         });
       } else {
-        uni.navigateBack({delta: curPage});
+        uni.navigateBack();
       }
     },
   },

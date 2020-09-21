@@ -2,7 +2,7 @@
  * @Description: 弹窗选择器
  * @Author: wish.WuJunLong
  * @Date: 2020-07-29 17:14:32
- * @LastEditTime: 2020-08-20 17:47:38
+ * @LastEditTime: 2020-09-21 14:42:30
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -12,6 +12,9 @@
         <view class="close_dialog" @click="closeDialog">取消</view>
         <view class="title_btn" v-if="addGroup" @click="addGroupBtn">
           <image class="title_btn_icon" src="@/static/add_group_icon.png" mode="contain" />新增分组
+        </view>
+        <view class="user_search_btn" v-if="userSearch" @click="userSearchBtn">
+          用户名筛选
         </view>
         <view class="submit_btn" @click="submitBtn">确定</view>
       </view>
@@ -75,6 +78,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    userSearch: {
+      type: Boolean,
+      default: () => false
+    },
   },
   data() {
     const date = new Date();
@@ -135,6 +142,13 @@ export default {
     closeDialog() {
       this.$refs.selectorPopup.close();
     },
+
+    // 用户名筛选按钮
+    userSearchBtn(){
+      this.$emit('userSearchBtn')
+      this.$refs.selectorPopup.close();
+    },
+
     // 确定按钮
     submitBtn() {
       if (this.selectType === "text") {
@@ -194,6 +208,14 @@ export default {
           height: 22upx;
           margin-right: 10upx;
         }
+      }
+      .user_search_btn{
+        display: flex;
+        align-items: center;
+        padding: 8upx 40upx;
+        border: 2upx solid #F1F3F5;
+        font-size: 28upx;
+        color: #AFB9C4;
       }
       .submit_btn {
         font-size: 28upx;

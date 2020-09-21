@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-17 14:27:34
+ * @LastEditTime: 2020-09-21 16:37:44
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -219,8 +219,20 @@ export default {
               this.cityList[index]["data"].push(oitem);
             }
           });
+
+
+          var hash = {};
+          this.cityList[index]["data"] = this.cityList[index]["data"].reduce(function(oitem, next) {
+            hash[next.city_name] ? '' : hash[next.city_name] = true && oitem.push(next);
+            return oitem
+        }, [])
         });
         console.log(this.cityList)
+        
+        
+
+
+        
       });
     },
 
@@ -298,14 +310,17 @@ export default {
             data: [],
           });
           this.cityAirList.forEach((oitem) => {
-            console.log(JSON.stringify(oitem).toLowerCase())
-            if (JSON.stringify(oitem).toLowerCase().indexOf(this.searchCity.toLowerCase()) !== -1 && this.searchList[index].unit === oitem.province) {
+            let cityName = oitem.air_port + oitem.air_port_name + oitem.province_py
+                           oitem.city_name + oitem.city_code + oitem.city_pinyin 
+                           
+            if (JSON.stringify(cityName).toLowerCase().indexOf(this.searchCity.toLowerCase()) !== -1 && this.searchList[index].unit === oitem.province) {
               this.searchList[index].data.push(oitem);
             }
           });
         });
       }
-      console.log(this.searchList);
+      this.searchList = this.searchList.filter(item => item.data.length > 0)
+      console.log(this.searchList)
     },
   },
 

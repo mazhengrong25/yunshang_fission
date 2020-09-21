@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-15 16:56:55
+ * @LastEditTime: 2020-09-21 17:38:29
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -80,7 +80,7 @@
 
       <!-- 公告版块 -->
       <view class="notice">
-        <model-notice :modelType="true"></model-notice>
+        <model-notice :modelType="true" :noticeList="noticeList"></model-notice>
       </view>
     </view>
 
@@ -188,6 +188,8 @@ import ticketInput from "@/components/ticket_input.vue"; // 航程选择
 
 import messageDialog from "@/components/message_dialog.vue"; // 信息弹窗内容
 
+import noticeApi from "@/api/notice"; // 公告api
+
 import moment from "moment";
 moment.locale("zh-cn");
 export default {
@@ -200,6 +202,8 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
+
+      checkTickedType: false, // 切换往返地
 
       swiperList: [
         {
@@ -250,6 +254,9 @@ export default {
         from: {},
         toTime: {},
       },
+
+
+      noticeList: [] // 公告列表
     };
   },
   methods: {
@@ -294,6 +301,7 @@ export default {
 
     // 切换往返地址
     checkTicked(data) {
+      this.checkTickedType = !this.checkTickedType
       let toAddress = data.to;
       let fromAddress = data.rorm;
       if (data.type) {
@@ -397,6 +405,7 @@ export default {
           province: "北京",
         };
       }
+
       if (Object.keys(this.airMessage.toTime).length === 0) {
         this.airMessage.toTime = {
           date: moment().add(1, "d").format("YYYY-MM-DD"),
@@ -413,14 +422,46 @@ export default {
       } else if (this.currentTab === 0 && this.airMessage.fromTime) {
         jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
       }
-      uni.navigateTo({
+
+      if(this.checkTickedType){
+        let newArr = JSON.parse(JSON.stringify(this.airMessage))
+        let to = JSON.parse(JSON.stringify(this.airMessage.to))
+        let from = JSON.parse(JSON.stringify(this.airMessage.from))
+        newArr.to = from
+        newArr.from = to
+        uni.navigateTo({
+        url: jumpUrl + "?data=" + JSON.stringify(newArr),
+      });
+        
+      }else{
+        uni.navigateTo({
         url: jumpUrl + "?data=" + JSON.stringify(this.airMessage),
+      });
+      }
+
+      
+    },
+
+    // 获取公告列表
+    getNoticeList() {
+      noticeApi.getNotice().then((res) => {
+        if(res.errorcode === 10000){
+          // this.noticeList = res.data.data
+          res.data.data.forEach((item, index) =>{
+            if(index < 5){
+              this.noticeList.push(item)
+            }
+          })
+          console.log('首页',this.noticeList)
+        }
       });
     },
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.setSwiperHeight();
+
+    this.getNoticeList();
   },
   onShow() {
     // 获取城市信息
