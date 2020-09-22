@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-21 18:48:33
+ * @LastEditTime: 2020-09-22 09:25:12
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
@@ -211,7 +211,7 @@
                   }}票</view
                 >
                 <view class="info_name">{{ item.PassengerName || '' }}</view>
-                <view class="is_insurance" v-if="orderDetails.insurance_total > 0">
+                <view class="is_insurance" v-if="Number(item.insurance_total) > 0">
                     <image src="@/static/insurance_icon.png" mode="contain" />
                 </view>
                 <view class="group_type">员工</view>
