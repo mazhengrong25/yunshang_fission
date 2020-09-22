@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-21 17:04:58
+ * @LastEditTime: 2020-09-22 17:45:44
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -349,11 +349,7 @@ export default {
 
       showData: false, // 数据加载
 
-      headerAddress: {
-        // 导航栏信息
-        to: "",
-        from: "",
-      },
+      headerAddress: {},
 
       ruleInfos: { // 退改签信息
         gauge: {
@@ -452,43 +448,23 @@ export default {
           this.flightData = {
             // 组装航班信息
             flightType: "单程", // 航程类型
-            time: moment(segmentMessage.depTime).format("YYYY-MM-DD"), // 航程日期
-            week: segmentMessage.week, // 航程星期
-            fromTime: segmentMessage.departureTime, // 出发时间
-            fromAddress:
-              segmentMessage.depAirport_CN.city_name +
-              segmentMessage.depAirport_CN.air_port_name +
-              "机场" +
-              segmentMessage.depTerminal, // 出发机场
-            duration: segmentMessage.duration, // 飞行时长
-            toTime: segmentMessage.arrivalTime, // 到达时间
-            toAddress:
-              segmentMessage.arrAirport_CN.city_name +
-              segmentMessage.arrAirport_CN.air_port_name +
-              "机场" +
-              segmentMessage.arrTerminal, // 到达机场
-            airIcon: "https://fxxcx.ystrip.cn/" + segmentMessage.airline_png, // 航司图片
-            airline: segmentMessage.airline_CN + segmentMessage.flightNumber, // 航司
-            model: segmentMessage.aircraftCode, // 机型
-            food: "有早餐", // 餐饮
-            cabin: res.data.cabinInfo.cabinCode + res.data.cabinInfo.cabinDesc, // 舱位信息
-            baggage: res.data.cabinInfo.baggage, // 行李额
+            data: segmentMessage
           };
 
           // 组装航班信息
           let filghtMessage = {
-            time: moment(segmentMessage.depTime).format(
+            time: moment(segmentMessage[0].depTime).format(
               "YYYY-MM-DD HH:mm:ss"
             ), // 起飞时间
-            code: segmentMessage.flightNumber, // 航班号
+            code: segmentMessage[0].flightNumber, // 航班号
             address:
-              segmentMessage.depAirport_CN.city_name +
+              segmentMessage[0].depAirport_CN.city_name +
               " " +
-              segmentMessage.depAirport_CN.city_code +
+              segmentMessage[0].depAirport_CN.city_code +
               " - " +
-              segmentMessage.arrAirport_CN.city_name +
+              segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_name +
               " " +
-              segmentMessage.arrAirport_CN.city_code, // 行程
+              segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_code, // 行程
             cabin: res.data.cabinInfo.cabinDesc, // 舱位
             price: res.data.adtPrice.rulePrice.price, // 票面价
             baggage: res.data.cabinInfo.baggage,
@@ -579,60 +555,13 @@ export default {
             this.flightData = {
               // 组装航班信息
               flightType: "去程", // 航程类型
-              time: moment(segmentMessage.depTime).format("YYYY-MM-DD"), // 航程日期
-              week: segmentMessage.week, // 航程星期
-              fromTime: segmentMessage.departureTime, // 出发时间
-              fromAddress:
-                segmentMessage.depAirport_CN.city_name +
-                segmentMessage.depAirport_CN.air_port_name +
-                "机场" +
-                segmentMessage.depTerminal, // 出发机场
-              duration: segmentMessage.duration, // 飞行时长
-              toTime: segmentMessage.arrivalTime, // 到达时间
-              toAddress:
-                segmentMessage.arrAirport_CN.city_name +
-                segmentMessage.arrAirport_CN.air_port_name +
-                "机场" +
-                segmentMessage.arrTerminal, // 到达机场
-              airIcon: "https://fxxcx.ystrip.cn/" + segmentMessage.airline_png, // 航司图片
-              airline: segmentMessage.airline_CN + segmentMessage.flightNumber, // 航司
-              model: segmentMessage.aircraftCode, // 机型
-              food: "有早餐", // 餐饮
-              cabin:
-                res.data.depCabinInfo.cabinCode +
-                res.data.depCabinInfo.cabinDesc, // 舱位信息
-              baggage: res.data.depCabinInfo.baggage, // 行李额
+              data: segmentMessage
             };
 
             this.flightRoundData = {
               // 组装航班信息
               flightType: "返程", // 航程类型
-              time: moment(segmentRoundMessage.depTime).format("YYYY-MM-DD"), // 航程日期
-              week: segmentRoundMessage.week, // 航程星期
-              fromTime: segmentRoundMessage.departureTime, // 出发时间
-              fromAddress:
-                segmentRoundMessage.depAirport_CN.city_name +
-                segmentRoundMessage.depAirport_CN.air_port_name +
-                "机场" +
-                segmentRoundMessage.depTerminal, // 出发机场
-              duration: segmentRoundMessage.duration, // 飞行时长
-              toTime: segmentRoundMessage.arrivalTime, // 到达时间
-              toAddress:
-                segmentRoundMessage.arrAirport_CN.city_name +
-                segmentRoundMessage.arrAirport_CN.air_port_name +
-                "机场" +
-                segmentRoundMessage.arrTerminal, // 到达机场
-              airIcon:
-                "https://fxxcx.ystrip.cn/" + segmentRoundMessage.airline_png, // 航司图片
-              airline:
-                segmentRoundMessage.airline_CN +
-                segmentRoundMessage.flightNumber, // 航司
-              model: segmentRoundMessage.aircraftCode, // 机型
-              food: "有早餐", // 餐饮
-              cabin:
-                res.data.arrCabinInfo.cabinCode +
-                res.data.arrCabinInfo.cabinDesc, // 舱位信息
-              baggage: res.data.arrCabinInfo.baggage, // 行李额
+              data: segmentRoundMessage
             };
 
             // 组装分销商数据
@@ -1090,7 +1019,9 @@ export default {
     console.log(data);
     // this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.headerAddress = data.data?JSON.parse(data.data):{};
+    this.headerAddress = data.airMessage?JSON.parse(data.airMessage):{};
+
+    console.log('头部信息',this.headerAddress)
 
     this.roundTripType = data.type ? JSON.parse(data.type) : false;
 
@@ -1107,9 +1038,6 @@ export default {
       this.price = data.price;
       this.getData();
     }
-
-    
-    // this.flightData = airData.flightData;
   },
 };
 </script>

@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-21 16:37:44
+ * @LastEditTime: 2020-09-22 18:31:52
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -310,9 +310,8 @@ export default {
             data: [],
           });
           this.cityAirList.forEach((oitem) => {
-            let cityName = oitem.air_port + oitem.air_port_name + oitem.province_py
-                           oitem.city_name + oitem.city_code + oitem.city_pinyin 
-                           
+            let cityName = oitem.air_port + oitem.air_port_name + oitem.province_py 
+                           oitem.city_name + oitem.city_code + oitem.city_pinyin  + oitem.city_ename
             if (JSON.stringify(cityName).toLowerCase().indexOf(this.searchCity.toLowerCase()) !== -1 && this.searchList[index].unit === oitem.province) {
               this.searchList[index].data.push(oitem);
             }

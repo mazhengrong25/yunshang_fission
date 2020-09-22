@@ -66,6 +66,7 @@
                   <view class="list_content">{{item.title}}</view>
                 </view>
               </view>
+              <text class="not_message" v-if="ruleInfos.gauge.refund < 1">暂无数据</text>
               <view class="main_title" style="margin-top: 20rpx">改签</view>
               <view class="main_table">
                 <view
@@ -77,6 +78,7 @@
                   <view class="list_content">{{item.title}}</view>
                 </view>
               </view>
+              <text class="not_message" v-if="ruleInfos.gauge.change < 1">暂无数据</text>
             </view>
             <view class="main_box">
               <view class="main_title">退改信息</view>
@@ -234,6 +236,11 @@ export default {
             color: #999999;
           }
         }
+      }
+      .not_message{
+        font-size: 24upx;
+        font-weight: 500;
+        color: #999999;
       }
       .main_message {
         font-size: 24upx;

@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-21 16:43:18
+ * @LastEditTime: 2020-09-22 13:58:06
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -279,36 +279,38 @@ export default {
     // 获取往返提示头部信息
     getScrollData() {
       this.showRoundTrip = this.oldScrollTop > 10;
-      console.log(this.flightList,this.toActive)
-      this.showRoundTripData = {
-        toCode: this.flightList[this.toActive].segments[0].flightNumber,
-        fromCode: this.roundFlightList[this.fromActive].segments[0]
-          .flightNumber,
-        toTime:
-          moment(this.flightList[this.toActive].segments[0].depTime).format(
-            "HH:mm"
-          ) +
-          "-" +
-          moment(this.flightList[this.toActive].segments[0].arrTime).format(
-            "HH:mm"
-          ),
-        fromTime:
-          moment(
-            this.roundFlightList[this.fromActive].segments[0].depTime
-          ).format("HH:mm") +
-          "-" +
-          moment(
-            this.roundFlightList[this.fromActive].segments[0].arrTime
-          ).format("HH:mm"),
-      };
+      if(this.flightList.length > 0 && this.roundFlightList.length > 0 ){
+        this.showRoundTripData = {
+          toCode: this.flightList[this.toActive].segments[0].flightNumber,
+          fromCode: this.roundFlightList[this.fromActive].segments[0]
+            .flightNumber,
+          toTime:
+            moment(this.flightList[this.toActive].segments[0].depTime).format(
+              "HH:mm"
+            ) +
+            "-" +
+            moment(this.flightList[this.toActive].segments[0].arrTime).format(
+              "HH:mm"
+            ),
+          fromTime:
+            moment(
+              this.roundFlightList[this.fromActive].segments[0].depTime
+            ).format("HH:mm") +
+            "-" +
+            moment(
+              this.roundFlightList[this.fromActive].segments[0].arrTime
+            ).format("HH:mm"),
+        };
+      }
+      
     },
 
     // 获取去程航班信息
     getTicketData() {
       let data = {
-        departure: this.ticketAddress.departure, // 起飞机场三字码
-        arrival: this.ticketAddress.arrival, // 到达机场三字码
-        departureTime: this.ticketAddress.departureTime, // 起飞时间
+        departure: this.ticketAddress.to.city_code, // 起飞机场三字码
+        arrival: this.ticketAddress.from.city_code, // 到达机场三字码
+        departureTime: this.ticketAddress.toTime.date, // 起飞时间
         airline: "", // 航司二字码
         only_segment: 1,
       };
@@ -347,9 +349,9 @@ export default {
     // 获取返程航班信息
     getRoundTicketData() {
       let data = {
-        departure: this.ticketAddress.arrival, // 起飞机场三字码
-        arrival: this.ticketAddress.departure, // 到达机场三字码
-        departureTime: this.ticketAddress.arrTime, // 起飞时间
+        departure: this.ticketAddress.from.city_code, // 起飞机场三字码
+        arrival: this.ticketAddress.to.city_code, // 到达机场三字码
+        departureTime: this.ticketAddress.fromTime.date, // 起飞时间
         airline: "", // 航司二字码
         only_segment: 1,
       };
@@ -607,20 +609,7 @@ export default {
     this.ticketData = data.data ? JSON.parse(data.data) : "";
     console.log("往返数据", this.ticketData);
     // 组装头部数据
-    this.ticketAddress = {
-      to: this.ticketData.to.city_name,
-      from: this.ticketData.from.city_name,
-      departure:
-        this.ticketData.to_type === "air"
-          ? this.ticketData.to.air_port
-          : this.ticketData.to.city_code, // 起飞机场三字码
-      arrival:
-        this.ticketData.from_type === "air"
-          ? this.ticketData.from.air_port
-          : this.ticketData.from.city_code, // 到达机场三字码
-      departureTime: this.ticketData.toTime.date, // 起飞时间
-      arrTime: this.ticketData.fromTime.date,
-    };
+    this.ticketAddress = this.ticketData;
 
     // 组装日期数据
     this.timeData = {

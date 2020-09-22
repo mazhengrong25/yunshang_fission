@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-09-21 10:05:07
+ * @LastEditTime: 2020-09-22 11:17:14
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -13,10 +13,20 @@
     <view v-if="showReturn" class="go_back" @click="goBack"></view>
     <view class="center_title" v-if="centerTitle">{{centerTitle}}</view>
     <view class="title" v-else>
-      <view class="title_left">{{headerAddress.to}}</view>
+      <view class="title_left">
+        {{headerAddress.to_type === 'air'? headerAddress.to.air_port_name :
+            headerAddress.to_type === 'hot' && headerAddress.to.city_name === "上海" ? headerAddress.to.city_name + headerAddress.to.air_port_name :
+            headerAddress.to_type === 'hot' && headerAddress.to.city_name === "北京" ? headerAddress.to.city_name + '首都' :
+            headerAddress.to.city_name}}
+      </view>
       <view class="title_icon" v-if="!statusType"></view>
       <view class="title_icon roundTripIcon" v-else></view>
-      <view class="title_right">{{headerAddress.from}}</view>
+      <view class="title_right">
+        {{headerAddress.from_type === 'air'? headerAddress.from.air_port_name:
+            headerAddress.from_type === 'hot' && headerAddress.from.city_name === "上海" ? headerAddress.from.city_name + headerAddress.from.air_port_name :
+            headerAddress.from_type === 'hot' && headerAddress.from.city_name === "北京" ? headerAddress.from.city_name + '首都' :
+            headerAddress.from.city_name}}
+      </view>
     </view>
   </view>
 </template>
@@ -75,6 +85,8 @@ export default {
         uni.navigateBack();
       }
     },
+  },
+  mounted(){
   },
 };
 </script>

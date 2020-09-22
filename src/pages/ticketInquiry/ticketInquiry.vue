@@ -2,13 +2,13 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-21 10:41:43
+ * @LastEditTime: 2020-09-22 17:38:29
  * @LastEditors: wish.WuJunLong
 --> 
 
 <template>
   <view class="ticket_inquiry">
-    <yun-header :statusHeight="iStatusBarHeight" :headerAddress="ticketAddress"></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" :headerAddress="airMessage"></yun-header>
 
     <view class="ticket_header" v-if="!showDefaultType">
       <scroll-view scroll-x="true" class="ticket_time_list" :scroll-into-view="timeIndex">
@@ -56,16 +56,16 @@
                 Math.floor(item.segments[0].duration % 60)
                 }}m
               </view>
-              <view class="ticket_type" v-if="ticketType !== '国内'">{{item.voyageType}}</view>
+              <view class="ticket_type" v-if="item.segments.length > 1">转 {{item.segments[0].arrAirport_CN.city_name}}</view>
             </view>
             <view class="ticket_end ticket_time">
               <view class="ticket_date">
-                {{$dateTool(item.segments[0].arrTime,'HH:mm')}}
+                {{$dateTool(item.segments[item.segments.length - 1].arrTime,'HH:mm')}}
                 <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
               </view>
               <view
                 class="ticket_address"
-              >{{item.segments[0].arrAirport_CN.air_port_name}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+              >{{item.segments[item.segments.length - 1].arrAirport_CN.air_port_name}}{{item.segments[item.segments.length - 1].arrTerminal !== '--' ?item.segments[item.segments.length - 1].arrTerminal : ''}}</view>
             </view>
           </view>
 
@@ -206,14 +206,36 @@ export default {
 
     // 获取航班信息
     getTicketData() {
-      this.airMessage["only_segment"] = 1;
-
       this.backScroll();
-      if(this.$refs.flightFilter.filterBtnActive !== 'time'){
+      try{
+        if(this.$refs.flightFilter.filterBtnActive !== 'time'){
         this.$refs.flightFilter.filterBtnActive = "time";
       }
+      }catch{}
       
-      ticket.getTicket(this.airMessage).then((res) => {
+
+      let data = {
+        departure:
+        this.ticketData.to_type === "air"
+          ? this.ticketData.to.air_port: 
+          this.ticketData.to_type === "hot" && this.ticketData.to.city_name === "上海" ?
+          this.ticketData.to.air_port:
+          this.ticketData.to_type === "hot" && this.ticketData.to.city_name === "北京" ?
+          this.ticketData.to.air_port
+          : this.ticketData.to.city_code, // 起飞机场三字码
+      arrival:
+        this.ticketData.from_type === "air"
+          ? this.ticketData.from.air_port: 
+          this.ticketData.from_type === "hot" && this.ticketData.from.city_name === "上海" ?
+          this.ticketData.from.air_port: 
+          this.ticketData.from_type === "hot" && this.ticketData.from.city_name === "北京" ?
+          this.ticketData.from.air_port
+          : this.ticketData.from.city_code,
+        departureTime: this.ticketData.toTime.date,  
+        only_segment: 1
+      }
+      
+      ticket.getTicket(data).then((res) => {
         console.log(res);
         if (res.errorcode === 10000) {
           this.showDefaultType = "";
@@ -255,12 +277,12 @@ export default {
         this.ticketList = [];
         console.log(val);
         this.activeTimeNumber = val.date;
-        this.airMessage = {
-          departure: this.ticketData.to.city_code, // 起飞机场三字码
-          arrival: this.ticketData.from.city_code, // 到达机场三字码
-          departureTime: val.date, // 起飞时间
-          airline: "", // 航司二字码
-        };
+        // this.airMessage = {
+        //   departure: this.ticketData.to.city_code, // 起飞机场三字码
+        //   arrival: this.ticketData.from.city_code, // 到达机场三字码
+        //   departureTime: val.date, // 起飞时间
+        //   airline: "", // 航司二字码
+        // };
         this.file_key = "";
         this.getTicketData();
         this.getDateList();
@@ -303,7 +325,9 @@ export default {
       });
 
       this.timeIndex = "";
-      this.activeTimeNumber = this.airMessage.departureTime;
+      this.activeTimeNumber = this.ticketData.toTime.date;
+
+      console.log(this.ticketTimeList)
     },
 
     // 返回日历选择
@@ -480,7 +504,7 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      console.log("跳转");
+      console.log("跳转",data);
       if (data.min_price === 0) {
         return false;
       }
@@ -488,6 +512,7 @@ export default {
         url:
           "/pages/flightInfo/flightInfo?airData=" +
           JSON.stringify(data) +
+          "&airMessage=" + JSON.stringify(this.airMessage) +
           "&fileKey=" +
           this.file_key +
           "&pageType=false",
@@ -512,8 +537,8 @@ export default {
     console.log("单程查询数据", this.ticketData);
     // 组装数据
     this.ticketAddress = {
-      to: this.ticketData.to.city_name,
-      from: this.ticketData.from.city_name,
+      to: this.ticketData.to_type ==='air'?this.ticketData.to.air_port_name:this.ticketData.to.city_name,
+      from: this.ticketData.from_type ==='air'?this.ticketData.from.air_port_name:this.ticketData.from.city_name,
       departure:
         this.ticketData.to_type === "air"
           ? this.ticketData.to.air_port
@@ -523,52 +548,42 @@ export default {
           ? this.ticketData.from.air_port
           : this.ticketData.from.city_code, // 到达机场三字码
     };
-    if (this.ticketData.to_type === "hot") {
-      this.ticketAddress.to =
-        this.ticketData.to.city_name === "上海"
-          ? this.ticketData.to.city_name + this.ticketData.to.air_port_name
-          : this.ticketData.to.city_name;
-      this.ticketAddress.departure =
-        this.ticketData.to.city_name === "上海"
-          ? this.ticketData.to.air_port
-          : this.ticketData.to.city_code;
-    }
-    if (this.ticketData.from_type === "hot") {
-      this.ticketAddress.from =
-        this.ticketData.from.city_name === "上海"
-          ? this.ticketData.from.city_name + this.ticketData.from.air_port_name
-          : this.ticketData.from.city_name;
-      this.ticketAddress.arrival =
-        this.ticketData.from.city_name === "上海"
-          ? this.ticketData.from.air_port
-          : this.ticketData.from.city_code;
-    }
-    this.airMessage = {
-      departure:
-        this.ticketData.to_type === "air"
-          ? this.ticketData.to.air_port
-          : this.ticketData.to.city_code, // 起飞机场三字码
-      arrival:
-        this.ticketData.from_type === "air"
-          ? this.ticketData.from.air_port
-          : this.ticketData.from.city_code, // 到达机场三字码
-      departureTime: this.ticketData.toTime.date, // 起飞时间
-      airline: "", // 航司二字码
-    };
+    // if (this.ticketData.to_type === "hot") {
+    //   this.ticketAddress.to =
+    //     this.ticketData.to.city_name === "上海"
+    //       ? this.ticketData.to.city_name + this.ticketData.to.air_port_name
+    //       : this.ticketData.to.city_name;
+    //   this.ticketAddress.departure =
+    //     this.ticketData.to.city_name === "上海"
+    //       ? this.ticketData.to.air_port
+    //       : this.ticketData.to.city_code;
+    // }
+    // if (this.ticketData.from_type === "hot") {
+    //   this.ticketAddress.from =
+    //     this.ticketData.from.city_name === "上海"
+    //       ? this.ticketData.from.city_name + this.ticketData.from.air_port_name
+    //       : this.ticketData.from.city_name;
+    //   this.ticketAddress.arrival =
+    //     this.ticketData.from.city_name === "上海"
+    //       ? this.ticketData.from.air_port
+    //       : this.ticketData.from.city_code;
+    // }
 
-    if (this.ticketData.to_type === "hot") {
-      this.airMessage.departure =
-        this.ticketData.to.city_name === "上海"
-          ? this.ticketData.to.air_port
-          : this.ticketData.to.city_code;
-    }
-    if (this.ticketData.from_type === "hot") {
-      this.airMessage.arrival =
-        this.ticketData.from.city_name === "上海"
-          ? this.ticketData.from.air_port
-          : this.ticketData.from.city_code;
-    }
+    // if (this.ticketData.to_type === "hot") {
+    //   this.airMessage.departure =
+    //     this.ticketData.to.city_name === "上海"
+    //       ? this.ticketData.to.air_port
+    //       : this.ticketData.to.city_code;
+    // }
+    // if (this.ticketData.from_type === "hot") {
+    //   this.airMessage.arrival =
+    //     this.ticketData.from.city_name === "上海"
+    //       ? this.ticketData.from.air_port
+    //       : this.ticketData.from.city_code;
+    // }
 
+    this.airMessage = JSON.parse(JSON.stringify(this.ticketData));
+    
     // 获取时间日期
     if (uni.getStorageSync("time")) {
       let timeData = JSON.parse(uni.getStorageSync("time"));
@@ -579,6 +594,7 @@ export default {
     }
     this.getTicketData();
     this.getDateList(); // 时间处理
+    this.$forceUpdate()
   },
 };
 </script>

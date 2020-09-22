@@ -2,27 +2,14 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-21 17:50:28
- * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-09-17 10:19:30
-=======
- * @LastEditTime: 2020-09-18 10:49:48
->>>>>>> 24b6980e9355e697eae7b8ed4a9403c0c07eb9ed
- * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-09-21 15:32:29
+ * @LastEditTime: 2020-09-22 17:41:47
  * @LastEditors: wish.WuJunLong
->>>>>>> 6b1654dc6af52371ea04b98607342d4726330d29
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
     <yun-header
       :statusHeight="iStatusBarHeight"
-      :headerAddress="ticketAddress"
+      :headerAddress="airMessage"
       :headerBottom="Number(10)"
       :statusType="roundTripType"
     ></yun-header>
@@ -188,15 +175,18 @@ export default {
       flightData: {
         // 航班头部信息
         flightType: "", // 航程类型
-        time: "", // 航程日期
-        fromTime: "", // 出发时间
-        fromAddress: "", // 出发机场
-        duration: "", // 飞行时长
-        toTime: "", // 到达时间
-        toAddress: "", // 到达机场
-        airline: "", // 航司
-        model: "", // 机型
-        food: "", // 餐饮
+        data: [{// 航班数据
+          depTime: '', 
+                depAirport_CN: '',
+                arrTerminal: '', 
+                depTerminal:'', 
+                duration: '', 
+                arrTime: '',
+                airline_CN: '', 
+                flightNumber: '',
+                aircraftCode: '', 
+                hasMeal: '', 
+        }], 
       },
 
       roundTripFlightData: {
@@ -248,9 +238,9 @@ export default {
       let data = {
         only_cabin: 1,
         file_key: this.fileKey,
-        segments_key: this.airMessage.segments_key,
-        arrival: this.airMessage.Departure,
-        departure: this.airMessage.Destination,
+        segments_key: this.segmentsMessage.segments_key,
+        departure: this.segmentsMessage.segments[0].depAirport,
+        destination: this.segmentsMessage.segments[0].arrAirport,
         departureTime: moment(this.airMessage.QueryDate).format("YYYY-MM-DD"),
       };
       ticket.getTicket(data).then((res) => {
@@ -320,26 +310,6 @@ export default {
     closePopup() {
       this.$refs.flightExplanation.closeExp();
     },
-
-    // 获取航司退改详情
-    // getGaugeMessage() {
-    //   let data = {
-    //     air_line_code: [],
-    //   };
-    //   data.air_line_code.push(this.airMessage.segments[0].airline);
-    //   console.log("客规原始信息", this.airMessage, this.depMessage);
-    //   if (JSON.stringify(this.depMessage) !== "{}") {
-    //     data.air_line_code.push(this.depMessage.airSegments[0].airline);
-    //   }
-    //   ticket.getGaugetype(data).then((res) => {
-    //     this.airGuestInfo = res.data[this.airMessage.segments[0].airline];
-    //     if (JSON.stringify(this.depMessage) !== "{}") {
-    //       this.depGuestInfo = res.data[this.depMessage.segments[0].airline];
-    //     }
-
-    //     console.log("客规信息", this.airGuestInfo, this.depGuestInfo);
-    //   });
-    // },
 
     // 组装退改信息
     getGaugeInfo(data) {
@@ -421,7 +391,7 @@ export default {
 
     // 获取价格信息 - 验价
     getPriceData(data, header, index, type) {
-      console.log(data, header, index, type, this.airMessage);
+      console.log(data, header, index, type);
       this.getGaugeInfo(data);
       let params;
       if (type) {
@@ -435,9 +405,9 @@ export default {
         params = {
           sourceCode: "IBE",
           file_key: this.roundTripFileKey,
-          queryDate: this.depMessage.flightData.time,
-          departure: this.depMessage.ticketAddress.departure,
-          destination: this.depMessage.ticketAddress.arrival,
+          queryDate: this.segmentsMessage.QueryDate,
+          departure: this.segmentsMessage.segments[0].depAirport,
+          destination: this.segmentsMessage.segments[0].arrAirport,
           systemMsg: "",
           segments: this.depMessage.airSegments,
           ItineraryInfo: this.depMessage.data.data,
@@ -450,15 +420,14 @@ export default {
           price: data.data.cabinPrices.ADT.price,
           type: data.type,
         };
-        this.airMessage["data"] = data;
         params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
-          queryDate: this.airMessage.QueryDate,
-          departure: this.airMessage.Departure,
-          destination: this.airMessage.Destination,
+          queryDate: this.segmentsMessage.segments[0].depTime,
+          departure: this.segmentsMessage.segments[0].depAirport,
+          destination: this.segmentsMessage.segments[0].arrAirport,
           systemMsg: "",
-          segments: this.airMessage.segments,
+          segments: this.segmentsMessage.segments,
           ItineraryInfo: data.data,
           relatedKey: "11",
         };
@@ -540,7 +509,7 @@ export default {
 
     // 跳转预定页面 - 先验价再跳转
     jumpReservationBtn(data, header, index, type) {
-      console.log(data, header, index, type, this.airMessage);
+      console.log(data, header, index, type);
       this.getGaugeInfo(data);
       let params;
       if (this.roundTripBtnActive === 0) {
@@ -550,16 +519,15 @@ export default {
           price: data.data.cabinPrices.ADT.price,
           type: data.type,
         };
-        this.airMessage["data"] = data;
         data.data.productType = "FD" ? "SD" : data.data.productType;
         params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
-          queryDate: this.airMessage.QueryDate,
-          departure: this.airMessage.Departure,
-          destination: this.airMessage.Destination,
+          queryDate: this.segmentsMessage.QueryDate,
+          departure: this.segmentsMessage.segments[0].depAirport,
+          destination: this.segmentsMessage.segments[0].arrAirport,
           systemMsg: "",
-          segments: this.airMessage.segments,
+          segments: this.segmentsMessage.segments,
           ItineraryInfo: data.data,
           relatedKey: "11",
         };
@@ -581,8 +549,6 @@ export default {
           segments: this.depMessage.airSegments,
           ItineraryInfo: this.depMessage.data.data,
           relatedKey: "11",
-          // routing: JSON.stringify(this.airMessage.data.data.routing),
-          // standardPrice: this.airMessage.data.data.routing.ItineraryInfo.cabinPrices.ADT.standardPrice
         };
       }
 
@@ -593,6 +559,7 @@ export default {
             url:
               "/pages/flightReservation/flightReservation?key=" +
               data.data.cabinPrices.ADT.rulePrice.key +
+              "&airMessage=" + JSON.stringify(this.airMessage) +
               "&price=" +
               data.data.cabinPrices.ADT.rulePrice.price + 
             "&data=" + JSON.stringify(this.ticketAddress),
@@ -630,6 +597,7 @@ export default {
                   url:
                     "/pages/flightReservation/flightReservation?key=" +
                     res.data.keys +
+                    "&airMessage=" + JSON.stringify(this.airMessage) +
                     "&price=" +
                     res.data.price + 
             "&data=" + JSON.stringify(this.ticketAddress),
@@ -725,6 +693,7 @@ export default {
           url:
             "/pages/flightReservation/flightReservation?key=" +
             this.relatedKey +
+            "&airMessage=" + JSON.stringify(this.airMessage) +
             "&price=" +
             this.newPrice + 
             "&data=" + JSON.stringify(this.ticketAddress),
@@ -773,42 +742,18 @@ export default {
   onLoad(data) {
     this.roundTripType = data.pageType ? JSON.parse(data.pageType) : false;
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.airMessage = JSON.parse(data.airData);
+    this.airMessage = JSON.parse(data.airMessage);
+    this.segmentsMessage  = JSON.parse(data.airData);
     this.fileKey = data.fileKey;
     this.segmentsKey = data.segmentsKey;
 
-    console.log("舱位信息", this.airMessage);
-
-    // 组装头部信息
-    this.ticketAddress = {
-        to: this.airMessage.segments[0].depAirport_CN.city_name,
-        from: this.airMessage.segments[0].arrAirport_CN.city_name,
-    }
+    console.log("航班数据", this.airMessage);
+    console.log("舱位信息", this.segmentsMessage);
 
     // 组装航程信息
     this.flightData = {
       flightType: "单程", // 航程类型
-      time: moment(this.airMessage.QueryDate).format("YYYY-MM-DD"), // 航程日期
-      week: moment(this.airMessage.QueryDate).format("ddd"),
-      fromTime: moment(this.airMessage.segments[0].depTime).format("HH:mm"), // 出发时间
-      fromAddress:
-        this.airMessage.segments[0].depAirport_CN.province +
-        this.airMessage.segments[0].depAirport_CN.air_port_name +
-        "机场" +
-        this.airMessage.segments[0].depTerminal, // 出发机场
-      duration: this.airMessage.segments[0].duration, // 飞行时长
-      toTime: moment(this.airMessage.segments[0].arrTime).format("HH:mm"), // 到达时间
-      toAddress:
-        this.airMessage.segments[0].arrAirport_CN.province +
-        this.airMessage.segments[0].arrAirport_CN.air_port_name +
-        "机场" +
-        this.airMessage.segments[0].arrTerminal, // 到达机场
-      airIcon: "https://fxxcx.ystrip.cn/" + this.airMessage.segments[0].image,
-      airline:
-        this.airMessage.segments[0].airline_CN +
-        this.airMessage.segments[0].flightNumber, // 航司
-      model: this.airMessage.segments[0].aircraftCode, // 机型
-      food: this.airMessage.segments[0].hasMeal, // 餐饮
+      data: this.segmentsMessage.segments, // 原始数据
     };
 
     console.log("舱位信息航班详情", this.flightData);

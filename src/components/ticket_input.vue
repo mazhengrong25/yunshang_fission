@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-09-10 16:17:05
+ * @LastEditTime: 2020-09-22 13:50:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -10,21 +10,31 @@
     <view class="ticket_item">
       <text class="multi_pass_number">1</text>
       <view class="ticket_address">
-        <view class="to_input address_input" @click="tocketToBtn">{{addressForm.to}}</view>
+        <view class="to_input address_input" @click="tocketToBtn">
+          {{addressForm.to_type === 'air'? addressForm.to.air_port_name :
+            addressForm.to_type === 'hot' && addressForm.to.city_name === "上海" ? addressForm.to.city_name + addressForm.to.air_port_name :
+            addressForm.to_type === 'hot' && addressForm.to.city_name === "北京" ? addressForm.to.city_name + '首都' :
+            addressForm.to.city_name}}
+        </view>
         <view
           class="check_toform_btn"
           @click="checkTickedBtn(false,addressForm.to,addressForm.from)"
         >
           <image class="ticket_image" src="@/static/ticket_btn.png" mode="contain" />
         </view>
-        <view class="from_input address_input" @click="tocketFromBtn">{{addressForm.from}}</view>
+        <view class="from_input address_input" @click="tocketFromBtn">
+          {{addressForm.from_type === 'air'? addressForm.from.air_port_name:
+            addressForm.from_type === 'hot' && addressForm.from.city_name === "上海" ? addressForm.from.city_name + addressForm.from.air_port_name :
+            addressForm.from_type === 'hot' && addressForm.from.city_name === "北京" ? addressForm.from.city_name + '首都' :
+            addressForm.from.city_name}}
+        </view>
       </view>
 
       <view class="ticket_time">
         <view class="ticket_to_time time_box" @click="jumpDate('start')">
-          <view class="time_true" v-if="addressForm.toTime">
-            <view class="time">{{addressForm.toTime}}</view>
-            <view class="time_day">{{addressForm.toDay}}出发</view>
+          <view class="time_true" v-if="JSON.stringify(addressForm.toTime)">
+            <view class="time">{{addressForm.toTime.month}}</view>
+            <view class="time_day">{{addressForm.toTime.week}}出发</view>
           </view>
           <view v-else class="time_false">
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />
@@ -32,10 +42,10 @@
           </view>
         </view>
         <view class="ticket_from_time time_box" @click.stop="jumpDate('end')">
-          <view class="time_true" v-if="addressForm.fromTime">
+          <view class="time_true" v-if="JSON.stringify(addressForm.fromTime) !== '{}'">
             <image class="close_from_btn" src="@/static/close.png" @click.stop="closeFromBtn" />
-            <view class="time">{{addressForm.fromTime}}</view>
-            <view class="time_day">{{addressForm.fromDay}}返回</view>
+            <view class="time">{{addressForm.fromTime.month}}</view>
+            <view class="time_day">{{addressForm.fromTime.week}}返回</view>
           </view>
           <view v-else class="time_false">
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />

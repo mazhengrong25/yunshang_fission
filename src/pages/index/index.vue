@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-21 17:38:29
+ * @LastEditTime: 2020-09-22 14:02:14
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -38,7 +38,7 @@
               <view class="tabs_center">
                 <ticket-input
                   :ticketType="item"
-                  :addressForm="addressForm"
+                  :addressForm="airMessage"
                   @checkTicked="checkTicked"
                   @closeFromBtn="closeFromBtn"
                 ></ticket-input>
@@ -248,11 +248,29 @@ export default {
       passengerFormBack: {}, // 乘客信息
 
       popupCurrent: 0, // 弹窗轮播下标
-
       airMessage: {
-        to: {},
-        from: {},
-        toTime: {},
+        to: {
+          city_code: "CKG",
+          city_name: "重庆",
+          country_code: "CN",
+          province: "重庆",
+        },
+        from: {
+          city_code: "BJS",
+          city_name: "北京",
+          country_code: "CN",
+          province: "北京",
+        },
+        toTime: {
+          date: moment().add(1, "d").format("YYYY-MM-DD"),
+          month: moment().add(1, "d").format("M月DD日"),
+          status: "start",
+          type: "time",
+          week: moment().add(1, "d").format("ddd"),
+        },
+        fromTime: {},
+        to_type: '',
+        from_type: ''
       },
 
 
@@ -302,21 +320,26 @@ export default {
     // 切换往返地址
     checkTicked(data) {
       this.checkTickedType = !this.checkTickedType
-      let toAddress = data.to;
-      let fromAddress = data.rorm;
-      if (data.type) {
-        this.addressForm.multi_pass_to = fromAddress;
-        this.addressForm.multi_pass_from = toAddress;
-      } else {
-        this.addressForm.to = fromAddress;
-        this.addressForm.from = toAddress;
-      }
+
+
+        console.log(this.airMessage)
+        let to = this.airMessage.to
+        let from = this.airMessage.from
+        let toType = this.airMessage.to_type?this.airMessage.to_type:''
+        let fromType = this.airMessage.from_type?this.airMessage.from_type:''
+        this.$set(this.airMessage,'to',from)
+        this.$set(this.airMessage,'from',to)
+
+        this.airMessage['to_type'] = fromType?fromType:''
+        this.airMessage['from_type'] = toType?toType:''
+        // this.$set(this.airMessage,'to_type',from_type)
+        // this.$set(this.airMessage,'from_type',to_type)
+        console.log(this.airMessage)
+        this.$forceUpdate()
     },
     // 清除返程信息
     closeFromBtn() {
-      this.addressForm.fromTime = "";
-      this.addressForm.fromDay = "";
-      delete this.airMessage["fromTime"];
+      this.airMessage.fromTime = {};
     },
 
     // 获取当前swiper-item高度
@@ -386,58 +409,19 @@ export default {
 
     // 提交按钮
     submitTicket() {
-      console.log("提交");
+      console.log("提交",this.airMessage);
       this.airMessage["type"] = this.currentTab;
 
-      if (Object.keys(this.airMessage.to).length === 0) {
-        this.airMessage.to = {
-          city_code: "CKG",
-          city_name: "重庆",
-          country_code: "CN",
-          province: "重庆",
-        };
-      }
-      if (Object.keys(this.airMessage.from).length === 0) {
-        this.airMessage.from = {
-          city_code: "BJS",
-          city_name: "北京",
-          country_code: "CN",
-          province: "北京",
-        };
-      }
-
-      if (Object.keys(this.airMessage.toTime).length === 0) {
-        this.airMessage.toTime = {
-          date: moment().add(1, "d").format("YYYY-MM-DD"),
-          month: moment().add(1, "d").format("M月DD日"),
-          status: "start",
-          type: "time",
-          week: moment().add(1, "d").format("ddd"),
-        };
-      }
-      console.log(this.airMessage);
       let jumpUrl;
-      if (this.currentTab === 0 && !this.airMessage.fromTime) {
+      if (this.currentTab === 0 && JSON.stringify(this.airMessage.fromTime) === '{}') {
         jumpUrl = "/pages/ticketInquiry/ticketInquiry";
       } else if (this.currentTab === 0 && this.airMessage.fromTime) {
         jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
       }
-
-      if(this.checkTickedType){
-        let newArr = JSON.parse(JSON.stringify(this.airMessage))
-        let to = JSON.parse(JSON.stringify(this.airMessage.to))
-        let from = JSON.parse(JSON.stringify(this.airMessage.from))
-        newArr.to = from
-        newArr.from = to
-        uni.navigateTo({
-        url: jumpUrl + "?data=" + JSON.stringify(newArr),
-      });
-        
-      }else{
         uni.navigateTo({
         url: jumpUrl + "?data=" + JSON.stringify(this.airMessage),
       });
-      }
+   
 
       
     },
@@ -467,53 +451,30 @@ export default {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
+      console.log(cityData)
       if (cityData.status === "to") {
-        this.addressForm.to =
-          cityData.type === "city"
-            ? cityData.data.city_name
-            : cityData.data.air_port_name;
+        this.airMessage.to = cityData.data;
         if (cityData.type === "hot") {
-          this.addressForm.to =
-            cityData.data.city_name === "上海"
-              ? cityData.data.city_name + cityData.data.air_port_name
-              : cityData.data.city_name === "北京"
-              ? cityData.data.city_name + "首都"
-              : cityData.data.city_name;
+          this.airMessage.to = cityData.data
         }
-        this.airMessage["to"] = cityData.data;
         this.airMessage["to_type"] = cityData.type;
       } else if (cityData.status === "from") {
-        this.addressForm.from =
-          cityData.type === "city"
-            ? cityData.data.city_name
-            : cityData.data.air_port_name;
+        this.airMessage.from = cityData.data;
         if (cityData.type === "hot") {
-          this.addressForm.from =
-            cityData.data.city_name === "上海"
-              ? cityData.data.city_name + cityData.data.air_port_name
-              : cityData.data.city_name === "北京"
-              ? cityData.data.city_name + "首都"
-              : cityData.data.city_name;
+          this.airMessage.from = cityData.data;
         }
-        this.airMessage["from"] = cityData.data;
         this.airMessage["from_type"] = cityData.type;
       }
-      console.log("airMessage", this.airMessage);
       uni.removeStorageSync("city");
     }
     // 获取时间日期
     if (uni.getStorageSync("time")) {
       let timeData = JSON.parse(uni.getStorageSync("time"));
+      console.log('时间',timeData)
       if (timeData.status === "start") {
-        this.addressForm.toTime = timeData.month;
-        this.addressForm.toDay = timeData.week;
         this.airMessage["toTime"] = timeData;
-        this.addressForm["toDate"] = timeData.date;
       } else if (timeData.status === "end") {
-        this.addressForm.fromTime = timeData.month;
-        this.addressForm.fromDay = timeData.week;
         this.airMessage["fromTime"] = timeData;
-        this.addressForm["fromDate"] = timeData.date;
       }
 
       this.$forceUpdate();
@@ -521,12 +482,6 @@ export default {
       console.log("时间返回", timeData);
       uni.removeStorageSync("time");
     }
-  },
-  mounted() {
-    let date = new Date();
-    date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
-    this.addressForm["toTime"] =
-      date.getMonth() + 1 + "月" + date.getDate() + "日";
   },
 };
 </script>
