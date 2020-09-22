@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-22 09:25:12
+ * @LastEditTime: 2020-09-22 14:14:05
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-09 18:24:24
@@ -287,6 +287,7 @@
           </view>
         </view>
 
+        <!-- 退改信息弹窗 -->
         <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
 
       </scroll-view>

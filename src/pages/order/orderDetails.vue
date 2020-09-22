@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-18 15:58:56
+ * @LastEditTime: 2020-09-22 10:24:02
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -180,7 +180,7 @@ export default {
       iStatusBarHeight: 0,
       orderDetails: [], // 订单详情 --国际
       flightData: {}, // 航班信息
-	  orderListType: '', // 订单列表页 类型
+	    orderListType: '', // 订单列表页 类型
     };
   },
   methods: {
@@ -235,17 +235,17 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-	let orderData = JSON.parse(data.orderData)
-	console.log(data)
-	this.orderListType = data.type
-	this.orderHeaderTitle = 
-		this.orderListType === '0'?'国内订单': 
-		this.orderListType === '1'?'国内退票订单': 
-		this.orderListType === '2'?'国内改签订单': 
-		this.orderListType === '3'?'国际订单':
-		this.orderListType === '4'?'国际退票订单':
-		this.orderListType === '5'?'国际改签订单':''
-    this.getOrderDetails(orderData.order_no);
+    let orderData = JSON.parse(data.orderData)
+    console.log(data)
+    this.orderListType = data.type
+    this.orderHeaderTitle = 
+      this.orderListType === '0'?'国内订单': 
+      this.orderListType === '1'?'国内退票订单': 
+      this.orderListType === '2'?'国内改签订单': 
+      this.orderListType === '3'?'国际订单':
+      this.orderListType === '4'?'国际退票订单':
+      this.orderListType === '5'?'国际改签订单':''
+      this.getOrderDetails(orderData.order_no);
 	
   },
 };

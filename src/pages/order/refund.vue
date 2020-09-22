@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-17 11:19:17
+ * @LastEditTime: 2020-09-22 15:49:40
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -166,7 +166,7 @@
         <view class="middle_message">
           <view class="message_first">退票金额参考</view>
           <view
-            class="message_bottom input-right-arrow">
+            class="message_bottom input-right-arrow" @click="openExp">
             <text class="logo">&yen;</text>
 			      <text class="total_price">{{ orderDetails.total_price }}</text>
           </view>
@@ -208,17 +208,10 @@
         </view>
       </view>
 
-      <!-- 退票申请提交弹框 -->
-      <uni-popup ref="checkPricePopup" type="dialog">
-        <view class="check_Price">
-          <view class="box_title">预定价格变更</view>
-          <view class="content_text">您的当前预定票价已变动至&yen;{{newPrice}}需要继续购买吗？</view>
-          <view class="box_bottom">
-            <view class="submit" @click="submitCheckPrice">确 定</view>
-            <view @click="closeCheckPrice">取 消</view>
-          </view>
-        </view>
-    </uni-popup>
+      
+      <!-- 退改信息弹窗 -->
+      <refund-amount ref="refundAmountRefer"></refund-amount>
+      
     </scroll-view>
     <!-- 提交申请按钮 -->
     <view class="filter_bottom">
@@ -233,9 +226,11 @@ import orderApi from "@/api/order.js";
 import moment from "../../moment";
 moment.locale("zh-cn");
 import refundTop from "@/components/refund_top.vue"; //退票信息
+import RefundAmount from "@/components/refund_amount_refer.vue"; //退票金额参考
 export default {
   components: {
     refundTop,
+    RefundAmount
   },
   data() {
     return {
@@ -244,6 +239,7 @@ export default {
       orderDetails: {}, // 订单详情
 
       checkedPassengerlist: [], // 选中乘客列表
+
     };
   },
   methods: {
@@ -266,6 +262,17 @@ export default {
         .then(res =>{
           console.log(res)
         })
+    },
+
+    // 打开退改签说明弹窗
+    openExp() {
+      
+      this.$refs.refundAmountRefer.openExp();
+    },
+
+    // 关闭产品说明弹窗
+    closeExp() {
+      this.$refs.refundAmountRefer.closeExp();
     },
 
     // 选择联系人
@@ -312,7 +319,8 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    let refundData = JSON.parse(data.refundData);
+    // let refundData = JSON.parse("'data.refundData'");
+    let refundData = this.orderDetails;
     console.log("refund", refundData);
     this.orderDetails = refundData;
   },

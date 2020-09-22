@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-21 15:07:48
+ * @LastEditTime: 2020-09-22 15:35:11
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -410,7 +410,6 @@ export default {
         Cityend: this.citySelect.end, //到达城市
         Timestart: this.timeLimit.start, //日始时间
         Timend: this.timeLimit.end, //日止时间
-        // destime: this.dateFilter[0].name, //预定日期
         status: this.activeStatus, // 订单状态
         date: this.dateStatus, //日期条件
   
