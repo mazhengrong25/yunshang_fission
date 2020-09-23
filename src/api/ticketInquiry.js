@@ -2,113 +2,110 @@
  * @Description: AV查询 获取航班信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-09-11 09:59:50
+ * @LastEditTime: 2020-09-23 14:52:06
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
 
 // 获取航班信息
-function getTicket (data,status) {
-	return request({
-		method: "POST",
+function getTicket(data, status) {
+  return request({
+    method: 'POST',
     url: '/api/inland/air',
-		data: data,
-		status: status
-	})
+    data: data,
+    status: status,
+  });
 }
-
 
 // 获取票价舱位信息
-function getNfd (data) {
-	return request({
-		method: "POST",
+function getNfd(data) {
+  return request({
+    method: 'POST',
     url: '/api/getNfd',
-    data: data
-	})
+    data: data,
+  });
 }
-
 
 // 验价
-function checkPrice(data){
-	return request({
-		method: "POST",
+function checkPrice(data) {
+  return request({
+    method: 'POST',
     url: '/api/checkPrice',
-    data: data
-	})
+    data: data,
+  });
 }
-
 
 // 单程预定
-function getTicketInfo(key,data){
-	return request({
-		method: "GET",
-		url: '/api/inland/entry/'+key +'?price='+data,
-	})
+function getTicketInfo(key, data) {
+  return request({
+    method: 'GET',
+    url: '/api/inland/entry/' + key,
+    data: data,
+  });
 }
 
-
 // 往返预定
-function getRoundTicketInfo(key,roundKey,data){
-	return request({
-		method: "GET",
-		url: '/api/inland/roundentry/'+key +'/'+roundKey,
-		data: data
-	})
+function getRoundTicketInfo(key, roundKey, data) {
+  return request({
+    method: 'GET',
+    url: '/api/inland/roundentry/' + key + '/' + roundKey,
+    data: data,
+  });
 }
 
 // 获取客规信息
-function getGaugetype(data){
-	return request({
-		method: "POST",
-		url: '/api/gaugetype/search',
-		data: data,
-	})
+function getGaugetype(data) {
+  return request({
+    method: 'POST',
+    url: '/api/gaugetype/search',
+    data: data,
+  });
 }
 
 // 单程下单
-function createOrder(data){
-	return request({
-		method: "POST",
-		url: '/api/insert/order',
-		data: data
-	})
+function createOrder(key, data) {
+  return request({
+    method: 'POST',
+    url: '/api/inland/entry/' + key,
+    data: data,
+  });
 }
 
 // 往返下单
-function createRoundOrder(data){
-	return request({
-		method: "POST",
-		url: '/api/insert/orders',
-		data: data
-	})
+function createRoundOrder(data) {
+  return request({
+    method: 'POST',
+    url: '/api/insert/orders',
+    data: data,
+  });
 }
 
 // 获取支付信息
-function getPayInfo(data){
-	return request({
-		method: "GET",
-		url: '/api/pay/' + data,
-	})
+function getPayInfo(data) {
+  return request({
+    method: 'GET',
+    url: '/api/pay/' + data,
+  });
 }
 
 // 支付
-function payOrder(id,data){
-	return request({
-		method: "POST",
-		url: '/api/pay/' + id,
-		data: data
-	})
+function payOrder(id, data) {
+  return request({
+    method: 'POST',
+    url: '/api/pay/' + id,
+    data: data,
+  });
 }
 
-export default{
-	getTicket,
-	getNfd,
-	checkPrice,
-	getTicketInfo,
-	getRoundTicketInfo,
-	getGaugetype,
-	createOrder,
-	createRoundOrder,
-	getPayInfo,
-	payOrder
-}
+export default {
+  getTicket,
+  getNfd,
+  checkPrice,
+  getTicketInfo,
+  getRoundTicketInfo,
+  getGaugetype,
+  createOrder,
+  createRoundOrder,
+  getPayInfo,
+  payOrder,
+};

@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-22 18:06:28
+ * @LastEditTime: 2020-09-23 09:15:45
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -100,7 +100,7 @@
         v-if="!flightInfo && !roundTripType"
         @click="openHeadExp"
       >
-        {{flightData.cabin?flightData.cabin+' | ': ''}}退改签规则 {{flightData.baggage?' | '+ flightData.baggage: ''}}
+        {{flightData.cabinInfo.cabinDesc? flightData.cabinInfo.cabinCode + flightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
     </view>

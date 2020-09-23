@@ -2,13 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-22 14:14:05
- * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-09-09 18:24:24
- * @LastEditors: mazhengrong
->>>>>>> b2a7fad691d697e8c775874470260dfec1fd8733
+ * @LastEditTime: 2020-09-23 17:37:32
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -108,8 +103,8 @@
       </view>
     </view>
 
-    <view class="details_main">
-      <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="details_main">
+      <view class="content">
         <view
           class="main_list filght_info"
           v-for="(item, index) in orderDetails.ticket_segments"
@@ -290,8 +285,8 @@
         <!-- 退改信息弹窗 -->
         <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
 
-      </scroll-view>
-    </view>
+      </view>
+    </scroll-view>
     <!-- 取消订单弹窗 -->
     <yun-config
       ref="yunConfig"
@@ -466,6 +461,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: rgba(243, 245, 247, 1);
+  overflow: hidden;
   .details_header {
     background: rgba(0, 112, 226, 1);
     padding: 40upx 20upx 30upx;
@@ -538,14 +534,15 @@ export default {
           border-color: #fff;
           background: #fff;
           color: rgba(0, 112, 226, 1);
-        }
+        } 
       }
     }
   }
   .details_main {
     position: relative;
     flex: 1;
-    display: flex;
+    height: 100%;
+    overflow-y: auto;
     &::after {
       content: "";
       display: block;
@@ -558,11 +555,9 @@ export default {
       z-index: 0;
     }
     .content {
-      flex: 1;
       height: 100%;
-      overflow-y: auto;
-      position: relative;
       z-index: 1;
+      position: relative;
       .main_list {
         background: rgba(255, 255, 255, 1);
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);

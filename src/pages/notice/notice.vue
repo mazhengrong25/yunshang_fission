@@ -2,7 +2,7 @@
  * @Description: 公告列表
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 17:21:22
- * @LastEditTime: 2020-09-21 11:42:51
+ * @LastEditTime: 2020-09-23 09:44:01
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -42,4 +42,7 @@ export default {
 </script>
 
 <style scoped lang="less">
+.notice{
+  padding: 40upx 0;
+}
 </style>
