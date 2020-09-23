@@ -2,8 +2,8 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-22 17:38:29
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-23 16:08:19
+ * @LastEditors: mazhengrong
 --> 
 
 <template>

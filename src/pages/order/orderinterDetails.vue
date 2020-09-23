@@ -2,13 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-22 14:14:05
+ * @LastEditTime: 2020-09-23 17:35:06
  * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-09-09 18:24:24
- * @LastEditors: mazhengrong
->>>>>>> b2a7fad691d697e8c775874470260dfec1fd8733
 -->
 <template>
   <view class="order_details">
@@ -292,6 +287,16 @@
 
       </scroll-view>
     </view>
+
+    <!-- 骨架屏 -->
+    <view class="flight_skeleton" v-for="i in orderDetails.length < 1? skeletonNumber :0" :key="i">
+      <view class="top">
+        <text></text>
+        <text></text>
+      </view>
+      <text></text>
+    </view>
+
     <!-- 取消订单弹窗 -->
     <yun-config
       ref="yunConfig"
@@ -326,7 +331,9 @@ export default {
             refund: [],
             change: []
           }
-    }, 
+      }, 
+
+      skeletonNumber: 1, // 骨架屏数量
     };
   },
   methods: {
@@ -402,8 +409,6 @@ export default {
       this.$refs.flightExplanation.closeExp();
     },
 
-
-
     // 获取订单详情
     getOrderDetails() {
       console.log("国内订单详情",  this.orderListType);
@@ -415,6 +420,9 @@ export default {
         if (res.result === 10000) {
          
           this.orderDetails = res.data.order_msg;
+          if(this.orderDetails.length < 1){
+            this.skeletonNumber = 0
+          }
         } else {
           uni.showToast({
             title: res.msg,

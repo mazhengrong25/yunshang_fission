@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-21 15:15:08
+ * @LastEditTime: 2020-09-23 16:14:51
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -22,31 +22,33 @@
     </view>
 
     <view class="order_filter">
-      <view class="filter_list">
+      <view class="filter_list" @click="sorTime('create')">
         <view class="list_icon">
           <image src="@/static/filter_time_active.png" mode="contain" />
         </view>
-        <view class="list_title" @click="sorTime('create')">预定(早-晚)</view>
+        <view class="list_title">预定(早-晚)</view>
       </view>
 
-      <view class="filter_list">
+      <view class="filter_list" @click="sorTime('depart')">
         <view class="list_icon">
           <image src="@/static/filter_setoff.png" mode="contain" />
         </view>
-        <view class="list_title" @click="sorTime('depart')">出发(早-晚)</view>
+        <view class="list_title">出发(早-晚)</view>
       </view>
 
-      <view class="filter_list">
+      <view class="filter_list" @click="goFilter('0')">
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="contain" />
         </view>
-        <view class="list_title" @click="goFilter('0')">筛选</view>
+        <view class="list_title">筛选</view>
       </view>
     </view>
 
     <scroll-view
       :scroll-y="true"
       :enable-back-to-top="true"
+      :scroll-top="scrollTop"
+      @scroll="scroll"
       class="content"
       @scrolltolower="nextPageData()"
     >
@@ -288,6 +290,9 @@ export default {
       orderListFilter: {}, // 筛选条件
 
       showDefault: false, // 报错页面
+
+      scrollTop: 0, // 航班列表滚动值
+      oldScrollTop: 0,
     };
   },
   methods: {
@@ -326,6 +331,7 @@ export default {
     },
     //获取国内外列表
     getOrderList() {
+      this.backScroll();
       this.orderPageStatus = true;
       if (this.orderListType === "3") {
         let data = {
@@ -472,6 +478,20 @@ export default {
       } else if (val === "depart") {
         this.innerList.sort(this.departSort("departure_time"));
       }
+      this.backScroll();
+    },
+
+    // 航班信息滚动
+    scroll(e) {
+      this.oldScrollTop = e.detail.scrollTop;
+    },
+
+    // 航班信息返回顶部
+    backScroll() {
+      this.scrollTop = this.oldScrollTop;
+      this.$nextTick(() => {
+        this.scrollTop = 0;
+      });
     },
   },
   onLoad(data) {
