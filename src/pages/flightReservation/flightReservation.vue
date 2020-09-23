@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-22 17:45:44
+ * @LastEditTime: 2020-09-23 15:26:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -207,9 +207,15 @@
 
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
-        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')">《关于规范互联网机票销售行为的通知》</text>
-        <text @click="openUrlDialog(statement)">《{{statement.title}}》</text>
-        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')">《锂电池航空运输规范》</text>
+        <text
+          @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')"
+        >《关于规范互联网机票销售行为的通知》</text>
+        <text
+          @click="openStatementWeb('https://fxxcx.ystrip.cn/air_file/'+ statement.code + '/' + statement.code + '.html')"
+        >《{{statement.title}}》</text>
+        <text
+          @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')"
+        >《锂电池航空运输规范》</text>
       </view>
     </scroll-view>
 
@@ -319,8 +325,6 @@
         </view>
       </view>
     </uni-popup>
-
-    
   </view>
 </template>
 
@@ -351,11 +355,12 @@ export default {
 
       headerAddress: {},
 
-      ruleInfos: { // 退改签信息
+      ruleInfos: {
+        // 退改签信息
         gauge: {
           refund: [],
-          change: []
-        }
+          change: [],
+        },
       },
 
       disMessage: {}, // 分销商信息
@@ -399,7 +404,7 @@ export default {
       passengerNumber: {
         adt: 0,
         inf: 0,
-        cnd: 0
+        cnd: 0,
       }, // 乘机人数量
 
       showRemove: "none", // 自动展开
@@ -442,14 +447,20 @@ export default {
   methods: {
     // 单程预定
     getData() {
-      ticket.getTicketInfo(this.relatedKey, this.price).then((res) => {
+      let data = {
+        price: this.price,
+      };
+      ticket.getTicketInfo(this.relatedKey, data).then((res) => {
         if (res.errorcode === 10000) {
           let segmentMessage = res.data.segment; // 航班信息
           this.flightData = {
             // 组装航班信息
             flightType: "单程", // 航程类型
-            data: segmentMessage
+            data: segmentMessage,
+            cabinInfo: res.data.cabinInfo, // 舱位信息
           };
+
+          console.log("航程信息", res.data);
 
           // 组装航班信息
           let filghtMessage = {
@@ -462,7 +473,8 @@ export default {
               " " +
               segmentMessage[0].depAirport_CN.city_code +
               " - " +
-              segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_name +
+              segmentMessage[segmentMessage.length - 1].arrAirport_CN
+                .city_name +
               " " +
               segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_code, // 行程
             cabin: res.data.cabinInfo.cabinDesc, // 舱位
@@ -507,30 +519,30 @@ export default {
             reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
           };
 
-          this.oldReward = res.data.adtPrice.rulePrice.reward
+          this.oldReward = res.data.adtPrice.rulePrice.reward;
 
           this.statement = {
             // 组装免责声明
             title: res.data.air_line.title,
             url: res.data.air_line.url,
+            code: res.data.air_line.code,
           };
 
           this.chdinf_msg = res.data.chdinf_msg; // 航司儿童婴儿携带数量组装
 
-          this.showData = true
+          this.showData = true;
         } else {
           uni.showToast({
-            title: res.data || '数据获取错误，请稍后再试',
+            title: res.data || "数据获取错误，请稍后再试",
             icon: "none",
             mask: true,
-            duration: 3000
+            duration: 3000,
           });
           setTimeout(() => {
             uni.navigateBack();
           }, 3000);
         }
       });
-      
     },
 
     // 往返预定
@@ -555,13 +567,13 @@ export default {
             this.flightData = {
               // 组装航班信息
               flightType: "去程", // 航程类型
-              data: segmentMessage
+              data: segmentMessage,
             };
 
             this.flightRoundData = {
               // 组装航班信息
               flightType: "返程", // 航程类型
-              data: segmentRoundMessage
+              data: segmentRoundMessage,
             };
 
             // 组装分销商数据
@@ -594,8 +606,8 @@ export default {
               roundReward: res.data.arrAdtPrice.rulePrice.reward, // 返程奖励金额
             };
 
-            this.oldReward = res.data.depAdtPrice.rulePrice.reward
-            this.oldRoundReward = res.data.arrAdtPrice.rulePrice.reward
+            this.oldReward = res.data.depAdtPrice.rulePrice.reward;
+            this.oldRoundReward = res.data.arrAdtPrice.rulePrice.reward;
 
             this.statement = {
               // 组装免责声明
@@ -606,13 +618,13 @@ export default {
             this.chdinf_msg = res.data.departure_chdinf_msg; // 航司儿童婴儿携带数量组装
             this.round_chdinf_msg = res.data.arrive_chdinf_msg; // 航司儿童婴儿携带数量组装
 
-            this.showData = true
+            this.showData = true;
           } else {
             uni.showToast({
               title: res.data,
               icon: "none",
               mask: true,
-              duration: 3000
+              duration: 3000,
             });
             setTimeout(() => {
               uni.navigateBack();
@@ -624,11 +636,11 @@ export default {
     // 保险选择
     changeInsurance(val) {
       console.log(val);
-      if(this.passengerList.filter((u) => u.is_insure === true).length < 1){
+      if (this.passengerList.filter((u) => u.is_insure === true).length < 1) {
         return uni.showToast({
-          title: '请打开需购买保险乘客的开关',
+          title: "请打开需购买保险乘客的开关",
           duration: 2000,
-          icon: 'none'
+          icon: "none",
         });
       }
       this.insuranceActive = val.id !== this.insuranceActive.id ? val : "";
@@ -639,7 +651,7 @@ export default {
     },
 
     // 选择手机区号
-    bindPickerChange: function (e) {
+    bindPickerChange(e) {
       console.log("picker发送选择改变，携带值为", e.target.value);
       this.areaCodeIndex = e.target.value;
     },
@@ -747,36 +759,31 @@ export default {
           : 0;
       this.getTotalPrice();
       // this.passengerList[index].is_insure = JSON.parse(JSON.stringify(e));
-      if(this.passengerList.filter((u) => u.is_insure === true).length < 1){
-        this.insuranceActive = {}
+      if (this.passengerList.filter((u) => u.is_insure === true).length < 1) {
+        this.insuranceActive = {};
       }
-      
     },
 
     // 打开运输总条件弹窗
-    openUrlDialog(val){
-      console.log(val)
+    openUrlDialog(val) {
+      console.log(val);
     },
 
     // 打开免责声明 外部链接
     openStatementWeb(url) {
-      console.log(url)
+      console.log(url);
       uni.navigateTo({
-        url:
-          "/pages/flightReservation/webView?url=" +
-          url
+        url: "/pages/flightReservation/webView?url=" + url,
       });
     },
 
     // 打开免责声明弹窗
     openDiscDialog(type) {
-      if(type){
-
-      }else {
+      if (type) {
+      } else {
         uni.navigateTo({
-        url:
-          "/pages/flightReservation/restrictedNotice"
-      });
+          url: "/pages/flightReservation/restrictedNotice",
+        });
       }
     },
 
@@ -796,7 +803,11 @@ export default {
 
     // 计算金额总价
     getTotalPrice() {
-      console.log('奖励金计算',this.priceInfo.reward,this.passengerNumber.adt);
+      console.log(
+        "奖励金计算",
+        this.priceInfo.reward,
+        this.passengerNumber.adt
+      );
       let totalPrice;
       if (this.roundTripType) {
         // 组装往返金额
@@ -817,15 +828,14 @@ export default {
             Number(this.priceInfo.insPrice || 0) *
             2;
         // 计算奖励金额
-        if(this.passengerNumber.adt > 0){
+        if (this.passengerNumber.adt > 0) {
           this.$set(
-          this.priceInfo,
-          "reward",
-          this.oldReward * this.passengerNumber.adt +
-            this.oldRoundReward * this.passengerNumber.adt
-        );
+            this.priceInfo,
+            "reward",
+            this.oldReward * this.passengerNumber.adt +
+              this.oldRoundReward * this.passengerNumber.adt
+          );
         }
-        
       } else {
         // 组装单程金额
         totalPrice =
@@ -836,14 +846,13 @@ export default {
           Number(this.passengerNumber.ins || 0) *
             Number(this.priceInfo.insPrice || 0);
         // 计算奖励金额
-        if(this.passengerNumber.adt> 0){
+        if (this.passengerNumber.adt > 0) {
           this.$set(
-          this.priceInfo,
-          "reward",
-          this.oldReward * this.passengerNumber.adt
-        );
+            this.priceInfo,
+            "reward",
+            this.oldReward * this.passengerNumber.adt
+          );
         }
-        
       }
       // 组装金额数据
       this.$set(this.priceInfo, "totalPrice", totalPrice);
@@ -873,7 +882,9 @@ export default {
       passengerList.forEach((item) => {
         // 组装乘客数据
         passengerData.push({
-          PassengerName: item.name?item.name: item.en_first_name + "/" + item.en_last_name, // 乘客名称
+          PassengerName: item.name
+            ? item.name
+            : item.en_first_name + "/" + item.en_last_name, // 乘客名称
           PassengerType:
             item.type === "成人"
               ? "ADT"
@@ -944,14 +955,39 @@ export default {
         });
       } else {
         // 单程下单
-        let data = {
-          passengers: passengerData, // 乘客数据
-          keys: this.relatedKey, // 航班key
-          insurance_id: this.insuranceActive.id || 0, // 保险id
-          contacts: this.orderPassenger, // 联系人信息
-        };
+        let passengerName = []; // 乘客姓名
+        let passengerType = []; // 乘客类型
+        let credential = [];
+        let credentialNo = [];
+        let birthday = [];
+        let phone = [];
+        let isInsure = []
+        passengerData.forEach((item) => {
+          passengerName.push(item.PassengerName);
+          passengerType.push(item.PassengerType);
+          credential.push(item.Credential);
+          credentialNo.push(item.CredentialNo);
+          birthday.push(item.Birthday);
+          phone.push(item.Phone);
+          isInsure.push(item.IsInsure)
+        });
 
-        ticket.createOrder(data).then((res) => {
+        let data = {
+          PassengerName: passengerName,
+          PassengerType: passengerType,
+          Credential: credential,
+          CredentialNo: credentialNo,
+          Birthday: birthday,
+          Phone: phone,
+          insurance_id: this.insuranceActive.id || 0, // 保险id
+          name: this.orderPassenger.name,
+          phone: this.orderPassenger.phone,
+          email: "",
+          flight_no: this.flightData.data[0].flightNumber,
+          IsInsure: isInsure
+        };
+        console.log(this.relatedKey, JSON.stringify(data));
+        ticket.createOrder(this.relatedKey, data).then((res) => {
           if (res.errorcode === 10000) {
             let orderId = [];
             let priceList = [];
@@ -977,7 +1013,7 @@ export default {
             console.log(res.data, this.flightData);
           } else {
             uni.showToast({
-              title: res.msg,
+              title: res.data,
               icon: "none",
             });
           }
@@ -1019,9 +1055,9 @@ export default {
     console.log(data);
     // this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.headerAddress = data.airMessage?JSON.parse(data.airMessage):{};
+    this.headerAddress = data.airMessage ? JSON.parse(data.airMessage) : {};
 
-    console.log('头部信息',this.headerAddress)
+    console.log("头部信息", this.headerAddress);
 
     this.roundTripType = data.type ? JSON.parse(data.type) : false;
 
@@ -1084,14 +1120,14 @@ export default {
           left: 120%;
         }
       }
-      text{
+      text {
         display: block;
         width: 80%;
         height: 28upx;
         background: #e5e9f2;
         margin-bottom: 10upx;
       }
-      view{
+      view {
         width: 80%;
         height: 40upx;
         margin: auto auto 0;

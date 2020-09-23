@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-21 14:15:05
+ * @LastEditTime: 2020-09-23 13:55:58
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -17,10 +17,11 @@
     </view>
 
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="order_pay_main">
-      <flight-header 
-        :flightData="flightData" 
+      <flight-header
+        :flightData="flightData"
         :roundTripType="orderType"
-        :roundTripFlightData="flightRoundData"></flight-header>
+        :roundTripFlightData="flightRoundData"
+      ></flight-header>
 
       <view class="order_message box-shadow-style">
         <view class="message_list" v-for="(item, index) in payOrder" :key="index">
@@ -89,24 +90,26 @@ export default {
     return {
       iStatusBarHeight: 0, // 导航栏高度
       price: 0,
-      priceList: [] ,// 金额列表
+      priceList: [], // 金额列表
       orderType: false,
       payOrder: "", // 订单号
       flightData: {
         flightType: "", // 航程类型
-        time: "", // 航程日期
-        week: "", // 航程星期
-        fromTime: "", // 出发时间
-        fromAddress: "", // 出发机场
-        duration: "", // 飞行时长
-        toTime: "", // 到达时间
-        toAddress: "", // 到达机场
-        airIcon: "", // 航司图片
-        airline: "", // 航司
-        model: "", // 机型
-        food: "", // 餐饮
-        cabin: "", // 舱位信息
-        baggage: "", // 行李额
+        data: [
+          {
+            // 航班数据
+            depTime: "",
+            depAirport_CN: "",
+            arrTerminal: "",
+            depTerminal: "",
+            duration: "",
+            arrTime: "",
+            airline_CN: "",
+            flightNumber: "",
+            aircraftCode: "",
+            hasMeal: "",
+          },
+        ],
       }, // 航程信息
       flightRoundData: {
         flightType: "", // 航程类型
@@ -149,7 +152,7 @@ export default {
             // this.payData.second = 10;
             if (this.payData.second <= 0) {
               this.payBtnStatus = false;
-              this.payPayStatus = false
+              this.payPayStatus = false;
               uni.showToast({
                 title: "支付超时",
                 time: 2000,
@@ -198,7 +201,7 @@ export default {
         clearInterval(this._inter);
         console.log("结束");
         this.payBtnStatus = false;
-        this.payPayStatus = false
+        this.payPayStatus = false;
       }
     },
 
@@ -209,11 +212,11 @@ export default {
     },
 
     // 易宝支付
-    notPayStatus(){
+    notPayStatus() {
       uni.showToast({
-        title: '当前暂不支持此支付方式',
+        title: "当前暂不支持此支付方式",
         duration: 2000,
-        icon: 'none'
+        icon: "none",
       });
     },
 
@@ -231,7 +234,8 @@ export default {
           )
           .then((res) => {
             if (res.errorcode === 10000) {
-              if (this.payOrder.length > 1) {  // 携带儿童订单
+              if (this.payOrder.length > 1) {
+                // 携带儿童订单
                 if (payType === 1) {
                   this.childPayStatus = true;
                 } else {
@@ -256,7 +260,8 @@ export default {
                   icon: "none",
                   mask: true,
                 });
-              } else {  // 单个成人订单
+              } else {
+                // 单个成人订单
                 this.payPayStatus = false;
                 let orderInfo = {
                   payId: this.payOrder,
@@ -286,11 +291,11 @@ export default {
     this.payOrder = JSON.parse(data.orderId);
     this.flightData = JSON.parse(data.flightData);
     this.price = data.price;
-    this.priceList = JSON.parse(data.priceList)
-    console.log('金额列表', this.priceList)
-    this.orderType = JSON.parse(data.type)
-    if(this.orderType){
-      this.flightRoundData = JSON.parse(data.flightRoundData)
+    this.priceList = JSON.parse(data.priceList);
+    console.log("金额列表", this.priceList);
+    this.orderType = JSON.parse(data.type);
+    if (this.orderType) {
+      this.flightRoundData = JSON.parse(data.flightRoundData);
     }
     this.getOrderDetails();
   },

@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-22 18:31:52
+ * @LastEditTime: 2020-09-23 17:04:16
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -14,7 +14,7 @@
         class="city_search_input"
         placeholder-style="font-size: 24rpx;font-weight:500;color:rgba(206,206,208,1);"
         v-model="searchCity"
-        placeholder="输入城市名称或者字母"
+        placeholder="输入城市名称或者字母，至少输入两个字符"
         v-on:input="openSearchStauts()"
       />
       <view class="close_input" v-if="searchCity !== ''" @click="closeSearch">取消</view>
@@ -23,7 +23,7 @@
     <!-- <view class="city_swiper_header" v-if="!searchCity">
       <view :class="['header_btn',{'acive': isCityActive}]" @click="checkedCityBtn(true)">国内</view>
       <view :class="['header_btn',{'acive': !isCityActive}]" @click="checkedCityBtn(false)">国际/中国港澳台</view>
-    </view> -->
+    </view>-->
 
     <scroll-view
       :enable-back-to-top="true"
@@ -38,14 +38,22 @@
         <view class="gps_address address_tag_list" v-if="isCityActive">
           <view class="address_title">当前定位</view>
           <view class="address_list_box">
-            <view class="address_tag address_tag_icon" @click="gpsGetAddress(Areaaddress.city)">{{Areaaddress.city || '获取定位中'}}</view>
+            <view
+              class="address_tag address_tag_icon"
+              @click="gpsGetAddress(Areaaddress.city)"
+            >{{Areaaddress.city || '获取定位中'}}</view>
           </view>
         </view>
 
         <view class="address_tag_list">
           <view class="address_title">热门城市</view>
           <view class="address_list_box">
-            <view class="address_tag" v-for="(item, index) in hotCity" :key="index" @click="getCityData(item,'hot')">
+            <view
+              class="address_tag"
+              v-for="(item, index) in hotCity"
+              :key="index"
+              @click="getCityData(item,'hot')"
+            >
               {{item.city_name === '上海'? item.city_name + item.air_port_name:
               item.city_name === '北京'? item.city_name + '首都':item.city_name}}
             </view>
@@ -140,11 +148,14 @@ export default {
     // 清空搜索框
     closeSearch() {
       this.searchCity = "";
+      this.searchList = [];
+      this.getAirData()
     },
 
     // 切换国内国外城市列表
     checkedCityBtn(val) {
       this.isCityActive = val;
+      
     },
 
     // 获取定位
@@ -180,9 +191,14 @@ export default {
     },
 
     // 定位数据查找相同城市
-    gpsGetAddress(val){
-      if(val){
-        this.getCityData(this.cityAirList.filter(item => val.indexOf(item.city_name) !== -1)[0],'city')
+    gpsGetAddress(val) {
+      if (val) {
+        this.getCityData(
+          this.cityAirList.filter(
+            (item) => val.indexOf(item.city_name) !== -1
+          )[0],
+          "city"
+        );
       }
     },
 
@@ -194,45 +210,50 @@ export default {
       city.getAir(data).then((res) => {
         this.cityAirList = res;
         // 热门城市组装
-        this.cityAirList.forEach(item =>{
-          if(
-            item.air_port_name === '首都'||
-            item.city_name === '重庆'||
-            item.city_name === '成都'||
-            item.city_name === '广州'||
-            item.city_name === '上海'||
-            item.city_name === '杭州'||
-            item.city_name === '乌鲁木齐'||
-            item.city_name === '深圳'
-            ){
-            this.hotCity.push(item)
-          }
-        })
+        if (this.hotCity.length < 1) {
+          this.cityAirList.forEach((item) => {
+            if (
+              item.air_port_name === "首都" ||
+              item.city_name === "重庆" ||
+              item.city_name === "成都" ||
+              item.city_name === "广州" ||
+              item.city_name === "上海" ||
+              item.city_name === "杭州" ||
+              item.city_name === "乌鲁木齐" ||
+              item.city_name === "深圳"
+            ) {
+              this.hotCity.push(item);
+            }
+          });
+        }
+        this.cityList = [];
         this.cityUnitList.forEach((item, index) => {
           this.cityList.push({
             unit: "",
             data: [],
           });
           res.forEach((oitem) => {
-            if (String(oitem.city_ename[0]).toUpperCase() === item && oitem.air_port !== 'MY2') {
+            if (
+              String(oitem.city_ename[0]).toUpperCase() === item &&
+              oitem.air_port !== "MY2"
+            ) {
               this.cityList[index]["unit"] = item;
               this.cityList[index]["data"].push(oitem);
             }
           });
 
-
           var hash = {};
-          this.cityList[index]["data"] = this.cityList[index]["data"].reduce(function(oitem, next) {
-            hash[next.city_name] ? '' : hash[next.city_name] = true && oitem.push(next);
-            return oitem
-        }, [])
+          this.cityList[index]["data"] = this.cityList[index]["data"].reduce(
+            function (oitem, next) {
+              hash[next.city_name]
+                ? ""
+                : (hash[next.city_name] = true && oitem.push(next));
+              return oitem;
+            },
+            []
+          );
         });
-        console.log(this.cityList)
-        
-        
-
-
-        
+        console.log(this.cityList);
       });
     },
 
@@ -266,11 +287,11 @@ export default {
     },
 
     // 获取城市信息 填入地址信息
-    getCityData(val,type) {
+    getCityData(val, type) {
       let data = {
         type: type,
         status: this.cityType,
-        data: val
+        data: val,
       };
       uni.setStorageSync("city", JSON.stringify(data));
       uni.navigateBack();
@@ -278,48 +299,47 @@ export default {
 
     // 筛选输入框状态
     openSearchStauts() {
-      this.searchList = [];
-      let provinceList = [];
-      if (this.searchCity) {
-        this.cityAirList.forEach((item) => {
-          if (
-            JSON.stringify(item)
-              .toLowerCase()
-              .indexOf(this.searchCity.toLowerCase()) !== -1
-          ) {
+      if (this.searchCity && this.searchCity.length > 1) {
+        let data = {
+          range: "CN",
+          keyword: this.searchCity,
+        };
+        city.getAir(data).then((res) => {
+          this.searchList = [];
+          let provinceList = [];
+          res.forEach((item) => {
             provinceList.push(item.province);
-          }
-        });
-        [...new Set(provinceList)].forEach((item, index) => {
-          this.searchList.push({
-            unit: item,
-            type:
-              item === "北京"
-                ? "首都"
-                : item === "上海" || item === "天津" || item === "重庆"
-                ? "直辖市"
-                : item === "内蒙古" ||
-                  item === "广西" ||
-                  item === "西藏" ||
-                  item === "宁夏" ||
-                  item === "新疆"
-                ? "自治区"
-                : item === "香港" || item === "澳门"
-                ? "特别行政区"
-                : "省份",
-            data: [],
           });
-          this.cityAirList.forEach((oitem) => {
-            let cityName = oitem.air_port + oitem.air_port_name + oitem.province_py 
-                           oitem.city_name + oitem.city_code + oitem.city_pinyin  + oitem.city_ename
-            if (JSON.stringify(cityName).toLowerCase().indexOf(this.searchCity.toLowerCase()) !== -1 && this.searchList[index].unit === oitem.province) {
-              this.searchList[index].data.push(oitem);
-            }
+
+          [...new Set(provinceList)].forEach((item, index) => {
+            this.searchList.push({
+              unit: item,
+              type:
+                item === "北京"
+                  ? "首都"
+                  : item === "上海" || item === "天津" || item === "重庆"
+                  ? "直辖市"
+                  : item === "内蒙古" ||
+                    item === "广西" ||
+                    item === "西藏" ||
+                    item === "宁夏" ||
+                    item === "新疆"
+                  ? "自治区"
+                  : item === "香港" || item === "澳门"
+                  ? "特别行政区"
+                  : "省份",
+              data: [],
+            });
+            res.forEach((oitem) => {
+              if (this.searchList[index].unit === oitem.province) {
+                this.searchList[index].data.push(oitem);
+              }
+            });
           });
         });
       }
-      this.searchList = this.searchList.filter(item => item.data.length > 0)
-      console.log(this.searchList)
+      // this.searchList = this.searchList.filter((item) => item.data.length > 0);
+      console.log(this.searchList);
     },
   },
 
