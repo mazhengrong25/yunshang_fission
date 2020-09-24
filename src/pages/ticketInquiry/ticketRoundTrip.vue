@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-22 13:58:06
+ * @LastEditTime: 2020-09-24 12:01:16
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -51,12 +51,16 @@
                 >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
               </view>
               <view class="flight_line">
-                <view
-                  class="time"
-                > {{ Math.floor(item.segments[0].duration / 60) }}h{{
-                Math.floor(item.segments[0].duration % 60)
-                }}m</view>
+                <view class="time">
+                  {{ Math.floor(item.segments[0].duration / 60) }}h{{
+                  Math.floor(item.segments[0].duration % 60)
+                  }}m
+                </view>
                 <view class="line_icon"></view>
+                <view
+                  class="ticket_type"
+                  v-if="item.segments.length > 1"
+                >{{item.segments.length - 1}}转</view>
               </view>
               <view class="top_time end_time">
                 <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
@@ -72,10 +76,10 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0].image"
+                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[item.segments.length - 1].image"
                   mode="contain"
                 />
-                {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}}
+                {{item.segments[item.segments.length - 1].airline_CN}}{{item.segments[item.segments.length - 1].flightNumber}}
               </view>
               <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
@@ -120,18 +124,22 @@
                 >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
               </view>
               <view class="flight_line">
-                <view
-                  class="time"
-                > {{ Math.floor(item.segments[0].duration / 60) }}h{{
-                Math.floor(item.segments[0].duration % 60)
-                }}m</view>
+                <view class="time">
+                  {{ Math.floor(item.segments[0].duration / 60) }}h{{
+                  Math.floor(item.segments[0].duration % 60)
+                  }}m
+                </view>
                 <view class="line_icon"></view>
+                <view
+                  class="ticket_type"
+                  v-if="item.segments.length > 1"
+                >{{item.segments.length - 1}}转</view>
               </view>
               <view class="top_time end_time">
-                <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
+                <view class="time">{{$dateTool(item.segments[item.segments.length - 1].arrTime,'HH:mm')}}</view>
                 <view
                   class="address"
-                >{{item.segments[0].arrAirport_CN.air_port_name}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+                >{{item.segments[item.segments.length - 1].arrAirport_CN.air_port_name}}{{item.segments[item.segments.length - 1].arrTerminal !== '--' ?item.segments[item.segments.length - 1].arrTerminal : ''}}</view>
               </view>
             </view>
             <view class="total_price_message">
@@ -141,10 +149,10 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[0].image"
+                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[item.segments.length - 1].image"
                   mode="contain"
                 />
-                {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}}
+                {{item.segments[item.segments.length - 1].airline_CN}}{{item.segments[item.segments.length - 1].flightNumber}}
               </view>
               <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
@@ -279,7 +287,7 @@ export default {
     // 获取往返提示头部信息
     getScrollData() {
       this.showRoundTrip = this.oldScrollTop > 10;
-      if(this.flightList.length > 0 && this.roundFlightList.length > 0 ){
+      if (this.flightList.length > 0 && this.roundFlightList.length > 0) {
         this.showRoundTripData = {
           toCode: this.flightList[this.toActive].segments[0].flightNumber,
           fromCode: this.roundFlightList[this.fromActive].segments[0]
@@ -302,7 +310,6 @@ export default {
             ).format("HH:mm"),
         };
       }
-      
     },
 
     // 获取去程航班信息
@@ -432,20 +439,19 @@ export default {
         this.flightList.sort(this.priceSort("min_price"));
         this.roundFlightList.sort(this.priceSort("min_price"));
 
-
         let priceList = this.flightList.filter((item) => item.min_price !== 0);
         let notPriceList = this.flightList.filter(
           (item) => item.min_price === 0
         );
         this.flightList = [...priceList, ...notPriceList];
 
-        let roundPriceList = this.roundFlightList.filter((item) => item.min_price !== 0);
+        let roundPriceList = this.roundFlightList.filter(
+          (item) => item.min_price !== 0
+        );
         let notRoundPriceList = this.roundFlightList.filter(
           (item) => item.min_price === 0
         );
         this.roundFlightList = [...roundPriceList, ...notRoundPriceList];
-
-
 
         this.price = this.flightList[this.toActive].min_price;
         this.price += this.roundFlightList[this.fromActive].min_price;
@@ -585,7 +591,6 @@ export default {
     // 往返航班提交
     submitRoundTrip() {
       let data = {
-        ticketMessage: this.ticketAddress,
         start: this.flightList[this.toActive],
         end: this.roundFlightList[this.fromActive],
       };
@@ -593,9 +598,17 @@ export default {
         start: this.file_key,
         end: this.roundFlightKey,
       };
+
+      console.log('往返跳转',"/pages/flightInfo/flightInfo?airMessage="+ JSON.stringify(this.ticketData) +
+          "&roundTripData=" +
+          JSON.stringify(data) +
+          "&roundTripKey=" +
+          JSON.stringify(roundTripKey) +
+          "&pageType=true")
       uni.navigateTo({
         url:
-          "/pages/flightInfo/flightInfo?roundTripData=" +
+          "/pages/flightInfo/flightInfo?airMessage="+ JSON.stringify(this.ticketData) +
+          "&roundTripData=" +
           JSON.stringify(data) +
           "&roundTripKey=" +
           JSON.stringify(roundTripKey) +
@@ -760,8 +773,11 @@ export default {
       .box_top {
         display: flex;
         align-items: flex-start;
+        justify-content: space-between;
         margin-bottom: 18upx;
         .top_time {
+          width: 95rpx;
+          flex-shrink: 0;
           .time {
             font-size: 34upx;
             font-weight: bold;
@@ -772,22 +788,32 @@ export default {
             font-size: 22upx;
             font-weight: 400;
             color: rgba(42, 42, 42, 1);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
         }
         .flight_line {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
           flex-direction: column;
           font-size: 22upx;
           font-weight: 400;
           color: rgba(175, 185, 196, 1);
-          margin: 0 28upx;
           .line_icon {
             background: url(@/static/ticket_path.png) no-repeat center center;
             background-size: contain;
             width: 80upx;
             height: 14upx;
+          }
+          .ticket_type {
+            font-size: 22upx;
+            font-weight: 400;
+            color: #afb9c4;
+            margin-top: 4upx;
+            width: 100%;
+            text-align: center;
           }
         }
       }
@@ -841,7 +867,7 @@ export default {
       display: inline-flex;
       flex-direction: column;
       margin-bottom: 4upx;
-      height: 226upx;
+      height: 204upx;
       padding: 28upx 16upx 16upx;
       box-sizing: border-box;
       position: relative;

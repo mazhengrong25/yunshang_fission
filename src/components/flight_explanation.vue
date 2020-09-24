@@ -26,7 +26,7 @@
           scroll-y="true"
           scroll-with-animation="true"
         >
-          <view class="flight_explanation_main">
+          <view class="flight_explanation_main" v-if="showRule">
             <view id="info" class="main_box">
               <view class="main_title">航班信息</view>
               <view class="main_table">
@@ -89,6 +89,70 @@
               <view class="main_message">{{ruleInfos.filght.baggage || '暂无数据'}}</view>
             </view>
           </view>
+
+          <view class="flight_explanation_main" v-else>
+            <view id="info" class="main_box">
+              <view class="main_title">航班信息</view>
+              <view class="main_table">
+                <view class="table_list">
+                  <view class="list_title">起飞时间</view>
+                  <view class="list_content">{{arrrRuleInfos.filght.time}}</view>
+                </view>
+                <view class="table_list">
+                  <view class="list_title">航班号</view>
+                  <view class="list_content">{{arrrRuleInfos.filght.code}}</view>
+                </view>
+                <view class="table_list">
+                  <view class="list_title">行程</view>
+                  <view class="list_content">{{arrrRuleInfos.filght.address}}</view>
+                </view>
+                <view class="table_list">
+                  <view class="list_title">舱位</view>
+                  <view class="list_content">{{arrrRuleInfos.filght.cabin}}</view>
+                </view>
+                <view class="table_list">
+                  <view class="list_title">票面价</view>
+                  <view
+                    class="list_content"
+                  >{{arrrRuleInfos.filght.price !== 0? (arrrRuleInfos.filght.price + '（元）'): '无运价'}}</view>
+                </view>
+              </view>
+            </view>
+            <view id="retreat" class="main_box">
+              <view class="main_title">退票</view>
+              <view class="main_table">
+                <view
+                  class="table_list"
+                  v-for="(item, index) in arrrRuleInfos.gauge.refund"
+                  :key="index"
+                >
+                  <view class="list_title">{{Number(item.value)}}%</view>
+                  <view class="list_content">{{item.title}}</view>
+                </view>
+              </view>
+              <text class="not_message" v-if="arrrRuleInfos.gauge.refund < 1">暂无数据</text>
+              <view class="main_title" style="margin-top: 20rpx">改签</view>
+              <view class="main_table">
+                <view
+                  class="table_list"
+                  v-for="(item, index) in arrrRuleInfos.gauge.change"
+                  :key="index"
+                >
+                  <view class="list_title">{{Number(item.value)}}%</view>
+                  <view class="list_content">{{item.title}}</view>
+                </view>
+              </view>
+              <text class="not_message" v-if="arrrRuleInfos.gauge.change < 1">暂无数据</text>
+            </view>
+            <view class="main_box">
+              <view class="main_title">退改信息</view>
+              <view class="main_message">{{arrrRuleInfos.gauge.back_msg || '暂无数据'}}</view>
+            </view>
+            <view id="cabin" class="main_box">
+              <view class="main_title">行李额</view>
+              <view class="main_message">{{arrrRuleInfos.filght.baggage || '暂无数据'}}</view>
+            </view>
+          </view>
         </scroll-view>
       </view>
     </uni-popup>
@@ -101,10 +165,15 @@ export default {
       type: Object,
       default:() => ({})
     },
+    arrrRuleInfos: {
+      type: Object,
+      default:() => ({})
+    },
   },
   data() {
     return {
       popupCurrent: "info",
+      showRule: true,
     };
   },
   created() {
@@ -116,6 +185,13 @@ export default {
     },
     // 打开退改签说明弹窗
     openExp() {
+      this.showRule = true
+      this.popupCurrent = "info";
+      this.$refs.flightExplanation.open();
+    },
+    // 打开返程退改签
+    openArrExp(){
+      this.showRule = false
       this.popupCurrent = "info";
       this.$refs.flightExplanation.open();
     },

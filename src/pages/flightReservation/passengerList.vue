@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-21 17:21:39
+ * @LastEditTime: 2020-09-24 10:48:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -78,12 +78,13 @@
     ></yun-selector>
 
     <!-- 姓名筛选弹窗 -->
-    <yun-config 
-    ref="yunConfig" 
-    :showInput="true"
-    :submitText="{left:'确认',right:'取消'}"
-    title="请输入姓名"
-    @submitConfig="submitConfig"></yun-config>
+    <yun-config
+      ref="yunConfig"
+      :showInput="true"
+      :submitText="{left:'确认',right:'取消'}"
+      title="请输入姓名"
+      @submitConfig="submitConfig"
+    ></yun-config>
 
     <view class="submit_box" v-if="!passengerType && !showDefault">
       <button class="submit_btn" @click="returnBtn">确认</button>
@@ -115,7 +116,7 @@ export default {
       chdinfNumber: {}, // 航司规定乘客数量
       flightPassengerList: [], // 预定页面切换乘机人
 
-      searchUserName: '', // 用户名筛选
+      searchUserName: "", // 用户名筛选
     };
   },
   methods: {
@@ -219,24 +220,28 @@ export default {
     },
 
     // 打开用户名筛选弹窗
-    userSearchBtn(){
-      console.log('打开弹窗')
-      this.$refs.yunConfig.openConfigPopup()
+    userSearchBtn() {
+      console.log("打开弹窗");
+      this.$refs.yunConfig.openConfigPopup();
     },
 
     // 用户名筛选
-    submitConfig(val){
-      console.log(val)
-      if(val){
-        let newArr = []
-        this.passengerList.forEach((item, index) =>{
-          let username = item.name + item.en_first_name + item.en_last_name
-          if(JSON.stringify(username).toLowerCase().indexOf(val.toLowerCase()) !== -1){
-            newArr.push(item)
+    submitConfig(val) {
+      console.log(val);
+      if (val) {
+        let newArr = [];
+        this.passengerList.forEach((item, index) => {
+          let username = item.name + item.en_first_name + item.en_last_name;
+          if (
+            JSON.stringify(username)
+              .toLowerCase()
+              .indexOf(val.toLowerCase()) !== -1
+          ) {
+            newArr.push(item);
           }
-        })
-        this.passengerList = newArr
-      }else{
+        });
+        this.passengerList = newArr;
+      } else {
         this.getPassengerData();
       }
     },
@@ -247,7 +252,7 @@ export default {
     },
     // 确认分组
     groupPopupSelecctBtn(e) {
-      this.$refs.yunConfig.inputValue = ''
+      this.$refs.yunConfig.inputValue = "";
       console.log(e);
       if (e.group_name !== "不限") {
         this.group = e;
@@ -286,12 +291,17 @@ export default {
       let chdNumber = 0;
       let infNumber = 0;
 
+      console.log(this.checkePassenger);
+
       this.checkePassenger.forEach((item) => {
         atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
         chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
         infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
       });
-      if ((atdNumber === 0 && chdNumber > 0) || infNumber > 0) {
+      if (
+        (atdNumber === 0 && chdNumber > 0) ||
+        (atdNumber === 0 && infNumber > 0)
+      ) {
         return uni.showToast({
           title: "请至少选择一个成人",
           icon: "none",
@@ -311,7 +321,7 @@ export default {
         }
         if (
           infNumber !== 0 &&
-          infNumber * this.chdinfNumber.has_inf_inf_number < infNumber
+          atdNumber * this.chdinfNumber.has_inf_inf_number < infNumber
         ) {
           return uni.showToast({
             title: "超出航司规定婴儿人数",
@@ -320,6 +330,7 @@ export default {
           });
         }
       }
+
       uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
       uni.navigateBack();
     },
@@ -339,12 +350,12 @@ export default {
       ? JSON.parse(data.editPassengerList)
       : [];
 
-    this.chdinfNumber = {
-      air_line: "CA",
-      cnn_number: 2,
-      has_inf_cnn_number: 1,
-      has_inf_inf_number: 1,
-    };
+    // this.chdinfNumber = {
+    //   air_line: "CA",
+    //   cnn_number: 2,
+    //   has_inf_cnn_number: 1,
+    //   has_inf_inf_number: 1,
+    // };
     console.log(this.chdinfNumber);
     this.getPassengerData();
     this.getGroupList();

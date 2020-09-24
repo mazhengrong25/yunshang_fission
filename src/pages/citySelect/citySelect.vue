@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-23 17:04:16
+ * @LastEditTime: 2020-09-24 15:29:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -149,13 +149,12 @@ export default {
     closeSearch() {
       this.searchCity = "";
       this.searchList = [];
-      this.getAirData()
+      this.getAirData();
     },
 
     // 切换国内国外城市列表
     checkedCityBtn(val) {
       this.isCityActive = val;
-      
     },
 
     // 获取定位
@@ -299,14 +298,14 @@ export default {
 
     // 筛选输入框状态
     openSearchStauts() {
+      this.searchList = [];
+      let provinceList = [];
       if (this.searchCity && this.searchCity.length > 1) {
         let data = {
           range: "CN",
           keyword: this.searchCity,
         };
         city.getAir(data).then((res) => {
-          this.searchList = [];
-          let provinceList = [];
           res.forEach((item) => {
             provinceList.push(item.province);
           });
