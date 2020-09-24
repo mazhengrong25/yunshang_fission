@@ -2,13 +2,8 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-24 17:59:44
+ * @LastEditTime: 2020-09-24 18:33:08
  * @LastEditors: wish.WuJunLong
-=======
- * @LastEditTime: 2020-09-24 15:55:09
- * @LastEditors: wish.WuJunLong
->>>>>>> 174b8837c29ec92dc859de9fb8d4ac1a84ded447
 --> 
 <template>
   <view class="fight_header">
@@ -17,7 +12,7 @@
         <view class="header_type">{{flightData.flightType}}</view>
         <view
           class="header_time"
-        >{{$dateTool(flightData.data[0].depTime,'YYYY-MM-DD')}} {{$dateTool(flightData.data[0].depTime,'dddd')}}</view>
+        >{{$dateTool(flightType===true?flightData.data[0].depTime:flightData.data.ticket_segments[0].departure_time,'YYYY-MM-DD')}} {{$dateTool(flightType===true?flightData.data[0].depTime:flightData.data.ticket_segments[0].departure_time,'dddd')}}</view>
       </view>
 
       <!-- 单程直飞 -->
@@ -233,6 +228,11 @@ export default {
     flightInfo: {
       // 航班信息状态 true 航班信息、 false 预定页面
       type: Boolean,
+      default: () => true,
+    },
+    flightType: {
+      // type false 国内订单详情
+      type:Boolean,
       default: () => true,
     },
     flightData: {
