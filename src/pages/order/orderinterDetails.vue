@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-23 17:59:10
+ * @LastEditTime: 2020-09-24 16:02:01
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -105,85 +105,15 @@
 
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="details_main"> 
       <view class="content">
-        <view
-          class="main_list filght_info"
-          v-for="(item, index) in orderDetails.ticket_segments"
-          :key="index">
-          <view class="info_header">
-            <view class="header_type">{{
-              orderDetails.segment_type === 1
-                ? "单程"
-                : orderDetails.segment_type === 2
-                ? "往返"
-                : orderDetails.segment_type === 3
-                ? "多程"
-                : ""
-            }}</view>
-            <view class="header_time">
-              {{ item.departure_time.substring(0, 10) }}
-              <text>{{ $dateTool(item.departure_time, "ddd") }}</text>
-            </view>
-          </view>
-          <view class="info_message">
-            <view class="message_box">
-              <view class="date">{{
-                item.departure_time.substring(11, 16)
-              }}</view>
-              <view class="address"
-                >{{ item.departure_CN.city_name
-                }}{{ item.departure_CN.air_port_name }}</view
-              >
-            </view>
 
-            <view class="message_center">
-              <view class="date"
-                >{{ Math.floor(item.duration / 3600) }}h{{
-                  Math.floor((item.duration / 60) % 60)
-                }}m</view
-              >
-              <view class="center_icon"></view>
-              <view class="type">直飞</view>
-            </view>
+        <flight-header
+        :flightData="flightData"
+        :roundTripFlightData="roundTripFlightData"
+        :roundTripType="roundTripType"
+        :type="false"
+        ></flight-header>
 
-            <view class="message_box">
-              <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
-              <view class="address"
-                >{{ item.arrive_CN.city_name
-                }}{{ item.arrive_CN.air_port_name }}</view
-              >
-            </view>
-          </view>
-
-          <view class="filght_message">
-            <!-- 航班图标 -->
-              <image
-                class="message_icon"
-                :src="'https://fxxcx.ystrip.cn/' + item.image"
-                mode="aspectFill"
-              />
-            <view class="message_list">{{ item.flight_no }}</view>
-            <view class="message_list">{{ item.model }}</view>
-            <view class="message_list">有早餐</view>
-          </view>
-
-          <view class="filght_bottom" @click="openExp">
-            <view class="bottom_list"
-              >{{ item.cabin
-              }}{{
-                item.cabin_level === "ECONOMY"
-                  ? "经济舱"
-                  : item.cabin_level === "FIRST"
-                  ? "头等舱"
-                  : item.cabin_level === "BUSINESS"
-                  ? "公务舱"
-                  : ""
-              }}</view
-            >
-            <view class="bottom_list">退改签规则</view>
-            <view class="bottom_list input-right-arrow">每人托运2件，每件23KG</view>
-          </view>
-        </view>
-
+        <!-- 出行信息 -->
         <view class="main_list passenger">
           <view class="main_list_title">出行信息</view>
           <view class="passenger_list">
@@ -253,6 +183,7 @@
             </view>
           </view>
         </view>
+        <!-- 订单信息 -->
         <view class="main_list order_message">
           <view class="main_list_title">订单信息</view>
           <view class="message_list">
@@ -310,10 +241,16 @@
 import orderApi from "@/api/order.js";
 import moment from "../../moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
+import flightHeader from "@/components/flight_header.vue"; // 航程信息
+
+
 moment.locale("zh-cn");
 export default {
   components: {
+    
     flightExplanation,
+    flightHeader
+   
   },
   data() {
     return {
@@ -332,6 +269,38 @@ export default {
       }, 
 
       skeletonNumber: 1, // 骨架屏数量
+      roundTripType: false, // 是否往返
+
+      flightData: {
+        // 航班头部信息
+        flightType: "", // 航程类型
+        data: [{// 航班数据
+          depTime: '', 
+                depAirport_CN: '',
+                arrTerminal: '', 
+                depTerminal:'', 
+                duration: '', 
+                arrTime: '',
+                airline_CN: '', 
+                flightNumber: '',
+                aircraftCode: '', 
+                hasMeal: '', 
+        }], 
+      },
+
+      roundTripFlightData: {
+        // 返程数据
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
+      },
     };
   },
   methods: {
@@ -461,6 +430,12 @@ export default {
           ? "国际改签订单"
           : "";
       this.getOrderDetails();
+
+      // 组装航程信息
+      this.flightData = {
+      flightType: "单程", // 航程类型
+      data: this.listData, // 原始数据
+    };
     },
   },
 };

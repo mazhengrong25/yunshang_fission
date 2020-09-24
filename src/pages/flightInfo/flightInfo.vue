@@ -2,8 +2,8 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-22 17:41:47
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-24 15:24:27
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
@@ -755,7 +755,6 @@ export default {
       flightType: "单程", // 航程类型
       data: this.segmentsMessage.segments, // 原始数据
     };
-
     console.log("舱位信息航班详情", this.flightData);
 
     // 获取航司退改信息

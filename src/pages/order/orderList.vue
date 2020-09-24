@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-23 16:14:51
+ * @LastEditTime: 2020-09-24 11:22:26
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -69,12 +69,10 @@
         <view
           @click.stop="jumpOrderDetails(item)"
           class="list_item"
-          v-for="(oitem, oindex) in item.ticket_segments"
-          :key="oindex"
         >
           <view class="item_header">
             <view class="item_title">
-              <view class="title">{{ oitem.departure_msg.city_name}} - {{ oitem.arrive_msg.city_name }}</view>
+              <view class="title">{{ item.ticket_segments[0].departure_msg.city_name}} - {{ item.ticket_segments[item.ticket_segments.length - 1].arrive_msg.city_name }}</view>
             </view>
             <view class="item_price">
               <text>&yen;</text>
@@ -96,10 +94,10 @@
           </view>
           <view class="item_info">
             <view class="info_left">
-              <text>{{ oitem.flight_no }}</text>
-              <text>{{ $dateTool(oitem.departure_time, "MM月DD日") }}</text>
+              <text>{{ item.ticket_segments[0].flight_no }}</text>
+              <text>{{ $dateTool(item.ticket_segments[0].departure_time, "MM月DD日") }}</text>
               <!-- HH:mm 24制   hh:mm 12制 -->
-              <text>{{ $dateTool(oitem.departure_time, "HH:mm") }}起飞</text> 
+              <text>{{ $dateTool(item.ticket_segments[0].departure_time, "HH:mm") }}起飞</text> 
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
