@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-24 16:11:51
+ * @LastEditTime: 2020-09-24 17:23:40
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -515,7 +515,7 @@ export default {
 
           this.orderPassenger = {
             name: res.data.dis_msg.contact,
-            phone: res.data.dis_msg.phone,
+            phone: String(res.data.dis_msg.phone),
           };
 
           // 组装分销商数据
@@ -584,7 +584,7 @@ export default {
             // 组装联系人信息
             this.orderPassenger = {
               name: res.data.dis_msg.contact,
-              phone: res.data.dis_msg.phone,
+              phone: String(res.data.dis_msg.phone),
             };
 
             this.flightData = {
@@ -1005,15 +1005,12 @@ export default {
       });
       if (this.roundTripType) {
         // 往返
-
-        // 单程下单
         let passengerName = []; // 乘客姓名
         let passengerType = []; // 乘客类型
         let credential = [];
         let credentialNo = [];
         let birthday = [];
         let phone = [];
-        let email = [];
         let isInsure = [];
         passengerData.forEach((item) => {
           passengerName.push(item.PassengerName);
@@ -1032,11 +1029,10 @@ export default {
           CredentialNo: credentialNo,
           Birthday: birthday,
           Phone: phone,
-          Email: email,
           insurance_id: this.insuranceActive.id || 0, // 保险id
           name: this.orderPassenger.name,
           phone: this.orderPassenger.phone,
-          email: this.orderPassenger.email,
+          email: this.orderPassenger.email || '',
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
         };
@@ -1051,7 +1047,7 @@ export default {
         //   insurance_id: this.insuranceActive.id || 0, // 保险id
         //   contacts: this.orderPassenger, // 联系人信息
         // };
-        ticket.createRoundOrder(data).then((res) => {
+        ticket.createRoundOrder(this.relatedKey,this.roundRelatedKey,data).then((res) => {
           console.log(res);
           if (res.errorcode === 10000) {
             let orderId = [];
@@ -1093,7 +1089,6 @@ export default {
         let credentialNo = [];
         let birthday = [];
         let phone = [];
-        let email = [];
         let isInsure = [];
         passengerData.forEach((item) => {
           passengerName.push(item.PassengerName);
@@ -1112,11 +1107,10 @@ export default {
           CredentialNo: credentialNo,
           Birthday: birthday,
           Phone: phone,
-          Email: email,
           insurance_id: this.insuranceActive.id || 0, // 保险id
           name: this.orderPassenger.name,
           phone: this.orderPassenger.phone,
-          email: this.orderPassenger.email,
+          email: this.orderPassenger.email || '',
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
         };

@@ -3,8 +3,8 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-24 16:12:55
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-24 17:59:44
+ * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2020-09-24 15:55:09
  * @LastEditors: wish.WuJunLong
@@ -199,16 +199,16 @@
         {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0].flightNumber}}{{roundTripFlightData.data[0].aircraftCode?' | '+ roundTripFlightData.data[0].aircraftCode: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
-      <view class="flight_reservation_box" v-if="!flightInfo && flightData.data.length <= 1" @click="openHeadExp()">
+      <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp()">
         {{flightData.cabinInfo.cabinDesc? flightData.cabinInfo.cabinCode + flightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
-      <view class="flight_reservation_box" v-if="!flightInfo && roundTripFlightData.data.length <= 1" @click="openHeadExp('arr')">
+      <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp('arr')">
         {{roundTripFlightData.cabinInfo.cabinDesc? roundTripFlightData.cabinInfo.cabinCode + roundTripFlightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{roundTripFlightData.cabinInfo.baggage?' | '+ roundTripFlightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
 
-      <view
+      <!-- <view
         class="flight_reservation_box"
         v-else-if="!flightInfo && flightData.data.length > 1"
         v-for="(item, index) in flightData.data"
@@ -216,7 +216,7 @@
       >
         3{{item.cabin?item.cabin+' | ': ''}}退改签规则 {{item.baggage?' | '+ item.baggage: ''}}
         <view class="message_more_btn"></view>
-      </view>
+      </view> -->
     </view>
 
     <view

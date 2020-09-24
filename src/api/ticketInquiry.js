@@ -2,7 +2,7 @@
  * @Description: AV查询 获取航班信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-09-23 14:52:06
+ * @LastEditTime: 2020-09-24 17:10:02
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -72,10 +72,10 @@ function createOrder(key, data) {
 }
 
 // 往返下单
-function createRoundOrder(data) {
+function createRoundOrder(key,arrKey,data) {
   return request({
     method: 'POST',
-    url: '/api/insert/orders',
+    url: '/api/inland/roundentry/'+key+'/'+arrKey,
     data: data,
   });
 }

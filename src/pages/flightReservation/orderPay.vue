@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-23 13:55:58
+ * @LastEditTime: 2020-09-24 16:37:35
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -113,19 +113,21 @@ export default {
       }, // 航程信息
       flightRoundData: {
         flightType: "", // 航程类型
-        time: "", // 航程日期
-        week: "", // 航程星期
-        fromTime: "", // 出发时间
-        fromAddress: "", // 出发机场
-        duration: "", // 飞行时长
-        toTime: "", // 到达时间
-        toAddress: "", // 到达机场
-        airIcon: "", // 航司图片
-        airline: "", // 航司
-        model: "", // 机型
-        food: "", // 餐饮
-        cabin: "", // 舱位信息
-        baggage: "", // 行李额
+        data: [
+          {
+            // 航班数据
+            depTime: "",
+            depAirport_CN: "",
+            arrTerminal: "",
+            depTerminal: "",
+            duration: "",
+            arrTime: "",
+            airline_CN: "",
+            flightNumber: "",
+            aircraftCode: "",
+            hasMeal: "",
+          },
+        ],
       },
       payType: "钱包",
 
@@ -292,7 +294,7 @@ export default {
     this.flightData = JSON.parse(data.flightData);
     this.price = data.price;
     this.priceList = JSON.parse(data.priceList);
-    console.log("金额列表", this.priceList);
+    console.log("金额列表", data);
     this.orderType = JSON.parse(data.type);
     if (this.orderType) {
       this.flightRoundData = JSON.parse(data.flightRoundData);

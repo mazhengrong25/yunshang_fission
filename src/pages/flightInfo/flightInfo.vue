@@ -2,15 +2,15 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-24 16:14:21
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-24 16:15:39
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
     <yun-header
       :statusHeight="iStatusBarHeight"
       :headerAddress="airMessage"
-      :headerBottom="Number(10)"
+      :headerBottom="Number(10)" 
       :statusType="roundTripType"
     ></yun-header>
     <view class="main_content">
