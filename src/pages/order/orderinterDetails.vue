@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-24 16:02:01
+ * @LastEditTime: 2020-09-24 18:29:23
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -110,7 +110,7 @@
         :flightData="flightData"
         :roundTripFlightData="roundTripFlightData"
         :roundTripType="roundTripType"
-        :type="false"
+        :flightType="false"
         ></flight-header>
 
         <!-- 出行信息 -->
@@ -256,10 +256,12 @@ export default {
     return {
       iStatusBarHeight: 0,
       orderDetails: [], // 订单详情
-      flightData: {}, // 航班信息
+      // flightData: {}, // 航班信息
       orderListType: "", // 订单列表页 类型
 
       orderId: "", // 订单号
+
+      cancelOrder:"", //取消订单
 
       ruleInfos: { // 退改签信息
           gauge: {
@@ -275,7 +277,7 @@ export default {
         // 航班头部信息
         flightType: "", // 航程类型
         data: [{// 航班数据
-          depTime: '', 
+                depTime: '', 
                 depAirport_CN: '',
                 arrTerminal: '', 
                 depTerminal:'', 
@@ -285,6 +287,9 @@ export default {
                 flightNumber: '',
                 aircraftCode: '', 
                 hasMeal: '', 
+                // 国内订单
+                // departure_time
+
         }], 
       },
 
@@ -415,6 +420,7 @@ export default {
       this.orderId = listData.order_no;
       console.log(listData);
       this.orderListType = data.type;
+      this.cancelOrder = data.cancel;
       this.orderHeaderTitle =
         this.orderListType === "0"
           ? "国内订单"

@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-24 11:22:26
+ * @LastEditTime: 2020-09-24 18:26:41
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -309,13 +309,16 @@ export default {
     removeOrder(data){
       console.log(data.order_no)
       console.log('取消订单')
-      let newData = {
-        order_no: data.order_no
-      }
-      orderApi.cancleInterRefund(newData)
-        .then(res =>{
-          console.log(res)
-        })
+      // let newData = {
+      //   order_no: data.order_no
+      // }
+      // orderApi.cancleInterRefund(newData)
+      //   .then(res =>{
+      //     console.log(res)
+      //   })
+      uni.navigateTo({
+          url: "/pages/order/orderinterDetails?cancel="+cancel,
+      });
     },
 
     //跳转到筛选页面
@@ -436,6 +439,7 @@ export default {
             this.orderListType,
         });
       } else if (this.orderListType === "0") {
+        // 国内
         uni.navigateTo({
           url:
             "/pages/order/orderinterDetails?listData=" +
