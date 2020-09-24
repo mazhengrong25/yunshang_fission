@@ -2,8 +2,13 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
+<<<<<<< HEAD
  * @LastEditTime: 2020-09-24 16:12:55
  * @LastEditors: mazhengrong
+=======
+ * @LastEditTime: 2020-09-24 15:55:09
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 174b8837c29ec92dc859de9fb8d4ac1a84ded447
 --> 
 <template>
   <view class="fight_header">
@@ -40,15 +45,14 @@
       </view>
 
       <!-- 单程 中转 -->
-      <view class="content_message transit" v-else>
+      <view :class="['content_message transit',{fold: !filghtFold}]" v-else>
         <view class="flight_message" v-for="(item, index) in flightData.data" :key="index">
           <view class="fly_message">
             <view class="fly_left">
               <view class="fly_time">{{$dateTool(item.depTime,'HH:mm')}}</view>
               <view class="fly_date">
                 <image class="fly_date_icon" src="@/static/filter_time.png" mode="aspectFill" />
-                {{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') / 60)}}m{{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') % 60)}}h
-                
+                {{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') % 60)}}m
               </view>
               <view class="fly_time">{{$dateTool(item.arrTime,'HH:mm')}}</view>
             </view>
@@ -58,7 +62,7 @@
                 {{item.depAirport_CN.air_port + ' '
                 + item.depAirport_CN.city_name
                 +item.depAirport_CN.air_port_name
-                + '机场' + ' / ' + item.depTerminal}}
+                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
               </view>
 
               <view class="fly_info">
@@ -71,27 +75,30 @@
                 {{item.airline_CN + item.flightNumber + ' | ' + item.aircraftCode}}
               </view>
 
-              <view class="fly_air">
+              <view class="fly_air bottom_fly_ait">
                 {{item.arrAirport_CN.air_port + ' '
                 + item.arrAirport_CN.city_name
                 +item.arrAirport_CN.air_port_name
-                + '机场' + ' / ' + item.depTerminal}}
+                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
               </view>
             </view>
           </view>
-          <view
-            class="transit_message"
-            v-if="index === 0"
-          >转 
-            {{flightData.data[0].arrAirport_CN.city_name + 
+          <view class="transit_message" v-if="index === 0">
+            转
+            {{flightData.data[0].arrAirport_CN.city_name +
             ' 停留 '}}
-            {{Math.floor($timeDiff(flightData.data[1].depTime,flightData.data[0].arrTime, 'minutes') / 60)}}m{{Math.floor($timeDiff(flightData.data[1].depTime,flightData.data[0].arrTime, 'minutes') % 60)}}h
+            {{Math.floor($timeDiff(flightData.data[1].depTime,flightData.data[0].arrTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(flightData.data[1].depTime,flightData.data[0].arrTime, 'minutes') % 60)}}m
           </view>
         </view>
       </view>
 
       <view class="bottom_message" v-if="flightData.data.length <= 1">
-        <image class="bottom_message_icon" v-if="flightData.data[0].image" :src="'https://fxxcx.ystrip.cn' + flightData.data[0].image" mode="aspectFill" />
+        <image
+          class="bottom_message_icon"
+          v-if="flightData.data[0].image"
+          :src="'https://fxxcx.ystrip.cn' + flightData.data[0].image"
+          mode="aspectFill"
+        />
         {{flightData.data[0].airline_CN + flightData.data[0].flightNumber}}{{flightData.data[0].aircraftCode?' | '+ flightData.data[0].aircraftCode: ''}} {{flightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
@@ -107,45 +114,116 @@
     <view class="fight_list found_fight_list" v-if="roundTripType">
       <view class="header_message">
         <view class="header_type round_trip_type">{{roundTripFlightData.flightType}}</view>
-        <view class="header_time">{{roundTripFlightData.time}} {{roundTripFlightData.week}}</view>
+        <view
+          class="header_time"
+        >{{$dateTool(roundTripFlightData.data[0].depTime,'YYYY-MM-DD')}} {{$dateTool(roundTripFlightData.data[0].depTime,'dddd')}}</view>
       </view>
-      <view class="content_message">
+      <view class="content_message" v-if="roundTripFlightData.data.length <= 1">
         <view class="left_message address_message">
-          <view class="time">{{roundTripFlightData.fromTime}}</view>
-          <view class="address">{{roundTripFlightData.fromAddress}}</view>
+          <view class="time">{{$dateTool(roundTripFlightData.data[0].depTime,'HH:mm')}}</view>
+          <view
+            class="address"
+          >{{roundTripFlightData.data[0].depAirport_CN.province + roundTripFlightData.data[0].depAirport_CN.air_port_name}}机场</view>
         </view>
         <view class="center_message">
-          <view
-            class="duration"
-          >{{roundTripFlightData.duration.indexOf(':') !== -1?Number(roundTripFlightData.duration.split(":")[0]):roundTripFlightData.duration}}h{{roundTripFlightData.duration.indexOf(':') !== -1?Number(flightData.duration.split(":")[1]):flightData.duration}}m</view>
+          <view class="duration">
+            {{ Math.floor(roundTripFlightData.data[0].duration / 60) }}h{{
+            Math.floor(roundTripFlightData.data[0].duration % 60)
+            }}m
+          </view>
           <view class="arrow_icon"></view>
         </view>
         <view class="right_message address_message">
-          <view class="time">{{roundTripFlightData.toTime}}</view>
-          <view class="address">{{roundTripFlightData.toAddress}}</view>
+          <view class="time">{{$dateTool(roundTripFlightData.data[0].arrTime,'HH:mm')}}</view>
+          <view
+            class="address"
+          >{{roundTripFlightData.data[0].arrAirport_CN.province + roundTripFlightData.data[0].arrAirport_CN.air_port_name}}机场</view>
         </view>
       </view>
 
-      <view class="bottom_message">
-        <image class="bottom_message_icon" v-if="roundTripFlightData.data[0].image" :src="'https://fxxcx.ystrip.cn' + roundTripFlightData.data[0].image" mode="aspectFill" />
-        {{roundTripFlightData.data[0].airline}}{{roundTripFlightData.data[0].model?' | '+ roundTripFlightData.data[0].model: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
+      <!-- 往返 中转 -->
+      <view :class="['content_message transit',{fold: !filghtFold}]" v-else>
+        <view class="flight_message" v-for="(item, index) in roundTripFlightData.data" :key="index">
+          <view :class="['fly_message',{fold: !filghtFold}]">
+            <view class="fly_left">
+              <view class="fly_time">{{$dateTool(item.depTime,'HH:mm')}}</view>
+              <view class="fly_date">
+                <image class="fly_date_icon" src="@/static/filter_time.png" mode="aspectFill" />
+                {{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') % 60)}}m
+              </view>
+              <view class="fly_time">{{$dateTool(item.arrTime,'HH:mm')}}</view>
+            </view>
+            <view class="fly_line"></view>
+            <view class="fly_right">
+              <view class="fly_air">
+                {{item.depAirport_CN.air_port + ' '
+                + item.depAirport_CN.city_name
+                +item.depAirport_CN.air_port_name
+                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
+              </view>
+
+              <view class="fly_info">
+                <image
+                  class="air_image"
+                  v-if="item.image"
+                  :src="'https://fxxcx.ystrip.cn' + item.image"
+                  mode="aspectFill"
+                />
+                {{item.airline_CN + item.flightNumber + ' | ' + item.aircraftCode}}
+              </view>
+
+              <view class="fly_air bottom_fly_ait">
+                {{item.arrAirport_CN.air_port + ' '
+                + item.arrAirport_CN.city_name
+                +item.arrAirport_CN.air_port_name
+                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
+              </view>
+            </view>
+          </view>
+          <view class="transit_message" v-if="index === 0">
+            转
+            {{roundTripFlightData.data[0].arrAirport_CN.city_name +
+            ' 停留 '}}
+            {{Math.floor($timeDiff(roundTripFlightData.data[1].depTime,roundTripFlightData.data[0].arrTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(roundTripFlightData.data[1].depTime,roundTripFlightData.data[0].arrTime, 'minutes') % 60)}}m
+          </view>
+        </view>
       </view>
 
-      <view class="flight_reservation_box" v-if="!flightInfo && flightData.data.length <= 1">
-        {{flightData.data[0].cabin?flightData.data[0].cabin+' | ': ''}}退改签规则 {{flightData.data[0].baggage?' | '+ flightData.data[0].baggage: ''}}
+      <view class="bottom_message" v-if="flightData.data.length <= 1">
+        <image
+          class="bottom_message_icon"
+          v-if="roundTripFlightData.data[0].image"
+          :src="'https://fxxcx.ystrip.cn' + roundTripFlightData.data[0].image"
+          mode="aspectFill"
+        />
+        {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0].flightNumber}}{{roundTripFlightData.data[0].aircraftCode?' | '+ roundTripFlightData.data[0].aircraftCode: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
+      </view>
+
+      <view class="flight_reservation_box" v-if="!flightInfo && flightData.data.length <= 1" @click="openHeadExp()">
+        {{flightData.cabinInfo.cabinDesc? flightData.cabinInfo.cabinCode + flightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
-      <view class="flight_reservation_box" v-if="!flightInfo && flightData.data.length <= 1">
-        {{roundTripFlightData.data[0].cabin?roundTripFlightData.data[0].cabin+' | ': ''}}退改签规则 {{roundTripFlightData.data[0].baggage?' | '+ roundTripFlightData.data[0].baggage: ''}}
+      <view class="flight_reservation_box" v-if="!flightInfo && roundTripFlightData.data.length <= 1" @click="openHeadExp('arr')">
+        {{roundTripFlightData.cabinInfo.cabinDesc? roundTripFlightData.cabinInfo.cabinCode + roundTripFlightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{roundTripFlightData.cabinInfo.baggage?' | '+ roundTripFlightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
 
-      <view class="flight_reservation_box" v-else-if="!flightInfo && flightData.data.length > 1" v-for="(item, index) in flightData.data" :key="index">
-        {{item.cabin?item.cabin+' | ': ''}}退改签规则 {{item.baggage?' | '+ item.baggage: ''}}
+      <view
+        class="flight_reservation_box"
+        v-else-if="!flightInfo && flightData.data.length > 1"
+        v-for="(item, index) in flightData.data"
+        :key="index"
+      >
+        3{{item.cabin?item.cabin+' | ': ''}}退改签规则 {{item.baggage?' | '+ item.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
-
     </view>
+
+    <view
+      @click="flodBtn"
+      :class="['filght_fold',{'unfold': filghtFold}]"
+      v-if="flightData.data.length > 1 || roundTripFlightData.data.length > 1"
+    >{{filghtFold?'收起详情':'展开详情'}}</view>
   </view>
 </template>
 
@@ -175,12 +253,20 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      filghtFold: false, // 往返中转航班折叠状态
+    };
   },
   methods: {
-    openHeadExp() {
+    openHeadExp(val) {
+      // 打开航班详情弹窗
       console.log("打开弹窗");
-      this.$emit("openHeadExpPopup");
+      this.$emit("openHeadExpPopup",val);
+    },
+
+    flodBtn() {
+      // 往返中转折叠航班详情
+      this.filghtFold = !this.filghtFold;
     },
   },
 };
@@ -202,10 +288,10 @@ export default {
     &.found_fight_list {
       .flight_reservation_box {
         border: unset;
-        margin-top: 18rpx;
+        margin-top: 18upx;
         padding-top: 0;
         justify-content: flex-start;
-        padding-left: 6rpx;
+        padding-left: 6upx;
         &::before {
           content: "";
           display: inline-flex;
@@ -274,12 +360,64 @@ export default {
     margin-bottom: 26upx;
     &.transit {
       flex-direction: column;
-      padding-left: 20rpx;
+      padding-left: 20upx;
+      &.fold {
+        position: relative;
+        &::before {
+          content: "";
+          display: block;
+          position: absolute;
+          width: 2upx;
+          left: 118upx;
+          top: 33upx;
+          height: 85upx;
+          border-left: 2upx dashed #f1f3f5;
+        }
+        .flight_message {
+          .fly_message {
+            height: 35upx;
+            .fly_left {
+              .fly_date {
+                display: none;
+              }
+            }
+            .fly_line {
+              background: transparent;
+              &::after {
+                opacity: 0;
+              }
+            }
+          }
+
+          &:last-child {
+            .fly_message {
+              .fly_left {
+                .fly_date {
+                  display: none;
+                }
+                .fly_time:not(:last-child) {
+                  display: none;
+                }
+              }
+              .fly_right {
+                .fly_info {
+                  display: none;
+                }
+                .fly_air:not(:last-child) {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+      }
       .flight_message {
         .fly_message {
           display: flex;
           align-items: center;
           height: 140upx;
+          overflow: hidden;
+          transition: all 0.3s;
         }
         .fly_left {
           display: flex;
@@ -287,6 +425,7 @@ export default {
           height: 100%;
           justify-content: space-between;
           margin-right: 10upx;
+          width: 80rpx;
           .fly_time {
             font-size: 28upx;
             font-weight: bold;
@@ -298,7 +437,7 @@ export default {
             color: #afb9c4;
             display: inline-flex;
             align-items: center;
-            .fly_date_icon{
+            .fly_date_icon {
               width: 16upx;
               height: 16upx;
               margin-right: 4upx;
@@ -310,13 +449,15 @@ export default {
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          width: 2upx;
-          height: calc(100% - 10upx);
+          width: 4upx;
+          height: calc(100% - 12upx);
           background: #d9e1ea;
           margin: 0 10upx;
+          transition: all 0.3s;
           &::before,
           &::after {
-            content: '';
+            content: "";
+            transition: all 0.3s;
             display: flex;
             flex-shrink: 0;
             width: 18upx;
@@ -335,7 +476,7 @@ export default {
             font-size: 28upx;
             font-weight: bold;
             color: #2a2a2a;
-            &:last-child {
+            &.bottom_fly_ait {
               margin-top: auto;
             }
           }
@@ -440,6 +581,31 @@ export default {
       height: 14upx;
       margin-left: 18upx;
       display: inline-flex;
+    }
+  }
+
+  .filght_fold {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24upx;
+    font-weight: 400;
+    color: #afb9c4;
+    margin-top: 20upx;
+    &.unfold {
+      &::after {
+        transform: rotate(180deg);
+      }
+    }
+    &::after {
+      content: "";
+      transition: all 0.3s;
+      display: block;
+      background: url("@/static/unfold.png") no-repeat;
+      background-size: contain;
+      width: 20upx;
+      height: 12upx;
+      margin-left: 10upx;
     }
   }
 }

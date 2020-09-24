@@ -2,7 +2,7 @@
  * @Description: 全局方法
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 18:27:51
- * @LastEditTime: 2020-08-19 10:24:11
+ * @LastEditTime: 2020-09-24 10:36:41
  * @LastEditors: wish.WuJunLong
  */
 import Vue from "vue";

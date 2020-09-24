@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-23 15:26:02
+ * @LastEditTime: 2020-09-24 16:11:51
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -130,6 +130,16 @@
               v-model="orderPassenger.phone"
             />
           </view>
+          <view class="form_item">
+            <view class="form_item_title">邮箱</view>
+            <input
+              class="form_item_input"
+              type="text"
+              placeholder="用于接收订单邮件"
+              placeholder-style="fontSize: 28upx;fontWeight:400;color:rgba(175,185,196,1);"
+              v-model="orderPassenger.email"
+            />
+          </view>
         </view>
       </view>
 
@@ -236,7 +246,11 @@
     </view>
 
     <!-- 航班退改信息 -->
-    <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
+    <flight-explanation
+      ref="flightExplanation"
+      :ruleInfos="ruleInfos"
+      :arrrRuleInfos="arrrRuleInfos"
+    ></flight-explanation>
 
     <!-- 金额明细弹窗 -->
     <uni-popup ref="priceInfoDialog" type="bottom">
@@ -363,6 +377,14 @@ export default {
         },
       },
 
+      arrrRuleInfos: {
+        // 返程退改签信息
+        gauge: {
+          refund: [],
+          change: [],
+        },
+      },
+
       disMessage: {}, // 分销商信息
 
       flightData: {
@@ -413,6 +435,7 @@ export default {
         // 订单联系人信息
         name: "", // 联系人
         phone: "", // 手机号
+        email: "",
       },
       insuranceList: [], // 保险列表
       moreInsurance: 4, // 保险默认显示条数
@@ -568,12 +591,72 @@ export default {
               // 组装航班信息
               flightType: "去程", // 航程类型
               data: segmentMessage,
+              cabinInfo: res.data.depCabinInfo, // 舱位信息
             };
 
             this.flightRoundData = {
               // 组装航班信息
               flightType: "返程", // 航程类型
               data: segmentRoundMessage,
+              cabinInfo: res.data.arrCabinInfo, // 舱位信息
+            };
+
+            // 组装去程航班信息
+            let filghtMessage = {
+              time: moment(segmentMessage[0].depTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ), // 起飞时间
+              code: segmentMessage[0].flightNumber, // 航班号
+              address:
+                segmentMessage[0].depAirport_CN.city_name +
+                " " +
+                segmentMessage[0].depAirport_CN.city_code +
+                " - " +
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN
+                  .city_name +
+                " " +
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN
+                  .city_code, // 行程
+              cabin: res.data.depCabinInfo.cabinDesc, // 舱位
+              price: res.data.depAdtPrice.rulePrice.price, // 票面价
+              baggage: res.data.depCabinInfo.baggage,
+            };
+
+            // 组装去程退改信息
+            let gaugeMessage = res.data.arrCabinInfo;
+
+            this.ruleInfos = {
+              filght: filghtMessage,
+              gauge: gaugeMessage,
+            };
+
+            // 组装返程航班信息
+            let arrFilghtMessage = {
+              time: moment(segmentRoundMessage[0].depTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ), // 起飞时间
+              code: segmentRoundMessage[0].flightNumber, // 航班号
+              address:
+                segmentRoundMessage[0].depAirport_CN.city_name +
+                " " +
+                segmentRoundMessage[0].depAirport_CN.city_code +
+                " - " +
+                segmentRoundMessage[segmentRoundMessage.length - 1]
+                  .arrAirport_CN.city_name +
+                " " +
+                segmentRoundMessage[segmentRoundMessage.length - 1]
+                  .arrAirport_CN.city_code, // 行程
+              cabin: res.data.arrCabinInfo.cabinDesc, // 舱位
+              price: res.data.arrAdtPrice.rulePrice.price, // 票面价
+              baggage: res.data.arrCabinInfo.baggage,
+            };
+
+            // 组装返程退改信息
+            let arrGaugeMessage = res.data.arrCabinInfo;
+
+            this.arrrRuleInfos = {
+              filght: arrFilghtMessage,
+              gauge: arrGaugeMessage,
             };
 
             // 组装分销商数据
@@ -788,8 +871,12 @@ export default {
     },
 
     // 打开航班退改信息弹窗
-    openHeadExpPopup() {
-      this.$refs.flightExplanation.openExp();
+    openHeadExpPopup(val) {
+      if (val === "arr") {
+        this.$refs.flightExplanation.openArrExp();
+      } else {
+        this.$refs.flightExplanation.openExp();
+      }
     },
     // 关闭航班退改信息弹窗
     closePopup() {
@@ -876,6 +963,12 @@ export default {
           icon: "none",
         });
       }
+      if (this.flightData.data.length > 1 && !this.orderPassenger.email) {
+        return uni.showToast({
+          title: "请填写邮箱",
+          icon: "none",
+        });
+      }
       // 处理乘客数据
       let passengerList = JSON.parse(JSON.stringify(this.passengerList));
       let passengerData = [];
@@ -912,13 +1005,52 @@ export default {
       });
       if (this.roundTripType) {
         // 往返
+
+        // 单程下单
+        let passengerName = []; // 乘客姓名
+        let passengerType = []; // 乘客类型
+        let credential = [];
+        let credentialNo = [];
+        let birthday = [];
+        let phone = [];
+        let email = [];
+        let isInsure = [];
+        passengerData.forEach((item) => {
+          passengerName.push(item.PassengerName);
+          passengerType.push(item.PassengerType);
+          credential.push(item.Credential);
+          credentialNo.push(item.CredentialNo);
+          birthday.push(item.Birthday);
+          phone.push(item.Phone);
+          isInsure.push(item.IsInsure);
+        });
+
         let data = {
-          passengers: passengerData, // 乘客数据
-          arr_keys: this.relatedKey, // 去程key
-          dep_keys: this.roundRelatedKey, // 返程key
+          PassengerName: passengerName,
+          PassengerType: passengerType,
+          Credential: credential,
+          CredentialNo: credentialNo,
+          Birthday: birthday,
+          Phone: phone,
+          Email: email,
           insurance_id: this.insuranceActive.id || 0, // 保险id
-          contacts: this.orderPassenger, // 联系人信息
+          name: this.orderPassenger.name,
+          phone: this.orderPassenger.phone,
+          email: this.orderPassenger.email,
+          flight_no: this.flightData.data[0].flightNumber,
+          IsInsure: isInsure,
         };
+
+
+
+        console.log(data)
+        // let data = {
+        //   passengers: passengerData, // 乘客数据
+        //   arr_keys: this.relatedKey, // 去程key
+        //   dep_keys: this.roundRelatedKey, // 返程key
+        //   insurance_id: this.insuranceActive.id || 0, // 保险id
+        //   contacts: this.orderPassenger, // 联系人信息
+        // };
         ticket.createRoundOrder(data).then((res) => {
           console.log(res);
           if (res.errorcode === 10000) {
@@ -961,7 +1093,8 @@ export default {
         let credentialNo = [];
         let birthday = [];
         let phone = [];
-        let isInsure = []
+        let email = [];
+        let isInsure = [];
         passengerData.forEach((item) => {
           passengerName.push(item.PassengerName);
           passengerType.push(item.PassengerType);
@@ -969,7 +1102,7 @@ export default {
           credentialNo.push(item.CredentialNo);
           birthday.push(item.Birthday);
           phone.push(item.Phone);
-          isInsure.push(item.IsInsure)
+          isInsure.push(item.IsInsure);
         });
 
         let data = {
@@ -979,12 +1112,13 @@ export default {
           CredentialNo: credentialNo,
           Birthday: birthday,
           Phone: phone,
+          Email: email,
           insurance_id: this.insuranceActive.id || 0, // 保险id
           name: this.orderPassenger.name,
           phone: this.orderPassenger.phone,
-          email: "",
+          email: this.orderPassenger.email,
           flight_no: this.flightData.data[0].flightNumber,
-          IsInsure: isInsure
+          IsInsure: isInsure,
         };
         console.log(this.relatedKey, JSON.stringify(data));
         ticket.createOrder(this.relatedKey, data).then((res) => {
@@ -1306,6 +1440,7 @@ export default {
           font-weight: 400;
           color: rgba(42, 42, 42, 1);
           margin-right: 30upx;
+          width: 85upx;
         }
 
         .phone_numbering {
