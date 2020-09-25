@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-25 17:17:49
+ * @LastEditTime: 2020-09-25 17:49:11
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -33,10 +33,10 @@
 
         <view class="order_price" v-if="JSON.stringify(orderDetails) !== '{}'">
           <text class="price_text">总价&yen;</text>
-          <text>{{ orderDetails.ticket_price || "" }}</text>
+          <text>{{ orderDetails.total_price || "" }}</text>
         </view>
 
-        <view v-else>
+        <view class="price_other"   v-else>
           数据获取中
         </view>
         
@@ -121,6 +121,7 @@
           :roundTripFlightData="roundTripFlightData"
           :roundTripType="roundTripType"
           :interType="false"
+          @openHeadExpPopup="openHeadExpPopup"
         ></flight-header>
 
 
@@ -238,19 +239,7 @@
         ></flight-explanation>
       </view>
     </scroll-view>
-
-    <!-- 骨架屏 -->
-    <view
-      class="flight_skeleton"
-      v-for="i in orderDetails.length < 1 ? skeletonNumber : 0"
-      :key="i"
-    >
-      <view class="top">
-        <text></text>
-        <text></text>
-      </view>
-      <text></text>
-    </view>
+    
     <!-- 取消订单弹窗 -->
     <yun-config
       ref="yunConfig"
@@ -415,6 +404,20 @@ export default {
       this.$refs.flightExplanation.closeExp();
     },
 
+    // 打开航班退改信息弹窗
+    openHeadExpPopup(val) {
+      if (val === "arr") {
+        this.$refs.flightExplanation.openArrExp();
+      } else {
+        this.$refs.flightExplanation.openExp();
+      }
+    },
+
+    // 关闭航班退改信息弹窗
+    closePopup() {
+      this.$refs.flightExplanation.closeExp();
+    },
+
     // 获取订单详情
     getOrderDetails() {
       console.log("国内订单详情", this.orderListType);
@@ -527,6 +530,9 @@ export default {
           margin-right: 6upx;
           margin-top: 10upx;
         }
+      }
+      .price_other {
+        color: #ffffff;
       }
     }
     .remaining_time {

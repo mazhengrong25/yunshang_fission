@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-25 16:23:03
+ * @LastEditTime: 2020-09-25 18:31:55
  * @LastEditors: mazhengrong
 --> 
 <template>
@@ -197,7 +197,11 @@
       </view>
 
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp()">
-        {{flightData.cabinInfo.cabinDesc? flightData.cabinInfo.cabinCode + flightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
+        {{flightData.cabinInfo[interType?(cabinDesc):
+        (cabin_level ===  "FIRST"?"头等舱":
+        cabin_level === "BUSINESS"?"公务舱":
+        cabin_level === "ECONOMY"?"经济舱":"")]? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
+        flightData.cabinInfo[interType?'cabinDesc':'cabin_level']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp('arr')">
