@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-25 16:59:44
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-25 18:24:31
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_list">
@@ -18,7 +18,8 @@
         v-for="(item, index) in headerList"
         :key="index"
         @click="checkedHeaderActive(index)"
-        >{{ item }}</view>
+        >{{ item }}</view
+      >
     </view>
 
     <view class="order_filter">
@@ -66,21 +67,24 @@
             ? "往返机票"
             : ""
         }}</view>
-        <view
-          @click.stop="jumpOrderDetails(item)"
-          class="list_item"
-        >
+        <view @click.stop="jumpOrderDetails(item)" class="list_item">
           <view class="item_header">
             <view class="item_title">
-              <view class="title">{{ item.ticket_segments[0].departure_msg.city_name}} - {{ item.ticket_segments[item.ticket_segments.length - 1].arrive_msg.city_name }}</view>
+              <view class="title"
+                >{{ item.ticket_segments[0].departure_msg.city_name }} -
+                {{
+                  item.ticket_segments[item.ticket_segments.length - 1]
+                    .arrive_msg.city_name
+                }}</view
+              >
             </view>
             <view class="item_price">
               <text>&yen;</text>
-              {{ item.ticket_price || "金额错误" }}
+              {{ item.total_price || "金额错误" }}
             </view>
             <view class="info_right" v-if="item.segment_type !== 1">
               {{
-                 item.status !== 0 && item.status !== 5 && item.pay_status === 1
+                item.status !== 0 && item.status !== 5 && item.pay_status === 1
                   ? "已预订"
                   : item.status === 1
                   ? "待出票"
@@ -95,9 +99,15 @@
           <view class="item_info">
             <view class="info_left">
               <text>{{ item.ticket_segments[0].flight_no }}</text>
-              <text>{{ $dateTool(item.ticket_segments[0].departure_time, "MM月DD日") }}</text>
+              <text>{{
+                $dateTool(item.ticket_segments[0].departure_time, "MM月DD日")
+              }}</text>
               <!-- HH:mm 24制   hh:mm 12制 -->
-              <text>{{ $dateTool(item.ticket_segments[0].departure_time, "HH:mm") }}起飞</text> 
+              <text
+                >{{
+                  $dateTool(item.ticket_segments[0].departure_time, "HH:mm")
+                }}起飞</text
+              >
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
@@ -114,7 +124,17 @@
             </view>
           </view>
 
-          <view class="item_time" v-if="item.pay_status === 1">
+          <view
+            class="item_time"
+            v-if="
+              item.pay_status === 1 &&
+              $timeDiff(
+                new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
+            "
+          >
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
@@ -130,8 +150,20 @@
             >
           </view>
 
-          <view class="item_btn_box" v-if="item.pay_status === 1">
-            <view class="item_btn close_btn" @click.stop="removeOrder(item)">取消订单</view>
+          <view
+            class="item_btn_box"
+            v-if="
+              item.pay_status === 1 &&
+              $timeDiff(
+                new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
+            "
+          >
+            <view class="item_btn close_btn" @click.stop="removeOrder(item)"
+              >取消订单</view
+            >
             <view class="item_btn submit_btn">去支付</view>
           </view>
         </view>
@@ -235,7 +267,11 @@
             </view>
           </view>
 
-          <view class="item_time" v-if="item.pay_status === 1">
+          <view class="item_time" v-if="item.pay_status === 1 && $timeDiff(
+                  new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                  new Date(),
+                  'minutes'
+                ) > 0">
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
@@ -251,7 +287,11 @@
             >
           </view>
 
-          <view class="item_btn_box" v-if="item.pay_status === 1">
+          <view class="item_btn_box" v-if="item.pay_status === 1 && $timeDiff(
+                  new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                  new Date(),
+                  'minutes'
+                ) > 0">
             <view class="item_btn close_btn">取消订单</view>
             <view class="item_btn submit_btn">去支付</view>
           </view>
@@ -294,42 +334,34 @@ export default {
     };
   },
   methods: {
-   
     checkedHeaderActive(index) {
       this.headerActive = index;
       this.orderPageNumber = 1;
-      this.orderList = [];  //国外
-      this.innerList = [];  //国内
-      if(JSON.stringify(this.orderListFilter) !== '{}'){
+      this.orderList = []; //国外
+      this.innerList = []; //国内
+      if (JSON.stringify(this.orderListFilter) !== "{}") {
         this.getOrderList();
       }
     },
 
     // 取消订单
-    removeOrder(data){
-      console.log(data.order_no)
-      console.log('取消订单')
-      // let newData = {
-      //   order_no: data.order_no
-      // }
-      // orderApi.cancleInterRefund(newData)
-      //   .then(res =>{
-      //     console.log(res)
-      //   })
-      let orderNo = data.order_no
+    removeOrder(data) {
       uni.navigateTo({
-          url: "/pages/order/orderinterDetails?orderNo="+orderNo + "&cancel=cancel",
+        url:
+          "/pages/order/orderinterDetails?orderNo=" +
+          data.order_no +
+          "&cancel=cancel",
       });
     },
 
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/pages/order/filter?type="+type,
+        url: "/pages/order/filter?type=" + type,
       });
-      this.orderList = []
-      this.innerList = []  
-      this.getOrderList()  
+      this.orderList = [];
+      this.innerList = [];
+      this.getOrderList();
     },
     //获取国内外列表
     getOrderList() {
@@ -353,7 +385,7 @@ export default {
             } else {
               this.orderList = res.data.data;
             }
-            if(this.orderList.length <1) {
+            if (this.orderList.length < 1) {
               this.showDefault = true;
             }
             if (this.orderPageNumber >= res.data.last_page) {
@@ -367,33 +399,35 @@ export default {
         // 国内
         let data = {
           page: this.orderPageNumber,
-          created_at: moment()
-            .subtract(3, "days")
-            .format("YYYY-MM-DD"),
+          created_at: moment().subtract(3, "days").format("YYYY-MM-DD"),
         };
         orderApi.orderList(data).then((res) => {
           console.log(res);
           if (res.result === 10000) {
-             this.showDefault = false;
+            this.showDefault = false;
             if (this.innerList.length > 0) {
               this.innerList.push.apply(this.innerList, res.data.data);
             } else {
               this.innerList = res.data.data;
             }
-            this.innerList.forEach(item =>{ //剩余支付时间
-              item.status = this.$timeDiff(
+            this.innerList.forEach((item) => {
+              //剩余支付时间
+              item.status =
+                this.$timeDiff(
                   new Date(item.created_at).getTime() + 30 * 60 * 1000,
                   new Date(),
                   "minutes"
-                ) > 0? item.status: 5
-            })
+                ) > 0
+                  ? item.status
+                  : 5;
+            });
             if (this.headerActive !== 0 && this.headerActive !== 1) {
               let activeIndex =
                 this.headerActive === 2
                   ? 1 // 待出票
                   : this.headerActive === 3
                   ? 3 // 已出票
-                  : this.headerActive === 4 
+                  : this.headerActive === 4
                   ? 5
                   : 0; // 已取消
               this.innerList = this.innerList.filter(
@@ -406,31 +440,31 @@ export default {
                 (item) =>
                   item.status !== 0 &&
                   item.status !== 5 &&
-                  item.pay_status === 1 
-              )
+                  item.pay_status === 1
+              );
             }
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
             this.showDefault = this.innerList.length < 1;
-            console.log('缺省状态',this.showDefault,this.innerList)
+            console.log("缺省状态", this.showDefault, this.innerList);
           } else {
             this.showDefault = true;
           }
         });
-      } 
+      }
     },
     // 下一页数据
     nextPageData() {
       if (this.orderPageStatus) {
         this.orderPageNumber = this.orderPageNumber + 1;
         this.getOrderList();
-      } 
+      }
     },
 
     // 跳转订单详情
     jumpOrderDetails(data) {
-      console.log("详情",data)
+      console.log("详情", data);
       if (this.orderListType === "3") {
         uni.navigateTo({
           url:
@@ -451,31 +485,28 @@ export default {
       }
     },
 
-     // 起飞时间排序
+    // 起飞时间排序
     departSort(d) {
-
-        return (m, n) => {
+      return (m, n) => {
         var a = new Date(m.ticket_segments[0][d]).getTime();
         var b = new Date(n.ticket_segments[0][d]).getTime();
-        return a -b;   
+        return a - b;
       };
-   
     },
 
     // 预定时间排序
     createSort(t) {
-        
-        return (m, n) => {
+      return (m, n) => {
         var a = new Date(m[t]).getTime();
         var b = new Date(n[t]).getTime();
-        return a - b;   
+        return a - b;
       };
     },
 
     //时间排序
     sorTime(val) {
-      console.log(val)
-  
+      console.log(val);
+
       if (val === "create") {
         this.innerList.sort(this.createSort("created_at"));
       } else if (val === "depart") {
@@ -500,8 +531,8 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.orderListType = data.type;
-    console.log(this.orderListType)
-    console.log(data)
+    console.log(this.orderListType);
+    console.log(data);
     this.orderHeaderTitle =
       this.orderListType === "0"
         ? "国内订单"
@@ -519,68 +550,91 @@ export default {
     console.log("orderHeaderTitle", this.orderHeaderTitle);
     this.getOrderList();
   },
-  onShow(){
-    this.orderListFilter = uni.getStorageSync('orderListFilter')
-    if(this.orderListFilter){
-      this.orderListFilter = JSON.parse(this.orderListFilter)
+  onShow() {
+    this.orderListFilter = uni.getStorageSync("orderListFilter");
+    if (this.orderListFilter) {
+      this.orderListFilter = JSON.parse(this.orderListFilter);
       //pnr筛选
-      if(this.orderListFilter.pnr){ 
-        this.innerList = this.innerList.filter(item =>item.pnr_code === this.orderListFilter.pnr)
+      if (this.orderListFilter.pnr) {
+        this.innerList = this.innerList.filter(
+          (item) => item.pnr_code === this.orderListFilter.pnr
+        );
       }
       //订单编号筛选
-      if(this.orderListFilter.orderNumber){ 
-        this.innerList = this.innerList.filter(item =>item.order_no === this.orderListFilter.orderNumber)
+      if (this.orderListFilter.orderNumber) {
+        this.innerList = this.innerList.filter(
+          (item) => item.order_no === this.orderListFilter.orderNumber
+        );
       }
 
       //航班号筛选
-      if(this.orderListFilter.flightNumber){
-        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].flight_no === this.orderListFilter.flightNumber)
+      if (this.orderListFilter.flightNumber) {
+        this.innerList = this.innerList.filter(
+          (item) =>
+            item.ticket_segments[0].flight_no ===
+            this.orderListFilter.flightNumber
+        );
       }
 
       //订票员  选择框
-      if(this.orderListFilter.booker){
-        this.innerList = this.innerList.filter(item =>item.book_user === this.created_at.booker)
+      if (this.orderListFilter.booker) {
+        this.innerList = this.innerList.filter(
+          (item) => item.book_user === this.created_at.booker
+        );
       }
 
-      //出发城市筛选  
-      if(this.orderListFilter.Citystart){
-        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].departure_msg.city_name === this.orderListFilter.Citystart)
+      //出发城市筛选
+      if (this.orderListFilter.Citystart) {
+        this.innerList = this.innerList.filter(
+          (item) =>
+            item.ticket_segments[0].departure_msg.city_name ===
+            this.orderListFilter.Citystart
+        );
       }
 
-      //到达城市筛选  
-      if(this.orderListFilter.Cityend){
-        this.innerList = this.innerList.filter(item =>item.ticket_segments[0].arrive_msg.city_name === this.orderListFilter.Cityend)
+      //到达城市筛选
+      if (this.orderListFilter.Cityend) {
+        this.innerList = this.innerList.filter(
+          (item) =>
+            item.ticket_segments[0].arrive_msg.city_name ===
+            this.orderListFilter.Cityend
+        );
       }
 
       //日始时间筛选
-      if(this.orderListFilter.Timestart){
-        this.innerList = this.innerList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timestart)
+      if (this.orderListFilter.Timestart) {
+        this.innerList = this.innerList.filter(
+          (item) =>
+            moment(item.ticket_segments[0].departure_time).format(
+              "YYYY-MM-DD"
+            ) === this.orderListFilter.Timestart
+        );
       }
 
-       //日止时间筛选
-      if(this.orderListFilter.Timend){
-        this.innerList = this.innerList.filter(item => moment(item.ticket_segments[0].departure_time).format("YYYY-MM-DD") === this.orderListFilter.Timend)
+      //日止时间筛选
+      if (this.orderListFilter.Timend) {
+        this.innerList = this.innerList.filter(
+          (item) =>
+            moment(item.ticket_segments[0].departure_time).format(
+              "YYYY-MM-DD"
+            ) === this.orderListFilter.Timend
+        );
       }
-    
+
       //日期条件排序
-      if(this.orderListFilter.date !== null){
-
-        this.sorTime(this.orderListFilter.date)
+      if (this.orderListFilter.date !== null) {
+        this.sorTime(this.orderListFilter.date);
       }
-      
+
       //订单状态筛选
-      if(this.orderListFilter.status !== null){
-
-        this.checkedHeaderActive(this.orderListFilter.status)
+      if (this.orderListFilter.status !== null) {
+        this.checkedHeaderActive(this.orderListFilter.status);
       }
 
+      console.log("订单列表筛选", this.innerList);
 
-      console.log('订单列表筛选',this.innerList)
-
-
-      uni.removeStorageSync('orderListFilter')
+      uni.removeStorageSync("orderListFilter");
     }
-
   },
 };
 </script>
