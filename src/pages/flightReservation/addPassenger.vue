@@ -2,13 +2,8 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-17 15:57:33
+ * @LastEditTime: 2020-09-25 09:25:03
  * @LastEditors: wish.WuJunLong
-=======
- * @LastEditTime: 2020-09-10 13:41:13
- * @LastEditors: mazhengrong
->>>>>>> 042a95ee030962ef0ea936ddc4ba9233514944c3
 --> 
 <template>
   <view class="add_passenger">
@@ -472,6 +467,7 @@ export default {
         });
       }
       this.$refs.returnSubmitDialog.open();
+      this.$forceUpdate()
     },
 
     // 二次确认信息取消

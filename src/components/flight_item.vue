@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-09-15 10:42:45
+ * @LastEditTime: 2020-09-25 11:09:17
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -11,7 +11,7 @@
       <view class="box_header_left">
         <view class="left_prcie">
           <text class="unit" v-if="!isNaN(flightData.data.cabinPrices.ADT.rulePrice.price)">&yen;</text>
-          <text v-if="flightData.data.cabinPrices.ADT.rulePrice.price !== 0">{{flightData.data.cabinPrices.ADT.rulePrice.price}}</text>
+          <text v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0">{{flightData.data.cabinPrices.ADT.rulePrice.price}}</text>
           <text class="not_price" v-else>待获取</text>
           <!-- <view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view> -->
         </view>
@@ -19,7 +19,7 @@
       </view>
       <view class="box_header_right">
         <button
-          v-if="flightData.data.cabinPrices.ADT.rulePrice.price !== 0"
+          v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0"
           :disabled="flightData.active || flightData.data.cabinPrices.ADT.rulePrice.price === '无运价'"
           :class="['header_right_btn',{active: flightData.active || flightData.data.cabinPrices.ADT.rulePrice.price === '无运价'}]"
           @click="jumpReservation"

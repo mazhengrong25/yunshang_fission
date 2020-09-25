@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-24 12:01:16
+ * @LastEditTime: 2020-09-25 14:20:53
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -326,7 +326,7 @@ export default {
           this.file_key = res.data.IBE.file_key;
           this.flightList = res.data.IBE.list;
           // this.flightList = uni.getStorageSync("flightList");
-          // this.oldFlightList = JSON.parse(JSON.stringify(this.flightList));
+          this.oldFlightList = JSON.parse(JSON.stringify(this.flightList));
           this.price += this.flightList[this.toActive].min_price;
           this.dataListApplyType = true;
 
@@ -367,9 +367,9 @@ export default {
           this.roundFlightKey = res.data.IBE.file_key;
           this.roundFlightList = res.data.IBE.list;
           // this.roundFlightList = uni.getStorageSync("roundFlightList");
-          // this.oldRoundFlightList = JSON.parse(
-          //   JSON.stringify(this.roundFlightList)
-          // );
+          this.oldRoundFlightList = JSON.parse(
+            JSON.stringify(this.roundFlightList)
+          );
 
           this.price += this.roundFlightList[this.fromActive].min_price;
           this.dataRoundListApplyType = true;
@@ -483,6 +483,7 @@ export default {
     // 确认筛选
     ticketFilter(val, status) {
       console.log(val, status);
+      console.log(this.flightList,this.roundFlightList)
       if (!status && val.length < 1) {
         this.flightList = this.oldFlightList;
         this.roundFlightList = this.oldRoundFlightList;
@@ -506,6 +507,7 @@ export default {
           this.roundFlightList = this.oldRoundFlightList;
         }
         if (val[0].indexOf("上午") !== -1) {
+          console.log('上午')
           this.flightList = this.flightList.filter(
             (item) =>
               new Date(item.segments[0].depTime).getHours() >= 0 &&
