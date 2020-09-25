@@ -2,21 +2,28 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-24 16:37:35
+ * @LastEditTime: 2020-09-25 09:58:46
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_pay">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="确认支付"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      centerTitle="确认支付"
+    ></yun-header>
     <view class="order_price">
       <text>订单总价</text>
       <view>
         <text>&yen;</text>
-        {{price}}
+        {{ price }}
       </view>
     </view>
 
-    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="order_pay_main">
+    <scroll-view
+      :enable-back-to-top="true"
+      :scroll-y="true"
+      class="order_pay_main"
+    >
       <flight-header
         :flightData="flightData"
         :roundTripType="orderType"
@@ -24,11 +31,21 @@
       ></flight-header>
 
       <view class="order_message box-shadow-style">
-        <view class="message_list" v-for="(item, index) in payOrder" :key="index">
-          <view
-            class="list_title"
-          >{{payOrder.length> 1 && index === 0? '成人': payOrder.length> 1 && index === 1?'儿童':''}}订单编号</view>
-          <view class="list_text">{{item}}</view>
+        <view
+          class="message_list"
+          v-for="(item, index) in payOrder"
+          :key="index"
+        >
+          <view class="list_title"
+            >{{
+              payOrder.length > 1 && index === 0
+                ? "成人"
+                : payOrder.length > 1 && index === 1
+                ? "儿童"
+                : ""
+            }}订单编号</view
+          >
+          <view class="list_text">{{ item }}</view>
         </view>
         <view class="message_list">
           <view class="list_title">收款方</view>
@@ -58,20 +75,26 @@
     <view class="pay_bottom">
       <view class="bottom_tip">
         您的订单已提交，剩余支付时间
-        <text>{{remainingTime}}</text>
+        <text>{{ remainingTime }}</text>
       </view>
-      <view :class="['bottom_submit',{is_two_pay: payOrder.length> 1}]">
+      <view :class="['bottom_submit', { is_two_pay: payOrder.length > 1 }]">
         <button
-          :class="['submit_pay',{is_disabled: !payPayStatus}]"
+          :class="['submit_pay', { is_disabled: !payPayStatus }]"
           :disabled="!payPayStatus"
           @click="jumpPay()"
-        >{{payOrder.length> 1? '成人支付 &yen;' + priceList[0] :'立即支付'}}</button>
+        >
+          {{
+            payOrder.length > 1 ? "成人支付 &yen;" + priceList[0] : "立即支付"
+          }}
+        </button>
         <button
-          v-if="payOrder.length> 1"
-          :class="['submit_pay child_pay',{is_disabled: childPayStatus}]"
+          v-if="payOrder.length > 1"
+          :class="['submit_pay child_pay', { is_disabled: childPayStatus }]"
           :disabled="childPayStatus"
           @click="jumpPay('儿童')"
-        >儿童支付 &yen;{{priceList[1]}}</button>
+        >
+          儿童支付 &yen;{{ priceList[1] }}
+        </button>
       </view>
     </view>
   </view>
@@ -144,7 +167,7 @@ export default {
   methods: {
     // 获取订单详情
     getOrderDetails() {
-      // this.payOrder = ["5000202008251120342122657000000006"];
+      // this.payOrder = ["5000202009250937182148367000002198"];
       let base64Data = uni.arrayBufferToBase64(new Buffer(this.payOrder[0]));
       ticket
         .getPayInfo(base64Data)
@@ -166,10 +189,13 @@ export default {
               this.orderCountdown();
             }, 1000);
           } else {
+             this.payBtnStatus = false;
+              this.payPayStatus = false;
             uni.showToast({
               title: res.data,
               icon: "none",
               mask: true,
+              duration: 4000
             });
             setTimeout(() => {
               uni.navigateBack();
@@ -278,9 +304,16 @@ export default {
                 });
               }
             } else {
+              if (payType === 1) {
+                this.childPayStatus = false;
+              } else {
+                this.payPayStatus = false;
+                this.payBtnStatus = false;
+              }
               uni.showToast({
                 title: res.data,
                 icon: "none",
+                duration: 4000
               });
             }
           });

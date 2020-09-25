@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-24 17:23:40
+ * @LastEditTime: 2020-09-25 10:03:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -329,11 +329,11 @@
             <view class="list_title">保险</view>
             <view class="list_message" v-if="!roundTripType">
               <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice:0}}</text>
-              <text>×{{passengerNumber.ins?passengerNumber.ins:0}}人</text>
+              <text>×{{passengerNumber.ins?passengerNumber.ins:0}}份</text>
             </view>
             <view class="list_message" v-else>
               <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice * 2:0}}</text>
-              <text>×{{passengerNumber.ins?passengerNumber.ins * 2:0}}人</text>
+              <text>×{{passengerNumber.ins?passengerNumber.ins * 2:0}}份</text>
             </view>
           </view>
         </view>
@@ -515,7 +515,7 @@ export default {
 
           this.orderPassenger = {
             name: res.data.dis_msg.contact,
-            phone: String(res.data.dis_msg.phone),
+            phone: res.data.dis_msg.phone[0],
           };
 
           // 组装分销商数据
@@ -584,7 +584,7 @@ export default {
             // 组装联系人信息
             this.orderPassenger = {
               name: res.data.dis_msg.contact,
-              phone: String(res.data.dis_msg.phone),
+              phone: res.data.dis_msg.phone[0],
             };
 
             this.flightData = {
@@ -962,6 +962,14 @@ export default {
               : "请完善下单信息",
           icon: "none",
         });
+      }
+      if(this.orderPassenger.email){
+        if(!this.$isEmail(this.orderPassenger.email)){
+          return uni.showToast({
+          title: "邮箱格式不正确",
+          icon: "none",
+        });
+        }
       }
       if (this.flightData.data.length > 1 && !this.orderPassenger.email) {
         return uni.showToast({
