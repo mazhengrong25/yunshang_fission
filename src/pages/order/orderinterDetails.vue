@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-24 18:29:23
+ * @LastEditTime: 2020-09-25 17:17:49
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -31,10 +31,15 @@
           }}
         </view>
 
-        <view class="order_price">
+        <view class="order_price" v-if="JSON.stringify(orderDetails) !== '{}'">
           <text class="price_text">总价&yen;</text>
-          <text>{{ orderDetails.ticket_price || "金额数据错误" }}</text>
+          <text>{{ orderDetails.ticket_price || "" }}</text>
         </view>
+
+        <view v-else>
+          数据获取中
+        </view>
+        
       </view>
       <!-- 剩余时间  已预订 -->
       <view
@@ -103,15 +108,27 @@
       </view>
     </view>
 
-    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="details_main"> 
+    <scroll-view
+      :enable-back-to-top="true"
+      :scroll-y="true"
+      class="details_main"
+    >
       <view class="content">
-
+        
         <flight-header
-        :flightData="flightData"
-        :roundTripFlightData="roundTripFlightData"
-        :roundTripType="roundTripType"
-        :flightType="false"
+          v-if="JSON.stringify(orderDetails) !== '{}'"
+          :flightData="flightData"
+          :roundTripFlightData="roundTripFlightData"
+          :roundTripType="roundTripType"
+          :interType="false"
         ></flight-header>
+
+
+        <view v-else class="not_flight_data">
+          <text></text>
+          <text></text>
+          <view></view>
+        </view>
 
         <!-- 出行信息 -->
         <view class="main_list passenger">
@@ -134,9 +151,12 @@
                       : ""
                   }}票</view
                 >
-                <view class="info_name">{{ item.PassengerName || '' }}</view>
-                <view class="is_insurance" v-if="Number(item.insurance_total) > 0">
-                    <image src="@/static/insurance_icon.png" mode="contain" />
+                <view class="info_name">{{ item.PassengerName || "" }}</view>
+                <view
+                  class="is_insurance"
+                  v-if="Number(item.insurance_total) > 0"
+                >
+                  <image src="@/static/insurance_icon.png" mode="contain" />
                 </view>
                 <view class="group_type">员工</view>
               </view>
@@ -165,7 +185,6 @@
             </view>
           </view>
 
-        
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
@@ -178,7 +197,7 @@
             <view class="contact_list">
               <view class="list_title">已购保险</view>
               <view class="list_message"
-                >{{ orderDetails.insurance_total }}元</view
+                >{{ orderDetails.insurance_total?orderDetails.insurance_total + '元': '' }}</view
               >
             </view>
           </view>
@@ -213,13 +232,19 @@
         </view>
 
         <!-- 退改信息弹窗 -->
-        <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
-
+        <flight-explanation
+          ref="flightExplanation"
+          :ruleInfos="ruleInfos"
+        ></flight-explanation>
       </view>
     </scroll-view>
 
-     <!-- 骨架屏 -->
-    <view class="flight_skeleton" v-for="i in orderDetails.length < 1? skeletonNumber :0" :key="i">
+    <!-- 骨架屏 -->
+    <view
+      class="flight_skeleton"
+      v-for="i in orderDetails.length < 1 ? skeletonNumber : 0"
+      :key="i"
+    >
       <view class="top">
         <text></text>
         <text></text>
@@ -243,32 +268,29 @@ import moment from "../../moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
 
-
 moment.locale("zh-cn");
 export default {
   components: {
-    
     flightExplanation,
-    flightHeader
-   
+    flightHeader,
   },
   data() {
     return {
       iStatusBarHeight: 0,
-      orderDetails: [], // 订单详情
-      // flightData: {}, // 航班信息
+      orderDetails: {}, // 订单详情
       orderListType: "", // 订单列表页 类型
 
       orderId: "", // 订单号
 
-      cancelOrder:"", //取消订单
+      cancelOrder: "", //取消订单
 
-      ruleInfos: { // 退改签信息
-          gauge: {
-            refund: [],
-            change: []
-          }
-      }, 
+      ruleInfos: {
+        // 退改签信息
+        gauge: {
+          refund: [],
+          change: [],
+        },
+      },
 
       skeletonNumber: 1, // 骨架屏数量
       roundTripType: false, // 是否往返
@@ -276,21 +298,23 @@ export default {
       flightData: {
         // 航班头部信息
         flightType: "", // 航程类型
-        data: [{// 航班数据
-                depTime: '', 
-                depAirport_CN: '',
-                arrTerminal: '', 
-                depTerminal:'', 
-                duration: '', 
-                arrTime: '',
-                airline_CN: '', 
-                flightNumber: '',
-                aircraftCode: '', 
-                hasMeal: '', 
-                // 国内订单
-                // departure_time
-
-        }], 
+        data: [
+          {
+            // 航班数据
+            depTime: "",
+            depAirport_CN: "",
+            arrTerminal: "",
+            depTerminal: "",
+            duration: "",
+            arrTime: "",
+            airline_CN: "",
+            flightNumber: "",
+            aircraftCode: "",
+            hasMeal: "",
+            // 国内订单
+            // departure_time
+          },
+        ],
       },
 
       roundTripFlightData: {
@@ -306,11 +330,14 @@ export default {
         model: "", // 机型
         food: "", // 餐饮
       },
+
+      cancelType: false, // 取消订单状态
     };
   },
   methods: {
     // 已预订 取消订单弹窗
     getCancel() {
+     
       this.$refs.yunConfig.openConfigPopup();
     },
 
@@ -333,15 +360,14 @@ export default {
       });
     },
 
-     // 组装退改信息
+    // 组装退改信息
     getGaugeInfo() {
-     
-     console.log(this.orderDetails.ticket_segments[0].cabin_level)
+      console.log(this.orderDetails.ticket_segments[0].cabin_level);
       // 组装航班数据
       let filghtMessage = {
-        time: moment(this.orderDetails.ticket_segments[0].departure_time).format(
-          "YYYY-MM-DD HH:mm:ss"
-        ), // 起飞时间
+        time: moment(
+          this.orderDetails.ticket_segments[0].departure_time
+        ).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
         code: this.orderDetails.ticket_segments[0].flight_no, // 航班号
         address:
           this.orderDetails.ticket_segments[0].departure_CN.city_name +
@@ -351,27 +377,35 @@ export default {
           this.orderDetails.ticket_segments[0].arrive_CN.city_name +
           " " +
           this.orderDetails.ticket_segments[0].arrive_CN.city_code, // 行程
-        cabin: this.orderDetails.ticket_segments[0].cabin + (this.orderDetails.ticket_segments[0].cabin_level === 'ECONOMY'?'经济舱'
-        :this.orderDetails.ticket_segments[0].cabin_level === 'FIRST'?'头等舱'
-        :this.orderDetails.ticket_segments[0].cabin_level === 'BUSINESS'?'公务舱':""), // 舱位
+        cabin:
+          this.orderDetails.ticket_segments[0].cabin +
+          (this.orderDetails.ticket_segments[0].cabin_level === "ECONOMY"
+            ? "经济舱"
+            : this.orderDetails.ticket_segments[0].cabin_level === "FIRST"
+            ? "头等舱"
+            : this.orderDetails.ticket_segments[0].cabin_level === "BUSINESS"
+            ? "公务舱"
+            : ""), // 舱位
         price: this.orderDetails.ticket_price, // 票面价
         // baggage: data.baggage, 行李额
       };
 
       // 组装退改信息
-      let gaugeMessage = this.orderDetails.ticket_segments[0].gaugeType.gauge_type_value;
-      console.log("数据",gaugeMessage)
+      let gaugeMessage = this.orderDetails.ticket_segments[0].gaugeType
+        .gauge_type_value;
+      console.log("数据", gaugeMessage);
 
       this.ruleInfos = {
         filght: filghtMessage,
         gauge: gaugeMessage,
       };
-      this.ruleInfos.gauge['back_msg'] = this.orderDetails.ticket_segments[0].gaugeType.back_msg
+      this.ruleInfos.gauge[
+        "back_msg"
+      ] = this.orderDetails.ticket_segments[0].gaugeType.back_msg;
     },
 
     // 打开退改签说明弹窗
     openExp() {
-      
       this.getGaugeInfo();
       this.$refs.flightExplanation.openExp();
     },
@@ -383,17 +417,26 @@ export default {
 
     // 获取订单详情
     getOrderDetails() {
-      console.log("国内订单详情",  this.orderListType);
+      console.log("国内订单详情", this.orderListType);
       let data = {
         order_no: this.orderId,
       };
 
       orderApi.orderDetails(data).then((res) => {
         if (res.result === 10000) {
-         
           this.orderDetails = res.data.order_msg;
-          if(this.orderDetails.length < 1){
-            this.skeletonNumber = 0
+          if (JSON.stringify(this.orderDetails) === "{}") {
+            this.skeletonNumber = 0;
+          }
+          // 组装航程信息
+          this.flightData = {
+            flightType: "单程", // 航程类型
+            data: this.orderDetails.ticket_segments, // 原始数据
+          };
+
+
+          if(this.cancelType){
+            this.getCancel()
           }
         } else {
           uni.showToast({
@@ -406,21 +449,23 @@ export default {
 
     // 跳转退票
     getRefund(data) {
-      console.log("退票",this.orderDetails)
+      console.log("退票", this.orderDetails);
       uni.navigateTo({
-        url: "/pages/order/refund?refundData=" + JSON.stringify(this.orderDetails),
-    
+        url:
+          "/pages/order/refund?refundData=" + JSON.stringify(this.orderDetails),
       });
     },
 
     onLoad(data) {
-      console.log('国内',data)
+      console.log("国内", data);
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-      let listData = JSON.parse(data.listData);
-      this.orderId = listData.order_no;
-      console.log(listData);
+      this.orderId = data.orderNo;
+      console.log(this.orderId);
+
+      this.cancelType = data.cancel?data.cancel:false
+      console.log('取消订单',this.cancelType,data.cancel)
+      
       this.orderListType = data.type;
-      this.cancelOrder = data.cancel;
       this.orderHeaderTitle =
         this.orderListType === "0"
           ? "国内订单"
@@ -436,12 +481,6 @@ export default {
           ? "国际改签订单"
           : "";
       this.getOrderDetails();
-
-      // 组装航程信息
-      this.flightData = {
-      flightType: "单程", // 航程类型
-      data: this.listData, // 原始数据
-    };
     },
   },
 };
@@ -526,11 +565,12 @@ export default {
           border-color: #fff;
           background: #fff;
           color: rgba(0, 112, 226, 1);
-        } 
+        }
       }
     }
   }
-  .details_main {//兼容问题
+  .details_main {
+    //兼容问题
     position: relative;
     flex: 1;
     height: 100%;
@@ -726,16 +766,15 @@ export default {
                   margin-right: 8upx;
                 }
                 .is_insurance {
-                  
-                    width: 30upx;
-                    height: 30upx;
-                    margin-right: 8upx;
-                    display: flex;
-                    image {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }
+                  width: 30upx;
+                  height: 30upx;
+                  margin-right: 8upx;
+                  display: flex;
+                  image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                  }
                 }
                 .group_type {
                   margin-left: 28upx;
@@ -828,6 +867,52 @@ export default {
           }
         }
       }
+      .not_flight_data {
+      border-radius: 20rpx;
+      background: #ffffff;
+      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+      padding: 30rpx 20rpx 22rpx;
+      margin: 0 20rpx 20rpx;
+      height: 144upx;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      &::before {
+        content: "";
+        display: block;
+        width: 44upx;
+        height: 200%;
+        position: absolute;
+        top: -30%;
+        transform: rotate(30deg);
+        background: #fff;
+        left: -30%;
+        animation: skeleton 3s infinite;
+        -webkit-animation: skeleton 3s infinite;
+      }
+      @keyframes skeleton {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 120%;
+        }
+      }
+      text {
+        display: block;
+        width: 80%;
+        height: 28upx;
+        background: #e5e9f2;
+        margin-bottom: 10upx;
+      }
+      view {
+        width: 80%;
+        height: 40upx;
+        margin: auto auto 0;
+        background: #e5e9f2;
+      }
+    }
     }
   }
 }

@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-24 18:26:41
+ * @LastEditTime: 2020-09-25 16:59:44
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -316,8 +316,9 @@ export default {
       //   .then(res =>{
       //     console.log(res)
       //   })
+      let orderNo = data.order_no
       uni.navigateTo({
-          url: "/pages/order/orderinterDetails?cancel="+cancel,
+          url: "/pages/order/orderinterDetails?orderNo="+orderNo + "&cancel=cancel",
       });
     },
 
@@ -442,8 +443,8 @@ export default {
         // 国内
         uni.navigateTo({
           url:
-            "/pages/order/orderinterDetails?listData=" +
-            JSON.stringify(data) +
+            "/pages/order/orderinterDetails?orderNo=" +
+            data.order_no +
             "&type=" +
             this.orderListType,
         });

@@ -2,8 +2,8 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-24 18:33:08
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-25 16:23:03
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <view class="fight_header">
@@ -12,16 +12,17 @@
         <view class="header_type">{{flightData.flightType}}</view>
         <view
           class="header_time"
-        >{{$dateTool(flightType===true?flightData.data[0].depTime:flightData.data.ticket_segments[0].departure_time,'YYYY-MM-DD')}} {{$dateTool(flightType===true?flightData.data[0].depTime:flightData.data.ticket_segments[0].departure_time,'dddd')}}</view>
+        >{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'YYYY-MM-DD')}}
+         {{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'dddd')}}</view>
       </view>
 
       <!-- 单程直飞 -->
       <view class="content_message" v-if="flightData.data.length <= 1">
         <view class="left_message address_message">
-          <view class="time">{{$dateTool(flightData.data[0].depTime,'HH:mm')}}</view>
+          <view class="time">{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'HH:mm')}}</view>
           <view
             class="address"
-          >{{flightData.data[0].depAirport_CN.province + flightData.data[0].depAirport_CN.air_port_name}}机场</view>
+          >{{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}机场</view>
         </view>
         <view class="center_message">
           <view class="duration">
@@ -32,10 +33,11 @@
           <view class="arrow_icon"></view>
         </view>
         <view class="right_message address_message">
-          <view class="time">{{$dateTool(flightData.data[0].arrTime,'HH:mm')}}</view>
+          <view class="time">{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'HH:mm')}}</view>
           <view
             class="address"
-          >{{flightData.data[0].arrAirport_CN.province + flightData.data[0].arrAirport_CN.air_port_name}}机场</view>
+          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}机场</view>
+       
         </view>
       </view>
 
@@ -44,20 +46,20 @@
         <view class="flight_message" v-for="(item, index) in flightData.data" :key="index">
           <view class="fly_message">
             <view class="fly_left">
-              <view class="fly_time">{{$dateTool(item.depTime,'HH:mm')}}</view>
+              <view class="fly_time">{{$dateTool(item[interType?'depTime':'departure_time'],'HH:mm')}}</view>
               <view class="fly_date">
                 <image class="fly_date_icon" src="@/static/filter_time.png" mode="aspectFill" />
-                {{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') % 60)}}m
+                {{Math.floor($timeDiff(item[interType?'arrTime':'arrive_time'],item[interType?'depTime':'departure_time'], 'minutes') / 60)}}h{{Math.floor($timeDiff(item[interType?'arrTime':'arrive_time'],item[interType?'depTime':'departure_time'], 'minutes') % 60)}}m
               </view>
-              <view class="fly_time">{{$dateTool(item.arrTime,'HH:mm')}}</view>
+              <view class="fly_time">{{$dateTool(item[interType?'arrTime':'arrive_time'],'HH:mm')}}</view>
             </view>
             <view class="fly_line"></view>
             <view class="fly_right">
               <view class="fly_air">
-                {{item.depAirport_CN.air_port + ' '
-                + item.depAirport_CN.city_name
-                +item.depAirport_CN.air_port_name
-                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
+                {{item[interType?'depAirport_CN':'departure_CN'].air_port + ' ' +
+                item[interType?'depAirport_CN':'departure_CN'].city_name +
+                item[interType?'depAirport_CN':'departure_CN'].air_port_name + 
+                (item[interType?'depTerminal':'departure_terminal']?' / '+ item[interType?'depTerminal':'departure_terminal']: '')}}
               </view>
 
               <view class="fly_info">
@@ -67,22 +69,22 @@
                   :src="'https://fxxcx.ystrip.cn' + item.image"
                   mode="aspectFill"
                 />
-                {{item.airline_CN + item.flightNumber + ' | ' + item.aircraftCode}}
+                {{item.airline_CN + item[interType?'flightNumber':'flight_no'] + ' | ' + item[interType?'aircraftCode':'model']}}
               </view>
 
               <view class="fly_air bottom_fly_ait">
-                {{item.arrAirport_CN.air_port + ' '
-                + item.arrAirport_CN.city_name
-                +item.arrAirport_CN.air_port_name
-                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
+                {{item[interType?'arrAirport_CN':'arrive_CN'].air_port + ' ' +
+                item[interType?'arrAirport_CN':'arrive_CN'].city_name +
+                item[interType?'arrAirport_CN':'arrive_CN'].air_port_name + 
+                (item[interType?'arrTerminal':'arrive_terminal']?' / '+ item[interType?'arrTerminal':'arrive_terminal']: '')}}
               </view>
             </view>
           </view>
-          <view class="transit_message" v-if="index === 0">
+          <view class="transit_message" v-if="index === 0">  
             转
-            {{flightData.data[0].arrAirport_CN.city_name +
+            {{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].city_name +
             ' 停留 '}}
-            {{Math.floor($timeDiff(flightData.data[1].depTime,flightData.data[0].arrTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(flightData.data[1].depTime,flightData.data[0].arrTime, 'minutes') % 60)}}m
+            {{Math.floor($timeDiff(flightData.data[1][interType?'depTime':'departure_time'],flightData.data[0][interType?'arrTime':'arrive_time'], 'minutes') / 60)}}h{{Math.floor($timeDiff(flightData.data[1][interType?'depTime':'departure_time'],flightData.data[0][interType?'arrTime':'arrive_time'], 'minutes') % 60)}}m
           </view>
         </view>
       </view>
@@ -94,7 +96,7 @@
           :src="'https://fxxcx.ystrip.cn' + flightData.data[0].image"
           mode="aspectFill"
         />
-        {{flightData.data[0].airline_CN + flightData.data[0].flightNumber}}{{flightData.data[0].aircraftCode?' | '+ flightData.data[0].aircraftCode: ''}} {{flightData.data[0].MealCode? ' | 有餐食': ''}}
+        {{flightData.data[0].airline_CN + flightData.data[0][interType?'flightNumber':'flight_no']}}{{flightData.data[0][intertype?'aircraftCode':'model']?' | '+ flightData.data[0][intertype?'aircraftCode':'model']: ''}} {{flightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
       <view
@@ -154,7 +156,7 @@
                 {{item.depAirport_CN.air_port + ' '
                 + item.depAirport_CN.city_name
                 +item.depAirport_CN.air_port_name
-                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
+                (item.depTerminal?' / '+ item.depTerminal: '')}}
               </view>
 
               <view class="fly_info">
@@ -171,7 +173,7 @@
                 {{item.arrAirport_CN.air_port + ' '
                 + item.arrAirport_CN.city_name
                 +item.arrAirport_CN.air_port_name
-                + '机场' + (item.depTerminal?' / '+ item.depTerminal: '')}}
+                (item.depTerminal?' / '+ item.depTerminal: '')}}
               </view>
             </view>
           </view>
@@ -230,7 +232,7 @@ export default {
       type: Boolean,
       default: () => true,
     },
-    flightType: {
+    interType: {
       // type false 国内订单详情
       type:Boolean,
       default: () => true,
