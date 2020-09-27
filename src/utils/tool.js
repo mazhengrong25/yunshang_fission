@@ -2,7 +2,7 @@
  * @Description: 全局方法
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 18:27:51
- * @LastEditTime: 2020-09-25 09:39:14
+ * @LastEditTime: 2020-09-27 16:32:51
  * @LastEditors: wish.WuJunLong
  */
 import Vue from "vue";
@@ -16,6 +16,11 @@ Vue.prototype.$dateTool = (data,type) =>{
 // 计算时间差值
 Vue.prototype.$timeDiff = (oldData,data,type) =>{
   return moment(oldData).diff(moment(data), type)
+}
+
+// 时间对比
+Vue.prototype.$timeBefore = (oldTime, newTime) => {
+  return moment(newTime?newTime: moment()).isBefore(oldTime)
 }
 
 // 邮箱验证

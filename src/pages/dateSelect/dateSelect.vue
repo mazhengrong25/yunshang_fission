@@ -2,26 +2,37 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-16 18:30:02
+ * @LastEditTime: 2020-09-27 18:33:55
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="date_select">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="选择日期"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      centerTitle="选择日期"
+    ></yun-header>
 
-    <view class="round_trip_tab" v-if="roundTripStatus.status">
-      <view :class="['date_checked',{active: roundTripStatus.type === 'start'}]" @click="checkedDate(true)">
+    <view class="round_trip_tab" v-if="roundTimeStatus">
+      <view
+        :class="['date_checked', { active: roundTripStatus === 'start' }]"
+        @click="checkedDate('start')"
+      >
         <view class="checked_title">去程日期</view>
-        <view class="checked_time">{{roundTripStatus.startTime || '—'}}</view>
+        <view class="checked_time">{{ roundData.toTime.date || "—" }}</view>
       </view>
-      <view :class="['date_checked',{active: roundTripStatus.type === 'end'}]" @click="checkedDate(false)">
+      <view
+        :class="['date_checked', { active: roundTripStatus === 'end' }]"
+        @click="checkedDate('end')"
+      >
         <view class="checked_title">返程日期</view>
-        <view class="checked_time">{{roundTripStatus.endTime || '—'}}</view>
+        <view class="checked_time">{{ roundData.fromTime.date || "—" }}</view>
       </view>
     </view>
 
     <view class="date_header">
-      <view class="hader_list" v-for="item in weekCn" :key="item">{{item}}</view>
+      <view class="hader_list" v-for="item in weekCn" :key="item">{{
+        item
+      }}</view>
     </view>
 
     <scroll-view
@@ -31,16 +42,29 @@
       class="date_main"
     >
       <view class="date_list" v-for="(item, index) in dateList" :key="index">
-        <view class="list_title">{{item.title}}</view>
+        <view class="list_title">{{ item.title }}</view>
 
         <view class="list_item">
-          <view class="item_box not_day" v-for="(oitem, oindex) in item.type" :key="oindex"></view>
           <view
-            @click="checkedDayBtn(item.title,oitem)"
-            :class="['item_box',{'active': oitem.active},{'is_before': oitem.status === false},{'checked': oitem.checked}]"
+            class="item_box not_day"
+            v-for="(oitem, oindex) in item.type"
+            :key="oindex"
+          ></view>
+          <view
+            @click="checkedDayBtn(item.title, oitem)"
+            :class="[
+              'item_box',
+              { active: oitem.active },
+              { is_before: oitem.status === false },
+              { checked: oitem.checked },
+              { to: oitem.toChecked },
+              { from: oitem.fromChecked},
+              roundTripStatus
+            ]"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
-          >{{oitem.day}}</view>
+            >{{ oitem.day }}</view
+          >
         </view>
       </view>
     </scroll-view>
@@ -64,9 +88,12 @@ export default {
 
       checkedDay: {}, // 选中日期
 
-      roundTripStatus: {},
+      roundTripStatus: '',
 
       ticketData: {}, // 已选日期数据
+
+      roundData: {}, // 往返日期数据
+      roundTimeStatus: {}, // 往返状态
     };
   },
   methods: {
@@ -84,7 +111,10 @@ export default {
         nextList.push({
           day: i + 1,
           time: moment().add(this.nextIndex, "M").format("YYYY-MM"),
-          date: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)),
+          date:
+            moment().add(this.nextIndex, "M").format("YYYY-MM") +
+            "-" +
+            (i + 1 < 10 ? "0" + (i + 1) : i + 1),
           status:
             currentDate === nextDate
               ? i + 1 > Number(moment().format("D"))
@@ -93,8 +123,21 @@ export default {
             currentDate === nextDate
               ? i + 1 === Number(moment().format("D"))
               : false,
-          checked: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)) === this.ticketData.data,
-          roundChecked: moment().add(this.nextIndex, "M").format("YYYY-MM") + '-' + ((i + 1) < 10?'0'+(i + 1):(i + 1)) === this.ticketData.roundData
+          checked:
+            moment().add(this.nextIndex, "M").format("YYYY-MM") +
+              "-" +
+              (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
+            this.ticketData.data,
+          toChecked:
+            moment().add(this.nextIndex, "M").format("YYYY-MM") +
+              "-" +
+              (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
+            this.roundData.toTime.date,
+            fromChecked:
+            moment().add(this.nextIndex, "M").format("YYYY-MM") +
+              "-" +
+              (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
+            this.roundData.fromTime.date,
         });
       }
       this.dateList.push({
@@ -110,15 +153,13 @@ export default {
     },
 
     // 往返日期切换
-    checkedDate(type){
-      this.roundTripStatus.type = type?'start':'end';
-      console.log(this.roundTripStatus)
-      console.log(this.dateList)
+    checkedDate(type) {
+      this.roundTripStatus = type;
     },
 
     // 点击日期
     checkedDayBtn(month, day) {
-      console.log('时间点击',month, day);
+      console.log("时间点击", month, day);
       if (day.status) {
         this.dateList.forEach((item) => {
           if (item.title === month) {
@@ -131,13 +172,14 @@ export default {
             });
           }
         });
-        let fromNow = moment(
-          moment(day.date).format("YYYY-MM-DD")
-        ).calendar(null, {
-          nextDay: "[明天]",
-          nextWeek: "ddd",
-          sameElse: "ddd",
-        });
+        let fromNow = moment(moment(day.date).format("YYYY-MM-DD")).calendar(
+          null,
+          {
+            nextDay: "[明天]",
+            nextWeek: "ddd",
+            sameElse: "ddd",
+          }
+        );
 
         this.checkedDay = {
           type: "time",
@@ -156,21 +198,28 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.timeStatus = data.type;
 
-  
     // 组装单程日期更换
-    this.ticketData = data.ticketType?JSON.parse(data.ticketType):{}
-    console.log('数据',this.ticketData)
+    this.ticketData = data.ticketType ? JSON.parse(data.ticketType) : {};
 
+    console.log(data.roundDate);
     // 组装往返日期
-    this.roundData = data.roundDate?JSON.parse(data.roundDate): {}
-    console.log(this.roundData)
+    if(data.roundDate){
+      this.roundData = JSON.parse(data.roundDate)
+      this.roundTripStatus = this.roundData.type !== 'all'?this.roundData.type: ''
+      this.roundTimeStatus = true;
+      console.log("往返数据", this.roundData);
+    }
+
+    
+
+    
 
     if (data.status) {
       this.roundTripStatus = {
         status: true,
         startTime: data.startTime,
         endTime: data.endTime,
-        type: data.type
+        type: data.type,
       };
     }
     if (this.dateList.length < 2) {
@@ -178,7 +227,6 @@ export default {
         this.getDateList();
       }
     }
-
   },
 };
 </script>
@@ -282,11 +330,12 @@ export default {
           font-weight: 500;
           color: rgba(42, 42, 42, 1);
           border: 4upx solid transparent;
+          position: relative;
           // flex: 7 0 auto;
-          &:not(:nth-child(7n)){
+          &:not(:nth-child(7n)) {
             margin-right: 10upx;
           }
-          &.not_day { 
+          &.not_day {
             box-shadow: none;
           }
           &.active {
@@ -308,6 +357,50 @@ export default {
           &.checked {
             background: rgba(0, 112, 226, 1);
             color: rgba(255, 255, 255, 1);
+          }
+          &.to {
+            background: #E4F1FF;
+            box-shadow: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            &.start {       
+              background: #0070E2;
+              box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
+              color: #fff;
+              &::before{
+                color: #fff;
+              }
+            }
+            &::before {
+              content: "去程";
+              position: absolute;
+              font-size: 18upx;
+              font-weight: 500;
+              color: #2a2a2a;
+              top: 0
+            }
+          }
+          &.from {
+            background: #E4F1FF;
+            box-shadow: none; 
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            &.end {       
+              background: #0070E2;
+              box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
+              color: #fff;
+              &::before{
+                color: #fff;
+              }
+            }
+            &::before {
+              content: "返程";
+              position: absolute;
+              font-size: 18upx;
+              font-weight: 500;
+              color: #2a2a2a;
+              top: 0
+            }
           }
         }
       }

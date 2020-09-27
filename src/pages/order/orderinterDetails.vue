@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-27 16:08:25
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-27 17:49:09
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -19,11 +19,7 @@
           {{
             orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
-            $timeDiff(
-                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) > 0 &&
+            $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000) &&
             orderDetails.pay_status === 1
               ? "已预订"
               : orderDetails.status === 1
@@ -34,11 +30,7 @@
               : orderDetails.status === 5
               ? "已取消"
               : orderDetails.status === 1 && 
-              0 > $timeDiff(
-                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) 
+              !$timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
               ? "已取消"
               : ''
           }}
@@ -61,11 +53,7 @@
           orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
             orderDetails.pay_status === 1 &&
-             $timeDiff(
-                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) > 0
+            $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
         "
       >
         <image
@@ -84,7 +72,7 @@
       </view>
 
       <view class="order_option">
-        <view class="option_btn" v-if="orderDetails.status === 1"
+        <view class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
           >发送短信</view
         >
         <view
@@ -93,11 +81,7 @@
             orderDetails.status !== 0 &&
               orderDetails.status !== 5 &&
               orderDetails.pay_status === 1 &&
-              $timeDiff(
-                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) < 0
+              $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
           "
           @click="getCancel(item)"
           >取消订单</view
@@ -108,12 +92,9 @@
             orderDetails.status !== 0 &&
               orderDetails.status !== 5 &&
               orderDetails.pay_status === 1 &&
-              $timeDiff(
-                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) < 0
+              $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
           "
+          @click="jumpOrderPay()"
           >去支付</view
         >
         <view class="option_btn" v-if="orderDetails.status === 3"
@@ -129,7 +110,7 @@
           >退票</view
         >
         <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
-        <view class="option_btn" v-if="orderDetails.status === 5"
+        <view class="option_btn" v-if="orderDetails.status === 5 || (orderDetails.pay_status === 1 && orderDetails.status === 1 && !$timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000))"
           >再次预定</view
         >
       </view>
@@ -369,10 +350,31 @@ export default {
           this.getOrderDetails();
         } else {
           uni.showToast({
-            title: res.msg,
+            title: res.data,
             icon: "none",
           });
         }
+      });
+    },
+
+    // 去支付
+    jumpOrderPay() {
+      let orderId = [this.orderDetails.order_no];
+      let priceList = [this.orderDetails.need_pay_amount]
+      let priceNumber = this.orderDetails.need_pay_amount
+
+      uni.navigateTo({
+        url:
+          "/pages/flightReservation/orderPay?orderId=" +
+          JSON.stringify(orderId) +
+          "&flightData=" +
+          JSON.stringify(this.flightData) +
+          "&priceList=" +
+          JSON.stringify(priceList) +
+          "&price=" +
+          priceNumber +
+          "&headerType=false" +
+          "&type=false",
       });
     },
 
@@ -462,13 +464,14 @@ export default {
           // 组装航程信息
           this.flightData = {
   
-            flightType: !this.type ? '单程' : (this.type === "0" ?'去程':'返程'),
+            flightType: this.type ? this.type === "0" ?'去程':'返程' : '单程',
             data: this.orderDetails.ticket_segments, // 单程信息
             cabinInfo: this.orderDetails.ticket_segments, //退票规则
           };
 
 
           if(this.cancelType){
+            this.cancelType = false
             this.getCancel()
           }
         } else {
@@ -498,6 +501,7 @@ export default {
       this.type = data.roundType; //去程  返程
       
       this.cancelType = data.cancel?data.cancel:false  //取消订单
+      this.cancelOrderType = data.cancel !== ''
       console.log('取消订单',this.cancelType,data.cancel)
       
       this.orderListType = data.type;

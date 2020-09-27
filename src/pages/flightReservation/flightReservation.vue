@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-27 09:36:48
+ * @LastEditTime: 2020-09-27 18:10:58
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -332,7 +332,7 @@
               <text>×{{passengerNumber.ins?passengerNumber.ins:0}}份</text>
             </view>
             <view class="list_message" v-else>
-              <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice * 2:0}}</text>
+              <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice:0}}</text>
               <text>×{{passengerNumber.ins?passengerNumber.ins * 2:0}}份</text>
             </view>
           </view>
