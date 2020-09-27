@@ -2,8 +2,13 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-27 12:01:33
+<<<<<<< HEAD
+ * @LastEditTime: 2020-09-27 12:06:15
  * @LastEditors: mazhengrong
+=======
+ * @LastEditTime: 2020-09-27 11:59:36
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 236243f21876fcd33b682431f1237c1cb5acd181
 --> 
 <template>
   <view class="fight_header">
