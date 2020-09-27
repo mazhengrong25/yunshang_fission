@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-27 09:46:10
+ * @LastEditTime: 2020-09-27 11:53:20
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -61,24 +61,41 @@
       >
         <!--单程  往返  多程 -->
         <view class="list_tyle">{{
-          item.segment_type === 1
+          item.segment_type === 1 && !item.is_round_last
             ? "单程机票"
             : item.ticket_round_order_id > 0
             ? "往返机票"
             : ""
         }}</view>
-        <view @click.stop="jumpOrderDetails(item)" class="list_item">
+        <view
+          v-for="(oitem, oindex) in item.ticket_segments"
+          :key="oindex"
+          @click.stop="jumpOrderDetails(oitem,oindex,item.is_round_last)"
+          class="list_item"
+        >
           <view class="item_header">
             <view class="item_title">
-              <view class="title"
-                >{{ item.ticket_segments[0].departure_msg.city_name }} -
+              <view class="title" v-if="item.is_round_last">
+                <text :class="['title_tag', { to: oindex === 0 }]">{{
+                  oindex === 0 ? "去程" : "返程"
+                }}</text>
+
+                {{ oitem.departure_CN.city_name }} -
+                {{ oitem.arrive_CN.city_name }}</view
+              >
+              <view class="title" v-else
+                >{{ item.ticket_segments[0].departure_CN.city_name }} -
                 {{
                   item.ticket_segments[item.ticket_segments.length - 1]
-                    .arrive_msg.city_name
+                    .arrive_CN.city_name
                 }}</view
               >
             </view>
-            <view class="item_price">
+            <view class="item_price" v-if="item.is_round_last">
+              <text>&yen;</text>
+              {{ oindex === 0?item.total_price:item.from_total_price || "金额错误" }}
+            </view>
+            <view class="item_price" v-else>
               <text>&yen;</text>
               {{ item.total_price || "金额错误" }}
             </view>
@@ -98,16 +115,10 @@
           </view>
           <view class="item_info">
             <view class="info_left">
-              <text>{{ item.ticket_segments[0].flight_no }}</text>
-              <text>{{
-                $dateTool(item.ticket_segments[0].departure_time, "MM月DD日")
-              }}</text>
+              <text>{{ oitem.flight_no }}</text>
+              <text>{{ $dateTool(oitem.departure_time, "MM月DD日") }}</text>
               <!-- HH:mm 24制   hh:mm 12制 -->
-              <text
-                >{{
-                  $dateTool(item.ticket_segments[0].departure_time, "HH:mm")
-                }}起飞</text
-              >
+              <text>{{ $dateTool(oitem.departure_time, "HH:mm") }}起飞</text>
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
@@ -149,7 +160,6 @@
               }}分钟</view
             >
           </view>
-
           <view
             class="item_btn_box"
             v-if="
@@ -161,10 +171,10 @@
               ) > 0
             "
           >
-            <view class="item_btn close_btn" @click.stop="removeOrder(item)"
+            <view class="item_btn close_btn" @click.stop="removeOrder(item,oindex)"
               >取消订单</view
             >
-            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item)"
+            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item,oindex)"
               >去支付</view
             >
           </view>
@@ -369,16 +379,17 @@ export default {
     },
 
     // 去支付
-    jumpPayOrder(val) {
+    jumpPayOrder(val,index) {
       console.log(val);
-      let orderId = [val.order_no]
+      let orderId = [index === 0 ?val.order_no:val.from_order_no];
+      let ticketSegments = [val.ticket_segments[index]]
       let flightData = {
-        flightType: '单程',
-        data: val.ticket_segments,
-        cabinInfo: {}
-      }
-      let priceList = [val.need_pay_amount]
-      let priceNumber = val.need_pay_amount
+        flightType: val.is_round_last?index === 0?'去程':'返程':"单程",
+        data: ticketSegments,
+        cabinInfo: {},
+      };
+      let priceList = [index === 0?val.need_pay_amount:val.from_need_pay_amount];
+      let priceNumber = index === 0?val.need_pay_amount:val.from_need_pay_amount;
 
       uni.navigateTo({
         url:
@@ -443,7 +454,6 @@ export default {
           created_at: moment().subtract(3, "days").format("YYYY-MM-DD"),
         };
         orderApi.orderList(data).then((res) => {
-          console.log(res);
           if (res.result === 10000) {
             this.showDefault = false;
             if (this.innerList.length > 0) {
@@ -451,7 +461,24 @@ export default {
             } else {
               this.innerList = res.data.data;
             }
-            this.innerList.forEach((item) => {
+            this.innerList.forEach((item, index) => {
+              if (item.is_round_last) {
+                this.innerList.forEach((oitem, oindex) => {
+                  if (
+                    oitem.is_round_first &&
+                    oitem.relevant_order_no === item.order_no
+                  ) {
+                    item['from_total_price'] = oitem.total_price
+                    item['from_order_no'] = oitem.order_no
+                    item['from_need_pay_amount'] = oitem.need_pay_amount
+                    item.ticket_segments.push.apply(
+                      item.ticket_segments,
+                      oitem.ticket_segments
+                    );
+                  }
+                });
+              }
+
               //剩余支付时间
               item.status =
                 this.$timeDiff(
@@ -462,6 +489,7 @@ export default {
                   ? item.status
                   : 5;
             });
+
             if (this.headerActive !== 0 && this.headerActive !== 1) {
               let activeIndex =
                 this.headerActive === 2
@@ -487,6 +515,13 @@ export default {
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
+
+            this.innerList = this.innerList.filter(({ is_round_first }) => !is_round_first);
+            // this.innerList.splice(
+            //   this.innerList.findIndex((item) => item.is_round_first === true),
+            //   1
+            // );
+
             this.showDefault = this.innerList.length < 1;
             console.log("缺省状态", this.showDefault, this.innerList);
           } else {
@@ -504,7 +539,7 @@ export default {
     },
 
     // 跳转订单详情
-    jumpOrderDetails(data) {
+    jumpOrderDetails(data,index,type) {
       console.log("详情", data);
       if (this.orderListType === "3") {
         uni.navigateTo({
@@ -521,7 +556,8 @@ export default {
             "/pages/order/orderinterDetails?orderNo=" +
             data.order_no +
             "&type=" +
-            this.orderListType,
+            this.orderListType +
+            '&roundType='+ (type?index: ''),
         });
       }
     },
@@ -628,7 +664,7 @@ export default {
       if (this.orderListFilter.Citystart) {
         this.innerList = this.innerList.filter(
           (item) =>
-            item.ticket_segments[0].departure_msg.city_name ===
+            item.ticket_segments[0].departure_CN.city_name ===
             this.orderListFilter.Citystart
         );
       }
@@ -637,7 +673,7 @@ export default {
       if (this.orderListFilter.Cityend) {
         this.innerList = this.innerList.filter(
           (item) =>
-            item.ticket_segments[0].arrive_msg.city_name ===
+            item.ticket_segments[0].arrive_CN.city_name ===
             this.orderListFilter.Cityend
         );
       }
@@ -808,6 +844,9 @@ export default {
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
         border-radius: 20upx;
         padding: 20upx 20upx 40upx;
+        &:not(:last-child) {
+          margin-bottom: 20upx;
+        }
         &.multiple_trips_item {
           border-radius: 0;
           &:last-child {
@@ -860,6 +899,24 @@ export default {
               font-size: 34upx;
               font-weight: bold;
               color: rgba(42, 42, 42, 1);
+              display: inline-flex;
+              align-items: center;
+              .title_tag {
+                width: 80upx;
+                height: 30upx;
+                background: linear-gradient(90deg, #9bec99 0%, #85cd83 100%);
+                border-radius: 10upx;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20upx;
+                font-weight: 400;
+                color: #ffffff;
+                margin-right: 12upx;
+                &.to {
+                  background: linear-gradient(270deg, #0070e2 0%, #56c5ff 100%);
+                }
+              }
             }
           }
           .item_price {

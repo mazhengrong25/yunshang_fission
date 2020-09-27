@@ -2,8 +2,8 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-25 18:31:55
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-27 10:54:16
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="fight_header">
@@ -25,9 +25,14 @@
           >{{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}机场</view>
         </view>
         <view class="center_message">
-          <view class="duration">
+          <view class="duration" v-if="interType">
             {{ Math.floor(flightData.data[0].duration / 60) }}h{{
             Math.floor(flightData.data[0].duration % 60)
+            }}m
+          </view>
+          <view v-else class="duration">
+            {{ Math.floor($timeDiff(flightData.data[0].arrive_time,flightData.data[0].departure_time, 'minutes') / 60) }}h{{
+            Math.floor($timeDiff(flightData.data[0].arrive_time,flightData.data[0].departure_time, 'minutes') % 60)
             }}m
           </view>
           <view class="arrow_icon"></view>
@@ -36,7 +41,7 @@
           <view class="time">{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'HH:mm')}}</view>
           <view
             class="address"
-          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}机场</view>
+          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province?flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province:'' + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}机场</view>
        
         </view>
       </view>
@@ -193,6 +198,7 @@
           :src="'https://fxxcx.ystrip.cn' + roundTripFlightData.data[0].image"
           mode="aspectFill"
         />
+
         {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0].flightNumber}}{{roundTripFlightData.data[0].aircraftCode?' | '+ roundTripFlightData.data[0].aircraftCode: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
