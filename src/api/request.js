@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-09-25 14:43:44
+ * @LastEditTime: 2020-09-27 09:20:27
  * @LastEditors: wish.WuJunLong
  */
 
@@ -69,6 +69,7 @@ const request = (config, type) => {
                   uni.showToast({
                     title: '网络超时',
                     icon: 'none',
+                    duration: 3000
                   });
                 } else {
                   let response = responses[1].data;
@@ -92,6 +93,7 @@ const request = (config, type) => {
             uni.showToast({
               title: '网络超时',
               icon: 'none',
+              duration: 3000
             });
           } else {
             let response = responses[1].data;

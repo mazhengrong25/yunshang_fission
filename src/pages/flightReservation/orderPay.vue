@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-25 09:58:46
+ * @LastEditTime: 2020-09-27 09:48:22
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -28,6 +28,7 @@
         :flightData="flightData"
         :roundTripType="orderType"
         :roundTripFlightData="flightRoundData"
+        :interType="headerType"
       ></flight-header>
 
       <view class="order_message box-shadow-style">
@@ -162,6 +163,8 @@ export default {
       payBtnStatus: true, // 支付按钮
       payPayStatus: true,
       childPayStatus: false, // 儿童票支付状态
+
+      headerType: true,  // 航班信息状态
     };
   },
   methods: {
@@ -327,8 +330,15 @@ export default {
     this.flightData = JSON.parse(data.flightData);
     this.price = data.price;
     this.priceList = JSON.parse(data.priceList);
-    console.log("金额列表", data);
+    
     this.orderType = JSON.parse(data.type);
+
+    if(data.headerType){
+      this.headerType = false
+    }
+
+    console.log('航班信息',this.flightData,'航班头部状态',this.headerType);
+
     if (this.orderType) {
       this.flightRoundData = JSON.parse(data.flightRoundData);
     }

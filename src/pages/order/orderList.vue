@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-25 18:24:31
+ * @LastEditTime: 2020-09-27 09:46:10
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -164,7 +164,9 @@
             <view class="item_btn close_btn" @click.stop="removeOrder(item)"
               >取消订单</view
             >
-            <view class="item_btn submit_btn">去支付</view>
+            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item)"
+              >去支付</view
+            >
           </view>
         </view>
       </view>
@@ -267,11 +269,17 @@
             </view>
           </view>
 
-          <view class="item_time" v-if="item.pay_status === 1 && $timeDiff(
-                  new Date(item.created_at).getTime() + 30 * 60 * 1000,
-                  new Date(),
-                  'minutes'
-                ) > 0">
+          <view
+            class="item_time"
+            v-if="
+              item.pay_status === 1 &&
+              $timeDiff(
+                new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
+            "
+          >
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
@@ -287,11 +295,17 @@
             >
           </view>
 
-          <view class="item_btn_box" v-if="item.pay_status === 1 && $timeDiff(
-                  new Date(item.created_at).getTime() + 30 * 60 * 1000,
-                  new Date(),
-                  'minutes'
-                ) > 0">
+          <view
+            class="item_btn_box"
+            v-if="
+              item.pay_status === 1 &&
+              $timeDiff(
+                new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
+            "
+          >
             <view class="item_btn close_btn">取消订单</view>
             <view class="item_btn submit_btn">去支付</view>
           </view>
@@ -351,6 +365,33 @@ export default {
           "/pages/order/orderinterDetails?orderNo=" +
           data.order_no +
           "&cancel=cancel",
+      });
+    },
+
+    // 去支付
+    jumpPayOrder(val) {
+      console.log(val);
+      let orderId = [val.order_no]
+      let flightData = {
+        flightType: '单程',
+        data: val.ticket_segments,
+        cabinInfo: {}
+      }
+      let priceList = [val.need_pay_amount]
+      let priceNumber = val.need_pay_amount
+
+      uni.navigateTo({
+        url:
+          "/pages/flightReservation/orderPay?orderId=" +
+          JSON.stringify(orderId) +
+          "&flightData=" +
+          JSON.stringify(flightData) +
+          "&priceList=" +
+          JSON.stringify(priceList) +
+          "&price=" +
+          priceNumber +
+          "&headerType=false" +
+          "&type=false",
       });
     },
 

@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-25 10:03:02
+ * @LastEditTime: 2020-09-27 09:36:48
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -1086,6 +1086,7 @@ export default {
             uni.showToast({
               title: res.msg,
               icon: "none",
+              duration: 3000
             });
           }
         });
@@ -1120,6 +1121,7 @@ export default {
           phone: this.orderPassenger.phone,
           email: this.orderPassenger.email || '',
           flight_no: this.flightData.data[0].flightNumber,
+          price: this.priceInfo.totalPrice,
           IsInsure: isInsure,
         };
         console.log(this.relatedKey, JSON.stringify(data));
@@ -1133,6 +1135,8 @@ export default {
               priceList.push(item.need_pay_amount);
               priceNumber += item.need_pay_amount;
             });
+
+            console.log(orderId,this.flightData,priceList,priceNumber)
 
             uni.navigateTo({
               url:
@@ -1151,6 +1155,7 @@ export default {
             uni.showToast({
               title: res.data,
               icon: "none",
+              duration: 3000
             });
           }
         });

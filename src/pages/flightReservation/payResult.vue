@@ -2,7 +2,7 @@
  * @Description: 支付结果页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-25 15:35:17
- * @LastEditTime: 2020-09-09 18:30:27
+ * @LastEditTime: 2020-09-27 09:50:49
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -66,12 +66,8 @@ export default {
     },
     // 跳转订单详情页
     jumpOrderDetails() {
-			let data ={
-        order_no: this.orderInfo.payId[0]
-      }
-			
       uni.reLaunch({
-        url: "/pages/order/orderinterDetails?listData=" + JSON.stringify(data),
+        url: "/pages/order/orderinterDetails?orderNo=" + this.orderInfo.payId[0],
       });
     },
   },
