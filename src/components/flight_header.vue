@@ -2,14 +2,14 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-27 11:50:03
+ * @LastEditTime: 2020-09-27 12:01:33
  * @LastEditors: mazhengrong
 --> 
 <template>
   <view class="fight_header">
     <view class="fight_list">
       <view class="header_message">
-        <view class="header_type">{{flightData.flightType}}</view>
+        <view :class="['header_type', {'round_trip_type': flightData.flightType === '返程'}]">{{flightData.flightType}}</view>
         <view
           class="header_time"
         >{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'YYYY-MM-DD')}}
@@ -25,9 +25,14 @@
           >{{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}机场</view>
         </view>
         <view class="center_message">
-          <view class="duration">
+          <view class="duration" v-if="interType">
             {{ Math.floor(flightData.data[0].duration / 60) }}h{{
             Math.floor(flightData.data[0].duration % 60)
+            }}m
+          </view>
+          <view v-else class="duration">
+            {{ Math.floor($timeDiff(flightData.data[0].arrive_time,flightData.data[0].departure_time, 'minutes') / 60) }}h{{
+            Math.floor($timeDiff(flightData.data[0].arrive_time,flightData.data[0].departure_time, 'minutes') % 60)
             }}m
           </view>
           <view class="arrow_icon"></view>
@@ -36,7 +41,7 @@
           <view class="time">{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'HH:mm')}}</view>
           <view
             class="address"
-          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}机场</view>
+          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province?flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province:'' + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}机场</view>
        
         </view>
       </view>
@@ -199,6 +204,7 @@
           :src="'https://fxxcx.ystrip.cn' + roundTripFlightData.data[0].image"
           mode="aspectFill"
         />
+
         {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0].flightNumber}}{{roundTripFlightData.data[0].aircraftCode?' | '+ roundTripFlightData.data[0].aircraftCode: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
