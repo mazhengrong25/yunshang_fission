@@ -2,8 +2,8 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-27 09:48:22
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-27 16:41:27
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_pay">
@@ -11,12 +11,16 @@
       :statusHeight="iStatusBarHeight"
       centerTitle="确认支付"
     ></yun-header>
-    <view class="order_price">
+    <view class="order_price" v-if="JSON.stringify(payData) !== '{}'">
       <text>订单总价</text>
       <view>
         <text>&yen;</text>
         {{ price }}
       </view>
+    </view>
+
+    <view class="price_other" v-else>
+          数据获取中
     </view>
 
     <scroll-view
@@ -25,11 +29,18 @@
       class="order_pay_main"
     >
       <flight-header
+        v-if="JSON.stringify(payData) !== '{}'"
         :flightData="flightData"
         :roundTripType="orderType"
         :roundTripFlightData="flightRoundData"
         :interType="headerType"
       ></flight-header>
+
+      <view v-else class="not_flight_data">
+          <text></text>
+          <text></text>
+          <view></view>
+      </view>
 
       <view class="order_message box-shadow-style">
         <view
@@ -376,6 +387,9 @@ export default {
       }
     }
   }
+  .price_other {
+        color: #ffffff;
+  }
   .order_pay_main {
     position: relative;
     flex: 1;
@@ -394,6 +408,53 @@ export default {
       display: block;
     }
   }
+
+    .not_flight_data {
+      border-radius: 20rpx;
+      background: #ffffff;
+      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+      padding: 30rpx 20rpx 22rpx;
+      margin: 0 20rpx 20rpx;
+      height: 144upx;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      &::before {
+        content: "";
+        display: block;
+        width: 44upx;
+        height: 200%;
+        position: absolute;
+        top: -30%;
+        transform: rotate(30deg);
+        background: #fff;
+        left: -30%;
+        animation: skeleton 3s infinite;
+        -webkit-animation: skeleton 3s infinite;
+      }
+      @keyframes skeleton {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 120%;
+        }
+      }
+      text {
+        display: block;
+        width: 80%;
+        height: 28upx;
+        background: #e5e9f2;
+        margin-bottom: 10upx;
+      }
+      view {
+        width: 80%;
+        height: 40upx;
+        margin: auto auto 0;
+        background: #e5e9f2;
+      }
+    }
   .order_message {
     .message_list {
       display: flex;

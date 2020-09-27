@@ -2,8 +2,8 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-24 16:15:39
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-27 17:26:13
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
@@ -15,10 +15,17 @@
     ></yun-header>
     <view class="main_content">
       <flight-header
+        v-if="showData"
         :flightData="flightData"
         :roundTripFlightData="roundTripFlightData"
         :roundTripType="roundTripType"
       ></flight-header>
+
+      <view v-else class="not_flight_data">
+        <text></text>
+        <text></text>
+        <view></view>
+      </view>
 
       <view class="round_trip_message" v-if="roundTripType && roundTripCheckList.length > 0">
         <view class="flight_list">
@@ -243,6 +250,8 @@ export default {
 
       airGuestInfo: {}, // 客规信息
       depGuestInfo: {}, // 返程客规
+
+      showData: false, // 数据加载
     };
   },
   methods: {
@@ -330,6 +339,7 @@ export default {
             }
           });
           this.headerDiaplay = this.cabinHeader.length !== 2;
+          this.showData = true;
         } else {
           uni.showToast({
             title: res.data,

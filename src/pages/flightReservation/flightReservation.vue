@@ -21,6 +21,7 @@
         :roundTripFlightData="flightRoundData"
         @openHeadExpPopup="openHeadExpPopup"
       ></flight-header>
+      
       <view v-else class="not_flight_data">
         <text></text>
         <text></text>

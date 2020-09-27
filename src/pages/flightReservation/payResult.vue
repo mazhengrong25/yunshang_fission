@@ -2,8 +2,8 @@
  * @Description: 支付结果页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-25 15:35:17
- * @LastEditTime: 2020-09-27 09:50:49
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-27 18:05:38
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="pay_result">
@@ -17,7 +17,7 @@
       <view class="main_content">
         <view class="content_box">
           <view class="price">
-            <text>&yen;</text>{{orderInfo.price}}
+            <text>&yen;</text>{{orderInfo.price || ''}}
           </view>
 
           <view class="order_info">
