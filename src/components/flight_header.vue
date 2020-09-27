@@ -2,14 +2,14 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-27 10:54:16
+ * @LastEditTime: 2020-09-27 11:59:36
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="fight_header">
     <view class="fight_list">
       <view class="header_message">
-        <view class="header_type">{{flightData.flightType}}</view>
+        <view :class="['header_type', {'round_trip_type': flightData.flightType === '返程'}]">{{flightData.flightType}}</view>
         <view
           class="header_time"
         >{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'YYYY-MM-DD')}}
