@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-27 11:49:36
+ * @LastEditTime: 2020-09-27 16:08:25
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -19,15 +19,28 @@
           {{
             orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
+            $timeDiff(
+                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0 &&
             orderDetails.pay_status === 1
               ? "已预订"
               : orderDetails.status === 1
+              && orderDetails.pay_status === 2
               ? "待出票"
               : orderDetails.status === 3
               ? "已出票"
               : orderDetails.status === 5
               ? "已取消"
-              : ""
+              : orderDetails.status === 1 && 
+              0 > $timeDiff(
+                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) 
+              ? "已取消"
+              : ''
           }}
         </view>
 
@@ -36,7 +49,7 @@
           <text>{{ orderDetails.total_price || "" }}</text>
         </view>
 
-        <view class="price_other"   v-else>
+        <view class="price_other" v-else>
           数据获取中
         </view>
         
@@ -47,14 +60,18 @@
         v-if="
           orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
-            orderDetails.pay_status === 1
+            orderDetails.pay_status === 1 &&
+             $timeDiff(
+                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
         "
       >
         <image
           class="time_icon"
           src="@/static/order_remaining_time.png"
-          mode="aspectFit"
-        />
+          mode="aspectFit"/>
         <text class="time_text"
           >剩余支付时间：{{
             $timeDiff(
@@ -75,7 +92,12 @@
           v-if="
             orderDetails.status !== 0 &&
               orderDetails.status !== 5 &&
-              orderDetails.pay_status === 1
+              orderDetails.pay_status === 1 &&
+              $timeDiff(
+                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) < 0
           "
           @click="getCancel(item)"
           >取消订单</view
@@ -85,7 +107,12 @@
           v-if="
             orderDetails.status !== 0 &&
               orderDetails.status !== 5 &&
-              orderDetails.pay_status === 1
+              orderDetails.pay_status === 1 &&
+              $timeDiff(
+                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) < 0
           "
           >去支付</view
         >
@@ -270,6 +297,7 @@ export default {
       orderListType: "", // 订单列表页 类型
 
       orderId: "", // 订单号
+      type: "", // 单程 返程
 
       cancelOrder: "", //取消订单
 
@@ -421,7 +449,7 @@ export default {
     getOrderDetails() {
       console.log("国内订单详情", this.orderListType);
       let data = {
-        order_no: this.orderId,
+        order_no: this.orderId, //订单号
       };
 
       orderApi.orderDetails(data).then((res) => {
@@ -430,9 +458,11 @@ export default {
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;
           }
+        
           // 组装航程信息
           this.flightData = {
-            flightType: "单程", // 航程类型
+  
+            flightType: !this.type ? '单程' : (this.type === "0" ?'去程':'返程'),
             data: this.orderDetails.ticket_segments, // 单程信息
             cabinInfo: this.orderDetails.ticket_segments, //退票规则
           };
@@ -462,15 +492,13 @@ export default {
     onLoad(data) {
       console.log("国内", data);
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-      this.orderId = data.orderNo;
+      this.orderId = data.orderNo; //订单编号
       console.log(this.orderId);
 
-      this.cancelType = data.cancel?data.cancel:false
+      this.type = data.roundType; //去程  返程
+      
+      this.cancelType = data.cancel?data.cancel:false  //取消订单
       console.log('取消订单',this.cancelType,data.cancel)
-
-      if(data.roundType){
-        data.roundType === '0'? '去程' : '返程'
-      }
       
       this.orderListType = data.type;
       this.orderHeaderTitle =
