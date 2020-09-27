@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-27 11:53:20
+ * @LastEditTime: 2020-09-27 15:10:47
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -68,34 +68,19 @@
             : ""
         }}</view>
         <view
-          v-for="(oitem, oindex) in item.ticket_segments"
-          :key="oindex"
-          @click.stop="jumpOrderDetails(oitem,oindex,item.is_round_last)"
+          @click.stop="jumpOrderDetails(item.ticket_segments[0],item.is_round_last)"
           class="list_item"
         >
           <view class="item_header">
             <view class="item_title">
-              <view class="title" v-if="item.is_round_last">
-                <text :class="['title_tag', { to: oindex === 0 }]">{{
-                  oindex === 0 ? "去程" : "返程"
-                }}</text>
+              <view class="title">
+                <text class="title_tag to" v-if="item.is_round_last">去程</text>
 
-                {{ oitem.departure_CN.city_name }} -
-                {{ oitem.arrive_CN.city_name }}</view
-              >
-              <view class="title" v-else
-                >{{ item.ticket_segments[0].departure_CN.city_name }} -
-                {{
-                  item.ticket_segments[item.ticket_segments.length - 1]
-                    .arrive_CN.city_name
-                }}</view
+                {{ item.ticket_segments[0].departure_CN.city_name }} -
+                {{ item.ticket_segments[item.ticket_segments.length - 1].arrive_CN.city_name }}</view
               >
             </view>
-            <view class="item_price" v-if="item.is_round_last">
-              <text>&yen;</text>
-              {{ oindex === 0?item.total_price:item.from_total_price || "金额错误" }}
-            </view>
-            <view class="item_price" v-else>
+            <view class="item_price">
               <text>&yen;</text>
               {{ item.total_price || "金额错误" }}
             </view>
@@ -115,10 +100,10 @@
           </view>
           <view class="item_info">
             <view class="info_left">
-              <text>{{ oitem.flight_no }}</text>
-              <text>{{ $dateTool(oitem.departure_time, "MM月DD日") }}</text>
+              <text>{{ item.ticket_segments[0].flight_no }}</text>
+              <text>{{ $dateTool(item.ticket_segments[0].departure_time, "MM月DD日") }}</text>
               <!-- HH:mm 24制   hh:mm 12制 -->
-              <text>{{ $dateTool(oitem.departure_time, "HH:mm") }}起飞</text>
+              <text>{{ $dateTool(item.ticket_segments[0].departure_time, "HH:mm") }}起飞</text>
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
@@ -171,10 +156,111 @@
               ) > 0
             "
           >
-            <view class="item_btn close_btn" @click.stop="removeOrder(item,oindex)"
+            <view class="item_btn close_btn" @click.stop="removeOrder(item,0)"
               >取消订单</view
             >
-            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item,oindex)"
+            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item,0)"
+              >去支付</view
+            >
+          </view>
+        </view>
+
+        <!-- 返程数据 -->
+
+        <view
+        v-if="item.from_ticket_segments"
+          @click.stop="jumpOrderDetails(item.from_ticket_segments[0],oindex,item.is_round_last)"
+          class="list_item"
+        >
+          <view class="item_header">
+            <view class="item_title">
+              <view class="title">
+                <text class="title_tag">返程</text>
+
+                {{ item.from_ticket_segments[0].departure_CN.city_name }} -
+                {{ item.from_ticket_segments[item.from_ticket_segments.length - 1].arrive_CN.city_name }}</view
+              >
+            </view>
+            <view class="item_price">
+              <text>&yen;</text>
+              {{ item.from_total_price || "金额错误" }}
+            </view>
+            <view class="info_right" v-if="item.segment_type !== 1">
+              {{
+                item.status !== 0 && item.status !== 5 && item.pay_status === 1
+                  ? "已预订"
+                  : item.status === 1
+                  ? "待出票"
+                  : item.status === 3
+                  ? "已出票"
+                  : item.status === 5
+                  ? "已取消"
+                  : ""
+              }}
+            </view>
+          </view>
+          <view class="item_info">
+            <view class="info_left">
+              <text>{{ item.from_ticket_segments[0].flight_no }}</text>
+              <text>{{ $dateTool(item.from_ticket_segments[0].departure_time, "MM月DD日") }}</text>
+              <!-- HH:mm 24制   hh:mm 12制 -->
+              <text>{{ $dateTool(item.from_ticket_segments[0].departure_time, "HH:mm") }}起飞</text>
+            </view>
+            <view class="info_right" v-if="item.segment_type === 1">
+              {{
+                item.status !== 0 && item.status !== 5 && item.pay_status === 1
+                  ? "已预订"
+                  : item.status === 1
+                  ? "待出票"
+                  : item.status === 3
+                  ? "已出票"
+                  : item.status === 5 && item.pay_status === 1
+                  ? "已取消"
+                  : ""
+              }}
+            </view>
+          </view>
+
+          <view
+            class="item_time"
+            v-if="
+              item.pay_status === 1 &&
+              $timeDiff(
+                new Date(item.from_created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
+            "
+          >
+            <view class="time_icon">
+              <image src="@/static/remaining_time.png" mode="aspectFit" />
+            </view>
+            <view class="time_text">剩余支付时间：</view>
+            <view class="time_number"
+              >{{
+                $timeDiff(
+                  new Date(item.from_created_at).getTime() + 30 * 60 * 1000,
+                  new Date(),
+                  "minutes"
+                )
+              }}分钟</view
+            >
+          </view>
+          <view
+            class="item_btn_box"
+            v-if="
+              item.pay_status === 1 &&
+              $timeDiff(
+                new Date(item.from_created_at).getTime() + 30 * 60 * 1000,
+                new Date(),
+                'minutes'
+              ) > 0
+            "
+          >
+            <view class="item_btn close_btn" @click.stop="removeOrder(item,1)"
+              >取消订单</view
+            >
+            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item,1)"
               >去支付</view
             >
           </view>
@@ -369,11 +455,12 @@ export default {
     },
 
     // 取消订单
-    removeOrder(data) {
+    removeOrder(data,index) {
+      let orderNo = index === 0?data.order_no: data.from_order_no
       uni.navigateTo({
         url:
           "/pages/order/orderinterDetails?orderNo=" +
-          data.order_no +
+          orderNo +
           "&cancel=cancel",
       });
     },
@@ -382,10 +469,9 @@ export default {
     jumpPayOrder(val,index) {
       console.log(val);
       let orderId = [index === 0 ?val.order_no:val.from_order_no];
-      let ticketSegments = [val.ticket_segments[index]]
       let flightData = {
         flightType: val.is_round_last?index === 0?'去程':'返程':"单程",
-        data: ticketSegments,
+        data: index === 0 ?val.ticket_segments: val.from_ticket_segments,
         cabinInfo: {},
       };
       let priceList = [index === 0?val.need_pay_amount:val.from_need_pay_amount];
@@ -468,13 +554,11 @@ export default {
                     oitem.is_round_first &&
                     oitem.relevant_order_no === item.order_no
                   ) {
+                    item['from_created_at'] = oitem.created_at
                     item['from_total_price'] = oitem.total_price
                     item['from_order_no'] = oitem.order_no
                     item['from_need_pay_amount'] = oitem.need_pay_amount
-                    item.ticket_segments.push.apply(
-                      item.ticket_segments,
-                      oitem.ticket_segments
-                    );
+                    item['from_ticket_segments'] = oitem.ticket_segments
                   }
                 });
               }
