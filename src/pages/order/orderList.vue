@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-25 18:24:31
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-27 10:11:40
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_list">

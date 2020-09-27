@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-25 17:49:11
+ * @LastEditTime: 2020-09-27 11:49:36
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -266,7 +266,7 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      orderDetails: {}, // 订单详情
+      orderDetails: {}, // 订单详情  对象判断119
       orderListType: "", // 订单列表页 类型
 
       orderId: "", // 订单号
@@ -285,40 +285,39 @@ export default {
       roundTripType: false, // 是否往返
 
       flightData: {
-        // 航班头部信息
-        flightType: "", // 航程类型
-        data: [
-          {
-            // 航班数据
-            depTime: "",
-            depAirport_CN: "",
-            arrTerminal: "",
-            depTerminal: "",
-            duration: "",
-            arrTime: "",
-            airline_CN: "",
-            flightNumber: "",
-            aircraftCode: "",
-            hasMeal: "",
-            // 国内订单
-            // departure_time
-          },
-        ],
-      },
-
-      roundTripFlightData: {
-        // 返程数据
-        flightType: "", // 航程类型
-        time: "", // 航程日期
-        fromTime: "", // 出发时间
-        fromAddress: "", // 出发机场
-        duration: "", // 飞行时长
-        toTime: "", // 到达时间
-        toAddress: "", // 到达机场
-        airline: "", // 航司
-        model: "", // 机型
-        food: "", // 餐饮
-      },
+          // 单程航班信息
+          flightType: "", // 航程类型
+          time: "", // 航程日期
+          week: "", // 航程星期
+          fromTime: "", // 出发时间
+          fromAddress: "", // 出发机场
+          duration: "", // 飞行时长
+          toTime: "", // 到达时间
+          toAddress: "", // 到达机场
+          airIcon: "", // 航司图片
+          airline: "", // 航司
+          model: "", // 机型
+          food: "", // 餐饮
+          cabin: "", // 舱位信息
+          baggage: "", // 行李额
+        },
+        flightRoundData: {
+          // 往返航班信息
+          flightType: "", // 航程类型
+          time: "", // 航程日期
+          week: "", // 航程星期
+          fromTime: "", // 出发时间
+          fromAddress: "", // 出发机场
+          duration: "", // 飞行时长
+          toTime: "", // 到达时间
+          toAddress: "", // 到达机场
+          airIcon: "", // 航司图片
+          airline: "", // 航司
+          model: "", // 机型
+          food: "", // 餐饮
+          cabin: "", // 舱位信息
+          baggage: "", // 行李额
+        },
 
       cancelType: false, // 取消订单状态
     };
@@ -434,7 +433,8 @@ export default {
           // 组装航程信息
           this.flightData = {
             flightType: "单程", // 航程类型
-            data: this.orderDetails.ticket_segments, // 原始数据
+            data: this.orderDetails.ticket_segments, // 单程信息
+            cabinInfo: this.orderDetails.ticket_segments, //退票规则
           };
 
 
@@ -467,6 +467,10 @@ export default {
 
       this.cancelType = data.cancel?data.cancel:false
       console.log('取消订单',this.cancelType,data.cancel)
+
+      if(data.roundType){
+        data.roundType === '0'? '去程' : '返程'
+      }
       
       this.orderListType = data.type;
       this.orderHeaderTitle =

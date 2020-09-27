@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-25 18:31:55
+ * @LastEditTime: 2020-09-27 11:50:03
  * @LastEditors: mazhengrong
 --> 
 <template>
@@ -102,9 +102,15 @@
       <view
         class="flight_reservation_box"
         v-if="!flightInfo && !roundTripType"
-        @click="openHeadExp"
-      >
-        {{flightData.cabinInfo.cabinDesc? flightData.cabinInfo.cabinCode + flightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
+        @click="openHeadExp">
+            {{flightData.cabinInfo[0][interType?cabinDesc:
+            cabin_level ===  'FIRST'?'头等舱':
+            cabin_level === 'BUSINESS'?'公务舱':
+            cabin_level === 'ECONOMY'?'经济舱':'']? flightData.cabinInfo[0][interType?'cabinCode':'cabin'] + 
+            flightData.cabinInfo[0][interType?cabinDesc:
+            cabin_level ===  "FIRST"?"头等舱":
+            cabin_level === "BUSINESS"?"公务舱":
+            cabin_level === "ECONOMY"?"经济舱":""]+' | ': ''}}退改签规则 {{flightData.cabinInfo[0].baggage?' | '+ flightData.cabinInfo[0].baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
     </view>
@@ -197,11 +203,14 @@
       </view>
 
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp()">
-        {{flightData.cabinInfo[interType?(cabinDesc):
-        (cabin_level ===  "FIRST"?"头等舱":
+        {{flightData.cabinInfo[0][interType?cabinDesc:
+        cabin_level ===  "FIRST"?"头等舱":
         cabin_level === "BUSINESS"?"公务舱":
-        cabin_level === "ECONOMY"?"经济舱":"")]? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
-        flightData.cabinInfo[interType?'cabinDesc':'cabin_level']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
+        cabin_level === "ECONOMY"?"经济舱":""]? flightData.cabinInfo[0][interType?'cabinCode':'cabin'] + 
+        flightData.cabinInfo[0][interType?cabinDesc:
+        cabin_level ===  "FIRST"?"头等舱":
+        cabin_level === "BUSINESS"?"公务舱":
+        cabin_level === "ECONOMY"?"经济舱":""]+' | ': ''}}退改签规则 {{flightData.cabinInfo[0].baggage?' | '+ flightData.cabinInfo[0].baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp('arr')">
