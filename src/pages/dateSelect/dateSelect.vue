@@ -58,8 +58,8 @@
               { is_before: oitem.status === false },
               { checked: oitem.checked },
               { to: oitem.toChecked },
-              { from: oitem.fromChecked},
-              roundTripStatus
+              { from: oitem.fromChecked },
+              roundTripStatus,
             ]"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
@@ -88,12 +88,12 @@ export default {
 
       checkedDay: {}, // 选中日期
 
-      roundTripStatus: '',
+      roundTripStatus: "",
 
       ticketData: {}, // 已选日期数据
 
       roundData: {}, // 往返日期数据
-      roundTimeStatus: {}, // 往返状态
+      roundTimeStatus: false, // 往返状态
     };
   },
   methods: {
@@ -128,16 +128,18 @@ export default {
               "-" +
               (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
             this.ticketData.data,
-          toChecked:
-            moment().add(this.nextIndex, "M").format("YYYY-MM") +
-              "-" +
-              (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
-            this.roundData.toTime.date,
-            fromChecked:
-            moment().add(this.nextIndex, "M").format("YYYY-MM") +
-              "-" +
-              (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
-            this.roundData.fromTime.date,
+          toChecked: this.roundTimeStatus
+            ? moment().add(this.nextIndex, "M").format("YYYY-MM") +
+                "-" +
+                (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
+              this.roundData.toTime.date
+            : false,
+          fromChecked: this.roundTimeStatus
+            ? moment().add(this.nextIndex, "M").format("YYYY-MM") +
+                "-" +
+                (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
+              this.roundData.fromTime.date
+            : false,
         });
       }
       this.dateList.push({
@@ -203,25 +205,14 @@ export default {
 
     console.log(data.roundDate);
     // 组装往返日期
-    if(data.roundDate){
-      this.roundData = JSON.parse(data.roundDate)
-      this.roundTripStatus = this.roundData.type !== 'all'?this.roundData.type: ''
+    if (data.roundDate) {
+      this.roundData = JSON.parse(data.roundDate);
+      this.roundTripStatus =
+        this.roundData.type !== "all" ? this.roundData.type : "";
       this.roundTimeStatus = true;
       console.log("往返数据", this.roundData);
     }
 
-    
-
-    
-
-    if (data.status) {
-      this.roundTripStatus = {
-        status: true,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        type: data.type,
-      };
-    }
     if (this.dateList.length < 2) {
       for (let index = 0; index < 2; index++) {
         this.getDateList();
@@ -359,15 +350,15 @@ export default {
             color: rgba(255, 255, 255, 1);
           }
           &.to {
-            background: #E4F1FF;
+            background: #e4f1ff;
             box-shadow: none;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
-            &.start {       
-              background: #0070E2;
+            &.start {
+              background: #0070e2;
               box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
               color: #fff;
-              &::before{
+              &::before {
                 color: #fff;
               }
             }
@@ -377,19 +368,19 @@ export default {
               font-size: 18upx;
               font-weight: 500;
               color: #2a2a2a;
-              top: 0
+              top: 0;
             }
           }
           &.from {
-            background: #E4F1FF;
-            box-shadow: none; 
+            background: #e4f1ff;
+            box-shadow: none;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            &.end {       
-              background: #0070E2;
+            &.end {
+              background: #0070e2;
               box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
               color: #fff;
-              &::before{
+              &::before {
                 color: #fff;
               }
             }
@@ -399,7 +390,7 @@ export default {
               font-size: 18upx;
               font-weight: 500;
               color: #2a2a2a;
-              top: 0
+              top: 0;
             }
           }
         }
