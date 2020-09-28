@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-27 15:41:23
+ * @LastEditTime: 2020-09-28 14:45:28
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -303,6 +303,8 @@ export default {
   box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
   padding: 30upx 20upx 22upx;
   margin: 0 20upx 20upx;
+  position: relative;
+  z-index: 9;
   .fight_list {
     &:nth-child(2) {
       margin-top: 30upx;

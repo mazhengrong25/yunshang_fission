@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-27 17:54:12
+ * @LastEditTime: 2020-09-28 16:00:20
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -60,13 +60,16 @@
         :key="index"
       >
         <!--单程  往返  多程 -->
-        <view class="list_tyle">{{
-          item.segment_type === 1 && !item.is_round_last
-            ? "单程机票"
-            : item.ticket_round_order_id > 0
-            ? "往返机票"
-            : ""
-        }}</view>
+        <view class="list_item_header">
+          <view class="list_tyle">{{
+            item.segment_type === 1 && !item.is_round_last
+              ? "单程机票"
+              : item.ticket_round_order_id > 0
+              ? "往返机票"
+              : ""
+          }}</view>
+          <view class="scheduled_time">{{$dateTool(item.created_at,'YYYY-MM-DD HH:mm')}}</view>
+        </view>
         <view
           @click.stop="
             jumpOrderDetails(item.ticket_segments[0], 0, item.is_round_last)
@@ -602,8 +605,10 @@ export default {
                     item["from_ticket_segments"] = oitem.ticket_segments;
 
                     //剩余支付时间
-                    item['from_status'] =
-                      !this.$timeBefore(new Date(oitem.created_at).getTime() + 30 * 60 * 1000) &&
+                    item["from_status"] =
+                      !this.$timeBefore(
+                        new Date(oitem.created_at).getTime() + 30 * 60 * 1000
+                      ) &&
                       oitem.pay_status === 1 &&
                       oitem.status === 1
                         ? 5
@@ -762,7 +767,7 @@ export default {
         : "";
     console.log("orderHeaderTitle", this.orderHeaderTitle);
   },
-  onHide(){
+  onHide() {
     this.orderList = [];
     this.innerList = [];
   },
@@ -943,18 +948,28 @@ export default {
       &:first-child {
         margin-top: 40upx;
       }
-      .list_tyle {
-        display: inline-flex;
+      .list_item_header {
+        display: flex;
         align-items: center;
-        padding: 0 32upx;
-        height: 50upx;
-        background: rgba(123, 155, 193, 0.4);
-        border-radius: 26upx;
-        font-size: 24upx;
-        font-weight: 400;
-        color: rgba(255, 255, 255, 1);
-        margin-bottom: 20upx;
+        justify-content: space-between;
+         margin-bottom: 20upx;
+        .list_tyle {
+          display: inline-flex;
+          align-items: center;
+          padding: 0 32upx;
+          height: 50upx;
+          background: rgba(123, 155, 193, 0.4);
+          border-radius: 26upx;
+          font-size: 24upx;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 1);
+        }
+        .scheduled_time {
+          font-size: 24upx;
+          color: gray;
+        }
       }
+
       .multiple_trips_header {
         display: flex;
         align-items: center;
