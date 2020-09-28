@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-27 17:54:12
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-28 16:00:33
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_list">
@@ -540,6 +540,7 @@ export default {
       this.orderList = [];
       this.innerList = [];
       this.getOrderList();
+    
     },
     //获取国内外列表
     getOrderList() {
@@ -767,7 +768,7 @@ export default {
     this.innerList = [];
   },
   onShow() {
-    this.getOrderList();
+    // this.getOrderList();
     this.orderListFilter = uni.getStorageSync("orderListFilter");
     if (this.orderListFilter) {
       this.orderListFilter = JSON.parse(this.orderListFilter);
@@ -851,6 +852,7 @@ export default {
       console.log("订单列表筛选", this.innerList);
 
       uni.removeStorageSync("orderListFilter");
+  
     }
   },
 };

@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-22 15:35:11
+ * @LastEditTime: 2020-09-28 15:45:46
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -511,7 +511,7 @@ export default {
           this.airMessage["from"] = cityData.data;
           this.airMessage["from_type"] = cityData.type;
     }
-    console.log(this.airMessage);
+    console.log('airMessage',this.airMessage);
     uni.removeStorageSync("city");
   }
 },
