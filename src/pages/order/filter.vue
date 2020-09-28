@@ -2,8 +2,8 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-22 15:35:11
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-28 18:31:35
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="filter">
@@ -98,12 +98,24 @@
           <view
             :class="['dialog_view',{input_placeholder: !citySelect.start}]"
             @click="whereToBtn()"
-          >{{citySelect.start?citySelect.start:'出发城市'}}</view>
+          >{{
+            citySelect.start.type === 'city'? citySelect.start.data.city_name:
+            citySelect.start.type === 'hot' && citySelect.start.data.city_name === "上海" ? citySelect.start.data.city_name + citySelect.start.data.air_port_name :
+            citySelect.start.type === 'hot' && citySelect.start.data.city_name === "北京" ? citySelect.start.data.city_name + '首都' :
+            citySelect.start.type === 'hot' ? citySelect.start.data.city_name :
+            citySelect.start.data.air_port_name || '出发城市'
+            }}</view>
           <view class="dialog_line">—</view>
           <view
             :class="['dialog_view',{input_placeholder: !citySelect.end}]"
             @click="whereFromBtn()"
-          >{{citySelect.end?citySelect.end:'到达城市'}}</view>
+          >{{ 
+            citySelect.end.type === 'city'? citySelect.end.data.city_name:
+            citySelect.end.type === 'hot' && citySelect.end.data.city_name === "上海" ? citySelect.end.data.city_name + citySelect.end.data.air_port_name :
+            citySelect.end.type === 'hot' && citySelect.end.data.city_name === "北京" ? citySelect.end.data.city_name + '首都' :
+            citySelect.end.type === 'hot' ? citySelect.end.data.city_name :
+            citySelect.end.data.air_port_name || '到达城市'
+            }}</view>
         </view>
       </view>
 
@@ -148,13 +160,13 @@
           placeholder-class="input_placeholder"
         />
       </view>
-      <view class="list_item list_input" v-if="filterType === '0'">
+      <!-- <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">订票员</view>
         <view class="item_input input-right-arrow" @click="openFilterDialog">
           <text v-if="booker">{{booker}}</text>
           <text v-else>请选择</text>
         </view> 
-      </view>
+      </view> -->
 
       <view class="list_item list_input" v-if="filterType === '1'">
         <view class="item_title">乘机人</view>
@@ -481,13 +493,29 @@ export default {
       console.log(this.nameGroup)
     },
 
-  
-
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.filterType = data.type
+    if(data.filterData !== '{}'){
+      let fliterData = JSON.parse(data.filterData)
+      console.log('筛选条件',fliterData)
+      this.pnr = fliterData.pnr //pnr
+      this.orderNumber = fliterData.orderNumber //订单号
+      this.flightNumber = fliterData.flightNumber // 航班号
+      this.booker = fliterData.book_user  //订票员
+      this.citySelect.start = fliterData.Citystart //出发城市
+      this.citySelect.end = fliterData.Cityend //到达城市
+      this.timeLimit.start = fliterData.Timestart//日始时间
+      this.timeLimit.end = fliterData.Timend //日止时间
+      this.activeStatus = fliterData.status // 订单状态
+      this.dateStatus = fliterData.date //日期条件
 
+      this.orderStatus.forEach(item => item.active = item.id === fliterData.status)
+      this.dateFilter[1].active = fliterData.date === 'depart'
+      this.dateFilter[0].active = fliterData.date === 'create'
+    }
+    
     console.log('筛选类型',this.filterType)
   },
 
@@ -497,21 +525,15 @@ export default {
     let cityData = JSON.parse(uni.getStorageSync("city"));
     console.log(JSON.parse(uni.getStorageSync("city")))
     if (cityData.status === "to") {
-      this.citySelect.start =
-        cityData.type === "city"
-          ? cityData.data.city_name
-          : cityData.data.air_port_name;
+      this.citySelect.start= cityData;
           this.airMessage["to"] = cityData.data;
           this.airMessage["to_type"] = cityData.type;
     } else if (cityData.status === "from") {
-      this.citySelect.end =
-        cityData.type === "city"
-          ? cityData.data.city_name
-          : cityData.data.air_port_name;
-          this.airMessage["from"] = cityData.data;
-          this.airMessage["from_type"] = cityData.type;
+      this.citySelect.end = cityData;
+      this.airMessage["from"] = cityData.data;
+      this.airMessage["from_type"] = cityData.type;
     }
-    console.log(this.airMessage);
+    console.log(this.citySelect);
     uni.removeStorageSync("city");
   }
 },

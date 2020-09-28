@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-28 16:00:20
+ * @LastEditTime: 2020-09-28 18:34:04
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -447,7 +447,7 @@
       <!-- 缺省页 -->
       <default-page v-if="showDefault" defaultType="not_order"></default-page>
 
-      <view class="no_data" v-if="!orderPageStatus">
+      <view class="no_data" v-if="!orderPageStatus && !showDefault">
         <text>到底啦</text>
       </view>
     </scroll-view>
@@ -477,6 +477,8 @@ export default {
 
       scrollTop: 0, // 航班列表滚动值
       oldScrollTop: 0,
+
+      orderLishStuats: false,
     };
   },
   methods: {
@@ -538,11 +540,8 @@ export default {
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/pages/order/filter?type=" + type,
+        url: "/pages/order/filter?type=" + type + "&filterData=" + JSON.stringify(this.orderListFilter),
       });
-      this.orderList = [];
-      this.innerList = [];
-      this.getOrderList();
     },
     //获取国内外列表
     getOrderList() {
@@ -579,16 +578,44 @@ export default {
       } else if (this.orderListType === "0") {
         // 国内
         let data = {
-          page: this.orderPageNumber,
-          created_at: moment().subtract(3, "days").format("YYYY-MM-DD"),
-        };
+          created_at: this.orderListFilter.Timestart || moment().subtract(3, "days").format("YYYY-MM-DD"),  // 预定日期开始
+          created_at_end: this.orderListFilter.Timend || moment().format("YYYY-MM-DD"),  // 预定日期结束
+          pnr_code: this.orderListFilter.pnr || '', // pnr
+          order_no: this.orderListFilter.orderNumber || '',  // 订单号
+          flight_no: this.orderListFilter.flightNumber || '', // 航班号
+          book_user: this.orderListFilter.book_user || '',  // 订票员
+        }
+
+        if(this.orderListFilter.Citystart){
+          data['departure'] = 
+            this.orderListFilter.Citystart.type === 'city'? 
+            this.orderListFilter.Citystart.data.city_code: 
+            this.orderListFilter.Citystart.type === 'hot' && this.orderListFilter.Citystart.data.city_name === "上海"? 
+            this.orderListFilter.Citystart.data.air_port: 
+            this.orderListFilter.Citystart.type === 'hot'? 
+            this.orderListFilter.Citystart.data.city_code: 
+            this.orderListFilter.Citystart.data.air_port
+        }
+        if(this.orderListFilter.Cityend){
+          data['arrive'] =  
+            this.orderListFilter.Cityend.type === 'city'? 
+            this.orderListFilter.Cityend.data.city_code: 
+            this.orderListFilter.Cityend.type === 'hot' && this.orderListFilter.Cityend.data.city_name === "上海"? 
+            this.orderListFilter.Cityend.data.air_port: 
+            this.orderListFilter.Cityend.type === 'hot'? 
+            this.orderListFilter.Cityend.data.city_code: 
+            this.orderListFilter.Cityend.data.air_port
+        }
+
+        
         orderApi.orderList(data).then((res) => {
           if (res.result === 10000) {
             this.showDefault = false;
-            if (this.innerList.length > 0) {
+            if (this.orderLishStuats) {
               this.innerList.push.apply(this.innerList, res.data.data);
             } else {
               this.innerList = res.data.data;
+              this.orderLishStuats = true
             }
             this.innerList.forEach((item, index) => {
               if (item.is_round_last) {
@@ -770,78 +797,15 @@ export default {
   onHide() {
     this.orderList = [];
     this.innerList = [];
+    this.orderLishStuats = false
   },
   onShow() {
-    this.getOrderList();
-    this.orderListFilter = uni.getStorageSync("orderListFilter");
-    if (this.orderListFilter) {
-      this.orderListFilter = JSON.parse(this.orderListFilter);
-      //pnr筛选
-      if (this.orderListFilter.pnr) {
-        this.innerList = this.innerList.filter(
-          (item) => item.pnr_code === this.orderListFilter.pnr
-        );
-      }
-      //订单编号筛选
-      if (this.orderListFilter.orderNumber) {
-        this.innerList = this.innerList.filter(
-          (item) => item.order_no === this.orderListFilter.orderNumber
-        );
-      }
+    this.orderListFilter = uni.getStorageSync("orderListFilter")?JSON.parse(uni.getStorageSync("orderListFilter")):{};
+    uni.removeStorageSync("orderListFilter");
 
-      //航班号筛选
-      if (this.orderListFilter.flightNumber) {
-        this.innerList = this.innerList.filter(
-          (item) =>
-            item.ticket_segments[0].flight_no ===
-            this.orderListFilter.flightNumber
-        );
-      }
+    this.getOrderList()
 
-      //订票员  选择框
-      if (this.orderListFilter.booker) {
-        this.innerList = this.innerList.filter(
-          (item) => item.book_user === this.created_at.booker
-        );
-      }
-
-      //出发城市筛选
-      if (this.orderListFilter.Citystart) {
-        this.innerList = this.innerList.filter(
-          (item) =>
-            item.ticket_segments[0].departure_CN.city_name ===
-            this.orderListFilter.Citystart
-        );
-      }
-
-      //到达城市筛选
-      if (this.orderListFilter.Cityend) {
-        this.innerList = this.innerList.filter(
-          (item) =>
-            item.ticket_segments[0].arrive_CN.city_name ===
-            this.orderListFilter.Cityend
-        );
-      }
-
-      //日始时间筛选
-      if (this.orderListFilter.Timestart) {
-        this.innerList = this.innerList.filter(
-          (item) =>
-            moment(item.ticket_segments[0].departure_time).format(
-              "YYYY-MM-DD"
-            ) === this.orderListFilter.Timestart
-        );
-      }
-
-      //日止时间筛选
-      if (this.orderListFilter.Timend) {
-        this.innerList = this.innerList.filter(
-          (item) =>
-            moment(item.ticket_segments[0].departure_time).format(
-              "YYYY-MM-DD"
-            ) === this.orderListFilter.Timend
-        );
-      }
+    if (JSON.stringify(this.orderListFilter) !== '{}') {
 
       //日期条件排序
       if (this.orderListFilter.date !== null) {
@@ -852,11 +816,8 @@ export default {
       if (this.orderListFilter.status !== null) {
         this.checkedHeaderActive(this.orderListFilter.status);
       }
-
-      console.log("订单列表筛选", this.innerList);
-
-      uni.removeStorageSync("orderListFilter");
     }
+
   },
 };
 </script>

@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-28 10:58:50
+ * @LastEditTime: 2020-09-28 16:07:48
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -206,9 +206,9 @@ export default {
 
           if(!this.roundTripStatus){
             return uni.showToast({
-              title: '请选择去程或返程时间',
+              title: '请在上方选择卡中选择去程或返程',
               icon: 'none',
-              duration: 2000
+              duration: 3000
             });
           }
 
