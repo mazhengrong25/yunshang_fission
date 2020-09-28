@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-28 16:00:33
+ * @LastEditTime: 2020-09-28 17:03:07
  * @LastEditors: mazhengrong
 =======
  * @LastEditTime: 2020-09-28 16:00:20
@@ -772,13 +772,14 @@ export default {
         ? "国际改签订单"
         : "";
     console.log("orderHeaderTitle", this.orderHeaderTitle);
+    
   },
   onHide() {
     this.orderList = [];
     this.innerList = [];
   },
   onShow() {
-    // this.getOrderList();
+    this.getOrderList();
     this.orderListFilter = uni.getStorageSync("orderListFilter");
     if (this.orderListFilter) {
       this.orderListFilter = JSON.parse(this.orderListFilter);
