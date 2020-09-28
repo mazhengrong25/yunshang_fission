@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-09-27 09:20:27
+ * @LastEditTime: 2020-09-28 14:53:18
  * @LastEditors: wish.WuJunLong
  */
 
@@ -77,6 +77,11 @@ const request = (config, type) => {
                 }
               })
               .catch((error) => {
+                uni.showToast({
+                  title: error.data || '数据错误，请联系客服重试',
+                  icon: 'none',
+                  duration: 3000
+                });
                 uni.hideLoading();
                 reject(error);
               });
@@ -101,6 +106,11 @@ const request = (config, type) => {
           }
         })
         .catch((error) => {
+          uni.showToast({
+            title: error.data || '数据错误，请联系客服重试',
+            icon: 'none',
+            duration: 3000
+          });
           uni.hideLoading();
           reject(error);
         });

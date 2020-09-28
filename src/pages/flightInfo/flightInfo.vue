@@ -2,15 +2,15 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-27 17:26:13
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-28 15:24:49
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
     <yun-header
       :statusHeight="iStatusBarHeight"
       :headerAddress="airMessage"
-      :headerBottom="Number(10)" 
+      :headerBottom="Number(10)"
       :statusType="roundTripType"
     ></yun-header>
     <view class="main_content">
@@ -27,18 +27,29 @@
         <view></view>
       </view>
 
-      <view class="round_trip_message" v-if="roundTripType && roundTripCheckList.length > 0">
+      <view
+        class="round_trip_message"
+        v-if="roundTripType && roundTripCheckList.length > 0"
+      >
         <view class="flight_list">
-          <view class="list_item" v-for="(item, index) in roundTripCheckList" :key="index">
+          <view
+            class="list_item"
+            v-for="(item, index) in roundTripCheckList"
+            :key="index"
+          >
             <view class="item_main" v-if="item.type">
-              <view :class="['item_type',{'start': index === 0}]">{{index === 0?'已选去程':'已选返程'}}</view>
+              <view :class="['item_type', { start: index === 0 }]">{{
+                index === 0 ? "已选去程" : "已选返程"
+              }}</view>
               <view class="item_info">
                 <text class="info_title">舱位</text>
-                <text class="info_text">{{item.type}}</text>
+                <text class="info_text">{{ item.type }}</text>
               </view>
               <view class="item_info">
                 <text class="info_title">票面价</text>
-                <text class="info_text">&yen;{{index === 0?checkPrice:checkRoundPrice}}</text>
+                <text class="info_text"
+                  >&yen;{{ index === 0 ? checkPrice : checkRoundPrice }}</text
+                >
               </view>
             </view>
           </view>
@@ -47,34 +58,43 @@
           class="roundTrip_pay_order_btn"
           v-if="roundTripCheckList.length === 2 && roundTripCheckList[0]"
           @click="roundTripCheckedBtn()"
-        >预定</button>
+        >
+          预定
+        </button>
       </view>
 
       <view class="round_trip_checked" v-if="roundTripType">
         <button
-          :class="['checked_btn',{active: roundTripBtnActive === 0}]"
+          :class="['checked_btn', { active: roundTripBtnActive === 0 }]"
           @click="roundTripBtn(0)"
-        >选择去程</button>
+        >
+          选择去程
+        </button>
         <button
-          :class="['checked_btn',{active: roundTripBtnActive === 1}]"
+          :class="['checked_btn', { active: roundTripBtnActive === 1 }]"
           @click="roundTripBtn(1)"
-        >选择返程</button>
+        >
+          选择返程
+        </button>
       </view>
       <view class="flight_cabin" v-if="roundTripBtnActive === 0">
-        <view :class="['cabin_header',{'is_display': headerDiaplay}]">
+        <view :class="['cabin_header', { is_display: headerDiaplay }]">
           <view
-            :class="['cabin_header_box',{'is_active': current === index}]"
+            :class="['cabin_header_box', { is_active: current === index }]"
             @click="checkedHeader(index)"
             v-for="(item, index) in cabinHeader"
             :key="index"
           >
-            {{item}}
+            {{ item }}
             <view class="cabin_header_line"></view>
           </view>
         </view>
 
         <swiper class="cabin_content" @change="change" :current="current">
-          <swiper-item v-for="(header, headerIndex) in cabinHeader" :key="headerIndex">
+          <swiper-item
+            v-for="(header, headerIndex) in cabinHeader"
+            :key="headerIndex"
+          >
             <view class="cabin_content_item">
               <flight-item
                 v-for="(item, index) in cabinList[header]"
@@ -88,26 +108,32 @@
                 @jumpReservation="jumpReservationBtn"
                 @getPriceData="getPriceData"
               ></flight-item>
+              <view class="not_content_item" v-if="cabinList[header].length < 1"
+                >暂无舱位</view
+              >
             </view>
           </swiper-item>
         </swiper>
       </view>
 
       <view class="flight_cabin" v-else>
-        <view :class="['cabin_header',{'is_display': depHeaderDiaplay}]">
+        <view :class="['cabin_header', { is_display: depHeaderDiaplay }]">
           <view
-            :class="['cabin_header_box',{'is_active': current === index}]"
+            :class="['cabin_header_box', { is_active: current === index }]"
             @click="checkedHeader(index)"
             v-for="(item, index) in depCabinHeader"
             :key="index"
           >
-            {{item}}
+            {{ item }}
             <view class="cabin_header_line"></view>
           </view>
         </view>
 
         <swiper class="cabin_content" @change="change" :current="current">
-          <swiper-item v-for="(header, headerIndex) in depCabinHeader" :key="headerIndex">
+          <swiper-item
+            v-for="(header, headerIndex) in depCabinHeader"
+            :key="headerIndex"
+          >
             <view class="cabin_content_item">
               <flight-item
                 v-for="(item, index) in depCabinList[header]"
@@ -122,19 +148,29 @@
                 @jumpReservation="jumpReservationBtn"
                 @getPriceData="getPriceData"
               ></flight-item>
+              <view
+                class="not_content_item"
+                v-if="depCabinList[header].length < 1"
+                >暂无舱位</view
+              >
             </view>
           </swiper-item>
         </swiper>
       </view>
     </view>
 
-    <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
+    <flight-explanation
+      ref="flightExplanation"
+      :ruleInfos="ruleInfos"
+    ></flight-explanation>
 
     <!-- 验价弹窗 -->
     <uni-popup ref="checkPricePopup" type="dialog">
       <view class="check_Price">
         <view class="box_title">预定价格变更</view>
-        <view class="content_text">您的当前预定票价已变动至&yen;{{newPrice}}需要继续购买吗？</view>
+        <view class="content_text"
+          >您的当前预定票价已变动至&yen;{{ newPrice }}需要继续购买吗？</view
+        >
         <view class="box_bottom">
           <view class="submit" @click="submitCheckPrice">确 定</view>
           <view @click="closeCheckPrice">取 消</view>
@@ -388,9 +424,11 @@ export default {
           " " +
           data.data.routing.segments[0].depAirport_CN.city_code +
           " - " +
-          data.data.routing.segments[data.data.routing.segments.length - 1].arrAirport_CN.city_name +
+          data.data.routing.segments[data.data.routing.segments.length - 1]
+            .arrAirport_CN.city_name +
           " " +
-          data.data.routing.segments[data.data.routing.segments.length - 1].arrAirport_CN.city_code, // 行程
+          data.data.routing.segments[data.data.routing.segments.length - 1]
+            .arrAirport_CN.city_code, // 行程
         cabin: data.cabin, // 舱位
         price: data.data.cabinPrices.ADT.rulePrice.price, // 票面价
         baggage: data.baggage,
@@ -416,6 +454,13 @@ export default {
 
     // 处理往返选中列表
     getRoundTrip() {
+      // if (this.roundTripType && this.roundTripBtnActive === 0) {
+
+      // } else if (this.roundTripType && this.roundTripBtnActive === 1) {
+      //   this.checkRoundPrice = res.data.price; // 获取验价价格
+      //   this.checkRoundPriceKey = res.data.keys; // 获取验价key
+      // }
+
       if (this.roundTripType && this.roundTripBtnActive === 0) {
         // this.cabinHeader.forEach(item =>{
         //   this.cabinList[item].forEach((oitem,oindex) =>{
@@ -427,10 +472,19 @@ export default {
             item.cabin === this.airActiveInfo.cabin &&
             item.data.cabinPrices.ADT.price === this.airActiveInfo.price
           ) {
+            console.log(
+              "获取价格完成后选中",
+              this.airActiveInfo,
+              item,
+              this.cabinList
+            );
+            // this.checkPrice = item.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
+            // this.checkPriceKey = item.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
             // this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
+        this.roundTripBtn(1);
       } else if (this.roundTripType && this.roundTripBtnActive === 1) {
         // this.depCabinHeader.forEach(item =>{
         //   this.depCabinList[item].forEach((oitem,oindex) =>{
@@ -442,7 +496,9 @@ export default {
             item.cabin === this.depActiveInfo.cabin &&
             item.data.cabinPrices.ADT.price === this.depActiveInfo.price
           ) {
-            // this.$set(this.depCabinList[this.depActiveInfo.type][index],"active",true);
+            console.log("获取价格完成后选中", item);
+            // this.checkRoundPrice = item.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
+            // this.checkRoundPriceKey = item.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
@@ -455,6 +511,7 @@ export default {
     // 获取价格信息 - 验价
     getPriceData(data, header, index, type) {
       console.log(data, header, index, type);
+      console.log("验价", this.segmentsMessage, this.roundSegmentsMessage);
       this.getGaugeInfo(data);
       let params;
       if (type) {
@@ -464,16 +521,18 @@ export default {
           price: data.data.cabinPrices.ADT.price,
           type: data.type,
         };
-        this.depMessage["data"] = data;
+        this.roundSegmentsMessage["data"] = data;
         params = {
           sourceCode: "IBE",
           file_key: this.roundTripFileKey,
-          queryDate: this.segmentsMessage.QueryDate,
-          departure: this.segmentsMessage.segments[0].depAirport,
-          destination: this.segmentsMessage.segments[0].arrAirport,
+          queryDate: this.roundSegmentsMessage.queryDate,
+          departure: this.roundSegmentsMessage.segments[0].departure,
+          destination: this.roundSegmentsMessage.segments[
+            this.roundSegmentsMessage.segments.length - 1
+          ].destination,
           systemMsg: "",
-          segments: this.depMessage.airSegments,
-          ItineraryInfo: this.depMessage.data.data,
+          segments: this.roundSegmentsMessage.segments,
+          ItineraryInfo: data.data,
           relatedKey: "11",
         };
       } else {
@@ -488,7 +547,9 @@ export default {
           file_key: this.fileKey,
           queryDate: this.segmentsMessage.segments[0].depTime,
           departure: this.segmentsMessage.segments[0].depAirport,
-          destination: this.segmentsMessage.segments[0].arrAirport,
+          destination: this.segmentsMessage.segments[
+            this.segmentsMessage.segments.length - 1
+          ].arrAirport,
           systemMsg: "",
           segments: this.segmentsMessage.segments,
           ItineraryInfo: data.data,
@@ -533,6 +594,7 @@ export default {
                 res.data.keys
               );
             }
+            this.$forceUpdate();
           } else {
             if (type) {
               this.$set(
@@ -588,9 +650,11 @@ export default {
         params = {
           sourceCode: "IBE",
           file_key: this.fileKey,
-          queryDate: this.segmentsMessage.QueryDate,
-          departure: this.segmentsMessage.segments[0].depAirport,
-          destination: this.segmentsMessage.segments[0].arrAirport,
+          queryDate: this.segmentsMessage.queryDate,
+          departure: this.segmentsMessage.segments[0].departure,
+          destination: this.segmentsMessage.segments[
+            this.segmentsMessage.segments.length - 1
+          ].destination,
           systemMsg: "",
           segments: this.segmentsMessage.segments,
           ItineraryInfo: data.data,
@@ -606,9 +670,11 @@ export default {
         params = {
           sourceCode: "IBE",
           file_key: this.roundTripFileKey,
-          queryDate: this.roundSegmentsMessage.QueryDate,
-          departure: this.roundSegmentsMessage.segments[0].depAirport,
-          destination: this.roundSegmentsMessage.segments[0].arrAirport,
+          queryDate: this.roundSegmentsMessage.queryDate,
+          departure: this.roundSegmentsMessage.segments[0].departure,
+          destination: this.roundSegmentsMessage.segments[
+            this.roundSegmentsMessage.segments.length - 1
+          ].destination,
           systemMsg: "",
           segments: this.roundSegmentsMessage.segments,
           ItineraryInfo: data.data,
@@ -631,6 +697,15 @@ export default {
               JSON.stringify(this.ticketAddress),
           });
         } else {
+          console.log(data, header, index, type);
+          // 往返验价
+          if (this.roundTripBtnActive === 0) {
+            this.checkPrice = data.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
+            this.checkPriceKey = data.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
+          } else {
+            this.checkRoundPrice = data.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
+            this.checkRoundPriceKey = data.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
+          }
           this.getRoundTrip();
         }
       } else {
@@ -649,12 +724,24 @@ export default {
                     "price",
                     res.data.price
                   );
+                  this.$set(
+                    this.depCabinList[header][index].data.cabinPrices.ADT
+                      .rulePrice,
+                    "key",
+                    res.data.keys
+                  );
                 } else {
                   this.$set(
                     this.cabinList[header][index].data.cabinPrices.ADT
                       .rulePrice,
                     "price",
                     res.data.price
+                  );
+                  this.$set(
+                    this.cabinList[header][index].data.cabinPrices.ADT
+                      .rulePrice,
+                    "key",
+                    res.data.keys
                   );
                 }
 
@@ -694,6 +781,7 @@ export default {
                   this.checkRoundPrice = res.data.price; // 获取验价价格
                   this.checkRoundPriceKey = res.data.keys; // 获取验价key
                 }
+                this.$forceUpdate();
                 console.log("往返验价");
               }
               if (type) {
@@ -788,7 +876,7 @@ export default {
           "/pages/flightReservation/flightReservation?type=" +
           this.roundTripType +
           "&airMessage=" +
-            JSON.stringify(this.airMessage) +
+          JSON.stringify(this.airMessage) +
           "&key=" +
           this.checkPriceKey +
           "&price=" +
@@ -801,6 +889,19 @@ export default {
     },
   },
   onShow() {
+    let error = uni.getStorageSync("errorFlightData");
+    if (error) {
+      uni.removeStorageSync("errorFlightData");
+      this.roundTripBtn(0);
+      this.airActiveInfo = {}; // 去程预定
+      this.depActiveInfo = {}; // 返程预定
+      this.checkRoundPrice = null;
+      this.checkRoundPriceKey = "";
+      this.roundTripCheckList = [];
+      this.checkPrice = null;
+      this.checkPriceKey = "";
+    }
+
     // 获取航班详情
     if (this.roundTripType) {
       this.getDetailsData();
@@ -841,6 +942,12 @@ export default {
         "舱位信息航班详情",
         this.flightData,
         this.roundTripFlightData
+      );
+      console.log(
+        "航班数据",
+        this.airMessage,
+        this.segmentsMessage,
+        this.roundSegmentsMessage
       );
     } else {
       // 组装单程数据
@@ -939,6 +1046,53 @@ export default {
         font-weight: 400;
         color: #ffffff;
         letter-spacing: 4upx;
+      }
+    }
+
+    .not_flight_data {
+      border-radius: 20rpx;
+      background: #ffffff;
+      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+      padding: 30rpx 20rpx 22rpx;
+      margin: 0 20rpx 20rpx;
+      height: 144upx;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      &::before {
+        content: "";
+        display: block;
+        width: 44upx;
+        height: 200%;
+        position: absolute;
+        top: -30%;
+        transform: rotate(30deg);
+        background: #fff;
+        left: -30%;
+        animation: skeleton 3s infinite;
+        -webkit-animation: skeleton 3s infinite;
+      }
+      @keyframes skeleton {
+        from {
+          left: -30%;
+        }
+        to {
+          left: 120%;
+        }
+      }
+      text {
+        display: block;
+        width: 80%;
+        height: 28upx;
+        background: #e5e9f2;
+        margin-bottom: 10upx;
+      }
+      view {
+        width: 80%;
+        height: 40upx;
+        margin: auto auto 0;
+        background: #e5e9f2;
       }
     }
   }
@@ -1062,6 +1216,14 @@ export default {
         height: 100%;
         padding: 0 20upx;
         flex: 1;
+        .not_content_item {
+          width: 100%;
+          height: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: darkgray;
+        }
       }
     }
   }

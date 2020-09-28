@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-24 10:48:21
+ * @LastEditTime: 2020-09-28 14:18:22
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -81,7 +81,8 @@
     <yun-config
       ref="yunConfig"
       :showInput="true"
-      :submitText="{left:'确认',right:'取消'}"
+      :submitText="{left:'取消',right:'确认'}"
+      submitIndex="right"
       title="请输入姓名"
       @submitConfig="submitConfig"
     ></yun-config>

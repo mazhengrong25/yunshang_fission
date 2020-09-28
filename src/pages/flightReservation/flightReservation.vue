@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-27 18:10:58
+ * @LastEditTime: 2020-09-28 16:02:35
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -12,7 +12,11 @@
       :headerBottom="Number(10)"
       :headerAddress="headerAddress"
     ></yun-header>
-    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="flight_reservation_main">
+    <scroll-view
+      :enable-back-to-top="true"
+      :scroll-y="true"
+      class="flight_reservation_main"
+    >
       <flight-header
         v-if="showData"
         :flightInfo="false"
@@ -21,7 +25,7 @@
         :roundTripFlightData="flightRoundData"
         @openHeadExpPopup="openHeadExpPopup"
       ></flight-header>
-      
+
       <view v-else class="not_flight_data">
         <text></text>
         <text></text>
@@ -32,11 +36,18 @@
         <view class="passenger_title">
           <view class="title_text">
             <text v-if="passengerList.length < 1">乘机人</text>
-            <text
-              v-else
-            >已选 {{passengerNumber.adt? passengerNumber.adt + '成人': ''}}{{passengerNumber.chd? '，'+passengerNumber.chd + '儿童': ''}}{{passengerNumber.inf? '，'+passengerNumber.inf + '婴儿': ''}}</text>
+            <text v-else
+              >已选 {{ passengerNumber.adt ? passengerNumber.adt + "成人" : ""
+              }}{{
+                passengerNumber.chd ? "，" + passengerNumber.chd + "儿童" : ""
+              }}{{
+                passengerNumber.inf ? "，" + passengerNumber.inf + "婴儿" : ""
+              }}</text
+            >
           </view>
-          <view class="add_passenger_btn" @click="jumpPassengerPage">添加乘机人</view>
+          <view class="add_passenger_btn" @click="jumpPassengerPage"
+            >添加乘机人</view
+          >
         </view>
 
         <!-- <uni-swipe-action class="passenger_main" v-if="passengerList.length > 0">
@@ -45,9 +56,12 @@
           </uni-swipe-action-item>
         </uni-swipe-action>-->
 
-        <uni-swipe-action class="passenger_main" v-if="passengerList.length > 0">
+        <uni-swipe-action
+          class="passenger_main"
+          v-if="passengerList.length > 0"
+        >
           <uni-swipe-action-item
-            :class="['main_list',{show: item.show}]"
+            :class="['main_list', { show: item.show }]"
             v-for="(item, index) in passengerList"
             :key="index"
           >
@@ -55,19 +69,21 @@
             <view class="list_message">
               <view class="message_info">
                 <view class="info_left">
-                  <view class="type">{{item.type}}票</view>
-                  <view
-                    class="user_name"
-                  >{{item.name || item.en_first_name + '/' + item.en_last_name}}</view>
-                  <view class="position">{{item.group?item.group:'未分组'}}</view>
+                  <view class="type">{{ item.type }}票</view>
+                  <view class="user_name">{{
+                    item.name || item.en_first_name + "/" + item.en_last_name
+                  }}</view>
+                  <view class="position">{{
+                    item.group ? item.group : "未分组"
+                  }}</view>
                 </view>
-                <view class="edit_btn" @click="flightEdit(item,index)"></view>
+                <view class="edit_btn" @click="flightEdit(item, index)"></view>
               </view>
 
               <view class="message_info">
                 <view class="bottom_left">
-                  <view class="bottom_title">{{item.cert_type}}</view>
-                  <view class="card">{{item.cert_no}}</view>
+                  <view class="bottom_title">{{ item.cert_type }}</view>
+                  <view class="card">{{ item.cert_no }}</view>
                 </view>
                 <view class="insurance_box">
                   <yun-switch
@@ -82,7 +98,11 @@
             <template v-slot:right>
               <view class="option_box">
                 <view class="delete_btn" @click="removePassenger(item)">
-                  <image class="delete_btn_icon" src="@/static/delete_btn.png" mode="contain" />
+                  <image
+                    class="delete_btn_icon"
+                    src="@/static/delete_btn.png"
+                    mode="contain"
+                  />
                   <text>删除</text>
                 </view>
               </view>
@@ -90,7 +110,11 @@
           </uni-swipe-action-item>
 
           <view class="add_child_btn" @click="jumpAddPassenger()">
-            <image class="add_child_btn_icon" src="@/static/add_icon.png" mode="contain" />
+            <image
+              class="add_child_btn_icon"
+              src="@/static/add_icon.png"
+              mode="contain"
+            />
             <text>添加儿童/婴儿</text>
           </view>
         </uni-swipe-action>
@@ -146,7 +170,11 @@
 
       <view class="insurance_list box-shadow-style">
         <view class="title_text">
-          <image class="title_icon" src="@/static/insurance.png" mode="aspectFill" />购买保险
+          <image
+            class="title_icon"
+            src="@/static/insurance.png"
+            mode="aspectFill"
+          />购买保险
         </view>
         <view class="insurance_box">
           <view
@@ -156,33 +184,47 @@
             @click="changeInsurance(insuranceList[index])"
           >
             <view class="item_name">
-              {{item.insure_desc}}(保额{{(Number(item.amount) / 10000).toFixed(0)}}万)
-              <text :class="['item_icon', {true: item.type}]"></text>
+              {{ item.insure_desc }}(保额{{
+                (Number(item.amount) / 10000).toFixed(0)
+              }}万)
+              <text :class="['item_icon', { true: item.type }]"></text>
             </view>
             <view class="item_check">
               <view class="item_price">
-                <text>&yen; {{Number(item.default_dis_price).toFixed(0)}}</text>/份
+                <text
+                  >&yen; {{ Number(item.default_dis_price).toFixed(0) }}</text
+                >/份
               </view>
-              <view :class="['item_icon',{'is_active':insuranceActive.id === item.id}]"></view>
+              <view
+                :class="[
+                  'item_icon',
+                  { is_active: insuranceActive.id === item.id },
+                ]"
+              ></view>
             </view>
           </view>
           <view
             v-if="insuranceList.length > 4"
             @click="showMoreInsurance()"
-            :class="['more_btn',{open: moreInsurance === 4}]"
-          >{{moreInsurance === 4?'展开全部':'收起全部'}}</view>
+            :class="['more_btn', { open: moreInsurance === 4 }]"
+            >{{ moreInsurance === 4 ? "展开全部" : "收起全部" }}</view
+          >
         </view>
       </view>
 
       <view class="reward_list box-shadow-style">
         <view class="title_text">
-          <image class="title_icon" src="@/static/reward.png" mode="aspectFill" />本单奖励
+          <image
+            class="title_icon"
+            src="@/static/reward.png"
+            mode="aspectFill"
+          />本单奖励
         </view>
         <view class="reward_box">
           <view class="reward_list">
             <view class="list_name">奖励金</view>
 
-            <view class="list_price">&yen; {{priceInfo.reward}}</view>
+            <view class="list_price">&yen; {{ priceInfo.reward }}</view>
           </view>
           <!-- <view class="reward_list">
             <view class="list_name">返点</view>
@@ -219,31 +261,50 @@
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
         <text
-          @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')"
-        >《关于规范互联网机票销售行为的通知》</text>
+          @click="
+            openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')
+          "
+          >《关于规范互联网机票销售行为的通知》</text
+        >
         <text
-          @click="openStatementWeb('https://fxxcx.ystrip.cn/air_file/'+ statement.code + '/' + statement.code + '.html')"
-        >《{{statement.title}}》</text>
+          @click="
+            openStatementWeb(
+              'https://fxxcx.ystrip.cn/air_file/' +
+                statement.code +
+                '/' +
+                statement.code +
+                '.html'
+            )
+          "
+          >《{{ statement.title }}》</text
+        >
         <text
-          @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')"
-        >《锂电池航空运输规范》</text>
+          @click="
+            openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')
+          "
+          >《锂电池航空运输规范》</text
+        >
       </view>
     </scroll-view>
 
     <view class="bottom_bar">
       <view class="left_message">
-        <view class="not_pass_message" v-if="passengerList.length < 1">请先添加乘机人</view>
+        <view class="not_pass_message" v-if="passengerList.length < 1"
+          >请先添加乘机人</view
+        >
         <view class="pass_message" v-else @click="openOrderInfo()">
           <text>合计：&yen;</text>
-          {{priceInfo.totalPrice}}
+          {{ priceInfo.totalPrice }}
         </view>
       </view>
       <button
         :disabled="!trueSubmitOrder"
-        :class="['right_btn',{is_true: trueSubmitOrder}]"
+        :class="['right_btn', { is_true: trueSubmitOrder }]"
         type="default"
         @click="submitOrder()"
-      >去支付</button>
+      >
+        去支付
+      </button>
     </view>
 
     <!-- 航班退改信息 -->
@@ -266,75 +327,91 @@
             <view class="list_tag" v-if="roundTripType">去</view>
             <view class="list_title">成人票价</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.adtPrice}}</text>
-              <text>×{{passengerNumber.adt}}人</text>
+              <text>&yen; {{ priceInfo.adtPrice }}</text>
+              <text>×{{ passengerNumber.adt }}人</text>
             </view>
           </view>
           <view class="info_list" v-if="roundTripType">
             <view class="list_tag is_back">返</view>
             <view class="list_title">成人票价</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.roundAdtPrice}}</text>
-              <text>×{{passengerNumber.adt}}人</text>
+              <text>&yen; {{ priceInfo.roundAdtPrice }}</text>
+              <text>×{{ passengerNumber.adt }}人</text>
             </view>
           </view>
           <view class="info_list" v-if="passengerNumber.chd > 0">
             <view class="list_tag" v-if="roundTripType">去</view>
             <view class="list_title">儿童票价</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.chdPrice}}</text>
-              <text>×{{passengerNumber.chd}}人</text>
+              <text>&yen; {{ priceInfo.chdPrice }}</text>
+              <text>×{{ passengerNumber.chd }}人</text>
             </view>
           </view>
-          <view class="info_list" v-if="passengerNumber.chd > 0 && roundTripType">
+          <view
+            class="info_list"
+            v-if="passengerNumber.chd > 0 && roundTripType"
+          >
             <view class="list_tag is_back">返</view>
             <view class="list_title">儿童票价</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.chdPrice}}</text>
-              <text>×{{passengerNumber.chd}}人</text>
+              <text>&yen; {{ priceInfo.chdPrice }}</text>
+              <text>×{{ passengerNumber.chd }}人</text>
             </view>
           </view>
           <view class="info_list" v-if="passengerNumber.inf > 0">
             <view class="list_tag" v-if="roundTripType">去</view>
             <view class="list_title">婴儿票价</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.infPrice}}</text>
-              <text>×{{passengerNumber.inf}}人</text>
+              <text>&yen; {{ priceInfo.infPrice }}</text>
+              <text>×{{ passengerNumber.inf }}人</text>
             </view>
           </view>
-          <view class="info_list" v-if="passengerNumber.inf > 0 && roundTripType">
+          <view
+            class="info_list"
+            v-if="passengerNumber.inf > 0 && roundTripType"
+          >
             <view class="list_tag is_back">返</view>
             <view class="list_title">婴儿票价</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.infPrice}}</text>
-              <text>×{{passengerNumber.inf}}人</text>
+              <text>&yen; {{ priceInfo.infPrice }}</text>
+              <text>×{{ passengerNumber.inf }}人</text>
             </view>
           </view>
           <view class="info_list">
             <view class="list_tag" v-if="roundTripType">去</view>
             <view class="list_title">机建+燃油</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.buildPrice}}</text>
-              <text>×{{passengerNumber.adt}}人</text>
+              <text>&yen; {{ priceInfo.buildPrice }}</text>
+              <text>×{{ passengerNumber.adt }}人</text>
             </view>
           </view>
           <view class="info_list" v-if="roundTripType">
             <view class="list_tag is_back">返</view>
             <view class="list_title">机建+燃油</view>
             <view class="list_message">
-              <text>&yen; {{priceInfo.roundBuildPrice}}</text>
-              <text>×{{passengerNumber.adt}}人</text>
+              <text>&yen; {{ priceInfo.roundBuildPrice }}</text>
+              <text>×{{ passengerNumber.adt }}人</text>
             </view>
           </view>
           <view class="info_list" v-if="passengerNumber.ins > 0">
             <view class="list_title">保险</view>
             <view class="list_message" v-if="!roundTripType">
-              <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice:0}}</text>
-              <text>×{{passengerNumber.ins?passengerNumber.ins:0}}份</text>
+              <text
+                >&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text
+              >
+              <text
+                >×{{ passengerNumber.ins ? passengerNumber.ins : 0 }}份</text
+              >
             </view>
             <view class="list_message" v-else>
-              <text>&yen; {{priceInfo.insPrice?priceInfo.insPrice:0}}</text>
-              <text>×{{passengerNumber.ins?passengerNumber.ins * 2:0}}份</text>
+              <text
+                >&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text
+              >
+              <text
+                >×{{
+                  passengerNumber.ins ? passengerNumber.ins * 2 : 0
+                }}份</text
+              >
             </view>
           </view>
         </view>
@@ -712,6 +789,8 @@ export default {
             });
             setTimeout(() => {
               uni.navigateBack();
+
+              uni.setStorageSync("errorFlightData", "又他妈报错了");
             }, 3000);
           }
         });
@@ -964,12 +1043,12 @@ export default {
           icon: "none",
         });
       }
-      if(this.orderPassenger.email){
-        if(!this.$isEmail(this.orderPassenger.email)){
+      if (this.orderPassenger.email) {
+        if (!this.$isEmail(this.orderPassenger.email)) {
           return uni.showToast({
-          title: "邮箱格式不正确",
-          icon: "none",
-        });
+            title: "邮箱格式不正确",
+            icon: "none",
+          });
         }
       }
       if (this.flightData.data.length > 1 && !this.orderPassenger.email) {
@@ -1041,14 +1120,12 @@ export default {
           insurance_id: this.insuranceActive.id || 0, // 保险id
           name: this.orderPassenger.name,
           phone: this.orderPassenger.phone,
-          email: this.orderPassenger.email || '',
+          email: this.orderPassenger.email || "",
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
         };
 
-
-
-        console.log(data)
+        console.log(data);
         // let data = {
         //   passengers: passengerData, // 乘客数据
         //   arr_keys: this.relatedKey, // 去程key
@@ -1056,41 +1133,50 @@ export default {
         //   insurance_id: this.insuranceActive.id || 0, // 保险id
         //   contacts: this.orderPassenger, // 联系人信息
         // };
-        ticket.createRoundOrder(this.relatedKey,this.roundRelatedKey,data).then((res) => {
-          console.log(res);
-          if (res.errorcode === 10000) {
-            let orderId = [];
-            let priceList = [];
-            let priceNumber = 0;
-            res.data.forEach((item) => {
-              orderId.push(item.order_no);
-              priceList.push(item.need_pay_amount);
-              priceNumber += item.need_pay_amount;
-            });
+        ticket
+          .createRoundOrder(this.relatedKey, this.roundRelatedKey, data)
+          .then((res) => {
+            console.log(res);
+            if (res.errorcode === 10000) {
+              let orderId = [];
+              let priceList = [];
+              let priceNumber = 0;
+              res.data.forEach((item) => {
+                orderId.push(item.order_no);
+                priceList.push(item.need_pay_amount);
+                priceNumber += item.need_pay_amount;
+              });
 
-            uni.navigateTo({
-              url:
-                "/pages/flightReservation/orderPay?orderId=" +
-                JSON.stringify(orderId) +
-                "&flightData=" +
-                JSON.stringify(this.flightData) +
-                "&flightRoundData=" +
-                JSON.stringify(this.flightRoundData) +
-                "&priceList=" +
-                JSON.stringify(priceList) +
-                "&price=" +
-                priceNumber +
-                "&type=true",
-            });
-            console.log(res.data, this.flightData);
-          } else {
+              uni.navigateTo({
+                url:
+                  "/pages/flightReservation/orderPay?orderId=" +
+                  JSON.stringify(orderId) +
+                  "&flightData=" +
+                  JSON.stringify(this.flightData) +
+                  "&flightRoundData=" +
+                  JSON.stringify(this.flightRoundData) +
+                  "&priceList=" +
+                  JSON.stringify(priceList) +
+                  "&price=" +
+                  priceNumber +
+                  "&type=true",
+              });
+              console.log(res.data, this.flightData);
+            } else {
+              uni.showToast({
+                title: res.msg,
+                icon: "none",
+                duration: 3000,
+              });
+            }
+          })
+          .catch(() => {
             uni.showToast({
-              title: res.msg,
+              title: "接口数据错误，请联系客服处理",
               icon: "none",
-              duration: 3000
+              duration: 3000,
             });
-          }
-        });
+          });
       } else {
         // 单程下单
         let passengerName = []; // 乘客姓名
@@ -1120,46 +1206,55 @@ export default {
           insurance_id: this.insuranceActive.id || 0, // 保险id
           name: this.orderPassenger.name,
           phone: this.orderPassenger.phone,
-          email: this.orderPassenger.email || '',
+          email: this.orderPassenger.email || "",
           flight_no: this.flightData.data[0].flightNumber,
           price: this.priceInfo.totalPrice,
           IsInsure: isInsure,
         };
         console.log(this.relatedKey, JSON.stringify(data));
-        ticket.createOrder(this.relatedKey, data).then((res) => {
-          if (res.errorcode === 10000) {
-            let orderId = [];
-            let priceList = [];
-            let priceNumber = 0;
-            res.data.forEach((item) => {
-              orderId.push(item.order_no);
-              priceList.push(item.need_pay_amount);
-              priceNumber += item.need_pay_amount;
-            });
+        ticket
+          .createOrder(this.relatedKey, data)
+          .then((res) => {
+            if (res.errorcode === 10000) {
+              let orderId = [];
+              let priceList = [];
+              let priceNumber = 0;
+              res.data.forEach((item) => {
+                orderId.push(item.order_no);
+                priceList.push(item.need_pay_amount);
+                priceNumber += item.need_pay_amount;
+              });
 
-            console.log(orderId,this.flightData,priceList,priceNumber)
+              console.log(orderId, this.flightData, priceList, priceNumber);
 
-            uni.navigateTo({
-              url:
-                "/pages/flightReservation/orderPay?orderId=" +
-                JSON.stringify(orderId) +
-                "&flightData=" +
-                JSON.stringify(this.flightData) +
-                "&priceList=" +
-                JSON.stringify(priceList) +
-                "&price=" +
-                priceNumber +
-                "&type=false",
-            });
-            console.log(res.data, this.flightData);
-          } else {
+              uni.navigateTo({
+                url:
+                  "/pages/flightReservation/orderPay?orderId=" +
+                  JSON.stringify(orderId) +
+                  "&flightData=" +
+                  JSON.stringify(this.flightData) +
+                  "&priceList=" +
+                  JSON.stringify(priceList) +
+                  "&price=" +
+                  priceNumber +
+                  "&type=false",
+              });
+              console.log(res.data, this.flightData);
+            } else {
+              uni.showToast({
+                title: res.data,
+                icon: "none",
+                duration: 3000,
+              });
+            }
+          })
+          .catch(() => {
             uni.showToast({
-              title: res.data,
+              title: "接口数据错误，请联系客服处理",
               icon: "none",
-              duration: 3000
+              duration: 3000,
             });
-          }
-        });
+          });
       }
     },
   },

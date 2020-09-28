@@ -2,13 +2,17 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-25 14:20:53
+ * @LastEditTime: 2020-09-28 09:44:53
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="ticketRoundTrip">
     <!-- 导航栏 -->
-    <yun-header :statusHeight="iStatusBarHeight" :statusType="true" :headerAddress="ticketAddress"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      :statusType="true"
+      :headerAddress="ticketAddress"
+    ></yun-header>
     <!-- 往返时间 -->
     <view class="header_time" v-if="!showDefaultType">
       <round-trip-header :timeData="timeData"></round-trip-header>
@@ -26,13 +30,13 @@
       <view class="round_trip_header" v-if="showRoundTrip">
         <view class="header_box">
           <view class="box_tag">已选去程</view>
-          <text>{{showRoundTripData.toCode}}</text>
-          <text>{{showRoundTripData.toTime}}</text>
+          <text>{{ showRoundTripData.toCode }}</text>
+          <text>{{ showRoundTripData.toTime }}</text>
         </view>
         <view class="header_box">
           <view class="box_tag">已选返程</view>
-          <text>{{showRoundTripData.fromCode}}</text>
-          <text>{{showRoundTripData.fromTime}}</text>
+          <text>{{ showRoundTripData.fromCode }}</text>
+          <text>{{ showRoundTripData.fromTime }}</text>
         </view>
       </view>
       <view class="flight_content">
@@ -40,33 +44,46 @@
           <view
             v-for="(item, index) in flightList"
             :key="index"
-            @click="checkedFlight('to',item,index)"
-            :class="[{toActive: index === toActive},'flight_box']"
+            @click="checkedFlight('to', item, index)"
+            :class="[{ toActive: index === toActive }, 'flight_box']"
           >
             <view class="box_top">
               <view class="top_time start_time">
-                <view class="time">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
-                <view
-                  class="address"
-                >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+                <view class="time">{{
+                  $dateTool(item.segments[0].depTime, "HH:mm")
+                }}</view>
+                <view class="address"
+                  >{{ item.segments[0].depAirport_CN.air_port_name
+                  }}{{
+                    item.segments[0].depTerminal !== "--"
+                      ? item.segments[0].depTerminal
+                      : ""
+                  }}</view
+                >
               </view>
               <view class="flight_line">
                 <view class="time">
                   {{ Math.floor(item.segments[0].duration / 60) }}h{{
-                  Math.floor(item.segments[0].duration % 60)
+                    Math.floor(item.segments[0].duration % 60)
                   }}m
                 </view>
                 <view class="line_icon"></view>
-                <view
-                  class="ticket_type"
-                  v-if="item.segments.length > 1"
-                >{{item.segments.length - 1}}转</view>
+                <view class="ticket_type" v-if="item.segments.length > 1"
+                  >{{ item.segments.length - 1 }}转</view
+                >
               </view>
               <view class="top_time end_time">
-                <view class="time">{{$dateTool(item.segments[0].arrTime,'HH:mm')}}</view>
-                <view
-                  class="address"
-                >{{item.segments[0].arrAirport_CN.air_port_name}}{{item.segments[0].arrTerminal !== '--' ?item.segments[0].arrTerminal : ''}}</view>
+                <view class="time">{{
+                  $dateTool(item.segments[0].arrTime, "HH:mm")
+                }}</view>
+                <view class="address"
+                  >{{ item.segments[0].arrAirport_CN.air_port_name
+                  }}{{
+                    item.segments[0].arrTerminal !== "--"
+                      ? item.segments[0].arrTerminal
+                      : ""
+                  }}</view
+                >
               </view>
             </view>
             <view class="total_price_message">
@@ -76,15 +93,19 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[item.segments.length - 1].image"
+                  :src="
+                    'https://fxxcx.ystrip.cn/' +
+                    item.segments[item.segments.length - 1].image
+                  "
                   mode="contain"
                 />
-                {{item.segments[item.segments.length - 1].airline_CN}}{{item.segments[item.segments.length - 1].flightNumber}}
+                {{ item.segments[item.segments.length - 1].airline_CN
+                }}{{ item.segments[item.segments.length - 1].flightNumber }}
               </view>
               <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{item.min_price}}</text>
+                <text>{{ item.min_price }}</text>
                 <!-- <view class="price_mini">起</view> -->
               </view>
               <view v-else class="not_price">售罄</view>
@@ -94,7 +115,7 @@
           <!-- 骨架屏 -->
           <view
             class="flight_skeleton"
-            v-for="i in flightList.length < 1?skeletonNumber:0"
+            v-for="i in flightList.length < 1 ? skeletonNumber : 0"
             :key="i"
           >
             <view class="top">
@@ -113,33 +134,51 @@
           <view
             v-for="(item, index) in roundFlightList"
             :key="index"
-            @click="checkedFlight('from',item,index)"
-            :class="[{fromActive: index === fromActive},'flight_box']"
+            @click="checkedFlight('from', item, index)"
+            :class="[{ fromActive: index === fromActive }, 'flight_box']"
           >
             <view class="box_top">
               <view class="top_time start_time">
-                <view class="time">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
-                <view
-                  class="address"
-                >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+                <view class="time">{{
+                  $dateTool(item.segments[0].depTime, "HH:mm")
+                }}</view>
+                <view class="address"
+                  >{{ item.segments[0].depAirport_CN.air_port_name
+                  }}{{
+                    item.segments[0].depTerminal !== "--"
+                      ? item.segments[0].depTerminal
+                      : ""
+                  }}</view
+                >
               </view>
               <view class="flight_line">
                 <view class="time">
                   {{ Math.floor(item.segments[0].duration / 60) }}h{{
-                  Math.floor(item.segments[0].duration % 60)
+                    Math.floor(item.segments[0].duration % 60)
                   }}m
                 </view>
                 <view class="line_icon"></view>
-                <view
-                  class="ticket_type"
-                  v-if="item.segments.length > 1"
-                >{{item.segments.length - 1}}转</view>
+                <view class="ticket_type" v-if="item.segments.length > 1"
+                  >{{ item.segments.length - 1 }}转</view
+                >
               </view>
               <view class="top_time end_time">
-                <view class="time">{{$dateTool(item.segments[item.segments.length - 1].arrTime,'HH:mm')}}</view>
-                <view
-                  class="address"
-                >{{item.segments[item.segments.length - 1].arrAirport_CN.air_port_name}}{{item.segments[item.segments.length - 1].arrTerminal !== '--' ?item.segments[item.segments.length - 1].arrTerminal : ''}}</view>
+                <view class="time">{{
+                  $dateTool(
+                    item.segments[item.segments.length - 1].arrTime,
+                    "HH:mm"
+                  )
+                }}</view>
+                <view class="address"
+                  >{{
+                    item.segments[item.segments.length - 1].arrAirport_CN
+                      .air_port_name
+                  }}{{
+                    item.segments[item.segments.length - 1].arrTerminal !== "--"
+                      ? item.segments[item.segments.length - 1].arrTerminal
+                      : ""
+                  }}</view
+                >
               </view>
             </view>
             <view class="total_price_message">
@@ -149,15 +188,19 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/'+ item.segments[item.segments.length - 1].image"
+                  :src="
+                    'https://fxxcx.ystrip.cn/' +
+                    item.segments[item.segments.length - 1].image
+                  "
                   mode="contain"
                 />
-                {{item.segments[item.segments.length - 1].airline_CN}}{{item.segments[item.segments.length - 1].flightNumber}}
+                {{ item.segments[item.segments.length - 1].airline_CN
+                }}{{ item.segments[item.segments.length - 1].flightNumber }}
               </view>
               <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{item.min_price}}</text>
+                <text>{{ item.min_price }}</text>
                 <!-- <view class="price_mini">起</view> -->
               </view>
               <view v-else class="not_price">售罄</view>
@@ -167,7 +210,7 @@
           <!-- 骨架屏 -->
           <view
             class="flight_skeleton"
-            v-for="i in roundFlightList.length < 1? skeletonRoundNumber :0"
+            v-for="i in roundFlightList.length < 1 ? skeletonRoundNumber : 0"
             :key="i"
           >
             <view class="top">
@@ -192,7 +235,11 @@
     ></default-page>
 
     <view class="filter" v-if="!showDefaultType">
-      <flight-filter @openFilter="openFilter" :filterMini="true" @filterType="listFilter"></flight-filter>
+      <flight-filter
+        @openFilter="openFilter"
+        :filterMini="true"
+        @filterType="listFilter"
+      ></flight-filter>
     </view>
 
     <flight-filter-dialog
@@ -206,15 +253,17 @@
       <view class="left_message">
         <view class="price_box">
           <text>&yen;</text>
-          {{price}}
+          {{ price }}
         </view>
         <view class="not_pass_message">往返总价</view>
       </view>
       <button
         :disabled="submitBtnType"
-        :class="['right_btn',{'is_false': submitBtnType}]"
+        :class="['right_btn', { is_false: submitBtnType }]"
         @click="submitRoundTrip()"
-      >下一步</button>
+      >
+        下一步
+      </button>
     </view>
   </view>
 </template>
@@ -317,7 +366,7 @@ export default {
       let data = {
         departure: this.ticketAddress.to.city_code, // 起飞机场三字码
         arrival: this.ticketAddress.from.city_code, // 到达机场三字码
-        departureTime: this.ticketAddress.toTime.date, // 起飞时间
+        departureTime: this.timeData.toTime.date, // 起飞时间
         airline: "", // 航司二字码
         only_segment: 1,
       };
@@ -358,7 +407,7 @@ export default {
       let data = {
         departure: this.ticketAddress.from.city_code, // 起飞机场三字码
         arrival: this.ticketAddress.to.city_code, // 到达机场三字码
-        departureTime: this.ticketAddress.fromTime.date, // 起飞时间
+        departureTime: this.timeData.fromTime.date, // 起飞时间
         airline: "", // 航司二字码
         only_segment: 1,
       };
@@ -483,7 +532,7 @@ export default {
     // 确认筛选
     ticketFilter(val, status) {
       console.log(val, status);
-      console.log(this.flightList,this.roundFlightList)
+      console.log(this.flightList, this.roundFlightList);
       if (!status && val.length < 1) {
         this.flightList = this.oldFlightList;
         this.roundFlightList = this.oldRoundFlightList;
@@ -507,7 +556,7 @@ export default {
           this.roundFlightList = this.oldRoundFlightList;
         }
         if (val[0].indexOf("上午") !== -1) {
-          console.log('上午')
+          console.log("上午");
           this.flightList = this.flightList.filter(
             (item) =>
               new Date(item.segments[0].depTime).getHours() >= 0 &&
@@ -601,15 +650,20 @@ export default {
         end: this.roundFlightKey,
       };
 
-      console.log('往返跳转',"/pages/flightInfo/flightInfo?airMessage="+ JSON.stringify(this.ticketData) +
+      console.log(
+        "往返跳转",
+        "/pages/flightInfo/flightInfo?airMessage=" +
+          JSON.stringify(this.ticketData) +
           "&roundTripData=" +
           JSON.stringify(data) +
           "&roundTripKey=" +
           JSON.stringify(roundTripKey) +
-          "&pageType=true")
+          "&pageType=true"
+      );
       uni.navigateTo({
         url:
-          "/pages/flightInfo/flightInfo?airMessage="+ JSON.stringify(this.ticketData) +
+          "/pages/flightInfo/flightInfo?airMessage=" +
+          JSON.stringify(this.ticketData) +
           "&roundTripData=" +
           JSON.stringify(data) +
           "&roundTripKey=" +
@@ -617,6 +671,46 @@ export default {
           "&pageType=true",
       });
     },
+  },
+  onShow() {
+    let startTime = uni.getStorageSync("time");
+    let endTime = uni.getStorageSync("roundTime");
+
+    if (startTime && endTime) {
+      if(JSON.parse(startTime).date !== this.timeData.toTime.date){
+        this.timeData.toTime = JSON.parse(startTime)
+        this.price = this.price - this.flightList[this.toActive].min_price;
+        this.file_key = ''
+        this.flightList = []
+        this.oldFlightList = []
+        this.skeletonNumber = 6;
+        this.dataListApplyType = false;
+        this.submitBtnType = true
+        this.getTicketData();
+      }
+      if(JSON.parse(endTime).date !== this.timeData.fromTime.date){
+        this.price = this.price - this.roundFlightList[this.fromActive].min_price;
+        this.timeData.fromTime = JSON.parse(endTime)
+        this.roundFlightKey = ''
+        this.roundFlightList = []
+        this.oldRoundFlightList = []
+        this.skeletonRoundNumber = 6
+        this.dataRoundListApplyType = false
+        this.submitBtnType = true
+
+        this.getRoundTicketData();
+      }
+
+
+      this.timeData.jetLag = moment(JSON.parse(endTime).date).diff(moment(JSON.parse(startTime).date), "days")
+
+      console.log("往返时间", this.timeData);
+      
+      this.getScrollData();
+    }
+
+    uni.removeStorageSync("time");
+    uni.removeStorageSync("roundTime");
   },
   onLoad(data) {
     // let data = uni.getStorageSync("data");
@@ -635,6 +729,8 @@ export default {
         "days"
       ),
     };
+
+    console.log("往返时间", this.timeData);
 
     this.price = 0;
     this.getTicketData();
