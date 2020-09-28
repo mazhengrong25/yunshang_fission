@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-28 18:38:47
+ * @LastEditTime: 2020-09-28 18:41:09
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -38,7 +38,7 @@
           <view class="arrow_icon"></view>
         </view>
         <view class="right_message address_message">
-          <view class="time">{{$dateTool(flightData.data[0][interType?'arrTime':'arrarture_time'],'HH:mm')}}</view>
+          <view class="time">{{$dateTool(flightData.data[0][interType?'arrTime':'arrive_time'],'HH:mm')}}</view>
           <view
             class="address"
           >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}</view>

@@ -2,8 +2,13 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-28 18:31:35
+<<<<<<< HEAD
+ * @LastEditTime: 2020-09-28 18:41:38
  * @LastEditors: wish.WuJunLong
+=======
+ * @LastEditTime: 2020-09-28 15:45:46
+ * @LastEditors: mazhengrong
+>>>>>>> 0fe8e088eb6bb74c567b0cf30edab30ca6acdfaf
 -->
 <template>
   <view class="filter">
@@ -543,7 +548,7 @@ export default {
 <style lang="less" scoped>
 .filter {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   height: 100vh;
   position: relative;
   .filter_main {

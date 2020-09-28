@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-27 17:49:09
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-28 18:31:32
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_details">
@@ -111,7 +111,7 @@
         >
         <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
         <view class="option_btn" v-if="orderDetails.status === 5 || (orderDetails.pay_status === 1 && orderDetails.status === 1 && !$timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000))"
-          >再次预定</view
+        @click="reOrder()">再次预定</view
         >
       </view>
     </view>
@@ -329,6 +329,14 @@ export default {
         },
 
       cancelType: false, // 取消订单状态
+
+      ticketOrder: {
+
+        to:"",
+        from:"",
+        toTime:"",
+        fromTime:""
+      }
     };
   },
   methods: {
@@ -492,6 +500,14 @@ export default {
       });
     },
 
+    // 再次预定
+    reOrder(data) {
+      console.log(this.orderDetails)
+      uni.navigateTo({
+        url:"/pages/ticketInquiry/ticketInquiry" + JSON.stringify(this.orderDetails)
+      })
+    },
+
     onLoad(data) {
       console.log("国内", data);
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -499,11 +515,23 @@ export default {
       console.log(this.orderId);
 
       this.type = data.roundType; //去程  返程
-      
       this.cancelType = data.cancel?data.cancel:false  //取消订单
       this.cancelOrderType = data.cancel !== ''
       console.log('取消订单',this.cancelType,data.cancel)
       
+      // 组装数据
+      this.ticketOrder = {
+      // to: this.ticketData.to_type ==='air'?this.ticketData.to.air_port_name:this.ticketData.to.city_name,
+      // from: this.ticketData.from_type ==='air'?this.ticketData.from.air_port_name:this.ticketData.from.city_name,
+      // departure:
+      //   this.ticketData.to_type === "air"
+      //     ? this.ticketData.to.air_port
+      //     : this.ticketData.to.city_code, // 起飞机场三字码
+      // arrival:
+      //   this.ticketData.from_type === "air"
+      //     ? this.ticketData.from.air_port
+      //     : this.ticketData.from.city_code, // 到达机场三字码
+      };
       this.orderListType = data.type;
       this.orderHeaderTitle =
         this.orderListType === "0"

@@ -2,8 +2,17 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-28 18:34:04
+<<<<<<< HEAD
+ * @LastEditTime: 2020-09-28 18:42:02
+=======
+<<<<<<< HEAD
+ * @LastEditTime: 2020-09-28 17:03:07
  * @LastEditors: wish.WuJunLong
+=======
+ * @LastEditTime: 2020-09-28 16:00:20
+>>>>>>> 0fe8e088eb6bb74c567b0cf30edab30ca6acdfaf
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 4223b00e98077d7df0c5c196c79de01a0633daa2
 -->
 <template>
   <view class="order_list">
@@ -793,6 +802,7 @@ export default {
         ? "国际改签订单"
         : "";
     console.log("orderHeaderTitle", this.orderHeaderTitle);
+    
   },
   onHide() {
     this.orderList = [];
@@ -816,6 +826,9 @@ export default {
       if (this.orderListFilter.status !== null) {
         this.checkedHeaderActive(this.orderListFilter.status);
       }
+      console.log("订单列表筛选", this.innerList);
+
+      uni.removeStorageSync("orderListFilter");
     }
 
   },
