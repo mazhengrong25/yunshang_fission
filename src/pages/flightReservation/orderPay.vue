@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-27 16:41:27
+ * @LastEditTime: 2020-09-28 11:38:31
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -11,16 +11,12 @@
       :statusHeight="iStatusBarHeight"
       centerTitle="确认支付"
     ></yun-header>
-    <view class="order_price" v-if="JSON.stringify(payData) !== '{}'">
+    <view class="order_price">
       <text>订单总价</text>
       <view>
         <text>&yen;</text>
         {{ price }}
       </view>
-    </view>
-
-    <view class="price_other" v-else>
-          数据获取中
     </view>
 
     <scroll-view
@@ -388,7 +384,7 @@ export default {
     }
   }
   .price_other {
-        color: #ffffff;
+        color: rgba(255, 255, 255, 1)
   }
   .order_pay_main {
     position: relative;
