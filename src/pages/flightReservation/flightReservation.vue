@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-28 16:02:35
+ * @LastEditTime: 2020-09-29 09:11:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -643,6 +643,13 @@ export default {
             uni.navigateBack();
           }, 3000);
         }
+      }).catch(() =>{
+        uni.showToast({
+            title: "接口数据错误，请联系客服处理",
+            icon: "none",
+            mask: true,
+            duration: 3000,
+          });
       });
     },
 
@@ -782,18 +789,25 @@ export default {
             this.showData = true;
           } else {
             uni.showToast({
-              title: res.data,
-              icon: "none",
-              mask: true,
-              duration: 3000,
-            });
+            title: res.data || "数据获取错误，请稍后再试",
+            icon: "none",
+            mask: true,
+            duration: 3000,
+          });
             setTimeout(() => {
               uni.navigateBack();
 
               uni.setStorageSync("errorFlightData", "又他妈报错了");
             }, 3000);
           }
-        });
+        }).catch(() =>{
+        uni.showToast({
+            title: "接口数据错误，请联系客服处理",
+            icon: "none",
+            mask: true,
+            duration: 3000,
+          });
+      });
     },
 
     // 保险选择

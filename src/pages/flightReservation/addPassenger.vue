@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-09-25 09:25:03
+ * @LastEditTime: 2020-09-29 09:36:41
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -74,7 +74,7 @@
             <text>出生日期</text>
           </view>
 
-          <view class="item_input" @click="openBirthdaySelector(passenger.birthday)">
+          <view class="item_input" @click="openBirthdaySelector(passenger.birthday,'birthday')">
             <text v-if="passenger.birthday">{{passenger.birthday}}</text>
             <text class="input_placeholder" v-else>请选择出生年月日</text>
           </view>
@@ -127,8 +127,8 @@
                 <text>证件有效期</text>
               </view>
 
-              <view class="item_input" @click="openBirthdaySelector(passenger.birthday)">
-                <text v-if="passenger.birthday">{{passenger.birthday}}</text>
+              <view class="item_input" @click="openBirthdaySelector(passenger.cert_ex_date,'cardTime')">
+                <text v-if="passenger.cert_ex_date">{{passenger.cert_ex_date}}</text>
                 <text class="input_placeholder" v-else>请选择证件有效截至日期</text>
               </view>
             </view>
@@ -138,8 +138,8 @@
                 <text>证件签发国</text>
               </view>
 
-              <view class="item_input" @click="openBirthdaySelector(passenger.birthday)">
-                <text v-if="passenger.birthday">{{passenger.birthday}}</text>
+              <view class="item_input">
+                <text v-if="passenger.nationality">{{passenger.nationality}}</text>
                 <text class="input_placeholder" v-else>请选择证件签发国家</text>
               </view>
             </view>
@@ -281,6 +281,8 @@ export default {
         },
       ],
 
+      checkedTimeType: '', // 时间选择器类型
+
       certificateIndex: "", // 更改证件类型下标
 
       certificateTypeList: ["身份证", "护照", "其他证件"], //证件类型列表
@@ -325,14 +327,20 @@ export default {
     },
 
     // 打开出生日期选择框
-    openBirthdaySelector(data) {
+    openBirthdaySelector(data,type) {
+      this.checkedTimeType = type
       this.$refs.birthdayPopup.openDialog();
     },
-    // 确认出生日期
+    // 确认出生日期 || 证件有效期
     birthdaySelecctBtn(e) {
       console.log(e);
-      let birthday = e.year + "-" + e.month + "-" + e.day
-      this.$set(this.passenger, 'birthday',birthday)
+      let time = e.year + "-" + e.month + "-" + e.day
+      if(this.checkedTimeType === 'birthday'){
+        this.$set(this.passenger, 'birthday',time)
+      }else if(this.checkedTimeType === 'cardTime'){
+        this.$set(this.passenger, 'cert_ex_date',time)
+      }
+      
     },
 
     // 打开证件类型选择框

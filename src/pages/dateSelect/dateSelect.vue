@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-28 16:07:48
+ * @LastEditTime: 2020-09-29 10:12:50
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -98,7 +98,9 @@ export default {
       roundData: {}, // 往返日期数据
       roundTimeStatus: false, // 往返状态
 
-      checkedRoundTime: false
+      checkedRoundTime: false,
+
+      checkedToTime: '', // 已选择出发日期
     };
   },
   methods: {
@@ -202,6 +204,21 @@ export default {
     checkedDayBtn(month, day) {
       console.log("时间点击", month, day);
       if (day.status) {
+        if(this.timeStatus === 'end' && this.checkedToTime && moment(day.date).isBefore(this.checkedToTime)){
+          return uni.showToast({
+            title: '已选返程： '+this.checkedToTime+' 低于去程时间，请重新选择',
+            icon: 'none',
+            duration: 3000
+          });
+        }else if(this.timeStatus === 'start' && this.checkedToTime && moment(this.checkedToTime).isBefore(day.date)){
+          return uni.showToast({
+            title: '已选去程：'+ this.checkedToTime +' 高于返程时间，请重新选择',
+            icon: 'none',
+            duration: 3000
+          });
+        }
+
+
         if (this.roundTimeStatus) {
 
           if(!this.roundTripStatus){
@@ -414,6 +431,8 @@ export default {
     // 组装单程日期更换
     this.ticketData = data.ticketType ? JSON.parse(data.ticketType) : {};
 
+    this.checkedToTime = data.checkedToTime
+
     console.log(data.roundDate);
     // 组装往返日期
     if (data.roundDate) {
@@ -611,6 +630,11 @@ export default {
               font-weight: 500;
               color: #2a2a2a;
               top: 0;
+            }
+            &.to{
+              &::before{
+                content: "去程返程";
+              }
             }
           }
         }

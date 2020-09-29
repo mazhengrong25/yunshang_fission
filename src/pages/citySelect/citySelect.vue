@@ -2,7 +2,7 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-24 15:29:17
+ * @LastEditTime: 2020-09-29 09:57:01
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -142,6 +142,8 @@ export default {
       Areaaddress: {}, // 当前定位地理位置
 
       notCity: false, // 未找到相关信息
+
+      checkedCity: '', // 已选择城市
     };
   },
   methods: {
@@ -287,6 +289,14 @@ export default {
 
     // 获取城市信息 填入地址信息
     getCityData(val, type) {
+      console.log(val)
+      if(val.city_name === this.checkedCity){
+        return uni.showToast({
+          title: '已选择当前城市，请更换地区',
+          icon: 'none',
+          duration: 3000
+        });
+      }
       let data = {
         type: type,
         status: this.cityType,
@@ -362,6 +372,8 @@ export default {
     ); // 生成A-Z数组
     this.getAirData();
     this.cityType = data.type;
+
+    this.checkedCity = data.address
   },
 };
 </script>

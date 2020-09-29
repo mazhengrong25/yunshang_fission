@@ -2,16 +2,23 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-28 14:18:22
+ * @LastEditTime: 2020-09-29 11:36:46
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="passenger">
-    <yun-header :statusHeight="iStatusBarHeight" :centerTitle="passengerType?'旅客管理': '选择乘机人'"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      :centerTitle="passengerType ? '旅客管理' : '选择乘机人'"
+    ></yun-header>
     <view class="header_box" v-if="!showDefault">
       <view class="add_passenger_btn" @click="jumpAddPassenger()">
-        <image class="add_icon" src="@/static/add_passenger_btn.png" mode="contain" />
-        <text>{{ passengerType?'新增旅客':'新增乘机人' }}</text>
+        <image
+          class="add_icon"
+          src="@/static/add_passenger_btn.png"
+          mode="contain"
+        />
+        <text>{{ passengerType ? "新增旅客" : "新增乘机人" }}</text>
       </view>
     </view>
 
@@ -19,29 +26,42 @@
       <view class="mian_header">
         <view class="title">常用乘机人</view>
         <view class="filter" @click="openGroupSelect">
-          <text>{{group.group_name?group.group_name: '筛选'}}</text>
-          <image class="filter_icon" src="@/static/arrow_bule.png" mode="contain" />
+          <text>{{ group.group_name ? group.group_name : "筛选" }}</text>
+          <image
+            class="filter_icon"
+            src="@/static/arrow_bule.png"
+            mode="contain"
+          />
         </view>
       </view>
 
-      <scroll-view :enable-back-to-top="true" :scroll-y="true" class="mian_list">
+      <scroll-view
+        :enable-back-to-top="true"
+        :scroll-y="true"
+        class="mian_list"
+      >
         <uni-swipe-action :disabled="passengerType">
-          <uni-swipe-action-item v-for="(item, index) in passengerList" :key="index">
+          <uni-swipe-action-item
+            v-for="(item, index) in passengerList"
+            :key="index"
+          >
             <view class="list_item" @click="checkedPassenger(item, index)">
               <view class="checked" v-if="!passengerType">
                 <radio :checked="item.checked" color="#0070E2" />
               </view>
               <view class="item_info">
                 <view class="info_top">
-                  <view class="type">{{item.type}}</view>
-                  <view
-                    class="user_name"
-                  >{{item.name || item.en_first_name + '/' + item.en_last_name}}</view>
-                  <view class="position">{{item.group?item.group:'未分组'}}</view>
+                  <view class="type">{{ item.type }}</view>
+                  <view class="user_name">{{
+                    item.name || item.en_first_name + "/" + item.en_last_name
+                  }}</view>
+                  <view class="position">{{
+                    item.group ? item.group : "未分组"
+                  }}</view>
                 </view>
                 <view class="info_bottom">
-                  <view class="bottom_title">{{item.cert_type}}</view>
-                  <view class="card">{{item.cert_no}}</view>
+                  <view class="bottom_title">{{ item.cert_type }}</view>
+                  <view class="card">{{ item.cert_no }}</view>
                 </view>
               </view>
 
@@ -50,7 +70,11 @@
             <template v-slot:right>
               <view class="option_box">
                 <view class="delete_btn" @click="removePassenger(item, index)">
-                  <image class="delete_btn_icon" src="@/static/delete_btn.png" mode="contain" />
+                  <image
+                    class="delete_btn_icon"
+                    src="@/static/delete_btn.png"
+                    mode="contain"
+                  />
                   <text>删除</text>
                 </view>
               </view>
@@ -81,7 +105,7 @@
     <yun-config
       ref="yunConfig"
       :showInput="true"
-      :submitText="{left:'取消',right:'确认'}"
+      :submitText="{ left: '取消', right: '确认' }"
       submitIndex="right"
       title="请输入姓名"
       @submitConfig="submitConfig"
@@ -140,11 +164,12 @@ export default {
           group_id: id,
         };
       }
-      console.log(data);
       passenger.getPassenger(data).then((res) => {
-        console.log(res);
         if (res.errorcode === 10000) {
           this.passengerList = res.data.data;
+
+          console.log(this.passengerList);
+
           this.passengerList.forEach((item) => {
             item["type"] =
               moment().diff(item.birthday, "years") < 12 &&
@@ -165,6 +190,22 @@ export default {
             });
           }
           this.showDefault = false;
+
+          this.passengerList = this.passengerList.sort((x, y) => {
+            let reg = /[a-zA-Z0-9]/
+            console.log("排序", x.name, y.name ,  reg.test(x.name), reg.test(y.name));
+            if (reg.test(x.name) || reg.test(y.name)) {
+              if (x.name > y.name) {
+                return 1;
+              } else if (x.name < y.name) {
+                return -1;
+              } else {
+                return 0;
+              }
+            } else {
+              return x.name.localeCompare(y.name);
+            }
+          });
         }
       });
     },
@@ -342,6 +383,7 @@ export default {
       this.getPassengerData();
       uni.removeStorageSync("addPassenger");
     }
+    this.getGroupList();
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -359,7 +401,6 @@ export default {
     // };
     console.log(this.chdinfNumber);
     this.getPassengerData();
-    this.getGroupList();
   },
 };
 </script>

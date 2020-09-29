@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-28 15:24:49
+ * @LastEditTime: 2020-09-29 10:51:14
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -43,7 +43,7 @@
               }}</view>
               <view class="item_info">
                 <text class="info_title">舱位</text>
-                <text class="info_text">{{ item.type }}</text>
+                <text class="info_text">{{ item.cabin }}</text>
               </view>
               <view class="item_info">
                 <text class="info_title">票面价</text>
@@ -921,6 +921,8 @@ export default {
     this.roundTripType = data.pageType ? JSON.parse(data.pageType) : false;
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.airMessage = JSON.parse(data.airMessage);
+
+    console.log(this.airMessage)
 
     if (this.roundTripType) {
       console.log(JSON.parse(data.roundTripData));

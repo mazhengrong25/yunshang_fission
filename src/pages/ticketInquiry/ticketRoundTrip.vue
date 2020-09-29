@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-28 09:44:53
+ * @LastEditTime: 2020-09-29 09:50:36
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -74,13 +74,13 @@
               </view>
               <view class="top_time end_time">
                 <view class="time">{{
-                  $dateTool(item.segments[0].arrTime, "HH:mm")
+                  $dateTool(item.segments[item.segments.length - 1].arrTime, "HH:mm")
                 }}</view>
                 <view class="address"
-                  >{{ item.segments[0].arrAirport_CN.air_port_name
+                  >{{ item.segments[item.segments.length - 1].arrAirport_CN.air_port_name
                   }}{{
-                    item.segments[0].arrTerminal !== "--"
-                      ? item.segments[0].arrTerminal
+                    item.segments[item.segments.length - 1].arrTerminal !== "--"
+                      ? item.segments[item.segments.length - 1].arrTerminal
                       : ""
                   }}</view
                 >
