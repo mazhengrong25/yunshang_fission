@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-29 09:11:19
+ * @LastEditTime: 2020-09-29 18:02:09
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -266,7 +266,7 @@
           "
           >《关于规范互联网机票销售行为的通知》</text
         >
-        <text
+        <text v-if="statement.title"
           @click="
             openStatementWeb(
               'https://fxxcx.ystrip.cn/air_file/' +
@@ -551,106 +551,110 @@ export default {
       let data = {
         price: this.price,
       };
-      ticket.getTicketInfo(this.relatedKey, data).then((res) => {
-        if (res.errorcode === 10000) {
-          let segmentMessage = res.data.segment; // 航班信息
-          this.flightData = {
+      ticket
+        .getTicketInfo(this.relatedKey, data)
+        .then((res) => {
+          if (res.errorcode === 10000) {
+            let segmentMessage = res.data.segments; // 航班信息
+            this.flightData = {
+              // 组装航班信息
+              flightType: "单程", // 航程类型
+              data: segmentMessage,
+              cabinInfo: res.data.cabinInfo, // 舱位信息
+            };
+
+            console.log("航程信息", res.data);
+
             // 组装航班信息
-            flightType: "单程", // 航程类型
-            data: segmentMessage,
-            cabinInfo: res.data.cabinInfo, // 舱位信息
-          };
+            let filghtMessage = {
+              time: moment(segmentMessage[0].depTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ), // 起飞时间
+              code: segmentMessage[0].flightNumber, // 航班号
+              address:
+                segmentMessage[0].depAirport_CN.city_name +
+                " " +
+                segmentMessage[0].depAirport_CN.city_code +
+                " - " +
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN
+                  .city_name +
+                " " +
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN
+                  .city_code, // 行程
+              cabin: res.data.cabinInfo.cabinDesc, // 舱位
+              price: res.data.adtPrice.rulePrice.price, // 票面价
+              baggage: res.data.cabinInfo.baggage,
+            };
 
-          console.log("航程信息", res.data);
+            // 组装退改信息
+            let gaugeMessage = res.data.ruleInfos;
 
-          // 组装航班信息
-          let filghtMessage = {
-            time: moment(segmentMessage[0].depTime).format(
-              "YYYY-MM-DD HH:mm:ss"
-            ), // 起飞时间
-            code: segmentMessage[0].flightNumber, // 航班号
-            address:
-              segmentMessage[0].depAirport_CN.city_name +
-              " " +
-              segmentMessage[0].depAirport_CN.city_code +
-              " - " +
-              segmentMessage[segmentMessage.length - 1].arrAirport_CN
-                .city_name +
-              " " +
-              segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_code, // 行程
-            cabin: res.data.cabinInfo.cabinDesc, // 舱位
-            price: res.data.adtPrice.rulePrice.price, // 票面价
-            baggage: res.data.cabinInfo.baggage,
-          };
+            this.ruleInfos = {
+              filght: filghtMessage,
+              gauge: gaugeMessage,
+            };
 
-          // 组装退改信息
-          let gaugeMessage = res.data.ruleInfos;
+            this.orderPassenger = {
+              name: res.data.dis_msg.contact,
+              phone: res.data.dis_msg.phone.mobile[0],
+            };
 
-          this.ruleInfos = {
-            filght: filghtMessage,
-            gauge: gaugeMessage,
-          };
+            // 组装分销商数据
+            this.disMessage = res.data.dis_msg;
 
-          this.orderPassenger = {
-            name: res.data.dis_msg.contact,
-            phone: res.data.dis_msg.phone[0],
-          };
+            let insurance_list = res.data.insurance_list; // 组装保险信息
+            insurance_list.forEach((item) => {
+              item["is_insure"] = false;
+              item["type"] = item.insure_desc.indexOf("电子") === -1;
+              item.insure_desc = item.insure_desc.slice(
+                0,
+                item.insure_desc.indexOf("元") + 1
+              );
+            });
+            this.insuranceList = insurance_list;
 
-          // 组装分销商数据
-          this.disMessage = res.data.dis_msg;
+            this.priceInfo = {
+              // 组装金额数据
+              totalPrice: 0, // 总价
+              adtPrice: res.data.adtPrice.settle_price, // 成人票价
+              chdPrice: res.data.chdPrice.price, // 儿童票价
+              infPrice: res.data.infPrice.price, // 婴儿票价
+              buildPrice: Number(res.data.adtPrice.build), // 机建燃油费
+              reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
+            };
 
-          let insurance_list = res.data.insurance_list; // 组装保险信息
-          insurance_list.forEach((item) => {
-            item["is_insure"] = false;
-            item["type"] = item.insure_desc.indexOf("电子") === -1;
-            item.insure_desc = item.insure_desc.slice(
-              0,
-              item.insure_desc.indexOf("元") + 1
-            );
-          });
-          this.insuranceList = insurance_list;
+            this.oldReward = res.data.adtPrice.rulePrice.reward;
 
-          this.priceInfo = {
-            // 组装金额数据
-            totalPrice: 0, // 总价
-            adtPrice: res.data.adtPrice.settle_price, // 成人票价
-            chdPrice: res.data.chdPrice.price, // 儿童票价
-            infPrice: res.data.infPrice.price, // 婴儿票价
-            buildPrice: Number(res.data.adtPrice.build), // 机建燃油费
-            reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
-          };
+            this.statement = {
+              // 组装免责声明
+              title: res.data.air_line.title,
+              url: res.data.air_line.url,
+              code: res.data.air_line.code,
+            };
 
-          this.oldReward = res.data.adtPrice.rulePrice.reward;
+            this.chdinf_msg = res.data.chdinf_msg; // 航司儿童婴儿携带数量组装
 
-          this.statement = {
-            // 组装免责声明
-            title: res.data.air_line.title,
-            url: res.data.air_line.url,
-            code: res.data.air_line.code,
-          };
-
-          this.chdinf_msg = res.data.chdinf_msg; // 航司儿童婴儿携带数量组装
-
-          this.showData = true;
-        } else {
+            this.showData = true;
+          } else {
+            uni.showToast({
+              title: res.data || "数据获取错误，请稍后再试",
+              icon: "none",
+              mask: true,
+              duration: 3000,
+            });
+            setTimeout(() => {
+              uni.navigateBack();
+            }, 3000);
+          }
+        })
+        .catch(() => {
           uni.showToast({
-            title: res.data || "数据获取错误，请稍后再试",
-            icon: "none",
-            mask: true,
-            duration: 3000,
-          });
-          setTimeout(() => {
-            uni.navigateBack();
-          }, 3000);
-        }
-      }).catch(() =>{
-        uni.showToast({
             title: "接口数据错误，请联系客服处理",
             icon: "none",
             mask: true,
             duration: 3000,
           });
-      });
+        });
     },
 
     // 往返预定
@@ -669,7 +673,7 @@ export default {
             // 组装联系人信息
             this.orderPassenger = {
               name: res.data.dis_msg.contact,
-              phone: res.data.dis_msg.phone[0],
+              phone: res.data.dis_msg.phone,
             };
 
             this.flightData = {
@@ -789,25 +793,26 @@ export default {
             this.showData = true;
           } else {
             uni.showToast({
-            title: res.data || "数据获取错误，请稍后再试",
-            icon: "none",
-            mask: true,
-            duration: 3000,
-          });
+              title: res.data || "数据获取错误，请稍后再试",
+              icon: "none",
+              mask: true,
+              duration: 3000,
+            });
             setTimeout(() => {
               uni.navigateBack();
 
               uni.setStorageSync("errorFlightData", "又他妈报错了");
             }, 3000);
           }
-        }).catch(() =>{
-        uni.showToast({
+        })
+        .catch(() => {
+          uni.showToast({
             title: "接口数据错误，请联系客服处理",
             icon: "none",
             mask: true,
             duration: 3000,
           });
-      });
+        });
     },
 
     // 保险选择
@@ -1148,7 +1153,7 @@ export default {
         //   contacts: this.orderPassenger, // 联系人信息
         // };
         ticket
-          .createRoundOrder(this.relatedKey, this.roundRelatedKey, data)
+          .createRoundOrder(this.relatedKey, this.roundRelatedKey, data, this.price, this.roundPrice)
           .then((res) => {
             console.log(res);
             if (res.errorcode === 10000) {
@@ -1177,18 +1182,21 @@ export default {
               });
               console.log(res.data, this.flightData);
             } else {
+              this.trueSubmitOrder = false;
               uni.showToast({
-                title: res.msg,
+                title: res.msg || "接口数据错误，请联系客服处理",
                 icon: "none",
                 duration: 3000,
               });
             }
           })
-          .catch(() => {
+          .catch((err) => {
+            this.trueSubmitOrder = false;
+            console.log('接口报错了');
             uni.showToast({
               title: "接口数据错误，请联系客服处理",
-              icon: "none",
               duration: 3000,
+              icon: "none",
             });
           });
       } else {
@@ -1222,12 +1230,11 @@ export default {
           phone: this.orderPassenger.phone,
           email: this.orderPassenger.email || "",
           flight_no: this.flightData.data[0].flightNumber,
-          price: this.priceInfo.totalPrice,
           IsInsure: isInsure,
         };
         console.log(this.relatedKey, JSON.stringify(data));
         ticket
-          .createOrder(this.relatedKey, data)
+          .createOrder(this.relatedKey, data, this.price)
           .then((res) => {
             if (res.errorcode === 10000) {
               let orderId = [];
@@ -1255,18 +1262,20 @@ export default {
               });
               console.log(res.data, this.flightData);
             } else {
+              this.trueSubmitOrder = false;
               uni.showToast({
-                title: res.data,
+                title: res.data || "接口数据错误，请联系客服处理",
                 icon: "none",
                 duration: 3000,
               });
             }
           })
           .catch(() => {
+            this.trueSubmitOrder = false;
             uni.showToast({
               title: "接口数据错误，请联系客服处理",
-              icon: "none",
               duration: 3000,
+              icon: "none",
             });
           });
       }

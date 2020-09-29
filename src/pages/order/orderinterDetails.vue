@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-29 11:47:16
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-29 14:46:21
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -53,7 +53,7 @@
           orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
             orderDetails.pay_status === 1 &&
-            $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
+            $timeBefore(new Date(orderDetails.updated_at).getTime() + 30 * 60 * 1000)
         "
       >
         <image
@@ -63,7 +63,7 @@
         <text class="time_text"
           >剩余支付时间：{{
             $timeDiff(
-              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000,
+              new Date(orderDetails.updated_at).getTime() + 30 * 60 * 1000,
               new Date(),
               "minutes"
             )
@@ -72,7 +72,7 @@
       </view>
 
       <view class="order_option">
-        <view class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
+        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
           >发送短信</view
         >
         <view
@@ -97,10 +97,10 @@
           @click="jumpOrderPay()"
           >去支付</view
         >
-        <view class="option_btn" v-if="orderDetails.status === 3"
+        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 3"
           >报销凭证</view
         >
-        <view class="option_btn" v-if="orderDetails.status === 3"
+        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 3"
           >发送短信</view
         >
         <view
@@ -109,7 +109,7 @@
           @click="getRefund()"
           >退票</view
         >
-        <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
+        <view class="option_btn" @click="notMessage" v-if="orderDetails.status === 3">改签</view>
         <view class="option_btn" v-if="orderDetails.status === 5 || (orderDetails.pay_status === 1 && orderDetails.status === 1 && !$timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000))"
         @click="reOrder()">再次预定</view
         >
@@ -336,6 +336,15 @@ export default {
     };
   },
   methods: {
+    notMessage(){
+      uni.showToast({
+        title: '相关功能开发中，请等待后续版本更新',
+        icon: 'none',
+        duration: 3000
+      });
+    },
+
+
     // 已预订 取消订单弹窗
     getCancel() {
      

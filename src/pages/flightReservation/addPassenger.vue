@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-09-29 09:36:41
+ * @LastEditTime: 2020-09-29 14:45:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -138,7 +138,7 @@
                 <text>证件签发国</text>
               </view>
 
-              <view class="item_input">
+              <view class="item_input" @click="notMessage">
                 <text v-if="passenger.nationality">{{passenger.nationality}}</text>
                 <text class="input_placeholder" v-else>请选择证件签发国家</text>
               </view>
@@ -299,6 +299,15 @@ export default {
     };
   },
   methods: {
+    notMessage(){
+      uni.showToast({
+        title: '国际功能开发中，请等待后续版本更新',
+        icon: 'none',
+        duration: 3000
+      });
+    },
+
+
     // 姓名转拼音
     switchPinyin() {
       let name = this.passenger.name;

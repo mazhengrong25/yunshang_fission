@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-29 11:36:46
+ * @LastEditTime: 2020-09-29 14:04:46
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -152,6 +152,11 @@ export default {
       });
     },
 
+    compare(property) {
+      
+     
+    },
+
     /**
      * @Description: 获取旅客列表信息
      * @author Wish
@@ -168,9 +173,8 @@ export default {
         if (res.errorcode === 10000) {
           this.passengerList = res.data.data;
 
-          console.log(this.passengerList);
-
           this.passengerList.forEach((item) => {
+            item.name = item.name?item.name:null
             item["type"] =
               moment().diff(item.birthday, "years") < 12 &&
               moment().diff(item.birthday, "years") >= 2
@@ -179,6 +183,13 @@ export default {
                 ? "婴儿"
                 : "成人";
           });
+
+          let reg = /[a-zA-Z0-9]/;
+          this.passengerList.sort((a,b) => {
+            return reg.test(a.name) - reg.test(b.name)
+          })
+
+
           if (this.flightPassengerList.length > 0) {
             this.checkePassenger = this.flightPassengerList;
             this.flightPassengerList.forEach((item, index) => {
@@ -191,21 +202,9 @@ export default {
           }
           this.showDefault = false;
 
-          this.passengerList = this.passengerList.sort((x, y) => {
-            let reg = /[a-zA-Z0-9]/
-            console.log("排序", x.name, y.name ,  reg.test(x.name), reg.test(y.name));
-            if (reg.test(x.name) || reg.test(y.name)) {
-              if (x.name > y.name) {
-                return 1;
-              } else if (x.name < y.name) {
-                return -1;
-              } else {
-                return 0;
-              }
-            } else {
-              return x.name.localeCompare(y.name);
-            }
-          });
+
+          
+
         }
       });
     },
@@ -252,6 +251,8 @@ export default {
             });
           });
           this.groupList.unshift({ group_name: "不限" });
+
+          
         } else {
           uni.showToast({
             title: "分组列表获取失败，" + res.msg,
