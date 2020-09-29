@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-28 18:31:32
+ * @LastEditTime: 2020-09-29 11:47:16
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -330,13 +330,9 @@ export default {
 
       cancelType: false, // 取消订单状态
 
-      ticketOrder: {
-
-        to:"",
-        from:"",
-        toTime:"",
-        fromTime:""
-      }
+      ticketOrder: { //再次预定
+          
+      },
     };
   },
   methods: {
@@ -501,10 +497,37 @@ export default {
     },
 
     // 再次预定
-    reOrder(data) {
-      console.log(this.orderDetails)
+    reOrder() {
+      console.log('再次预定',this.ticketOrder)
+
+      this.ticketOrder = {
+        to: {
+            city_code: this.orderDetails.ticket_segments[0].departure,
+            city_name: this.orderDetails.ticket_segments[0].departure_CN.city_name,
+            country_code: this.orderDetails.ticket_segments[0].departure_CN.country_code,
+            province: this.orderDetails.ticket_segments[0].departure_CN.province,
+          },
+          from: {
+            city_code: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive,
+            city_name: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive_CN.city_name,
+            country_code: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive_CN.country_code,
+            province: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive_CN.province,
+          },
+          toTime: {
+            date: moment(this.orderDetails.ticket_segments[0].departure_time).format("YYYY-MM-DD"),
+            month: moment(this.orderDetails.ticket_segments[0].departure_time).format("M月DD日"),
+            status: "start",
+            type: "time",
+            week: moment(this.orderDetails.ticket_segments[0].departure_time).format("ddd"),
+          },
+          fromTime: {},
+          to_type: '',
+          from_type: '',
+      }
+
+      this.ticketOrder['type'] = 0
       uni.navigateTo({
-        url:"/pages/ticketInquiry/ticketInquiry" + JSON.stringify(this.orderDetails)
+        url:"/pages/ticketInquiry/ticketInquiry?data=" + JSON.stringify(this.ticketOrder)
       })
     },
 
@@ -518,20 +541,7 @@ export default {
       this.cancelType = data.cancel?data.cancel:false  //取消订单
       this.cancelOrderType = data.cancel !== ''
       console.log('取消订单',this.cancelType,data.cancel)
-      
-      // 组装数据
-      this.ticketOrder = {
-      // to: this.ticketData.to_type ==='air'?this.ticketData.to.air_port_name:this.ticketData.to.city_name,
-      // from: this.ticketData.from_type ==='air'?this.ticketData.from.air_port_name:this.ticketData.from.city_name,
-      // departure:
-      //   this.ticketData.to_type === "air"
-      //     ? this.ticketData.to.air_port
-      //     : this.ticketData.to.city_code, // 起飞机场三字码
-      // arrival:
-      //   this.ticketData.from_type === "air"
-      //     ? this.ticketData.from.air_port
-      //     : this.ticketData.from.city_code, // 到达机场三字码
-      };
+
       this.orderListType = data.type;
       this.orderHeaderTitle =
         this.orderListType === "0"
