@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-29 11:47:16
+ * @LastEditTime: 2020-09-29 15:36:50
  * @LastEditors: mazhengrong
 -->
 <template>
@@ -73,7 +73,7 @@
 
       <view class="order_option">
         <view class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
-          >发送短信</view
+        >发送短信</view
         >
         <view
           class="option_btn"
@@ -530,6 +530,8 @@ export default {
         url:"/pages/ticketInquiry/ticketInquiry?data=" + JSON.stringify(this.ticketOrder)
       })
     },
+
+
 
     onLoad(data) {
       console.log("国内", data);

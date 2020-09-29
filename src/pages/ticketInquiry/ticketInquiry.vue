@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-29 11:03:03
+ * @LastEditTime: 2020-09-29 15:54:15
  * @LastEditors: mazhengrong
 --> 
 
@@ -586,7 +586,6 @@ export default {
     // }
 
     this.airMessage = JSON.parse(JSON.stringify(this.ticketData));
-    // this.ticketOrder = JSON.parse(JSON.stringify(this.ticketData));
     
     // 获取时间日期
     if (uni.getStorageSync("time")) {

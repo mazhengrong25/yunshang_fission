@@ -2,8 +2,8 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-28 16:02:35
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-09-29 18:26:18
+ * @LastEditors: mazhengrong
 --> 
 <template>
   <view class="flight_reservation">
@@ -1051,6 +1051,7 @@ export default {
           });
         }
       }
+
       if (this.flightData.data.length > 1 && !this.orderPassenger.email) {
         return uni.showToast({
           title: "请填写邮箱",
