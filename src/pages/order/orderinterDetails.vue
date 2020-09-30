@@ -2,13 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-29 15:36:50
+ * @LastEditTime: 2020-09-30 09:25:16
  * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-09-29 14:46:21
- * @LastEditors: wish.WuJunLong
->>>>>>> 85b625e2b03f77b9ffb6e32396da6ce427221fe1
 -->
 <template>
   <view class="order_details">
@@ -77,13 +72,8 @@
       </view>
 
       <view class="order_option">
-<<<<<<< HEAD
-        <view class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
-        >发送短信</view
-=======
         <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
           >发送短信</view
->>>>>>> 85b625e2b03f77b9ffb6e32396da6ce427221fe1
         >
         <view
           class="option_btn"
