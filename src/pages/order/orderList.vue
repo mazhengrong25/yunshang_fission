@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-29 18:35:18
+ * @LastEditTime: 2020-09-30 09:10:38
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -663,7 +663,7 @@ export default {
             });
 
             //日期条件排序
-            if (this.orderListFilter.date) {
+            if (this.orderListFilter.date !== null) {
               this.sorTime(this.orderListFilter.date);
             }
 
@@ -796,6 +796,8 @@ export default {
       //订单状态筛选
       if (this.orderListFilter.status !== null) {
         this.checkedHeaderActive(this.orderListFilter.status);
+      }else{
+        this.checkedHeaderActive(0)
       }
       console.log("订单列表筛选", this.orderListFilter, this.innerList);
 
