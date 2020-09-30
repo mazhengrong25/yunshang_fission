@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
 <<<<<<< HEAD
- * @LastEditTime: 2020-09-28 18:41:38
+ * @LastEditTime: 2020-09-29 17:28:58
  * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2020-09-28 15:45:46
@@ -413,6 +413,9 @@ export default {
       this.orderNumber = "";
       this.flightNumber = "";
       this.booker = "";
+      let data = {}
+      uni.setStorageSync('orderListFilter',JSON.stringify(data));
+      uni.navigateBack();
     },
 
     // 确定筛选

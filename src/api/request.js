@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-09-28 14:53:18
+ * @LastEditTime: 2020-09-29 16:06:10
  * @LastEditors: wish.WuJunLong
  */
 
@@ -77,12 +77,12 @@ const request = (config, type) => {
                 }
               })
               .catch((error) => {
+                uni.hideLoading();
                 uni.showToast({
                   title: error.data || '数据错误，请联系客服重试',
                   icon: 'none',
                   duration: 3000
                 });
-                uni.hideLoading();
                 reject(error);
               });
           }

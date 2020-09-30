@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-29 10:51:14
+ * @LastEditTime: 2020-09-29 15:36:05
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -484,7 +484,6 @@ export default {
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
-        this.roundTripBtn(1);
       } else if (this.roundTripType && this.roundTripBtnActive === 1) {
         // this.depCabinHeader.forEach(item =>{
         //   this.depCabinList[item].forEach((oitem,oindex) =>{
@@ -762,64 +761,28 @@ export default {
                 if (this.roundTripBtnActive === 0) {
                   this.checkPrice = res.data.price; // 获取验价价格
                   this.checkPriceKey = res.data.keys; // 获取验价key
+                  
                 } else {
                   this.checkRoundPrice = res.data.price; // 获取验价价格
                   this.checkRoundPriceKey = res.data.keys; // 获取验价key
                 }
                 console.log("往返验价");
                 this.getRoundTrip();
+                if(this.roundTripBtnActive === 0){
+                  this.roundTripBtn(1);
+                }
               }
             } else {
               // 价格有修改 弹出提示框
               this.newPrice = res.data.price;
               this.relatedKey = res.data.keys;
-              if (this.roundTripType) {
-                if (this.roundTripBtnActive === 0) {
-                  this.checkPrice = res.data.price; // 获取验价价格
-                  this.checkPriceKey = res.data.keys; // 获取验价key
-                } else {
-                  this.checkRoundPrice = res.data.price; // 获取验价价格
-                  this.checkRoundPriceKey = res.data.keys; // 获取验价key
-                }
-                this.$forceUpdate();
-                console.log("往返验价");
-              }
-              if (type) {
-                this.$set(
-                  this.depCabinList[header][index].data.cabinPrices.ADT
-                    .rulePrice,
-                  "price",
-                  res.data.price
-                );
-                this.$set(
-                  this.depCabinList[header][index].data.cabinPrices.ADT
-                    .rulePrice,
-                  "type",
-                  true
-                );
-                this.$set(
-                  this.depCabinList[header][index].data.cabinPrices.ADT
-                    .rulePrice,
-                  "key",
-                  res.data.keys
-                );
-              } else {
-                this.$set(
-                  this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
-                  "price",
-                  res.data.price
-                );
-                this.$set(
-                  this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
-                  "type",
-                  true
-                );
-                this.$set(
-                  this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
-                  "key",
-                  res.data.keys
-                );
-              }
+              this.checkPriceData = {
+                header: header,
+                index: index,
+                type: type,
+                price: res.data.price,
+                keys: res.data.keys,
+              };
 
               this.$forceUpdate();
 
@@ -827,7 +790,7 @@ export default {
             }
           } else {
             uni.showToast({
-              title: res.data,
+              title: res.msg + res.data.Message,
               icon: "none",
               duration: 3000,
             });
@@ -839,9 +802,130 @@ export default {
     // 关闭验价弹窗
     closeCheckPrice() {
       this.$refs.checkPricePopup.close();
+
+      if (this.roundTripType) {
+        if (this.roundTripBtnActive === 0) {
+          this.checkPrice = this.checkPriceData.price; // 获取验价价格
+          this.checkPriceKey = this.checkPriceData.keys; // 获取验价key
+          this.roundTripBtn(1);
+        } else {
+          this.checkRoundPrice = this.checkPriceData.price; // 获取验价价格
+          this.checkRoundPriceKey = this.checkPriceData.keys; // 获取验价key
+        }
+        this.$forceUpdate();
+        console.log("往返验价");
+      }
+
+      if (this.checkPriceData.type) {
+        this.$set(
+          this.depCabinList[this.checkPriceData.header][
+            this.checkPriceData.index
+          ].data.cabinPrices.ADT.rulePrice,
+          "price",
+          this.checkPriceData.price
+        );
+        this.$set(
+          this.depCabinList[this.checkPriceData.header][
+            this.checkPriceData.index
+          ].data.cabinPrices.ADT.rulePrice,
+          "type",
+          true
+        );
+        this.$set(
+          this.depCabinList[this.checkPriceData.header][
+            this.checkPriceData.index
+          ].data.cabinPrices.ADT.rulePrice,
+          "key",
+          this.checkPriceData.keys
+        );
+      } else {
+        this.$set(
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT.rulePrice,
+          "price",
+          this.checkPriceData.price
+        );
+        this.$set(
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT.rulePrice,
+          "type",
+          true
+        );
+        this.$set(
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT.rulePrice,
+          "key",
+          this.checkPriceData.keys
+        );
+      }
+
+      this.$forceUpdate();
     },
     // 确认验价信息跳转预定页面
     submitCheckPrice() {
+      console.log(
+        this.checkPriceData,
+        this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+      );
+
+      if (this.roundTripType) {
+        if (this.roundTripBtnActive === 0) {
+          this.checkPrice = this.checkPriceData.price; // 获取验价价格
+          this.checkPriceKey = this.checkPriceData.keys; // 获取验价key
+        } else {
+          this.checkRoundPrice = this.checkPriceData.price; // 获取验价价格
+          this.checkRoundPriceKey = this.checkPriceData.keys; // 获取验价key
+        }
+        this.$forceUpdate();
+        console.log("往返验价");
+      }
+
+
+      if (this.checkPriceData.type) {
+        this.$set(
+          this.depCabinList[this.checkPriceData.header][
+            this.checkPriceData.index
+          ].data.cabinPrices.ADT.rulePrice,
+          "price",
+          this.checkPriceData.price
+        );
+        this.$set(
+          this.depCabinList[this.checkPriceData.header][
+            this.checkPriceData.index
+          ].data.cabinPrices.ADT.rulePrice,
+          "type",
+          true
+        );
+        this.$set(
+          this.depCabinList[this.checkPriceData.header][
+            this.checkPriceData.index
+          ].data.cabinPrices.ADT.rulePrice,
+          "key",
+          this.checkPriceData.keys
+        );
+      } else {
+        this.$set(
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT.rulePrice,
+          "price",
+          this.checkPriceData.price
+        );
+        this.$set(
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT.rulePrice,
+          "type",
+          true
+        );
+        this.$set(
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT.rulePrice,
+          "key",
+          this.checkPriceData.keys
+        );
+      }
+
+      this.$forceUpdate();
+
       if (!this.roundTripType) {
         // 单程验价
         this.closeCheckPrice();
@@ -922,7 +1006,7 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.airMessage = JSON.parse(data.airMessage);
 
-    console.log(this.airMessage)
+    console.log(this.airMessage);
 
     if (this.roundTripType) {
       console.log(JSON.parse(data.roundTripData));

@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-29 10:31:39
+ * @LastEditTime: 2020-09-29 18:35:18
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -23,25 +23,35 @@
     </view>
 
     <view class="order_filter">
-      <view class="filter_list" @click="sorTime('create')">
+      <view :class="['filter_list', { active: sortType === 'create' }]" @click="sorTime('create')">
         <view class="list_icon">
-          <image src="@/static/filter_time_active.png" mode="contain" />
+          <image v-if="sortType === 'create'" src="@/static/filter_time_active.png" mode="contain" />
+          <image v-else src="@/static/filter_time.png" mode="contain" />
         </view>
-        <view class="list_title">预定(早-晚)</view>
+        <view class="list_title"
+          >预定(早-晚)</view
+        >
       </view>
 
-      <view class="filter_list" @click="sorTime('depart')">
+      <view :class="['filter_list', { active: sortType === 'fly' }]" @click="sorTime('depart')">
         <view class="list_icon">
-          <image src="@/static/filter_setoff.png" mode="contain" />
+          <image v-if="sortType === 'fly'" src="@/static/filter_setoff_active.png" mode="contain" />
+          <image v-else src="@/static/filter_setoff.png" mode="contain" />
         </view>
-        <view class="list_title">出发(早-晚)</view>
+        <view class="list_title"
+          >出发(早-晚)</view
+        >
       </view>
 
-      <view class="filter_list" @click="goFilter('0')">
+      <view :class="['filter_list',{ active: JSON.stringify(this.orderListFilter) !== '{}' }]" @click="goFilter('0')">
         <view class="list_icon">
-          <image src="@/static/filter_btn_active.png" mode="contain" />
+          <image v-if="JSON.stringify(this.orderListFilter) !== '{}'" src="@/static/filter_btn_active.png" mode="contain" />
+          <image v-else src="@/static/filter_btn.png" mode="contain" />
         </view>
-        <view class="list_title">筛选</view>
+        <view
+          class="list_title"
+          >筛选</view
+        >
       </view>
     </view>
 
@@ -68,7 +78,9 @@
               ? "往返机票"
               : ""
           }}</view>
-          <view class="scheduled_time">{{$dateTool(item.created_at,'YYYY-MM-DD HH:mm')}}</view>
+          <view class="scheduled_time">{{
+            $dateTool(item.updated_at, "YYYY-MM-DD HH:mm")
+          }}</view>
         </view>
         <view
           @click.stop="
@@ -138,7 +150,7 @@
             class="item_time"
             v-if="
               item.pay_status === 1 &&
-              $timeBefore(new Date(item.created_at).getTime() + 30 * 60 * 1000)
+              item.status
             "
           >
             <view class="time_icon">
@@ -148,7 +160,7 @@
             <view class="time_number"
               >{{
                 $timeDiff(
-                  new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                  new Date(item.updated_at).getTime() + 30 * 60 * 1000,
                   new Date(),
                   "minutes"
                 )
@@ -159,7 +171,7 @@
             class="item_btn_box"
             v-if="
               item.pay_status === 1 &&
-              $timeBefore(new Date(item.created_at).getTime() + 30 * 60 * 1000)
+              item.status
             "
           >
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 0)"
@@ -259,11 +271,7 @@
             class="item_time"
             v-if="
               item.from_pay_status === 1 &&
-              $timeDiff(
-                new Date(item.from_created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) > 0
+              item.from_status
             "
           >
             <view class="time_icon">
@@ -273,7 +281,7 @@
             <view class="time_number"
               >{{
                 $timeDiff(
-                  new Date(item.from_created_at).getTime() + 30 * 60 * 1000,
+                  new Date(item.from_updated_at).getTime() + 30 * 60 * 1000,
                   new Date(),
                   "minutes"
                 )
@@ -284,11 +292,7 @@
             class="item_btn_box"
             v-if="
               item.from_pay_status === 1 &&
-              $timeDiff(
-                new Date(item.from_created_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) > 0
+              item.from_status
             "
           >
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 1)"
@@ -406,7 +410,7 @@
             v-if="
               item.pay_status === 1 &&
               $timeDiff(
-                new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                new Date(item.updated_at).getTime() + 30 * 60 * 1000,
                 new Date(),
                 'minutes'
               ) > 0
@@ -419,7 +423,7 @@
             <view class="time_number"
               >{{
                 $timeDiff(
-                  new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                  new Date(item.updated_at).getTime() + 30 * 60 * 1000,
                   new Date(),
                   "minutes"
                 )
@@ -432,7 +436,7 @@
             v-if="
               item.pay_status === 1 &&
               $timeDiff(
-                new Date(item.created_at).getTime() + 30 * 60 * 1000,
+                new Date(item.updated_at).getTime() + 30 * 60 * 1000,
                 new Date(),
                 'minutes'
               ) > 0
@@ -468,6 +472,8 @@ export default {
       orderPageStatus: true, // 是否允许加载下一页数据
       orderList: [], // 订单列表数据
 
+      sortType: "", // 筛选状态初始值
+
       orderListType: "", // 订单列表页 类型
       orderHeaderTitle: "", // 订单列表页头部标题
       innerList: [], //国内列表
@@ -487,9 +493,7 @@ export default {
       this.orderPageNumber = 1;
       this.orderList = []; //国外
       this.innerList = []; //国内
-      if (JSON.stringify(this.orderListFilter) !== "{}") {
-        this.getOrderList();
-      }
+      this.getOrderList();
     },
 
     // 取消订单
@@ -540,11 +544,16 @@ export default {
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/pages/order/filter?type=" + type + "&filterData=" + JSON.stringify(this.orderListFilter),
+        url:
+          "/pages/order/filter?type=" +
+          type +
+          "&filterData=" +
+          JSON.stringify(this.orderListFilter),
       });
     },
     //获取国内外列表
     getOrderList() {
+      this.sortType = "";
       this.backScroll();
       this.orderPageStatus = true;
       if (this.orderListType === "3") {
@@ -552,6 +561,8 @@ export default {
           status:
             this.headerActive === 0
               ? "-1"
+              : this.headerActive === 3
+              ? 4
               : this.headerActive === 4
               ? 5
               : this.headerActive,
@@ -578,36 +589,51 @@ export default {
       } else if (this.orderListType === "0") {
         // 国内
         let data = {
-          created_at: this.orderListFilter.Timestart || moment().subtract(3, "days").format("YYYY-MM-DD"),  // 预定日期开始
-          created_at_end: this.orderListFilter.Timend || moment().format("YYYY-MM-DD"),  // 预定日期结束
-          pnr_code: this.orderListFilter.pnr || '', // pnr
-          order_no: this.orderListFilter.orderNumber || '',  // 订单号
-          flight_no: this.orderListFilter.flightNumber || '', // 航班号
-          book_user: this.orderListFilter.book_user || '',  // 订票员
+          status:
+            this.headerActive === 0
+              ? "-1"
+              : this.headerActive === 2
+              ? 1
+              : this.headerActive === 3
+              ? 4
+              : this.headerActive === 4
+              ? 5
+              : this.headerActive,
+          pay_status: this.headerActive === 1 ? 1 : "",
+          created_at:
+            this.orderListFilter.Timestart ||
+            moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
+          created_at_end:
+            this.orderListFilter.Timend || moment().format("YYYY-MM-DD"), // 预定日期结束
+          pnr_code: this.orderListFilter.pnr || "", // pnr
+          order_no: this.orderListFilter.orderNumber || "", // 订单号
+          flight_no: this.orderListFilter.flightNumber || "", // 航班号
+          book_user: this.orderListFilter.book_user || "", // 订票员
+        };
+
+        if (this.orderListFilter.Citystart) {
+          data["departure"] =
+            this.orderListFilter.Citystart.type === "city"
+              ? this.orderListFilter.Citystart.data.city_code
+              : this.orderListFilter.Citystart.type === "hot" &&
+                this.orderListFilter.Citystart.data.city_name === "上海"
+              ? this.orderListFilter.Citystart.data.air_port
+              : this.orderListFilter.Citystart.type === "hot"
+              ? this.orderListFilter.Citystart.data.city_code
+              : this.orderListFilter.Citystart.data.air_port;
+        }
+        if (this.orderListFilter.Cityend) {
+          data["arrive"] =
+            this.orderListFilter.Cityend.type === "city"
+              ? this.orderListFilter.Cityend.data.city_code
+              : this.orderListFilter.Cityend.type === "hot" &&
+                this.orderListFilter.Cityend.data.city_name === "上海"
+              ? this.orderListFilter.Cityend.data.air_port
+              : this.orderListFilter.Cityend.type === "hot"
+              ? this.orderListFilter.Cityend.data.city_code
+              : this.orderListFilter.Cityend.data.air_port;
         }
 
-        if(this.orderListFilter.Citystart){
-          data['departure'] = 
-            this.orderListFilter.Citystart.type === 'city'? 
-            this.orderListFilter.Citystart.data.city_code: 
-            this.orderListFilter.Citystart.type === 'hot' && this.orderListFilter.Citystart.data.city_name === "上海"? 
-            this.orderListFilter.Citystart.data.air_port: 
-            this.orderListFilter.Citystart.type === 'hot'? 
-            this.orderListFilter.Citystart.data.city_code: 
-            this.orderListFilter.Citystart.data.air_port
-        }
-        if(this.orderListFilter.Cityend){
-          data['arrive'] =  
-            this.orderListFilter.Cityend.type === 'city'? 
-            this.orderListFilter.Cityend.data.city_code: 
-            this.orderListFilter.Cityend.type === 'hot' && this.orderListFilter.Cityend.data.city_name === "上海"? 
-            this.orderListFilter.Cityend.data.air_port: 
-            this.orderListFilter.Cityend.type === 'hot'? 
-            this.orderListFilter.Cityend.data.city_code: 
-            this.orderListFilter.Cityend.data.air_port
-        }
-
-        
         orderApi.orderList(data).then((res) => {
           if (res.result === 10000) {
             this.showDefault = false;
@@ -615,7 +641,7 @@ export default {
               this.innerList.push.apply(this.innerList, res.data.data);
             } else {
               this.innerList = res.data.data;
-              this.orderLishStuats = true
+              this.orderLishStuats = true;
             }
             this.innerList.forEach((item, index) => {
               if (item.is_round_last) {
@@ -624,59 +650,23 @@ export default {
                     oitem.is_round_first &&
                     oitem.relevant_order_no === item.order_no
                   ) {
-                    item["from_created_at"] = oitem.created_at;
+                    item["from_status"] = oitem.status;
+                    item["from_updated_at"] = oitem.updated_at;
                     item["from_pay_status"] = oitem.pay_status;
                     item["from_total_price"] = oitem.total_price;
                     item["from_order_no"] = oitem.order_no;
                     item["from_need_pay_amount"] = oitem.need_pay_amount;
                     item["from_ticket_segments"] = oitem.ticket_segments;
-
-                    //剩余支付时间
-                    item["from_status"] =
-                      !this.$timeBefore(
-                        new Date(oitem.created_at).getTime() + 30 * 60 * 1000
-                      ) &&
-                      oitem.pay_status === 1 &&
-                      oitem.status === 1
-                        ? 5
-                        : oitem.status;
                   }
                 });
               }
-
-              //剩余支付时间
-              item.status =
-                !this.$timeBefore(
-                  new Date(item.created_at).getTime() + 30 * 60 * 1000
-                ) &&
-                item.pay_status === 1 &&
-                item.status === 1
-                  ? 5
-                  : item.status;
             });
 
-            if (this.headerActive !== 0 && this.headerActive !== 1) {
-              let activeIndex =
-                this.headerActive === 2
-                  ? 1 // 待出票
-                  : this.headerActive === 3
-                  ? 3 // 已出票
-                  : this.headerActive === 4
-                  ? 5
-                  : 0; // 已取消
-              this.innerList = this.innerList.filter(
-                (item) => item.status === activeIndex && item.pay_status !== 1
-              );
+            //日期条件排序
+            if (this.orderListFilter.date) {
+              this.sorTime(this.orderListFilter.date);
             }
-            //判断是否为已预订
-            if (this.headerActive === 1) {
-              this.innerList = this.innerList.filter(
-                (item) =>
-                  item.status !== 0 &&
-                  item.status !== 5 &&
-                  item.pay_status === 1
-              );
-            }
+
             if (this.orderPageNumber >= res.data.last_page) {
               this.orderPageStatus = false;
             }
@@ -684,10 +674,6 @@ export default {
             this.innerList = this.innerList.filter(
               ({ is_round_first }) => !is_round_first
             );
-            // this.innerList.splice(
-            //   this.innerList.findIndex((item) => item.is_round_first === true),
-            //   1
-            // );
 
             this.showDefault = this.innerList.length < 1;
             console.log("缺省状态", this.showDefault, this.innerList);
@@ -732,6 +718,7 @@ export default {
 
     // 起飞时间排序
     departSort(d) {
+      this.sortType = "fly";
       return (m, n) => {
         var a = new Date(m.ticket_segments[0][d]).getTime();
         var b = new Date(n.ticket_segments[0][d]).getTime();
@@ -741,6 +728,7 @@ export default {
 
     // 预定时间排序
     createSort(t) {
+      this.sortType = "create";
       return (m, n) => {
         var a = new Date(m[t]).getTime();
         var b = new Date(n[t]).getTime();
@@ -753,7 +741,7 @@ export default {
       console.log(val);
 
       if (val === "create") {
-        this.innerList.sort(this.createSort("created_at"));
+        this.innerList.sort(this.createSort("updated_at"));
       } else if (val === "depart") {
         this.innerList.sort(this.departSort("departure_time"));
       }
@@ -793,35 +781,29 @@ export default {
         ? "国际改签订单"
         : "";
     console.log("orderHeaderTitle", this.orderHeaderTitle);
-    
   },
   onHide() {
     this.orderList = [];
     this.innerList = [];
-    this.orderLishStuats = false
+    this.orderLishStuats = false;
   },
   onShow() {
-    this.orderListFilter = uni.getStorageSync("orderListFilter")?JSON.parse(uni.getStorageSync("orderListFilter")):{};
+    this.orderListFilter = uni.getStorageSync("orderListFilter")
+      ? JSON.parse(uni.getStorageSync("orderListFilter"))
+      : {};
     uni.removeStorageSync("orderListFilter");
-
-    this.getOrderList()
-
-    if (JSON.stringify(this.orderListFilter) !== '{}') {
-
-      //日期条件排序
-      if (this.orderListFilter.date !== null) {
-        this.sorTime(this.orderListFilter.date);
-      }
-
+    if (JSON.stringify(this.orderListFilter) !== "{}") {
       //订单状态筛选
       if (this.orderListFilter.status !== null) {
         this.checkedHeaderActive(this.orderListFilter.status);
       }
-      console.log("订单列表筛选", this.innerList);
+      console.log("订单列表筛选", this.orderListFilter, this.innerList);
 
       uni.removeStorageSync("orderListFilter");
+    } else {
+      this.headerActive = 0;
+      this.getOrderList();
     }
-
   },
 };
 </script>
@@ -881,6 +863,11 @@ export default {
       justify-content: center;
       flex: 1;
       padding: 10upx 40upx;
+      &.active {
+        .list_title{
+          color: #0070E2;
+        }  
+      }
       &:not(:last-child) {
         border-right: 2upx solid #eaeaea;
       }
@@ -898,7 +885,7 @@ export default {
       .list_title {
         font-size: 22upx;
         font-weight: 400;
-        color: rgba(51, 51, 51, 1);
+        color:#AFB9C4;
       }
     }
   }
@@ -917,7 +904,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
-         margin-bottom: 20upx;
+        margin-bottom: 20upx;
         .list_tyle {
           display: inline-flex;
           align-items: center;

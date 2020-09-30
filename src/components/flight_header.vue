@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-29 11:23:19
+ * @LastEditTime: 2020-09-29 12:04:49
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -107,8 +107,8 @@
         class="flight_reservation_box"
         v-if="!flightInfo && !roundTripType"
         @click="openHeadExp">
-            {{flightData.cabinInfo[0][interType?'cabinCode':'cabin']? flightData.cabinInfo[0][interType?'cabinCode':'cabin'] + 
-            flightData.cabinInfo[0][interType?'cabinCode':'cabin']+' | ': ''}}退改签规则 {{flightData.cabinInfo[0].baggage?' | '+ flightData.cabinInfo[0].baggage: ''}}
+            {{flightData.cabinInfo[interType?'cabinDesc':'cabin']? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
+            flightData.cabinInfo[interType?'cabinDesc':'cabin']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
     </view>
@@ -200,9 +200,8 @@
 
         {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0][interType?'flightNumber':'flight_no']}}{{roundTripFlightData.data[0][interType?'aircraftCode':'model']?' | '+ roundTripFlightData.data[0][interType?'aircraftCode':'model']: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
-
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp()">
-        {{flightData.cabinInfo[interType?'cabinCode':'cabin']? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
+        {{flightData.cabinInfo[interType?'cabinDesc':'cabin']? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
         flightData.cabinInfo[interType?'cabinDesc':'cabin_level']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>

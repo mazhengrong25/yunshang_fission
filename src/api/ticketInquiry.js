@@ -63,19 +63,19 @@ function getGaugetype(data) {
 }
 
 // 单程下单
-function createOrder(key, data) {
+function createOrder(key, data, price) {
   return request({
     method: 'POST',
-    url: '/api/inland/entry/' + key,
+    url: '/api/inland/entry/' + key + "?price="+price,
     data: data,
   });
 }
 
 // 往返下单
-function createRoundOrder(key,arrKey,data) {
+function createRoundOrder(key,arrKey,data,dep_price,arr_price) {
   return request({
     method: 'POST',
-    url: '/api/inland/roundentry/'+key+'/'+arrKey,
+    url: '/api/inland/roundentry/'+key+'/'+arrKey +'?dep_price='+dep_price+'&arr_price='+arr_price,
     data: data,
   });
 }
