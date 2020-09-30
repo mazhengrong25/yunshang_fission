@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-28 18:41:09
+ * @LastEditTime: 2020-09-29 11:23:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -93,7 +93,6 @@
           </view>
         </view>
       </view>
-
       <view class="bottom_message" v-if="flightData.data.length <= 1">
         <image
           class="bottom_message_icon"
@@ -101,21 +100,15 @@
           :src="'https://fxxcx.ystrip.cn' + flightData.data[0].image"
           mode="aspectFill"
         />
-        {{flightData.data[0].airline_CN + flightData.data[0][interType?'flightNumber':'flight_no']}}{{flightData.data[0][intertype?'aircraftCode':'model']?' | '+ flightData.data[0][intertype?'aircraftCode':'model']: ''}} {{flightData.data[0].MealCode? ' | 有餐食': ''}}
+        {{flightData.data[0].airline_CN + flightData.data[0][interType?'flightNumber':'flight_no']}}{{flightData.data[0][interType?'aircraftCode':'model']?' | '+ flightData.data[0][interType?'aircraftCode':'model']: ''}} {{flightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
       <view
         class="flight_reservation_box"
         v-if="!flightInfo && !roundTripType"
         @click="openHeadExp">
-            {{flightData.cabinInfo[0][interType?cabinDesc:
-            cabin_level ===  'FIRST'?'头等舱':
-            cabin_level === 'BUSINESS'?'公务舱':
-            cabin_level === 'ECONOMY'?'经济舱':'']? flightData.cabinInfo[0][interType?'cabinCode':'cabin'] + 
-            flightData.cabinInfo[0][interType?cabinDesc:
-            cabin_level ===  "FIRST"?"头等舱":
-            cabin_level === "BUSINESS"?"公务舱":
-            cabin_level === "ECONOMY"?"经济舱":""]+' | ': ''}}退改签规则 {{flightData.cabinInfo[0].baggage?' | '+ flightData.cabinInfo[0].baggage: ''}}
+            {{flightData.cabinInfo[0][interType?'cabinCode':'cabin']? flightData.cabinInfo[0][interType?'cabinCode':'cabin'] + 
+            flightData.cabinInfo[0][interType?'cabinCode':'cabin']+' | ': ''}}退改签规则 {{flightData.cabinInfo[0].baggage?' | '+ flightData.cabinInfo[0].baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
     </view>
@@ -205,18 +198,12 @@
           mode="aspectFill"
         />
 
-        {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0][interType?'flightNumber':'flight_no']}}{{roundTripFlightData.data[0][intertype?'aircraftCode':'model']?' | '+ roundTripFlightData.data[0][intertype?'aircraftCode':'model']: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
+        {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0][interType?'flightNumber':'flight_no']}}{{roundTripFlightData.data[0][interType?'aircraftCode':'model']?' | '+ roundTripFlightData.data[0][interType?'aircraftCode':'model']: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
       </view>
 
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp()">
-        {{flightData.cabinInfo[0][interType?cabinDesc:
-        cabin_level ===  "FIRST"?"头等舱":
-        cabin_level === "BUSINESS"?"公务舱":
-        cabin_level === "ECONOMY"?"经济舱":""]? flightData.cabinInfo[0][interType?'cabinCode':'cabin'] + 
-        flightData.cabinInfo[0][interType?cabinDesc:
-        cabin_level ===  "FIRST"?"头等舱":
-        cabin_level === "BUSINESS"?"公务舱":
-        cabin_level === "ECONOMY"?"经济舱":""]+' | ': ''}}退改签规则 {{flightData.cabinInfo[0].baggage?' | '+ flightData.cabinInfo[0].baggage: ''}}
+        {{flightData.cabinInfo[interType?'cabinCode':'cabin']? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
+        flightData.cabinInfo[interType?'cabinDesc':'cabin_level']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
         <view class="message_more_btn"></view>
       </view>
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp('arr')">
@@ -253,7 +240,7 @@ export default {
     },
     interType: {
       // type false 国内订单详情
-      type:Boolean,
+      type: Boolean,
       default: () => true,
     },
     flightData: {

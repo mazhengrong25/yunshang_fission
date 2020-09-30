@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-09-22 13:50:17
+ * @LastEditTime: 2020-09-29 10:07:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -10,7 +10,7 @@
     <view class="ticket_item">
       <text class="multi_pass_number">1</text>
       <view class="ticket_address">
-        <view class="to_input address_input" @click="tocketToBtn">
+        <view class="to_input address_input" @click="tocketToBtn(addressForm.from.city_name)">
           {{addressForm.to_type === 'air'? addressForm.to.air_port_name :
             addressForm.to_type === 'hot' && addressForm.to.city_name === "上海" ? addressForm.to.city_name + addressForm.to.air_port_name :
             addressForm.to_type === 'hot' && addressForm.to.city_name === "北京" ? addressForm.to.city_name + '首都' :
@@ -22,16 +22,15 @@
         >
           <image class="ticket_image" src="@/static/ticket_btn.png" mode="contain" />
         </view>
-        <view class="from_input address_input" @click="tocketFromBtn">
+        <view class="from_input address_input" @click="tocketFromBtn(addressForm.to.city_name)">
           {{addressForm.from_type === 'air'? addressForm.from.air_port_name:
             addressForm.from_type === 'hot' && addressForm.from.city_name === "上海" ? addressForm.from.city_name + addressForm.from.air_port_name :
             addressForm.from_type === 'hot' && addressForm.from.city_name === "北京" ? addressForm.from.city_name + '首都' :
             addressForm.from.city_name}}
         </view>
       </view>
-
       <view class="ticket_time">
-        <view class="ticket_to_time time_box" @click="jumpDate('start')">
+        <view class="ticket_to_time time_box" @click="jumpDate('start',addressForm.fromTime.date)">
           <view class="time_true" v-if="JSON.stringify(addressForm.toTime)">
             <view class="time">{{addressForm.toTime.month}}</view>
             <view class="time_day">{{addressForm.toTime.week}}出发</view>
@@ -41,7 +40,7 @@
             <text class="time_text">出发日期</text>
           </view>
         </view>
-        <view class="ticket_from_time time_box" @click.stop="jumpDate('end')">
+        <view class="ticket_from_time time_box" @click.stop="jumpDate('end',addressForm.toTime.date)">
           <view class="time_true" v-if="JSON.stringify(addressForm.fromTime) !== '{}'">
             <image class="close_from_btn" src="@/static/close.png" @click.stop="closeFromBtn" />
             <view class="time">{{addressForm.fromTime.month}}</view>
@@ -120,10 +119,10 @@ export default {
   },
   methods: {
     // 出发按钮
-    tocketToBtn() {
+    tocketToBtn(val) {
       console.log("选择出发地");
       uni.navigateTo({
-        url: "/pages/citySelect/citySelect?type=to",
+        url: "/pages/citySelect/citySelect?type=to&address="+val,
       });
     },
     // 切换出发返程地
@@ -137,10 +136,10 @@ export default {
       console.log("交换出发返程地");
     },
     // 返程按钮
-    tocketFromBtn() {
+    tocketFromBtn(val) {
       console.log("选择返程地");
       uni.navigateTo({
-        url: "/pages/citySelect/citySelect?type=from",
+        url: "/pages/citySelect/citySelect?type=from&address="+val,
       });
     },
     // 清除返程按钮
@@ -149,7 +148,7 @@ export default {
       this.$emit("closeFromBtn", true);
     },
     // 跳转日历
-    jumpDate(val) {
+    jumpDate(val,time) {
       console.log(this.addressForm);
       let data;
       if (val === "start") {
@@ -170,7 +169,8 @@ export default {
           "/pages/dateSelect/dateSelect?type=" +
           val +
           "&ticketType=" +
-          JSON.stringify(data),
+          JSON.stringify(data) + 
+          "&checkedToTime="+time,
       });
     },
   },

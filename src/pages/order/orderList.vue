@@ -2,17 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-28 18:42:02
-=======
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-28 17:03:07
+ * @LastEditTime: 2020-09-29 10:31:39
  * @LastEditors: wish.WuJunLong
-=======
- * @LastEditTime: 2020-09-28 16:00:20
->>>>>>> 0fe8e088eb6bb74c567b0cf30edab30ca6acdfaf
- * @LastEditors: wish.WuJunLong
->>>>>>> 4223b00e98077d7df0c5c196c79de01a0633daa2
 -->
 <template>
   <view class="order_list">
