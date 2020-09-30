@@ -2,8 +2,8 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-30 09:23:43
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-09-30 11:37:10
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="flight_reservation">
@@ -1286,7 +1286,7 @@ export default {
     // 获取乘客列表
     let passenger = uni.getStorageSync("passengerList");
     if (passenger) {
-      this.passengerList = JSON.parse(passenger);
+      this.passengerList = JSON.parse(passenger)
       // this.passengerList.forEach((item) => (item.show = false));
       this.passengerNumber = {
         adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量

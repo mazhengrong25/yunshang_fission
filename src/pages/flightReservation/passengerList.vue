@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-29 14:04:46
+ * @LastEditTime: 2020-09-30 11:41:51
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -337,6 +337,7 @@ export default {
       console.log(this.checkePassenger);
 
       this.checkePassenger.forEach((item) => {
+        item['adtType'] = item.type === '成人'
         atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
         chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
         infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
@@ -373,6 +374,9 @@ export default {
           });
         }
       }
+
+      this.checkePassenger.sort((a, b) => b.adtType - a.adtType)
+      console.log('乘客类型排序',this.checkePassenger)
 
       uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
       uni.navigateBack();

@@ -599,7 +599,7 @@ export default {
               : this.headerActive === 4
               ? 5
               : this.headerActive,
-          pay_status: this.headerActive === 1 ? 1 : "",
+          pay_status: this.headerActive === 1 ? 1 :this.headerActive === 2 ? 2 : "",
           created_at:
             this.orderListFilter.Timestart ||
             moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
