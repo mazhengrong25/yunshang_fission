@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-30 11:41:51
+ * @LastEditTime: 2020-10-10 09:19:51
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -202,9 +202,7 @@ export default {
           }
           this.showDefault = false;
 
-
-          
-
+          this.getGroupList();
         }
       });
     },
@@ -251,8 +249,6 @@ export default {
             });
           });
           this.groupList.unshift({ group_name: "不限" });
-
-          
         } else {
           uni.showToast({
             title: "分组列表获取失败，" + res.msg,
@@ -388,7 +384,6 @@ export default {
       this.getPassengerData();
       uni.removeStorageSync("addPassenger");
     }
-    this.getGroupList();
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
