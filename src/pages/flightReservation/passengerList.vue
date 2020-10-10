@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-10-10 10:12:19
+ * @LastEditTime: 2020-10-10 11:14:40
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -26,6 +26,9 @@
       <view class="mian_header">
         <view class="title">常用乘机人</view>
         <view class="filter" @click="openGroupSelect">
+
+          <text v-if="searchUserName" class="username_search">姓名筛选：{{searchUserName}}</text>
+
           <text>{{ group.group_name ? group.group_name : "筛选" }}</text>
           <image
             class="filter_icon"
@@ -139,6 +142,8 @@ export default {
 
       passengerList: [], // 乘机人列表
 
+      oldPassgengerList: [], // 备份乘机人列表
+
       checkePassenger: [], // 已选择乘客列表
 
       chdinfNumber: {}, // 航司规定乘客数量
@@ -202,10 +207,9 @@ export default {
             });
           }
           this.showDefault = false;
-
-          this.notList = this.passengerList.length < 1
-
           this.getGroupList();
+
+          this.lockingChecked()
         }
       });
     },
@@ -258,6 +262,7 @@ export default {
             icon: "none",
           });
         }
+        this.oldPassgengerList = JSON.parse(JSON.stringify(this.passengerList))
       });
     },
 
@@ -270,7 +275,9 @@ export default {
     // 用户名筛选
     submitConfig(val) {
       console.log(val);
+      this.searchUserName = val
       if (val) {
+        this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList))
         let newArr = [];
         this.passengerList.forEach((item, index) => {
           let username = item.name + item.en_first_name + item.en_last_name;
@@ -283,11 +290,11 @@ export default {
           }
         });
         this.passengerList = newArr;
-        this.notList = this.passengerList.length < 1
       } else {
-        this.getPassengerData();
-        this.group = {};
+        this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList))
       }
+      
+      this.lockingChecked()
     },
 
     // 打开分组弹窗
@@ -298,6 +305,7 @@ export default {
     groupPopupSelecctBtn(e) {
       this.$refs.yunConfig.inputValue = "";
       console.log(e);
+      this.searchUserName = ""
       if (e.group_name !== "不限") {
         this.group = e;
         this.getPassengerData(e.id);
@@ -305,6 +313,20 @@ export default {
         this.group = {};
         this.getPassengerData();
       }
+    },
+
+    // 锁定选中乘机人数据
+    lockingChecked(){
+      if(this.checkePassenger.length> 0){
+        this.checkePassenger.forEach(item => {
+          this.passengerList.forEach(oitem => {
+            if(item.id === oitem.id){
+              oitem.checked = true
+            }
+          })
+        })
+      }
+      this.notList = this.passengerList.length < 1
     },
 
     // 选中乘机人
@@ -455,6 +477,17 @@ export default {
         font-size: 24upx;
         font-weight: bold;
         color: rgba(0, 112, 226, 1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: right;
+        .username_search{
+          margin-right: 40upx;
+          width: 30vw;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          white-space: nowrap;
+        }
         .filter_icon {
           width: 16upx;
           height: 12upx;
