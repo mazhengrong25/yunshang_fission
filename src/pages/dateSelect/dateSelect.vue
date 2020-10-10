@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-29 10:12:50
+ * @LastEditTime: 2020-10-10 10:44:32
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -100,7 +100,7 @@ export default {
 
       checkedRoundTime: false,
 
-      checkedToTime: '', // 已选择出发日期
+      checkedToTime: "", // 已选择出发日期
     };
   },
   methods: {
@@ -156,10 +156,10 @@ export default {
       });
       this.nextIndex = this.nextIndex + 1;
 
-      if(this.checkedRoundTime){
-        this.getClickRoundStatus()
-      }else{
-        this.getRoundStatus()
+      if (this.checkedRoundTime) {
+        this.getClickRoundStatus();
+      } else {
+        this.getRoundStatus();
       }
     },
     // 滚动底部加载下一月日历
@@ -177,10 +177,13 @@ export default {
       if (this.roundTimeStatus) {
         this.dateList.forEach((item) => {
           item.data.forEach((oitem) => {
-              if (moment(this.roundData.toTime.date).isBefore(oitem.date) && moment(oitem.date).isBefore(this.roundData.fromTime.date)) {
-                oitem["roundStatus"] = true;
-              }
-            });
+            if (
+              moment(this.roundData.toTime.date).isBefore(oitem.date) &&
+              moment(oitem.date).isBefore(this.roundData.fromTime.date)
+            ) {
+              oitem["roundStatus"] = true;
+            }
+          });
         });
       }
     },
@@ -190,10 +193,13 @@ export default {
       if (this.roundTimeStatus) {
         this.dateList.forEach((item) => {
           item.data.forEach((oitem) => {
-            if (moment(this.checkedDay.date).isBefore(oitem.date) && moment(oitem.date).isBefore(this.ftromCheckedDay.date)) {
+            if (
+              moment(this.checkedDay.date).isBefore(oitem.date) &&
+              moment(oitem.date).isBefore(this.ftromCheckedDay.date)
+            ) {
               oitem["roundStatus"] = true;
-            }else{
-              delete oitem["roundStatus"]
+            } else {
+              delete oitem["roundStatus"];
             }
           });
         });
@@ -204,64 +210,80 @@ export default {
     checkedDayBtn(month, day) {
       console.log("时间点击", month, day);
       if (day.status) {
-        if(this.timeStatus === 'end' && this.checkedToTime && moment(day.date).isBefore(this.checkedToTime)){
+        if (
+          this.timeStatus === "end" &&
+          this.checkedToTime &&
+          moment(day.date).isBefore(this.checkedToTime)
+        ) {
           return uni.showToast({
-            title: '已选返程： '+this.checkedToTime+' 低于去程时间，请重新选择',
-            icon: 'none',
-            duration: 3000
+            title:
+              "已选返程： " + this.checkedToTime + " 低于去程时间，请重新选择",
+            icon: "none",
+            duration: 3000,
           });
-        }else if(this.timeStatus === 'start' && this.checkedToTime && moment(this.checkedToTime).isBefore(day.date)){
+        } else if (
+          this.timeStatus === "start" &&
+          this.checkedToTime &&
+          moment(this.checkedToTime).isBefore(day.date)
+        ) {
           return uni.showToast({
-            title: '已选去程：'+ this.checkedToTime +' 高于返程时间，请重新选择',
-            icon: 'none',
-            duration: 3000
+            title:
+              "已选去程：" + this.checkedToTime + " 高于返程时间，请重新选择",
+            icon: "none",
+            duration: 3000,
           });
         }
 
-
         if (this.roundTimeStatus) {
-
-          if(!this.roundTripStatus){
+          if (!this.roundTripStatus) {
             return uni.showToast({
-              title: '请在上方选择卡中选择去程或返程',
-              icon: 'none',
-              duration: 3000
+              title: "请在上方选择卡中选择去程或返程",
+              icon: "none",
+              duration: 3000,
             });
           }
 
-
-          this.checkedRoundTime = true
-          let start_time 
-          let end_time
+          this.checkedRoundTime = true;
+          let start_time;
+          let end_time;
           this.dateList.forEach((item) => {
             item.data.forEach((oitem) => {
               if (oitem.toChecked) {
-                start_time = oitem.date
+                start_time = oitem.date;
                 // start_time = moment(oitem.date).add(2, 'days').format('YYYY-MM-DD')
               }
-              if(oitem.fromChecked){
-                end_time = oitem.date
+              if (oitem.fromChecked) {
+                end_time = oitem.date;
                 // end_time = moment(oitem.date).subtract(2, 'days').format('YYYY-MM-DD')
               }
             });
           });
-          console.log(moment(day.date).isBefore(end_time),start_time,end_time,day.date)
-          if(this.roundTripStatus === "start" && !moment(day.date).isBefore(end_time)){
+          console.log(
+            moment(day.date).isBefore(end_time),
+            start_time,
+            end_time,
+            day.date
+          );
+          if (
+            this.roundTripStatus === "start" &&
+            !moment(day.date).isBefore(end_time)
+          ) {
             return uni.showToast({
-              title: '请选择小于返程时间的日期',
-              icon: 'none',
-              duration: 2000
+              title: "请选择小于返程时间的日期",
+              icon: "none",
+              duration: 2000,
             });
           }
-          if(this.roundTripStatus === "end" && !moment(start_time).isBefore(day.date)){
+          if (
+            this.roundTripStatus === "end" &&
+            !moment(start_time).isBefore(day.date)
+          ) {
             return uni.showToast({
-              title: '请选择大于去程时间的日期',
-              icon: 'none',
-              duration: 2000
+              title: "请选择大于去程时间的日期",
+              icon: "none",
+              duration: 2000,
             });
           }
-
-
 
           if (this.roundTripStatus === "start") {
             this.dateList.forEach((item) => {
@@ -279,7 +301,6 @@ export default {
             this.dateList.forEach((item) => {
               item.data.forEach((oitem) => {
                 if (oitem.toChecked) {
-                  
                   console.log(oitem);
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
@@ -431,7 +452,7 @@ export default {
     // 组装单程日期更换
     this.ticketData = data.ticketType ? JSON.parse(data.ticketType) : {};
 
-    this.checkedToTime = data.checkedToTime
+    this.checkedToTime = data.checkedToTime;
 
     console.log(data.roundDate);
     // 组装往返日期
@@ -585,6 +606,25 @@ export default {
             background: #e4f1ff;
             box-shadow: none;
             border-radius: 0;
+            position: relative;
+            &::before {
+              content: "";
+              position: absolute;
+              right: -13upx;
+              top: -4upx;
+              height: 95upx;
+              width: 15upx;
+              background: #e4f1ff;
+            }
+            &::after{
+              content: '';
+              position: absolute;
+              left: -13upx;
+              top: -4upx;
+              height: 95upx;
+              width: 15upx;
+              background: #e4f1ff;
+            }
           }
           &.to {
             background: #e4f1ff;
@@ -631,8 +671,8 @@ export default {
               color: #2a2a2a;
               top: 0;
             }
-            &.to{
-              &::before{
+            &.to {
+              &::before {
                 content: "去程返程";
               }
             }
