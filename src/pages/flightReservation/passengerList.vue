@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-10-10 09:19:51
+ * @LastEditTime: 2020-10-10 10:12:19
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -40,6 +40,7 @@
         :scroll-y="true"
         class="mian_list"
       >
+        <view v-if="notList && !showDefault" class="not_passenger_list">您还没有当前筛选状态的旅客信息</view>
         <uni-swipe-action :disabled="passengerType">
           <uni-swipe-action-item
             v-for="(item, index) in passengerList"
@@ -87,8 +88,10 @@
     <default-page
       style="flex: 1"
       v-if="showDefault"
+      showAddPassenger="true"
       @returnBtn="getTicketData()"
       :defaultType="showDefaultType"
+      @addPassengerBtn="jumpAddPassenger()"
     ></default-page>
 
     <!-- 筛选弹窗 -->
@@ -142,6 +145,8 @@ export default {
       flightPassengerList: [], // 预定页面切换乘机人
 
       searchUserName: "", // 用户名筛选
+
+      notList: false, // 乘客列表为空
     };
   },
   methods: {
@@ -152,10 +157,7 @@ export default {
       });
     },
 
-    compare(property) {
-      
-     
-    },
+    compare(property) {},
 
     /**
      * @Description: 获取旅客列表信息
@@ -174,7 +176,7 @@ export default {
           this.passengerList = res.data.data;
 
           this.passengerList.forEach((item) => {
-            item.name = item.name?item.name:null
+            item.name = item.name ? item.name : null;
             item["type"] =
               moment().diff(item.birthday, "years") < 12 &&
               moment().diff(item.birthday, "years") >= 2
@@ -185,10 +187,9 @@ export default {
           });
 
           let reg = /[a-zA-Z0-9]/;
-          this.passengerList.sort((a,b) => {
-            return reg.test(a.name) - reg.test(b.name)
-          })
-
+          this.passengerList.sort((a, b) => {
+            return reg.test(a.name) - reg.test(b.name);
+          });
 
           if (this.flightPassengerList.length > 0) {
             this.checkePassenger = this.flightPassengerList;
@@ -201,6 +202,8 @@ export default {
             });
           }
           this.showDefault = false;
+
+          this.notList = this.passengerList.length < 1
 
           this.getGroupList();
         }
@@ -280,8 +283,10 @@ export default {
           }
         });
         this.passengerList = newArr;
+        this.notList = this.passengerList.length < 1
       } else {
         this.getPassengerData();
+        this.group = {};
       }
     },
 
@@ -333,7 +338,7 @@ export default {
       console.log(this.checkePassenger);
 
       this.checkePassenger.forEach((item) => {
-        item['adtType'] = item.type === '成人'
+        item["adtType"] = item.type === "成人";
         atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
         chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
         infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
@@ -371,8 +376,8 @@ export default {
         }
       }
 
-      this.checkePassenger.sort((a, b) => b.adtType - a.adtType)
-      console.log('乘客类型排序',this.checkePassenger)
+      this.checkePassenger.sort((a, b) => b.adtType - a.adtType);
+      console.log("乘客类型排序", this.checkePassenger);
 
       uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
       uni.navigateBack();
@@ -392,13 +397,6 @@ export default {
     this.flightPassengerList = data.editPassengerList
       ? JSON.parse(data.editPassengerList)
       : [];
-
-    // this.chdinfNumber = {
-    //   air_line: "CA",
-    //   cnn_number: 2,
-    //   has_inf_cnn_number: 1,
-    //   has_inf_inf_number: 1,
-    // };
     console.log(this.chdinfNumber);
     this.getPassengerData();
   },
@@ -469,6 +467,15 @@ export default {
       overflow-y: auto;
       height: 100%;
       flex: 1;
+      .not_passenger_list {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32upx;
+        font-weight: 400;
+        color: #666666;
+      }
       .list_item {
         background: rgba(255, 255, 255, 1);
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);

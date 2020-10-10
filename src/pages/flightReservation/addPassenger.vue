@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-09-29 14:45:21
+ * @LastEditTime: 2020-10-10 09:47:51
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -516,6 +516,7 @@ export default {
               });
               setTimeout(() => {
                 uni.navigateBack();
+                uni.setStorageSync('addPassenger', true)
               }, 500);
               if(this.flightEdit){
                  uni.setStorageSync("editPassengerList", JSON.stringify(data));

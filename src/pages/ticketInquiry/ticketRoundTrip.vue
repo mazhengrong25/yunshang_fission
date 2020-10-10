@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-09-29 09:50:36
+ * @LastEditTime: 2020-10-10 10:27:23
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -95,12 +95,12 @@
                   class="airlines_icon"
                   :src="
                     'https://fxxcx.ystrip.cn/' +
-                    item.segments[item.segments.length - 1].image
+                    item.segments[0].image
                   "
                   mode="contain"
                 />
-                {{ item.segments[item.segments.length - 1].airline_CN
-                }}{{ item.segments[item.segments.length - 1].flightNumber }}
+                {{ item.segments[0].airline_CN
+                }}{{ item.segments[0].flightNumber }}
               </view>
               <view class="price" v-if="item.min_price > 0">
                 <view class="price_mini">&yen;</view>
@@ -614,10 +614,12 @@ export default {
             (item) => item.segments[0].airline_CN === val[1]
           );
           this.roundFlightList = this.roundFlightList.filter(
-            (item) => item.segments[0].airline_CN === val[1]
+            (item) => item.segments[item.segments.length - 1].airline_CN === val[1]
           );
         }
       }
+
+      console.log(this.flightList,this.roundFlightList)
 
       if (this.flightList.length < 1 || this.roundFlightList.length < 1) {
         this.flightList = this.oldFlightList;
