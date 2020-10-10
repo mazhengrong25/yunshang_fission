@@ -1,11 +1,4 @@
 <!--
- * @Description: 
- * @Author: wish.WuJunLong
- * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-07 16:28:39
- * @LastEditors: wish.WuJunLong
--->
-<!--
  * @Description: 钱包流水
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
@@ -85,7 +78,7 @@
                 </view>
               </view>
               <view class="list_right">
-                {{item.after_balance > item.before_balance? '+': item.after_balance < item.before_balance? '-': ''}}
+                {{item.after_balance > item.before_balance? '+': item.before_balance > item.after_balance ? '-': ''}}
                 {{item.amount.toFixed(2)}}
               </view>
             </view>

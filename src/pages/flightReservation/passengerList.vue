@@ -234,6 +234,11 @@ export default {
             title: "删除成功",
             icon: "success",
           });
+          this.checkePassenger.forEach(item =>{
+            if(item.id === val.id){
+              this.checkePassenger.splice(this.checkePassenger.findIndex(item => item.id === val.id), 1)
+            }
+          })
         } else {
           uni.showToast({
             title: res.msg,
