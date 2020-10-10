@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-10-10 09:47:51
+ * @LastEditTime: 2020-10-10 11:18:49
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -115,7 +115,7 @@
 
               <input
                 class="item_input"
-                type="idcard"
+                :type="item.cert_type === '护照'?'text':'idcard'"
                 placeholder="请保持与证件一致"
                 v-model="item.cert_no"
                 placeholder-class="input_placeholder"
