@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-09-29 12:04:49
+ * @LastEditTime: 2020-10-14 16:45:52
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -22,7 +22,10 @@
           <view class="time">{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'HH:mm')}}</view>
           <view
             class="address"
-          >{{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}</view>
+          >
+          {{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}
+          {{flightData.data[0].depTerminal}}
+          </view>
         </view>
         <view class="center_message">
           <view class="duration" v-if="interType">
@@ -41,8 +44,10 @@
           <view class="time">{{$dateTool(flightData.data[0][interType?'arrTime':'arrive_time'],'HH:mm')}}</view>
           <view
             class="address"
-          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}</view>
-       
+          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}
+          {{flightData.data[0].arrTerminal}}
+          </view>
+          
         </view>
       </view>
 
@@ -65,6 +70,7 @@
                 item[interType?'depAirport_CN':'departure_CN'].city_name +
                 item[interType?'depAirport_CN':'departure_CN'].air_port_name + 
                 (item[interType?'depTerminal':'departure_terminal']?' / '+ item[interType?'depTerminal':'departure_terminal']: '')}}
+                {{item.depTerminal}}
               </view>
 
               <view class="fly_info">
@@ -124,7 +130,7 @@
           <view class="time">{{$dateTool(roundTripFlightData.data[0].depTime,'HH:mm')}}</view>
           <view
             class="address"
-          >{{roundTripFlightData.data[0].depAirport_CN.province + roundTripFlightData.data[0].depAirport_CN.air_port_name}}</view>
+          >{{roundTripFlightData.data[0].depAirport_CN.province + roundTripFlightData.data[0].depAirport_CN.air_port_name}}{{roundTripFlightData.data[0].depTerminal}}</view>
         </view>
         <view class="center_message">
           <view class="duration">
@@ -138,7 +144,7 @@
           <view class="time">{{$dateTool(roundTripFlightData.data[0].arrTime,'HH:mm')}}</view>
           <view
             class="address"
-          >{{roundTripFlightData.data[0].arrAirport_CN.province + roundTripFlightData.data[0].arrAirport_CN.air_port_name}}</view>
+          >{{roundTripFlightData.data[0].arrAirport_CN.province + roundTripFlightData.data[0].arrAirport_CN.air_port_name}}{{roundTripFlightData.data[0].arrTerminal}}</view>
         </view>
       </view>
 
@@ -161,6 +167,7 @@
                 item[interType?'depAirport_CN':'departure_CN'].city_name +
                 item[interType?'depAirport_CN':'departure_CN'].air_port_name + 
                 (item[interType?'depTerminal':'departure_terminal']?' / '+ item[interType?'depTerminal':'departure_terminal']: '')}}
+                {{item.depTerminal}}
               </view>
 
               <view class="fly_info">
@@ -178,6 +185,7 @@
                 item[interType?'arrAirport_CN':'arrive_CN'].city_name +
                 item[interType?'arrAirport_CN':'arrive_CN'].air_port_name + 
                 (item[interType?'arrTerminal':'arrive_terminal']?' / '+ item[interType?'arrTerminal':'arrive_terminal']: '')}}
+                {{item.arrTerminal}}
               </view>
             </view>
           </view>

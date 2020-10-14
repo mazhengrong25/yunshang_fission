@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-10-10 11:18:49
+ * @LastEditTime: 2020-10-14 16:51:05
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -483,6 +483,12 @@ export default {
           icon: "none",
         });
       }
+      this.certificateList.forEach((item, index) =>{
+        if(!item.cert_no){
+          this.certificateList.splice(index, 1)
+        }
+      })
+      console.log(this.certificateList)
       this.$refs.returnSubmitDialog.open();
       this.$forceUpdate()
     },
