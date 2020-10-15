@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-10-15 16:15:34
+ * @LastEditTime: 2020-10-15 16:20:38
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -477,7 +477,7 @@ export default {
         JSON.stringify(this.airMessage.fromTime) === "{}"
       ) {
         jumpUrl = "/pages/ticketInquiry/ticketInquiry";
-      } else if (this.currentTab === 0 && this.airMessage.fromTime) {
+      } else if (this.currentTab === 2 && this.airMessage.fromTime) {
         jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
       }
       uni.navigateTo({
