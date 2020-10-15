@@ -2,8 +2,8 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-09-29 15:54:15
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-10-15 16:03:30
+ * @LastEditors: wish.WuJunLong
 --> 
 
 <template>
@@ -88,6 +88,7 @@
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
           <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view>
+          <view class="ticket_low_price" v-if="item.lowPrice">最低价</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>
       </view>
@@ -246,7 +247,13 @@ export default {
           this.oldTicketList = res.data.IBE.list;
           this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
           this.dataListApplyType = true;
-          console.log(this.ticketList);
+          this.ticketList.forEach(item =>{
+            item.lowPrice = item.min_price === Math.min.apply(Math, this.ticketList.map((o) => {return o.min_price}))
+          })
+          this.oldTicketList.forEach(item =>{
+            item.lowPrice = item.min_price === Math.min.apply(Math, this.oldTicketList.map((o) => {return o.min_price}))
+          })
+          
           if (this.ticketList.length < 1) {
             this.showDefault = true;
             this.dataListApplyType = false;
@@ -853,6 +860,12 @@ export default {
           font-size: 22upx;
           font-weight: 400;
           color: rgba(153, 153, 153, 1);
+          margin-bottom: 2upx;
+        }
+        .ticket_low_price{
+          font-size: 22upx;
+          font-weight: 400;
+          color:#666;
           margin-bottom: 2upx;
         }
         .ticket_reward {

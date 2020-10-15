@@ -2,32 +2,37 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-28 17:29:08
+ * @LastEditTime: 2020-10-15 16:15:34
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="index">
-    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="云上航空"></yun-header>
+    <yun-header
+      :showReturn="false"
+      :statusHeight="iStatusBarHeight"
+      centerTitle="云上航空"
+    ></yun-header>
     <view class="index_main">
       <view class="header">
         <model-swiper :swiperList="swiperList"></model-swiper>
-        <view class="index_interval" style="margin-top: 50upx;"></view>
+        <view class="index_interval" style="margin-top: 50upx"></view>
 
         <view class="modal_tabs">
           <view class="swiper-tab">
             <view
               v-for="(item, index) in tabsList"
               :key="index"
-              :class="['swiper-tab-item',{'active': currentTab === index}]"
+              :class="['swiper-tab-item', { active: currentTab === index }]"
               @click="clickTab(index)"
-            >{{item}}</view>
+              >{{ item }}</view
+            >
           </view>
 
           <swiper
             class="tabs_main"
             :current="currentTab"
             duration="300"
-            :style="{'height':swiperHeight+'px'}"
+            :style="{ height: swiperHeight + 'px' }"
             @change="swiperTab"
           >
             <swiper-item
@@ -46,7 +51,7 @@
             </swiper-item>
           </swiper>
         </view>
-        <view class="child_box" v-if="currentTab !== 0">
+        <view class="child_box" v-if="currentTab !== 0 && currentTab !== 2">
           <view class="cabin">经济舱</view>
 
           <view class="passenger_message">
@@ -54,28 +59,35 @@
             <view class="passenger_message_main" @click="openPassengerNumber">
               <view class="passenger_list">
                 <text>成人</text>
-                <text class="number">{{passengerForm.adultNumber}}</text>
+                <text class="number">{{ passengerForm.adultNumber }}</text>
               </view>
               <view class="passenger_list">
                 <text>儿童</text>
-                <text class="number">{{passengerForm.childNumber}}</text>
+                <text class="number">{{ passengerForm.childNumber }}</text>
               </view>
               <view class="passenger_list">
                 <text>婴儿</text>
-                <text class="number">{{passengerForm.babyNumber}}</text>
+                <text class="number">{{ passengerForm.babyNumber }}</text>
               </view>
-              <image class="open_number_more" src="@/static/number_more_btn.png" mode="contain" />
+              <image
+                class="open_number_more"
+                src="@/static/number_more_btn.png"
+                mode="contain"
+              />
             </view>
           </view>
         </view>
 
         <view
           class="multi_pass_message"
-          v-if="currentTab === 2"
+          v-if="currentTab === 3"
           @click="openMultiPassProblem"
-        >至少选择一个国际城市</view>
+          >至少选择一个国际城市</view
+        >
 
-        <view class="submit_btn" @click="submitTicket">飞机票查询</view>
+        <view class="submit_btn" @click="submitTicket"
+          >{{ currentTrue ? "往返" : "" }}飞机票查询</view
+        >
       </view>
 
       <!-- 公告版块 -->
@@ -85,7 +97,12 @@
     </view>
 
     <!-- 乘客数量选择弹窗 -->
-    <uni-popup ref="childPopup" type="bottom" class="child_dialog" @change="childPopupStatus">
+    <uni-popup
+      ref="childPopup"
+      type="bottom"
+      class="child_dialog"
+      @change="childPopupStatus"
+    >
       <view class="child_dialog_mian">
         <view class="title">
           <view class="close" @click="closeChildDialog">取消</view>
@@ -96,11 +113,17 @@
             <view class="number_name">成人</view>
             <view class="number_box">
               <view
-                :class="['remove_number number_icon',{active: passengerFormBack.adultNumber > 0}]"
-                @click="editTicketNumber('remove','adult')"
+                :class="[
+                  'remove_number number_icon',
+                  { active: passengerFormBack.adultNumber > 0 },
+                ]"
+                @click="editTicketNumber('remove', 'adult')"
               ></view>
-              <view class="number">{{passengerFormBack.adultNumber}}</view>
-              <view class="add_number number_icon" @click="editTicketNumber('add','adult')"></view>
+              <view class="number">{{ passengerFormBack.adultNumber }}</view>
+              <view
+                class="add_number number_icon"
+                @click="editTicketNumber('add', 'adult')"
+              ></view>
             </view>
           </view>
           <view class="child_main">
@@ -110,11 +133,17 @@
             </view>
             <view class="number_box">
               <view
-                :class="['remove_number number_icon',{active: passengerFormBack.childNumber > 0}]"
-                @click="editTicketNumber('remove','child')"
+                :class="[
+                  'remove_number number_icon',
+                  { active: passengerFormBack.childNumber > 0 },
+                ]"
+                @click="editTicketNumber('remove', 'child')"
               ></view>
-              <view class="number">{{passengerFormBack.childNumber}}</view>
-              <view class="add_number number_icon" @click="editTicketNumber('add','child')"></view>
+              <view class="number">{{ passengerFormBack.childNumber }}</view>
+              <view
+                class="add_number number_icon"
+                @click="editTicketNumber('add', 'child')"
+              ></view>
             </view>
           </view>
           <view class="child_main">
@@ -124,11 +153,17 @@
             </view>
             <view class="number_box">
               <view
-                :class="['remove_number number_icon',{active: passengerFormBack.babyNumber > 0}]"
-                @click="editTicketNumber('remove','baby')"
+                :class="[
+                  'remove_number number_icon',
+                  { active: passengerFormBack.babyNumber > 0 },
+                ]"
+                @click="editTicketNumber('remove', 'baby')"
               ></view>
-              <view class="number">{{passengerFormBack.babyNumber}}</view>
-              <view class="add_number number_icon" @click="editTicketNumber('add','baby')"></view>
+              <view class="number">{{ passengerFormBack.babyNumber }}</view>
+              <view
+                class="add_number number_icon"
+                @click="editTicketNumber('add', 'baby')"
+              ></view>
             </view>
           </view>
         </view>
@@ -147,20 +182,27 @@
         <view class="explanation_header">
           <view
             @click="checkedExplanationBtn(0)"
-            :class="['header_btn',{'is_active': popupCurrent === 0}]"
-          >儿童票</view>
+            :class="['header_btn', { is_active: popupCurrent === 0 }]"
+            >儿童票</view
+          >
           <view
             @click="checkedExplanationBtn(1)"
-            :class="['header_btn',{'is_active': popupCurrent === 1}]"
-          >婴儿票</view>
+            :class="['header_btn', { is_active: popupCurrent === 1 }]"
+            >婴儿票</view
+          >
           <view
             @click="checkedExplanationBtn(2)"
-            :class="['header_btn',{'is_active': popupCurrent === 2}]"
-          >常见问题</view>
+            :class="['header_btn', { is_active: popupCurrent === 2 }]"
+            >常见问题</view
+          >
         </view>
       </view>
       <view class="flight_explanation_main">
-        <swiper class="explanation_content" @change="popupChange" :current="popupCurrent">
+        <swiper
+          class="explanation_content"
+          @change="popupChange"
+          :current="popupCurrent"
+        >
           <swiper-item>
             <view class="popup_content_item">儿童票</view>
           </swiper-item>
@@ -175,7 +217,12 @@
     </uni-popup>
 
     <!-- 国际城市说明弹窗 -->
-    <uni-popup ref="messageDialog" type="center" :maskClick="false" @change="childPopupStatus">
+    <uni-popup
+      ref="messageDialog"
+      type="center"
+      :maskClick="false"
+      @change="childPopupStatus"
+    >
       <messageDialog @closeDialog="closeMessageDialog"></messageDialog>
     </uni-popup>
   </view>
@@ -222,7 +269,7 @@ export default {
       ],
 
       currentTab: 0, // tab默认值
-      tabsList: ["国内", "国际", "多程"], // tab切换内容
+      tabsList: ["国内", "国际", "往返", "多程"], // tab切换内容
       swiperHeight: 0, // tab切换swiper高度
 
       addressForm: {
@@ -269,12 +316,13 @@ export default {
           week: moment().add(1, "d").format("ddd"),
         },
         fromTime: {},
-        to_type: '',
-        from_type: ''
+        to_type: "",
+        from_type: "",
       },
 
+      noticeList: [], // 公告列表
 
-      noticeList: [] // 公告列表
+      currentTrue: false, // 是否往返
     };
   },
   methods: {
@@ -306,10 +354,20 @@ export default {
 
     //点击切换
     clickTab(index) {
-      return uni.showToast({
-        title: "功能开发中,敬请期待",
-        icon: "none",
-      });
+      if (index === 1 || index === 3) {
+        return uni.showToast({
+          title: "功能开发中,敬请期待",
+          icon: "none",
+        });
+      }
+
+      if (index === 0) {
+        this.closeFromBtn();
+      }
+      
+      this.currentTrue = index === 2;
+      
+
       if (this.currentTab === index) {
         return false;
       } else {
@@ -319,27 +377,28 @@ export default {
 
     // 切换往返地址
     checkTicked(data) {
-      this.checkTickedType = !this.checkTickedType
+      this.checkTickedType = !this.checkTickedType;
 
+      console.log(this.airMessage);
+      let to = this.airMessage.to;
+      let from = this.airMessage.from;
+      let toType = this.airMessage.to_type ? this.airMessage.to_type : "";
+      let fromType = this.airMessage.from_type ? this.airMessage.from_type : "";
+      this.$set(this.airMessage, "to", from);
+      this.$set(this.airMessage, "from", to);
 
-        console.log(this.airMessage)
-        let to = this.airMessage.to
-        let from = this.airMessage.from
-        let toType = this.airMessage.to_type?this.airMessage.to_type:''
-        let fromType = this.airMessage.from_type?this.airMessage.from_type:''
-        this.$set(this.airMessage,'to',from)
-        this.$set(this.airMessage,'from',to)
-
-        this.airMessage['to_type'] = fromType?fromType:''
-        this.airMessage['from_type'] = toType?toType:''
-        // this.$set(this.airMessage,'to_type',from_type)
-        // this.$set(this.airMessage,'from_type',to_type)
-        console.log(this.airMessage)
-        this.$forceUpdate()
+      this.airMessage["to_type"] = fromType ? fromType : "";
+      this.airMessage["from_type"] = toType ? toType : "";
+      // this.$set(this.airMessage,'to_type',from_type)
+      // this.$set(this.airMessage,'from_type',to_type)
+      console.log(this.airMessage);
+      this.$forceUpdate();
     },
     // 清除返程信息
     closeFromBtn() {
       this.airMessage.fromTime = {};
+      this.currentTab = 0;
+      this.currentTrue = false;
     },
 
     // 获取当前swiper-item高度
@@ -409,34 +468,34 @@ export default {
 
     // 提交按钮
     submitTicket() {
-      console.log("提交",this.airMessage);
+      console.log("提交", this.airMessage);
       this.airMessage["type"] = this.currentTab;
 
       let jumpUrl;
-      if (this.currentTab === 0 && JSON.stringify(this.airMessage.fromTime) === '{}') {
+      if (
+        this.currentTab === 0 &&
+        JSON.stringify(this.airMessage.fromTime) === "{}"
+      ) {
         jumpUrl = "/pages/ticketInquiry/ticketInquiry";
       } else if (this.currentTab === 0 && this.airMessage.fromTime) {
         jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
       }
-        uni.navigateTo({
+      uni.navigateTo({
         url: jumpUrl + "?data=" + JSON.stringify(this.airMessage),
       });
-   
-
-      
     },
 
     // 获取公告列表
     getNoticeList() {
       noticeApi.getNotice().then((res) => {
-        if(res.errorcode === 10000){
+        if (res.errorcode === 10000) {
           // this.noticeList = res.data.data
-          res.data.data.forEach((item, index) =>{
-            if(index < 5){
-              this.noticeList.push(item)
+          res.data.data.forEach((item, index) => {
+            if (index < 5) {
+              this.noticeList.push(item);
             }
-          })
-          console.log('首页',this.noticeList)
+          });
+          console.log("首页", this.noticeList);
         }
       });
     },
@@ -451,11 +510,11 @@ export default {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
-      console.log(cityData)
+      console.log(cityData);
       if (cityData.status === "to") {
         this.airMessage.to = cityData.data;
         if (cityData.type === "hot") {
-          this.airMessage.to = cityData.data
+          this.airMessage.to = cityData.data;
         }
         this.airMessage["to_type"] = cityData.type;
       } else if (cityData.status === "from") {
@@ -470,10 +529,12 @@ export default {
     // 获取时间日期
     if (uni.getStorageSync("time")) {
       let timeData = JSON.parse(uni.getStorageSync("time"));
-      console.log('时间',timeData)
+      console.log("时间", timeData);
       if (timeData.status === "start") {
         this.airMessage["toTime"] = timeData;
       } else if (timeData.status === "end") {
+        this.currentTab = 2;
+        this.currentTrue = true;
         this.airMessage["fromTime"] = timeData;
       }
 
@@ -513,7 +574,7 @@ export default {
           height: 50upx;
           border: 2upx solid rgba(0, 112, 226, 1);
           opacity: 0.51;
-          border-radius: 20px;
+          border-radius: 25upx;
           color: #434343;
           font-size: 28upx;
           font-weight: 400;
@@ -523,7 +584,7 @@ export default {
           justify-content: center;
 
           &:not(:last-child) {
-            margin-right: 50upx;
+            margin-right: 20upx;
           }
 
           &.active {
@@ -639,7 +700,7 @@ export default {
       font-weight: 400;
       line-height: 38upx;
       color: rgba(255, 255, 255, 1);
-      letter-spacing: 10upx;
+      letter-spacing: 6upx;
     }
   }
 
