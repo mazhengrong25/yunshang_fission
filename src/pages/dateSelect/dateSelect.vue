@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-10-10 10:44:32
+ * @LastEditTime: 2020-10-16 14:56:25
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -64,8 +64,23 @@
             ]"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
-            >{{ oitem.day }}</view
           >
+            <text class="round_text text_to" v-if="oitem.toChecked">
+              {{oitem.toChecked?'去程':''}}
+            </text>
+            <text class="round_text text_from" v-if="oitem.fromChecked">
+              {{oitem.fromChecked?'返程':''}}
+            </text>
+            {{  oitem.active?'今天':oitem.day }}
+            <text
+              class="lunar lunar_day"
+              v-if="oitem.lunar.lunarDay !== '初一'"
+              >{{ oitem.lunar.lunarDay }}</text
+            >
+            <text class="lunar lunar_month" v-else>{{
+              oitem.lunar.lunarMonth
+            }}</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -106,6 +121,8 @@ export default {
   methods: {
     // 日期列表处理
     getDateList() {
+      const lunar = require("@tony801015/chinese-lunar");
+
       let currentDate = moment().format("YYYY年MM月"); // 当前月份
       let nextDate = moment().add(this.nextIndex, "M").format("YYYY年MM月"); // 下一月份
       let nextDateNumber = moment().add(this.nextIndex, "M").daysInMonth(); // 下一月份天数
@@ -114,6 +131,9 @@ export default {
         .startOf("month")
         .format("d"); // 下月1号星期
       let nextList = [];
+
+      console.log(lunar("2020", "01", "09").getJson());
+
       for (let i = 0; i < nextDateNumber; i++) {
         nextList.push({
           day: i + 1,
@@ -147,6 +167,12 @@ export default {
                 (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
               this.roundData.fromTime.date
             : false,
+
+          lunar: lunar(
+            String(moment().add(this.nextIndex, "M").format("YYYY")),
+            String(moment().add(this.nextIndex, "M").format("MM")),
+            String(i + 1 < 10 ? "0" + (i + 1) : i + 1)
+          ).getJson(), // 阴历
         });
       }
       this.dateList.push({
@@ -155,6 +181,8 @@ export default {
         data: nextList,
       });
       this.nextIndex = this.nextIndex + 1;
+
+      console.log(this.dateList);
 
       if (this.checkedRoundTime) {
         this.getClickRoundStatus();
@@ -583,16 +611,11 @@ export default {
             box-shadow: none;
           }
           &.active {
-            color: transparent !important;
             position: relative;
             border: 4upx solid rgba(0, 112, 226, 0.2);
-            &::before {
-              content: "今天";
-              position: absolute;
-              font-size: 22upx;
-              font-weight: 500;
-              color: rgba(0, 112, 226, 1);
-            }
+            font-size: 22upx;
+            font-weight: 500;
+            color: rgba(0, 112, 226, 1) !important;
           }
           &.is_before {
             box-shadow: none;
@@ -616,8 +639,8 @@ export default {
               width: 15upx;
               background: #e4f1ff;
             }
-            &::after{
-              content: '';
+            &::after {
+              content: "";
               position: absolute;
               left: -13upx;
               top: -4upx;
@@ -631,51 +654,67 @@ export default {
             box-shadow: none;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
+            &::before{
+              content: '';
+              background: #e4f1ff;
+              right: -13upx;
+              height: 95upx;
+              width: 15upx;
+              position: absolute;
+            }
             &.start {
               background: #0070e2;
               box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
               color: #fff;
               border-radius: 20upx;
-              &::before {
+              .text_to {
                 color: #fff;
               }
-            }
-            &::before {
-              content: "去程";
-              position: absolute;
-              font-size: 18upx;
-              font-weight: 500;
-              color: #2a2a2a;
-              top: 0;
+              &::before{
+                display: none;
+              }
             }
           }
           &.from {
-            background: #e4f1ff;
+             background: #e4f1ff;
             box-shadow: none;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
+            &::before{
+              content: '';
+              background: #e4f1ff;
+              left: -13upx;
+              height: 95upx;
+              width: 15upx;
+              position: absolute;
+            }
             &.end {
               background: #0070e2;
               box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
               color: #fff;
               border-radius: 20upx;
-              &::before {
+              .text_from {
                 color: #fff;
               }
+              &::before{
+                display: none;
+              }
             }
-            &::before {
-              content: "返程";
-              position: absolute;
+            // &.to {
+            //   &::before {
+            //     content: "去程返程";
+            //   }
+            // }
+          }
+          .round_text{
               font-size: 18upx;
               font-weight: 500;
               color: #2a2a2a;
-              top: 0;
             }
-            &.to {
-              &::before {
-                content: "去程返程";
-              }
-            }
+          .lunar {
+            font-size: 10px;
+            font-weight: 500;
+            color: #afb9c4;
           }
         }
       }

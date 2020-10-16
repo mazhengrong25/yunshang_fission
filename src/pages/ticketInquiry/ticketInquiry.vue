@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-10-15 16:03:30
+ * @LastEditTime: 2020-10-16 15:30:30
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -247,11 +247,16 @@ export default {
           this.oldTicketList = res.data.IBE.list;
           this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
           this.dataListApplyType = true;
+
+          let lowPriceList = this.ticketList.map((o) => {return o.min_price}).filter(a => a > 0)
+          console.log('最低价',lowPriceList)
+
+
           this.ticketList.forEach(item =>{
-            item.lowPrice = item.min_price === Math.min.apply(Math, this.ticketList.map((o) => {return o.min_price}))
+            item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList)
           })
           this.oldTicketList.forEach(item =>{
-            item.lowPrice = item.min_price === Math.min.apply(Math, this.oldTicketList.map((o) => {return o.min_price}))
+            item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList)
           })
           
           if (this.ticketList.length < 1) {
