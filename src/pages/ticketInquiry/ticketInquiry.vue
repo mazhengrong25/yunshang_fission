@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-10-16 15:30:30
+ * @LastEditTime: 2020-10-16 18:32:22
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -249,8 +249,6 @@ export default {
           this.dataListApplyType = true;
 
           let lowPriceList = this.ticketList.map((o) => {return o.min_price}).filter(a => a > 0)
-          console.log('最低价',lowPriceList)
-
 
           this.ticketList.forEach(item =>{
             item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList)
