@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-29 15:36:05
+ * @LastEditTime: 2020-10-19 14:32:24
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -48,7 +48,9 @@
               <view class="item_info">
                 <text class="info_title">票面价</text>
                 <text class="info_text"
-                  >&yen;{{ index === 0 ? checkPrice : checkRoundPrice }}</text
+                  >&yen;{{
+                    index === 0 ? checkMultiRate?checkMultiRate:checkPrice : roundCheckMultiRate?roundCheckMultiRate:checkRoundPrice
+                  }}</text
                 >
               </view>
             </view>
@@ -177,6 +179,58 @@
         </view>
       </view>
     </uni-popup>
+
+    <uni-popup ref="multiRatePopup" type="bottom">
+      <view class="multi_rate_popup">
+        <view class="title">
+          <text>价格选择</text>
+          <view class="close_btn" @click="closeMultiRate"></view>
+        </view>
+        <view class="multi_rate_tip">
+          如果选择低价可能不适用原政策，请以支付重选时政策为准！
+        </view>
+        <scroll-view class="multi_rate_scroll" scroll-y="true">
+          <view class="multi_rate_main">
+            <view class="main_table">
+              <view class="table_list">
+                <view class="list_title">选择项</view>
+                <view class="list_message">单项</view>
+              </view>
+              <view class="table_list">
+                <view class="list_title">价格选择</view>
+                <view class="list_message">去程</view>
+              </view>
+              <view class="table_price">
+                <view class="list_title">价格</view>
+                <view class="price_box">
+                  <view
+                    :class="[
+                      'price_list',
+                      { active: roundTripBtnActive === 1?roundCheckMultiRate === item.price: checkMultiRate === item.price },
+                    ]"
+                    @click="checkedMultiRate(item)"
+                    v-for="(item, index) in multiRateList"
+                    :key="index"
+                  >
+                    <view class="price_text"
+                      >{{ item.price }}/{{ item.tax }}/{{
+                        item.price + item.tax
+                      }}</view
+                    >
+                    <view class="price_checked"></view>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+        <view class="bottom_submit">
+          <button class="multi_rate_submit" @click="submitCheckPrice">
+            预定
+          </button>
+        </view>
+      </view>
+    </uni-popup>
   </scroll-view>
 </template>
 
@@ -288,6 +342,13 @@ export default {
       depGuestInfo: {}, // 返程客规
 
       showData: false, // 数据加载
+
+      checkMultiRate: "", // 多运价选择
+      roundCheckMultiRate: "", // 返程多运价选择
+      multiRateList: [], // 多运价列表
+
+      checkBuild: '',  // 多运价机建费
+      roundCheckBuild: '', // 返程机建费
     };
   },
   methods: {
@@ -454,19 +515,7 @@ export default {
 
     // 处理往返选中列表
     getRoundTrip() {
-      // if (this.roundTripType && this.roundTripBtnActive === 0) {
-
-      // } else if (this.roundTripType && this.roundTripBtnActive === 1) {
-      //   this.checkRoundPrice = res.data.price; // 获取验价价格
-      //   this.checkRoundPriceKey = res.data.keys; // 获取验价key
-      // }
-
       if (this.roundTripType && this.roundTripBtnActive === 0) {
-        // this.cabinHeader.forEach(item =>{
-        //   this.cabinList[item].forEach((oitem,oindex) =>{
-        //     this.$set(this.cabinList[item][oindex],"active",false);
-        //   })
-        // })
         this.cabinList[this.airActiveInfo.type].forEach((item, index) => {
           if (
             item.cabin === this.airActiveInfo.cabin &&
@@ -478,26 +527,16 @@ export default {
               item,
               this.cabinList
             );
-            // this.checkPrice = item.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
-            // this.checkPriceKey = item.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
-            // this.$set(this.cabinList[this.airActiveInfo.type][index],"active",true);
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
       } else if (this.roundTripType && this.roundTripBtnActive === 1) {
-        // this.depCabinHeader.forEach(item =>{
-        //   this.depCabinList[item].forEach((oitem,oindex) =>{
-        //     this.$set(this.depCabinList[item][oindex],"active",false);
-        //   })
-        // })
         this.depCabinList[this.depActiveInfo.type].forEach((item, index) => {
           if (
             item.cabin === this.depActiveInfo.cabin &&
             item.data.cabinPrices.ADT.price === this.depActiveInfo.price
           ) {
             console.log("获取价格完成后选中", item);
-            // this.checkRoundPrice = item.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
-            // this.checkRoundPriceKey = item.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
@@ -681,37 +720,67 @@ export default {
         };
       }
 
-      if (data.data.cabinPrices.ADT.rulePrice.type) {
-        if (!this.roundTripType) {
-          // 单程验价
-          uni.navigateTo({
-            url:
-              "/pages/flightReservation/flightReservation?key=" +
-              data.data.cabinPrices.ADT.rulePrice.key +
-              "&airMessage=" +
-              JSON.stringify(this.airMessage) +
-              "&price=" +
-              data.data.cabinPrices.ADT.rulePrice.price +
-              "&data=" +
-              JSON.stringify(this.ticketAddress),
-          });
-        } else {
-          console.log(data, header, index, type);
-          // 往返验价
-          if (this.roundTripBtnActive === 0) {
-            this.checkPrice = data.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
-            this.checkPriceKey = data.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
-          } else {
-            this.checkRoundPrice = data.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
-            this.checkRoundPriceKey = data.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
-          }
-          this.getRoundTrip();
-        }
-      } else {
+      // if (data.data.cabinPrices.ADT.rulePrice.type) {
+      //   if (!this.roundTripType) {
+      //     // 单程验价
+      //     uni.navigateTo({
+      //       url:
+      //         "/pages/flightReservation/flightReservation?key=" +
+      //         data.data.cabinPrices.ADT.rulePrice.key +
+      //         "&airMessage=" +
+      //         JSON.stringify(this.airMessage) +
+      //         "&price=" +
+      //         data.data.cabinPrices.ADT.rulePrice.price +
+      //         "&data=" +
+      //         JSON.stringify(this.ticketAddress),
+      //     });
+      //   } else {
+      //     console.log(data, header, index, type);
+      //     // 往返验价
+      //     if (this.roundTripBtnActive === 0) {
+      //       this.checkPrice = data.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
+      //       this.checkPriceKey = data.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
+      //     } else {
+      //       this.checkRoundPrice = data.data.cabinPrices.ADT.rulePrice.price; // 获取验价价格
+      //       this.checkRoundPriceKey = data.data.cabinPrices.ADT.rulePrice.key; // 获取验价key
+      //     }
+      //     this.getRoundTrip();
+      //   }
+      // } else {
         ticket.checkPrice(params).then((res) => {
           if (res.errorcode === 10000) {
             this.getGaugeInfo(data);
-            if (res.data.check_price_status) {
+            if (!res.data.check_price_status && res.data.is_sd_list) {
+              // 价格有修改 弹出提示框
+              this.newPrice = res.data.price;
+              this.relatedKey = res.data.keys;
+              this.checkPriceData = {
+                header: header,
+                index: index,
+                // type: type,
+                price: res.data.price,
+                keys: res.data.keys,
+              };
+
+              let newSdList = res.data.sd_list;
+              this.multiRateList = res.data.sd_list;
+
+              let hash = {};
+              this.multiRateList = newSdList.reduce((item, next) => {
+                hash[next.price]
+                  ? ""
+                  : (hash[next.price] = true && item.push(next));
+                return item;
+              }, []);
+
+              this.checkMultiRate = data.data.cabinPrices.ADT.price;
+
+              this.openMultiRate();
+
+              this.$forceUpdate();
+
+              // this.$refs.checkPricePopup.open();
+            } else {
               // 价格没有修改 直接进行操作
               if (!this.roundTripType) {
                 this.checkPrice = res.data.price; // 获取验价价格
@@ -761,32 +830,17 @@ export default {
                 if (this.roundTripBtnActive === 0) {
                   this.checkPrice = res.data.price; // 获取验价价格
                   this.checkPriceKey = res.data.keys; // 获取验价key
-                  
                 } else {
                   this.checkRoundPrice = res.data.price; // 获取验价价格
                   this.checkRoundPriceKey = res.data.keys; // 获取验价key
                 }
                 console.log("往返验价");
                 this.getRoundTrip();
-                if(this.roundTripBtnActive === 0){
+                if (this.roundTripBtnActive === 0) {
                   this.roundTripBtn(1);
                 }
               }
-            } else {
-              // 价格有修改 弹出提示框
-              this.newPrice = res.data.price;
-              this.relatedKey = res.data.keys;
-              this.checkPriceData = {
-                header: header,
-                index: index,
-                type: type,
-                price: res.data.price,
-                keys: res.data.keys,
-              };
-
-              this.$forceUpdate();
-
-              this.$refs.checkPricePopup.open();
+              
             }
           } else {
             uni.showToast({
@@ -796,7 +850,34 @@ export default {
             });
           }
         });
+      // }
+    },
+
+    // 打开多运价弹窗
+    openMultiRate() {
+      this.$refs.multiRatePopup.open();
+    },
+
+    // 关闭多运价弹窗
+    closeMultiRate() {
+      this.$refs.multiRatePopup.close();
+    },
+
+    // 选择多运价
+    checkedMultiRate(val) {
+      console.log(val);
+      if (this.roundTripBtnActive !== 0) {
+        this.$nextTick(() => {
+          this.roundCheckMultiRate = val.price;
+          this.roundCheckBuild = val.tax
+        });
+      }else {
+        this.$nextTick(() =>{
+        this.checkMultiRate = val.price
+        this.checkBuild = val.tax
+      })
       }
+      this.$forceUpdate();
     },
 
     // 关闭验价弹窗
@@ -868,18 +949,20 @@ export default {
         this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
       );
 
+      this.closeMultiRate();
+
       if (this.roundTripType) {
         if (this.roundTripBtnActive === 0) {
-          this.checkPrice = this.checkPriceData.price; // 获取验价价格
+          this.checkPrice = this.checkMultiRate?this.checkMultiRate:this.checkPriceData.price; // 获取验价价格
           this.checkPriceKey = this.checkPriceData.keys; // 获取验价key
+          this.checkPriceData.price = this.checkMultiRate
         } else {
-          this.checkRoundPrice = this.checkPriceData.price; // 获取验价价格
+          this.checkRoundPrice = this.roundCheckMultiRate?this.roundCheckMultiRate:this.checkPriceData.price; // 获取验价价格
           this.checkRoundPriceKey = this.checkPriceData.keys; // 获取验价key
         }
         this.$forceUpdate();
         console.log("往返验价");
       }
-
 
       if (this.checkPriceData.type) {
         this.$set(
@@ -887,14 +970,20 @@ export default {
             this.checkPriceData.index
           ].data.cabinPrices.ADT.rulePrice,
           "price",
-          this.checkPriceData.price
+          this.roundCheckMultiRate?this.roundCheckMultiRate:this.checkPriceData.price
         );
+        // this.$set(
+        //   this.depCabinList[this.checkPriceData.header][
+        //     this.checkPriceData.index
+        //   ].data.cabinPrices.ADT.rulePrice,
+        //   "type",
+        //   true
+        // );
         this.$set(
-          this.depCabinList[this.checkPriceData.header][
-            this.checkPriceData.index
-          ].data.cabinPrices.ADT.rulePrice,
-          "type",
-          true
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index]
+            .data.cabinPrices.ADT,
+          "build",
+          this.roundCheckBuild
         );
         this.$set(
           this.depCabinList[this.checkPriceData.header][
@@ -908,14 +997,20 @@ export default {
           this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
             .data.cabinPrices.ADT.rulePrice,
           "price",
-          this.checkPriceData.price
+          this.checkMultiRate?this.checkMultiRate:this.checkPriceData.price
         );
         this.$set(
           this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT.rulePrice,
-          "type",
-          true
+            .data.cabinPrices.ADT,
+          "build",
+          this.checkBuild
         );
+        // this.$set(
+        //   this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
+        //     .data.cabinPrices.ADT.rulePrice,
+        //   "type",
+        //   true
+        // );
         this.$set(
           this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
             .data.cabinPrices.ADT.rulePrice,
@@ -924,11 +1019,11 @@ export default {
         );
       }
 
-      this.$forceUpdate();
+      this.$forceUpdate(); 
 
       if (!this.roundTripType) {
         // 单程验价
-        this.closeCheckPrice();
+        // this.closeCheckPrice();
         uni.navigateTo({
           url:
             "/pages/flightReservation/flightReservation?key=" +
@@ -936,7 +1031,7 @@ export default {
             "&airMessage=" +
             JSON.stringify(this.airMessage) +
             "&price=" +
-            this.newPrice +
+            this.checkMultiRate +
             "&data=" +
             JSON.stringify(this.ticketAddress),
         });
@@ -1357,6 +1452,174 @@ export default {
           background: rgba(0, 112, 226, 1);
           color: rgba(255, 255, 255, 1);
         }
+      }
+    }
+  }
+
+  .multi_rate_popup {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
+    .title {
+      height: 140upx;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 80upx 80upx 0 0;
+      position: relative;
+      border-bottom: 2upx solid rgba(217, 225, 234, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30upx;
+      font-weight: bold;
+      color: #333333;
+
+      .close_btn {
+        position: absolute;
+        background: url(@/static/popup_close.png) no-repeat;
+        background-size: contain;
+        width: 30upx;
+        height: 30upx;
+        top: 54upx;
+        right: 44upx;
+      }
+    }
+    .multi_rate_tip {
+      font-size: 28upx;
+      font-weight: 400;
+      color: #fb9826;
+      background: RGBA(255, 245, 233, 1);
+      padding: 20upx 40upx;
+    }
+    .multi_rate_scroll {
+      overflow-y: auto;
+      box-sizing: border-box;
+      flex: 1;
+      max-height: 50vh;
+      width: 100%;
+      background: rgba(255, 255, 255, 1);
+      .multi_rate_main {
+        margin: 46upx 40upx;
+        height: 100%;
+        box-sizing: border-box;
+        .main_table {
+          // margin: 0 80upx;
+          border: 2upx solid #f1f3f5;
+          .table_list {
+            display: flex;
+            align-items: flex-start;
+            &:not(:last-child) {
+              border-bottom: 2upx solid #f1f3f5;
+            }
+            .list_title {
+              width: 140upx;
+              min-height: 80upx;
+              background: #f9f9f9;
+              display: inline-flex;
+              align-items: center;
+              font-size: 24upx;
+              font-weight: 500;
+              color: #333333;
+              flex-shrink: 0;
+              padding-left: 22upx;
+              box-sizing: border-box;
+            }
+            .list_message {
+              flex: 1;
+              display: flex;
+              align-items: center;
+              border-left: 2upx solid #f1f3f5;
+              min-height: 80upx;
+              font-size: 24upx;
+              font-weight: 500;
+              color: #999999;
+              padding: 0 22upx;
+            }
+          }
+          .table_price {
+            position: relative;
+            padding-left: 142upx;
+            .list_title {
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 100%;
+              width: 142upx;
+              border-right: 2upx solid #f1f3f5;
+              background: #f9f9f9;
+              display: inline-flex;
+              align-items: center;
+              font-size: 24upx;
+              font-weight: 500;
+              color: #333333;
+              flex-shrink: 0;
+              padding-left: 22upx;
+              box-sizing: border-box;
+            }
+            .price_box {
+              padding: 24upx 22upx;
+              .price_list {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                &:not(:last-child) {
+                  margin-bottom: 50upx;
+                }
+                &.active {
+                  .price_text {
+                    color: #0070e2;
+                  }
+                  .price_checked {
+                    background: url("@/static/selected_active.png") no-repeat
+                      center center;
+                    background-size: contain;
+                  }
+                }
+                .price_text {
+                  font-size: 28upx;
+                  font-weight: 400;
+                  color: #333333;
+                }
+                .price_checked {
+                  background: url("@/static/selected.png") no-repeat center
+                    center;
+                  background-size: contain;
+                  width: 40upx;
+                  height: 40upx;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .bottom_submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 90upx;
+      background: #fff;
+      padding-top: 20upx;
+      padding-bottom: 80upx;
+      .multi_rate_submit {
+        font-size: 32upx;
+        font-weight: 400;
+        color: #ffffff;
+        letter-spacing: 5upx;
+        width: calc(100% - 100upx);
+        height: 100%;
+        background: linear-gradient(90deg, #0070e2 0%, #56c5ff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
+        border-radius: 80upx;
       }
     }
   }
