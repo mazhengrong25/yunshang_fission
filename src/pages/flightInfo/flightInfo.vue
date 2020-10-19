@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-10-19 14:32:24
+ * @LastEditTime: 2020-10-19 15:09:47
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -198,7 +198,7 @@
               </view>
               <view class="table_list">
                 <view class="list_title">价格选择</view>
-                <view class="list_message">去程</view>
+                <view class="list_message">{{roundTripBtnActive === 1?"返程":"去程"}}</view>
               </view>
               <view class="table_price">
                 <view class="list_title">价格</view>
