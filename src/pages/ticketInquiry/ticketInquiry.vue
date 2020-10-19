@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-10-16 18:32:22
+ * @LastEditTime: 2020-10-19 16:17:35
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -372,7 +372,6 @@ export default {
 
     // 列表筛选
     listFilter(val) {
-      console.log(val);
 
       if (val === "price") {
         this.ticketList.sort(this.priceSort("min_price"));
@@ -381,10 +380,12 @@ export default {
           (item) => item.min_price === 0
         );
         this.ticketList = [...priceList, ...notPriceList];
-        console.log(this.ticketList);
+        console.log(val,this.ticketList);
         this.oldTicketList = JSON.parse(JSON.stringify(this.ticketList));
       } else if (val === "time") {
         this.ticketList.sort(this.timeSort("depTime"));
+        console.log(val,this.ticketList)
+        this.$forceUpdate()
       }
       this.backScroll();
     },
@@ -867,9 +868,11 @@ export default {
         }
         .ticket_low_price{
           font-size: 22upx;
-          font-weight: 400;
-          color:#666;
+          font-weight: 400;   
+          color: #ff8800;
           margin-bottom: 2upx;
+          background: rgba(251, 152, 38, .11);
+          padding: 2upx 12upx;
         }
         .ticket_reward {
           background: rgba(255, 0, 0, 0.1);
