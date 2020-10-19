@@ -2,8 +2,8 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2020-09-17 12:01:22
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-10-19 15:41:27
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order">
@@ -50,13 +50,13 @@ export default {
   methods: {
     jumpOrderList(type) {
       uni.navigateTo({
-        url: "/pages/order/orderList?type="+type,
+        url: "/order/orderList?type="+type,
       });
     },
     // 跳转到国内退票订单
     goRefundList() {
       uni.navigateTo({
-        url: "/pages/order/refundList",
+        url: "/order/refundList",
       })
     }
   },

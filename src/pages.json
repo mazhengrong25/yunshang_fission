@@ -7,54 +7,12 @@
       }
     },
     {
-      "path": "pages/order/filter",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/order/refund",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/order/orderList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
       "path": "pages/order/order",
       "style": {
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/order/refundList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/order/refundDetails",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/passengerList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/addPassenger",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-
+    
     {
       "path": "pages/ticketInquiry/ticketInquiry",
       "style": {
@@ -75,55 +33,11 @@
       }
     },
     {
-      "path": "pages/order/orderDetails",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/order/orderinterDetails",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
       "path": "pages/userInfo/userInfo",
       "style": {
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/userInfo/service",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-
-    {
-      "path": "pages/userInfo/wallet",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/userInfo/walletDetails",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/userInfo/editPassword",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/userInfo/userDetails",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-
     {
       "path": "pages/login/login",
       "style": {
@@ -155,53 +69,157 @@
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/flightReservation/mailAddress",
-      "style": {
-        "navigationBarTitleText": "报销凭证"
-      }
-    },
-
-    {
-      "path": "pages/flightReservation/passengerManage",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/flightReservation",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/orderPay",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/payResult",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
+   
     {
       "path": "pages/ticketInquiry/ticketRoundTrip",
       "style": {
         "navigationStyle": "custom"
       }
+    }
+    
+  ],
+
+  "subPackages": [
+    {
+      "root": "order",
+      "pages": [
+        {
+          "path": "filter",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "refund",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "orderList",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "orderDetails",
+          "style": {
+            "navigationStyle": "custom"
+          } 
+        },
+        {
+          "path": "orderinterDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "refundList",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "refundDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
     },
     {
-      "path": "pages/flightReservation/webView"
+      "root": "userInfo",
+      "pages": [
+        {
+          "path": "service",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+    
+        {
+          "path": "wallet",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "walletDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "editPassword",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "userDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
     },
     {
-      "path": "pages/flightReservation/restrictedNotice",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "root": "flightReservation",
+      "pages": [
+        {
+          "path": "passengerList",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "addPassenger",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }, {
+          "path": "mailAddress",
+          "style": {
+            "navigationBarTitleText": "报销凭证"
+          }
+        },
+    
+        {
+          "path": "passengerManage",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "flightReservation",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "orderPay",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "payResult",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },{
+          "path": "webView"
+        },
+        {
+          "path": "restrictedNotice",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
     }
   ],
+
   "tabBar": {
     "color": "#cdcdcd",
     "selectedColor": "#0070E2",

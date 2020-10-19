@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-09-29 15:36:05
+ * @LastEditTime: 2020-10-19 15:51:10
  * @LastEditors: wish.WuJunLong
 --> 
 <template>

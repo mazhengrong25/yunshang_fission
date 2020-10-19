@@ -725,7 +725,7 @@ export default {
       //     // 单程验价
       //     uni.navigateTo({
       //       url:
-      //         "/pages/flightReservation/flightReservation?key=" +
+      //         "/flightReservation/flightReservation?key=" +
       //         data.data.cabinPrices.ADT.rulePrice.key +
       //         "&airMessage=" +
       //         JSON.stringify(this.airMessage) +
@@ -816,7 +816,7 @@ export default {
                 // 单程验价
                 uni.navigateTo({
                   url:
-                    "/pages/flightReservation/flightReservation?key=" +
+                    "/flightReservation/flightReservation?key=" +
                     res.data.keys +
                     "&airMessage=" +
                     JSON.stringify(this.airMessage) +
@@ -1026,7 +1026,7 @@ export default {
         // this.closeCheckPrice();
         uni.navigateTo({
           url:
-            "/pages/flightReservation/flightReservation?key=" +
+            "/flightReservation/flightReservation?key=" +
             this.relatedKey +
             "&airMessage=" +
             JSON.stringify(this.airMessage) +
@@ -1052,7 +1052,7 @@ export default {
     roundTripCheckedBtn() {
       uni.navigateTo({
         url:
-          "/pages/flightReservation/flightReservation?type=" +
+          "/flightReservation/flightReservation?type=" +
           this.roundTripType +
           "&airMessage=" +
           JSON.stringify(this.airMessage) +

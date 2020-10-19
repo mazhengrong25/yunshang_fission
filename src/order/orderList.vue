@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-30 09:10:38
+ * @LastEditTime: 2020-10-19 15:47:59
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -501,7 +501,7 @@ export default {
       let orderNo = index === 0 ? data.order_no : data.from_order_no;
       uni.navigateTo({
         url:
-          "/pages/order/orderinterDetails?orderNo=" +
+          "/order/orderinterDetails?orderNo=" +
           orderNo +
           "&cancel=cancel",
       });
@@ -528,7 +528,7 @@ export default {
 
       uni.navigateTo({
         url:
-          "/pages/flightReservation/orderPay?orderId=" +
+          "/flightReservation/orderPay?orderId=" +
           JSON.stringify(orderId) +
           "&flightData=" +
           JSON.stringify(flightData) +
@@ -545,7 +545,7 @@ export default {
     goFilter(type) {
       uni.navigateTo({
         url:
-          "/pages/order/filter?type=" +
+          "/order/filter?type=" +
           type +
           "&filterData=" +
           JSON.stringify(this.orderListFilter),
@@ -697,7 +697,7 @@ export default {
       if (this.orderListType === "3") {
         uni.navigateTo({
           url:
-            "/pages/order/orderDetails?orderData=" +
+            "/order/orderDetails?orderData=" +
             JSON.stringify(data) +
             "&type=" +
             this.orderListType,
@@ -706,7 +706,7 @@ export default {
         // 国内
         uni.navigateTo({
           url:
-            "/pages/order/orderinterDetails?orderNo=" +
+            "/order/orderinterDetails?orderNo=" +
             data.order_no +
             "&type=" +
             this.orderListType +

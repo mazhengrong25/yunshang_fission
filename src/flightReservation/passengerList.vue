@@ -158,7 +158,7 @@ export default {
     // 跳转新增乘机人
     jumpAddPassenger() {
       uni.navigateTo({
-        url: "/pages/flightReservation/addPassenger",
+        url: "/flightReservation/addPassenger",
       });
     },
 
@@ -219,7 +219,7 @@ export default {
       console.log(val);
       uni.navigateTo({
         url:
-          "/pages/flightReservation/addPassenger?type=edit&data=" +
+          "/flightReservation/addPassenger?type=edit&data=" +
           JSON.stringify(val),
       });
     },

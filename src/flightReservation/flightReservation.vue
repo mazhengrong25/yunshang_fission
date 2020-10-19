@@ -846,7 +846,7 @@ export default {
     // 跳转报销凭证 添加邮件地址
     jumpAddMailAddress() {
       uni.navigateTo({
-        url: "/pages/flightReservation/mailAddress",
+        url: "/flightReservation/mailAddress",
       });
     },
 
@@ -854,7 +854,7 @@ export default {
     jumpPassengerPage() {
       uni.navigateTo({
         url:
-          "/pages/flightReservation/passengerList?chdinfNumber=" +
+          "/flightReservation/passengerList?chdinfNumber=" +
           JSON.stringify(this.chdinf_msg) +
           "&editPassengerList=" +
           JSON.stringify(this.passengerList),
@@ -891,7 +891,7 @@ export default {
     flightEdit(data, index) {
       uni.navigateTo({
         url:
-          "/pages/flightReservation/addPassenger?type=edit&data=" +
+          "/flightReservation/addPassenger?type=edit&data=" +
           JSON.stringify(data) +
           "&status=true",
       });
@@ -900,7 +900,7 @@ export default {
 
     // 添加儿童按钮
     jumpAddPassenger() {
-      uni.navigateTo({ url: "/pages/flightReservation/addPassenger" });
+      uni.navigateTo({ url: "/flightReservation/addPassenger" });
     },
 
     // 获取保险列表
@@ -955,7 +955,7 @@ export default {
     openStatementWeb(url) {
       console.log(url);
       uni.navigateTo({
-        url: "/pages/flightReservation/webView?url=" + url,
+        url: "/flightReservation/webView?url=" + url,
       });
     },
 
@@ -964,7 +964,7 @@ export default {
       if (type) {
       } else {
         uni.navigateTo({
-          url: "/pages/flightReservation/restrictedNotice",
+          url: "/flightReservation/restrictedNotice",
         });
       }
     },
@@ -1169,7 +1169,7 @@ export default {
 
               uni.navigateTo({
                 url:
-                  "/pages/flightReservation/orderPay?orderId=" +
+                  "/flightReservation/orderPay?orderId=" +
                   JSON.stringify(orderId) +
                   "&flightData=" +
                   JSON.stringify(this.flightData) +
@@ -1251,7 +1251,7 @@ export default {
 
               uni.navigateTo({
                 url:
-                  "/pages/flightReservation/orderPay?orderId=" +
+                  "/flightReservation/orderPay?orderId=" +
                   JSON.stringify(orderId) +
                   "&flightData=" +
                   JSON.stringify(this.flightData) +

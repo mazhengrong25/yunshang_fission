@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-30 09:25:16
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-10-19 15:46:46
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -261,7 +261,7 @@
 
 <script>
 import orderApi from "@/api/order.js";
-import moment from "../../moment";
+import moment from "moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
 
@@ -378,7 +378,7 @@ export default {
 
       uni.navigateTo({
         url:
-          "/pages/flightReservation/orderPay?orderId=" +
+          "/flightReservation/orderPay?orderId=" +
           JSON.stringify(orderId) +
           "&flightData=" +
           JSON.stringify(this.flightData) +
@@ -501,7 +501,7 @@ export default {
       console.log("退票", this.orderDetails);
       uni.navigateTo({
         url:
-          "/pages/order/refund?refundData=" + JSON.stringify(this.orderDetails),
+          "/order/refund?refundData=" + JSON.stringify(this.orderDetails),
       });
     },
 

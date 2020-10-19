@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-22 10:24:02
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-10-19 15:46:54
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -228,7 +228,7 @@ export default {
 	// 跳转订单详情
 	getRefund(data) {
 	  uni.navigateTo({
-	    url: "/pages/order/refund?orderData=" + JSON.stringify(data),
+	    url: "/order/refund?orderData=" + JSON.stringify(data),
 	  });
 	},
 

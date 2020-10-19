@@ -223,7 +223,7 @@
 
 <script>
 import orderApi from "@/api/order.js";
-import moment from "../../moment";
+import moment from "moment";
 moment.locale("zh-cn");
 import refundTop from "@/components/refund_top.vue"; //退票信息
 import RefundAmount from "@/components/refund_amount_refer.vue"; //退票金额参考

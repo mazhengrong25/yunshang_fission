@@ -282,7 +282,7 @@ export default {
       //   data: JSON.parse(val)
       // }
       uni.navigateTo({
-        url: '/pages/userInfo/walletDetails?data= '+ val
+        url: '/userInfo/walletDetails?data= '+ val
     });
     },
   },
