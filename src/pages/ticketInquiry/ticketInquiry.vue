@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-10-19 16:17:35
+ * @LastEditTime: 2020-10-19 16:28:28
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -364,8 +364,8 @@ export default {
     // 国内单程时间排序
     timeSort(t) {
       return (m, n) => {
-        var a = new Date(m.segments[0][t]).getTime();
-        var b = new Date(n.segments[0][t]).getTime();
+        var a = moment(m.segments[0][t]).format('x');
+        var b = moment(n.segments[0][t]).format('x');
         return a - b;
       };
     },
@@ -383,8 +383,8 @@ export default {
         console.log(val,this.ticketList);
         this.oldTicketList = JSON.parse(JSON.stringify(this.ticketList));
       } else if (val === "time") {
-        this.ticketList.sort(this.timeSort("depTime"));
-        console.log(val,this.ticketList)
+        this.ticketList = this.ticketList.sort(this.timeSort("depTime"));
+        console.log(val,this.ticketList,this.ticketList.sort(this.timeSort("depTime")))
         this.$forceUpdate()
       }
       this.backScroll();
