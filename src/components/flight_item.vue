@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-10-19 13:48:39
+ * @LastEditTime: 2020-10-20 10:24:44
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -21,14 +21,14 @@
           >
           <text
             class="total"
-            v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0"
+            v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0 && flightData.data.cabinPrices.ADT.rulePrice.price !== '无运价'"
           >
             {{
-              flightData.data.cabinPrices.ADT.build +
-              flightData.data.cabinPrices.ADT.rulePrice.price
+              Number(flightData.data.cabinPrices.ADT.build) +
+              Number(flightData.data.cabinPrices.ADT.rulePrice.price)
             }}(含税)
           </text>
-          <text class="not_price" v-else>待获取</text>
+          <text class="not_price" v-else-if="flightData.data.cabinPrices.ADT.rulePrice.price !== '无运价'">待获取</text>
           <!-- <view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view> -->
         </view>
         <view class="left_reward" v-if="flightData.reward > 0"
@@ -200,6 +200,7 @@ export default {
         color: rgba(255, 0, 0, 1);
         padding: 4upx 12upx;
         display: inline;
+        border: 2upx solid rgba(255,0,0,.24);
       }
     }
 

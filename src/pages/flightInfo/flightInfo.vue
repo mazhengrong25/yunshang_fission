@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-10-19 15:09:47
+ * @LastEditTime: 2020-10-20 10:23:27
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -192,14 +192,14 @@
         <scroll-view class="multi_rate_scroll" scroll-y="true">
           <view class="multi_rate_main">
             <view class="main_table">
-              <view class="table_list">
+              <!-- <view class="table_list">
                 <view class="list_title">选择项</view>
                 <view class="list_message">单项</view>
               </view>
               <view class="table_list">
                 <view class="list_title">价格选择</view>
                 <view class="list_message">{{roundTripBtnActive === 1?"返程":"去程"}}</view>
-              </view>
+              </view> -->
               <view class="table_price">
                 <view class="list_title">价格</view>
                 <view class="price_box">
@@ -213,9 +213,7 @@
                     :key="index"
                   >
                     <view class="price_text"
-                      >{{ item.price }}/{{ item.tax }}/{{
-                        item.price + item.tax
-                      }}</view
+                      >{{ item.price }}/{{ item.tax }}/{{item.reward}}/{{item.settle_price}}</view
                     >
                     <view class="price_checked"></view>
                   </view>

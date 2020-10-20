@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-10-19 16:28:28
+ * @LastEditTime: 2020-10-20 10:24:20
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -873,6 +873,7 @@ export default {
           margin-bottom: 2upx;
           background: rgba(251, 152, 38, .11);
           padding: 2upx 12upx;
+          border: 2upx solid rgba(251, 152, 38, .24);
         }
         .ticket_reward {
           background: rgba(255, 0, 0, 0.1);
