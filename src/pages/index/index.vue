@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-10-15 16:20:38
+ * @LastEditTime: 2020-10-20 11:33:15
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -468,7 +468,7 @@ export default {
 
     // 提交按钮
     submitTicket() {
-      console.log("提交", this.airMessage);
+      console.log("提交", JSON.stringify(this.airMessage));
       this.airMessage["type"] = this.currentTab;
 
       let jumpUrl;

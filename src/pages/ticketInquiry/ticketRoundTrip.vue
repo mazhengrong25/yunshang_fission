@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-10-10 10:27:23
+ * @LastEditTime: 2020-10-20 12:11:12
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -74,10 +74,15 @@
               </view>
               <view class="top_time end_time">
                 <view class="time">{{
-                  $dateTool(item.segments[item.segments.length - 1].arrTime, "HH:mm")
+                  $dateTool(
+                    item.segments[item.segments.length - 1].arrTime,
+                    "HH:mm"
+                  )
                 }}</view>
                 <view class="address"
-                  >{{ item.segments[item.segments.length - 1].arrAirport_CN.air_port_name
+                  >{{
+                    item.segments[item.segments.length - 1].arrAirport_CN
+                      .air_port_name
                   }}{{
                     item.segments[item.segments.length - 1].arrTerminal !== "--"
                       ? item.segments[item.segments.length - 1].arrTerminal
@@ -93,10 +98,7 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="
-                    'https://fxxcx.ystrip.cn/' +
-                    item.segments[0].image
-                  "
+                  :src="'https://fxxcx.ystrip.cn/' + item.segments[0].image"
                   mode="contain"
                 />
                 {{ item.segments[0].airline_CN
@@ -234,12 +236,19 @@
       :defaultType="showDefaultType"
     ></default-page>
 
-    <view class="filter" v-if="!showDefaultType">
-      <flight-filter
-        @openFilter="openFilter"
-        :filterMini="true"
-        @filterType="listFilter"
-      ></flight-filter>
+    <view
+      :class="['filter', { show: showFilterStatus === 'show' },{ hien: showFilterStatus === 'hien' }]"
+      v-if="!showDefaultType"
+    >
+      <view class="filter_btn" @click="showFilterBtn"></view>
+      <view class="filter_main">
+        <flight-filter
+          @openFilter="openFilter"
+          :filterMini="true"
+          @filterType="listFilter"
+        ></flight-filter>
+        <view class="filter_btn_close" @click="showFilterBtn"></view>
+      </view>
     </view>
 
     <flight-filter-dialog
@@ -324,6 +333,8 @@ export default {
       showDefaultType: "", // 报错类型
 
       airlineList: ["不限"], // 航班列表
+
+      showFilterStatus: '', // 显示筛选框
     };
   },
   methods: {
@@ -331,6 +342,11 @@ export default {
     scroll(e) {
       this.oldScrollTop = e.detail.scrollTop;
       this.getScrollData();
+    },
+
+    // 显示筛选框
+    showFilterBtn() {
+      this.showFilterStatus = this.showFilterStatus === 'show'?'hien':'show';
     },
 
     // 获取往返提示头部信息
@@ -614,12 +630,13 @@ export default {
             (item) => item.segments[0].airline_CN === val[1]
           );
           this.roundFlightList = this.roundFlightList.filter(
-            (item) => item.segments[item.segments.length - 1].airline_CN === val[1]
+            (item) =>
+              item.segments[item.segments.length - 1].airline_CN === val[1]
           );
         }
       }
 
-      console.log(this.flightList,this.roundFlightList)
+      console.log(this.flightList, this.roundFlightList);
 
       if (this.flightList.length < 1 || this.roundFlightList.length < 1) {
         this.flightList = this.oldFlightList;
@@ -679,35 +696,38 @@ export default {
     let endTime = uni.getStorageSync("roundTime");
 
     if (startTime && endTime) {
-      if(JSON.parse(startTime).date !== this.timeData.toTime.date){
-        this.timeData.toTime = JSON.parse(startTime)
+      if (JSON.parse(startTime).date !== this.timeData.toTime.date) {
+        this.timeData.toTime = JSON.parse(startTime);
         this.price = this.price - this.flightList[this.toActive].min_price;
-        this.file_key = ''
-        this.flightList = []
-        this.oldFlightList = []
+        this.file_key = "";
+        this.flightList = [];
+        this.oldFlightList = [];
         this.skeletonNumber = 6;
         this.dataListApplyType = false;
-        this.submitBtnType = true
+        this.submitBtnType = true;
         this.getTicketData();
       }
-      if(JSON.parse(endTime).date !== this.timeData.fromTime.date){
-        this.price = this.price - this.roundFlightList[this.fromActive].min_price;
-        this.timeData.fromTime = JSON.parse(endTime)
-        this.roundFlightKey = ''
-        this.roundFlightList = []
-        this.oldRoundFlightList = []
-        this.skeletonRoundNumber = 6
-        this.dataRoundListApplyType = false
-        this.submitBtnType = true
+      if (JSON.parse(endTime).date !== this.timeData.fromTime.date) {
+        this.price =
+          this.price - this.roundFlightList[this.fromActive].min_price;
+        this.timeData.fromTime = JSON.parse(endTime);
+        this.roundFlightKey = "";
+        this.roundFlightList = [];
+        this.oldRoundFlightList = [];
+        this.skeletonRoundNumber = 6;
+        this.dataRoundListApplyType = false;
+        this.submitBtnType = true;
 
         this.getRoundTicketData();
       }
 
-
-      this.timeData.jetLag = moment(JSON.parse(endTime).date).diff(moment(JSON.parse(startTime).date), "days")
+      this.timeData.jetLag = moment(JSON.parse(endTime).date).diff(
+        moment(JSON.parse(startTime).date),
+        "days"
+      );
 
       console.log("往返时间", this.timeData);
-      
+
       this.getScrollData();
     }
 
@@ -1039,16 +1059,112 @@ export default {
 
   .filter {
     position: fixed;
+    bottom: calc(146upx + var(--status-bar-height));
     width: calc(100% - 40upx);
-    bottom: calc(156upx + var(--status-bar-height));
-    left: 20upx;
-    height: 80upx;
+    margin: 0 10upx;
+    left: 10upx;
+    height: 100upx;
     border-radius: 50upx;
-    box-shadow: 0 0 12upx rgba(0, 0, 0, 0.16);
-    background: rgba(255, 255, 255, 1);
+    overflow: hidden;
+    pointer-events: none;
     display: flex;
     align-items: center;
-    justify-content: center;
+    box-sizing: border-box;
+    &.show {
+      .filter_main {
+        animation: showFilter 1s forwards;
+      }
+      .filter_btn {
+        opacity: 0;
+        transform: rotate(0deg);
+      }
+      .filter_btn_close{
+        transform: rotate(180deg);
+      }
+    }
+    &.hien {
+      .filter_main {
+        animation: hienFilter 1s forwards;
+      }
+      .filter_btn {
+        opacity: 1;
+        transform: rotate(180deg);
+      }
+      .filter_btn_close{
+        transform: rotate(0deg);
+      }
+    }
+    .filter_btn {
+      width: 80upx;
+      height: 80upx;
+      border-radius: 50upx;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      background: #fff;
+      font-size: 22upx;
+      color: #000;
+      box-shadow: 0 0 12upx rgba(0, 0, 0, 0.16);
+      margin-left: auto;
+      pointer-events: auto;
+      opacity: 1;
+      transition: all 0.5s;
+      position: relative;
+      z-index: 2;
+      background: url(@/static/filter_open_btn.png) no-repeat center center;
+      background-size: 35% 35%;
+      background-color: #fff;
+      transform: rotate(180deg);
+    }
+    .filter_main {
+      box-shadow: 0 0 12upx rgba(0, 0, 0, 0.16);
+      background: rgba(255, 255, 255, 1);
+      display: flex;
+      width: 100%;
+      box-sizing: border-box;
+      height: 80upx;
+      border-radius: 50upx;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      position: absolute;
+      right: -105%;
+      z-index: 0;
+      .filter_btn_close {
+        width: 80upx;
+        height: 80upx;
+        background: url(@/static/filter_open_btn.png) no-repeat center center;
+        background-size: 35% 35%;
+        background-color: #fff;
+        transform: rotate(0deg);
+        margin-left: auto;
+      }
+      /deep/.filter_box {
+        width: 615upx;
+        border-right: 2upx solid rgba(175, 185, 196, 0.2);
+        .filter_btn {
+          flex: 1;
+          width: auto;
+        }
+      }
+    }
+
+    @keyframes showFilter {
+      from {
+        right: -105%;
+      }
+      to {
+        right: 0;
+      }
+    }
+    @keyframes hienFilter {
+      from {
+        right: 0;
+      }
+      to {
+        right: -105%;
+      }
+    }
   }
 
   .bottom_bar {
