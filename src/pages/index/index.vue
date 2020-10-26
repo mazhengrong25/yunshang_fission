@@ -225,6 +225,10 @@
     >
       <messageDialog @closeDialog="closeMessageDialog"></messageDialog>
     </uni-popup>
+
+    <!-- #ifdef MP-WEIXIN -->
+    <button class="share-btn" open-type="share">立即分享</button>
+    <!-- #endif -->
   </view>
 </template>
 
@@ -364,9 +368,8 @@ export default {
       if (index === 0) {
         this.closeFromBtn();
       }
-      
+
       this.currentTrue = index === 2;
-      
 
       if (this.currentTab === index) {
         return false;
@@ -506,6 +509,12 @@ export default {
 
     this.getNoticeList();
   },
+  onShareAppMessage(res) {
+    return {
+      title: "云上航空机票分销",
+      path: "/pages/index/index",
+    };
+  },
   onShow() {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
@@ -548,6 +557,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.share-btn {
+  position: absolute;
+  opacity: 0;
+}
 .index {
   background: #f3f5f7;
   display: flex;

@@ -161,7 +161,7 @@ export default {
 
       skeletonNumber: 6, // 骨架屏数量
       showDefault: false, // 报错页面
-      showDefaultType: "", // 报错类型
+      showDefaultType: "404", // 报错类型
       // showReturnBtn: false,
 
       file_key: "", // av key

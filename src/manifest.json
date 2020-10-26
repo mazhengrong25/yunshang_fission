@@ -63,6 +63,7 @@
     /* 小程序特有相关 */
     "mp-weixin" : {
         "appid" : "wxfe1f2313e5bf0576",
+        "share": true,
         "setting" : {
             "urlCheck" : false,
             "es6" : true,

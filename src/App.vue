@@ -41,6 +41,12 @@ export default {
       // 新的版本下载失败
     });
   },
+  onLoad() {
+    uni.showShareMenu({
+      title: "云上航空机票分销",
+      path: "/pages/index/index",
+    });
+  },
   onShow: function () {
     console.log("App Show");
   },
