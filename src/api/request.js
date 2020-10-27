@@ -23,7 +23,7 @@ const request = (config, type) => {
     // 调用用户信息地址
     baseUrl = 'https://fxxcx.ystrip.cn/user';
   } else {
-    baseUrl = 'http://sell.70168.com:8085/';
+    baseUrl = 'https://fxxcx.ystrip.cn';
   }
   config.url = baseUrl + config.url;
 

@@ -72,7 +72,7 @@
           <view class="ticket_details">
             <image
               class="ticket_details_icon"
-              :src="'https://fxxcx.ystrip.cn/'+ item.segments[0].image"
+              :src="'https://fxxcx.ystrip.cn/assets/airline/'+ item.segments[0].airline +'.png'"
               mode="contain"
             />
             {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode}}
@@ -81,9 +81,9 @@
 
         <view class="ticket_right">
           <view class="ticket_price">
-            <text class="currency" v-if="item.available_cabin > 0 && item.min_price !== 0">&yen;</text>
-            <view v-if="item.available_cabin > 0 && item.min_price !== 0">{{item.min_price}}</view>
-            <view class="sold_out" v-if="item.min_price === 0">售罄</view>
+            <text class="currency" v-if="item.available_cabin > 0 && item.available_cabin !== 0">&yen;</text>
+            <view v-if="item.available_cabin > 0 && item.available_cabin !== 0">{{item.min_price}}</view>
+            <view class="sold_out" v-if="item.available_cabin === 0">售罄</view>
             <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
@@ -375,9 +375,9 @@ export default {
 
       if (val === "price") {
         this.ticketList.sort(this.priceSort("min_price"));
-        let priceList = this.ticketList.filter((item) => item.min_price !== 0);
+        let priceList = this.ticketList.filter((item) => item.available_cabin !== 0);
         let notPriceList = this.ticketList.filter(
-          (item) => item.min_price === 0
+          (item) => item.available_cabin === 0
         );
         this.ticketList = [...priceList, ...notPriceList];
         console.log(val,this.ticketList);
@@ -518,7 +518,7 @@ export default {
     // 跳转航程信息
     jumpFlightInfo(data) {
       console.log("跳转",data);
-      if (data.min_price === 0) {
+      if (data.available_cabin === 0) {
         return false;
       }
       uni.navigateTo({

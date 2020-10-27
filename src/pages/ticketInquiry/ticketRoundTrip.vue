@@ -98,13 +98,13 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/' + item.segments[0].image"
+                  :src="'https://fxxcx.ystrip.cn/assets/airline/'+ item.segments[0].airline +'.png'"
                   mode="contain"
                 />
                 {{ item.segments[0].airline_CN
                 }}{{ item.segments[0].flightNumber }}
               </view>
-              <view class="price" v-if="item.min_price > 0">
+              <view class="price" v-if="item.available_cabin > 0">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
                 <text>{{ item.min_price }}</text>
@@ -190,16 +190,13 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="
-                    'https://fxxcx.ystrip.cn/' +
-                    item.segments[item.segments.length - 1].image
-                  "
+                  :src="'https://fxxcx.ystrip.cn/assets/airline/'+ item.segments[item.segments.length - 1].airline +'.png'"
                   mode="contain"
                 />
                 {{ item.segments[item.segments.length - 1].airline_CN
                 }}{{ item.segments[item.segments.length - 1].flightNumber }}
               </view>
-              <view class="price" v-if="item.min_price > 0">
+              <view class="price" v-if="item.available_cabin > 0">
                 <view class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
                 <text>{{ item.min_price }}</text>
@@ -465,7 +462,7 @@ export default {
     // 选择航班
     checkedFlight(type, val, index) {
       console.log(type, val, index);
-      if (val.min_price === 0) {
+      if (val.available_cabin === 0) {
         return false;
       }
       if (type === "to") {
@@ -504,17 +501,17 @@ export default {
         this.flightList.sort(this.priceSort("min_price"));
         this.roundFlightList.sort(this.priceSort("min_price"));
 
-        let priceList = this.flightList.filter((item) => item.min_price !== 0);
+        let priceList = this.flightList.filter((item) => item.available_cabin !== 0);
         let notPriceList = this.flightList.filter(
-          (item) => item.min_price === 0
+          (item) => item.available_cabin === 0
         );
         this.flightList = [...priceList, ...notPriceList];
 
         let roundPriceList = this.roundFlightList.filter(
-          (item) => item.min_price !== 0
+          (item) => item.available_cabin !== 0
         );
         let notRoundPriceList = this.roundFlightList.filter(
-          (item) => item.min_price === 0
+          (item) => item.available_cabin === 0
         );
         this.roundFlightList = [...roundPriceList, ...notRoundPriceList];
 
