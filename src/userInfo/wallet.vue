@@ -49,13 +49,28 @@
                   />
                   <image v-if="false" src="@/static/wallet_type_2.png" mode="contain" />
                   <image
-                    v-if="item.trans_type === 1 || item.trans_type === 3 || item.trans_type === 11"
+                    v-if="item.trans_type === 1 || item.trans_type === 11"
                     src="@/static/wallet_type_3.png"
                     mode="contain"
                   />
                   <image
-                    v-if="item.trans_type === 8 || item.trans_type === 9"
+                    v-else-if="item.trans_type === 8 || item.trans_type === 9"
                     src="@/static/wallet_type_4.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-else-if="item.trans_type === 4 || item.trans_type === 3"
+                    src="@/static/wallet_type_6.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-else-if="item.trans_type === 7"
+                    src="@/static/wallet_type_7.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-else
+                    src="@/static/wallet_type_5.png"
                     mode="contain"
                   />
                 </view>

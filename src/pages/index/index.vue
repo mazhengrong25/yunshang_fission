@@ -241,6 +241,8 @@ import messageDialog from "@/components/message_dialog.vue"; // 信息弹窗内�
 
 import noticeApi from "@/api/notice"; // 公告api
 
+import userInfo from "@/api/getUserInfo.js";
+
 import moment from "moment";
 moment.locale("zh-cn");
 export default {
@@ -502,12 +504,22 @@ export default {
         }
       });
     },
+
+    getUserInfo(){
+      userInfo.getUserInfo().then((res) => {
+        console.log(res);
+        uni.setStorageSync("userInfo", res);
+      });
+    },
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.setSwiperHeight();
 
+    this.getUserInfo()
+
     this.getNoticeList();
+
   },
   onShareAppMessage(res) {
     return {

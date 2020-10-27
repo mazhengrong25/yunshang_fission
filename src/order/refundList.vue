@@ -141,9 +141,7 @@ export default {
       this.orderPageStatus = true;
       let data = {
         dis_id: uni.getStorageSync("userInfo").dis_id,
-        start_date: moment()
-          .subtract(7, "days")
-          .format("YYYY-MM-DD"),
+        start_date: moment().subtract(7, "days").format("YYYY-MM-DD"),
         end_date: moment().format("YYYY-MM-DD"),
         order_status:
           this.headerActive === 0
@@ -166,10 +164,10 @@ export default {
             this.refundOrderList = res.data.data;
           }
         } else {
-          //     uni.showToast({
-          // 	    title: res.msg,
-          // 	    icon: "none",
-          // });
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
         }
       });
     },

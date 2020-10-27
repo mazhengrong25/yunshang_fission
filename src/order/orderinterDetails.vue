@@ -196,18 +196,18 @@
 
           <view class="contact">
             <view class="contact_list">
+              <view class="list_title">已购保险</view>
+              <view class="list_message"
+                >{{ orderDetails.insurance_total?orderDetails.insurance_total + '元': '' }}</view
+              >
+            </view>
+            <view class="contact_list">
               <view class="list_title">联系人</view>
               <view class="list_message">{{ orderDetails.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
               <view class="list_message">{{ orderDetails.phone }}</view>
-            </view>
-            <view class="contact_list">
-              <view class="list_title">已购保险</view>
-              <view class="list_message"
-                >{{ orderDetails.insurance_total?orderDetails.insurance_total + '元': '' }}</view
-              >
             </view>
           </view>
         </view>

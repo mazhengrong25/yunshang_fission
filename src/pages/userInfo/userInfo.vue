@@ -145,12 +145,8 @@ export default {
 
     // 获取用户信息
     getUserInfo() {
-      userInfo.getUserInfo().then((res) => {
-        console.log(res);
-        this.userInfo = res;
-        uni.setStorageSync("userInfo", this.userInfo);
-        this.getWallet();
-      });
+      this.userInfo = uni.getStorageSync('userInfo');
+      this.getWallet();
     },
 
     // 获取钱包详情

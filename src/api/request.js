@@ -23,16 +23,16 @@ const request = (config, type) => {
     // 调用用户信息地址
     baseUrl = 'https://fxxcx.ystrip.cn/user';
   } else {
-    baseUrl = 'https://fxxcx.ystrip.cn';
+    baseUrl = 'http://sell.70168.com:8085/';
   }
   config.url = baseUrl + config.url;
 
-  if (uni.getStorageSync('loginInfo').token) {
+  // if (uni.getStorageSync('loginInfo').token) {
     // 判断token 在header中加入token信息
     config['header'] = {
-      Authorization: 'Bearer ' + uni.getStorageSync('loginInfo').token,
+      Authorization: 'Bearer ' + (uni.getStorageSync('loginInfo').token?uni.getStorageSync('loginInfo').token:''),
     };
-  }
+  // }
   if (!config.data) {
     config.data = {};
   }
@@ -65,11 +65,22 @@ const request = (config, type) => {
               .then((responses) => {
                 uni.hideLoading();
                 // 异常
+                if (responses[1].data.msg?responses[1].data.msg.indexOf('Token') >= 0 || responses[1].data.msg.indexOf('Invalid') >= 0:false) {
+                  uni.reLaunch({
+                    url: '/pages/login/login',
+                  });
+                  uni.showToast({
+                    title: '用户信息获取失败，请重新登录',
+                    icon: 'none',
+                    duration: 3000,
+                  });
+                  return false
+                }
                 if (responses[0]) {
                   uni.showToast({
                     title: '网络超时',
                     icon: 'none',
-                    duration: 3000
+                    duration: 3000,
                   });
                 } else {
                   let response = responses[1].data;
@@ -81,7 +92,7 @@ const request = (config, type) => {
                 uni.showToast({
                   title: error.data || '数据错误，请联系客服重试',
                   icon: 'none',
-                  duration: 3000
+                  duration: 3000,
                 });
                 reject(error);
               });
@@ -93,12 +104,24 @@ const request = (config, type) => {
         .request(config)
         .then((responses) => {
           uni.hideLoading();
+          console.log(responses[1])
+          if (responses[1].data.msg?responses[1].data.msg.indexOf('Token') >= 0 || responses[1].data.msg.indexOf('Invalid') >= 0:false) {
+            uni.reLaunch({
+              url: '/pages/login/login',
+            });
+            uni.showToast({
+              title: '用户信息获取失败，请重新登录',
+              icon: 'none',
+              duration: 3000,
+            });
+            return false
+          }
           // 异常
           if (responses[0]) {
             uni.showToast({
               title: '网络超时',
               icon: 'none',
-              duration: 3000
+              duration: 3000,
             });
           } else {
             let response = responses[1].data;
@@ -109,7 +132,7 @@ const request = (config, type) => {
           uni.showToast({
             title: error.data || '数据错误，请联系客服重试',
             icon: 'none',
-            duration: 3000
+            duration: 3000,
           });
           uni.hideLoading();
           reject(error);
