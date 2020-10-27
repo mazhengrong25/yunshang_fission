@@ -31,6 +31,7 @@ const request = (config, type) => {
     // 判断token 在header中加入token信息
     config['header'] = {
       Authorization: 'Bearer ' + (uni.getStorageSync('loginInfo').token?uni.getStorageSync('loginInfo').token:''),
+      'channel': 'wx_app',
     };
   // }
   if (!config.data) {
@@ -69,11 +70,13 @@ const request = (config, type) => {
                   uni.reLaunch({
                     url: '/pages/login/login',
                   });
-                  uni.showToast({
-                    title: '用户信息获取失败，请重新登录',
-                    icon: 'none',
-                    duration: 3000,
-                  });
+                  setTimeout(() =>{
+                    uni.showToast({
+                      title: '用户信息获取失败，请重新登录',
+                      icon: 'none',
+                      duration: 3000,
+                    });
+                  },1000)
                   return false
                 }
                 if (responses[0]) {
@@ -109,11 +112,13 @@ const request = (config, type) => {
             uni.reLaunch({
               url: '/pages/login/login',
             });
-            uni.showToast({
-              title: '用户信息获取失败，请重新登录',
-              icon: 'none',
-              duration: 3000,
-            });
+            setTimeout(() =>{
+              uni.showToast({
+                title: '用户信息获取失败，请重新登录',
+                icon: 'none',
+                duration: 3000,
+              });
+            },1000)
             return false
           }
           // 异常
