@@ -23,7 +23,7 @@ const request = (config, type) => {
     // 调用用户信息地址
     baseUrl = 'https://fxxcx.ystrip.cn/user';
   } else {
-    baseUrl = 'https://fxxcx.ystrip.cn';
+    baseUrl = 'http://192.168.0.187';
   }
   config.url = baseUrl + config.url;
 
@@ -42,7 +42,7 @@ const request = (config, type) => {
     if (currentTime > loginTime) {
       uni.request({
         method: 'POST',
-        url: 'https://fxxcx.ystrip.cn/api/login',
+        url: baseUrl+'/api/login',
         data: {
           login_name: loginInfo.account,
           password: loginInfo.password,
@@ -99,6 +99,20 @@ const request = (config, type) => {
                 });
                 reject(error);
               });
+          }else{
+            uni.removeStorageSync('loginInfo');
+            uni.removeStorageSync('userInfo');
+            uni.reLaunch({
+              url: '/pages/login/login',
+            });
+            setTimeout(() =>{
+              uni.showToast({
+                title: '用户信息获取失败，请重新登录',
+                icon: 'none',
+                duration: 3000,
+              });
+            },1000)
+            return false
           }
         },
       });

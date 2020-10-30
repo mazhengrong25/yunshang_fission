@@ -2,7 +2,7 @@
  * @Description: 钱包流水
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-04 09:38:11
+ * @LastEditTime: 2020-10-30 14:51:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -160,6 +160,7 @@ export default {
           year: moment().format('YYYY'),
           month: moment().format('MM')
         }
+        console.log(data)
         this.submitFilterBtn(data)
       } else if (this.headerActive === 2) {
         this.filterDate = moment().format('第Q季度');
@@ -208,7 +209,7 @@ export default {
         time = e.year + "-" + e.month;
         this.filterDate = e.year + "年" + e.month + "月";
         this.startTime = time + "-1";
-        this.endTime = time + "-" + moment(time).format('YYYY-MM').daysInMonth();
+        this.endTime = time + "-" + moment(time).daysInMonth();
       } else if (this.headerActive === 2) {
         if(e === '第1季度'){
           this.startTime = moment().format('YYYY') + "-1-1";

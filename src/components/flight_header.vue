@@ -594,7 +594,7 @@ export default {
     padding-top: 22upx;
     font-size: 24upx;
     font-weight: 400;
-    color: rgba(175, 185, 196, 1);
+    color:#666;
     text-align: center;
     display: flex;
     align-items: center;

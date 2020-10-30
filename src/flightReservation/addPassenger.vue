@@ -477,12 +477,12 @@ export default {
           icon: "none",
         });
       }
-      if (!this.group.id) {
-        return uni.showToast({
-          title: "请选择分组",
-          icon: "none",
-        });
-      }
+      // if (!this.group.id) {
+      //   return uni.showToast({
+      //     title: "请选择分组",
+      //     icon: "none",
+      //   });
+      // }
       this.certificateList.forEach((item, index) =>{
         if(!item.cert_no){
           this.certificateList.splice(index, 1)

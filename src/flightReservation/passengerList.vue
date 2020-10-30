@@ -26,8 +26,9 @@
       <view class="mian_header">
         <view class="title">常用乘机人</view>
         <view class="filter" @click="openGroupSelect">
-
-          <text v-if="searchUserName" class="username_search">姓名筛选：{{searchUserName}}</text>
+          <text v-if="searchUserName" class="username_search"
+            >姓名筛选：{{ searchUserName }}</text
+          >
 
           <text>{{ group.group_name ? group.group_name : "筛选" }}</text>
           <image
@@ -42,8 +43,12 @@
         :enable-back-to-top="true"
         :scroll-y="true"
         class="mian_list"
+        :scroll-top="scrollTop"
+        @scrolltolower="nextPageData()"
       >
-        <view v-if="notList && !showDefault" class="not_passenger_list">您还没有当前筛选状态的旅客信息</view>
+        <view v-if="notList && !showDefault" class="not_passenger_list"
+          >您还没有当前筛选状态的旅客信息</view
+        >
         <uni-swipe-action :disabled="passengerType">
           <uni-swipe-action-item
             v-for="(item, index) in passengerList"
@@ -152,6 +157,11 @@ export default {
       searchUserName: "", // 用户名筛选
 
       notList: false, // 乘客列表为空
+
+      page: 1,
+      passengerListStatus: false, // 加载状态
+      groupId: "",
+      scrollTop: 0,
     };
   },
   methods: {
@@ -162,6 +172,11 @@ export default {
       });
     },
 
+    nextPageData() {
+      this.page = this.page + 1;
+      this.getPassengerData();
+    },
+
     compare(property) {},
 
     /**
@@ -169,16 +184,32 @@ export default {
      * @author Wish
      * @date 2020/8/14
      */
-    getPassengerData(id) {
-      let data;
-      if (id) {
-        data = {
-          group_id: id,
-        };
-      }
+    getPassengerData() {
+      let data = {
+        group_id: this.groupId,
+        page: this.page,
+        name: this.searchUserName,
+      };
       passenger.getPassenger(data).then((res) => {
         if (res.errorcode === 10000) {
-          this.passengerList = res.data.data;
+          if (this.passengerListStatus) {
+            if(res.data.data.length < 1){
+              return uni.showToast({
+                title: '到底了',
+                icon: 'none',
+                duration: 2000
+              });
+            }
+            this.passengerList.push.apply(this.passengerList, res.data.data);
+            
+          } else {
+            this.passengerListStatus = true;
+            this.passengerList = res.data.data;
+            this.$nextTick(() => {
+              this.scrollTop = 0;
+            });
+            this.getGroupList();
+          }
 
           this.passengerList.forEach((item) => {
             item.name = item.name ? item.name : null;
@@ -207,9 +238,8 @@ export default {
             });
           }
           this.showDefault = false;
-          this.getGroupList();
 
-          this.lockingChecked()
+          this.lockingChecked();
         }
       });
     },
@@ -234,11 +264,14 @@ export default {
             title: "删除成功",
             icon: "success",
           });
-          this.checkePassenger.forEach(item =>{
-            if(item.id === val.id){
-              this.checkePassenger.splice(this.checkePassenger.findIndex(item => item.id === val.id), 1)
+          this.checkePassenger.forEach((item) => {
+            if (item.id === val.id) {
+              this.checkePassenger.splice(
+                this.checkePassenger.findIndex((item) => item.id === val.id),
+                1
+              );
             }
-          })
+          });
         } else {
           uni.showToast({
             title: res.msg,
@@ -267,7 +300,7 @@ export default {
             icon: "none",
           });
         }
-        this.oldPassgengerList = JSON.parse(JSON.stringify(this.passengerList))
+        this.oldPassgengerList = JSON.parse(JSON.stringify(this.passengerList));
       });
     },
 
@@ -280,26 +313,28 @@ export default {
     // 用户名筛选
     submitConfig(val) {
       console.log(val);
-      this.searchUserName = val
-      if (val) {
-        this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList))
-        let newArr = [];
-        this.passengerList.forEach((item, index) => {
-          let username = item.name + item.en_first_name + item.en_last_name;
-          if (
-            JSON.stringify(username)
-              .toLowerCase()
-              .indexOf(val.toLowerCase()) !== -1
-          ) {
-            newArr.push(item);
-          }
-        });
-        this.passengerList = newArr;
-      } else {
-        this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList))
-      }
-      
-      this.lockingChecked()
+      this.searchUserName = val;
+      this.page = 1;
+      this.passengerListStatus = false;
+      // if (val) {
+      //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
+      //   let newArr = [];
+      //   this.passengerList.forEach((item, index) => {
+      //     let username = item.name + item.en_first_name + item.en_last_name;
+      //     if (
+      //       JSON.stringify(username)
+      //         .toLowerCase()
+      //         .indexOf(val.toLowerCase()) !== -1
+      //     ) {
+      //       newArr.push(item);
+      //     }
+      //   });
+      //   this.passengerList = newArr;
+      // } else {
+      //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
+      // }
+      this.getPassengerData();
+      this.lockingChecked();
     },
 
     // 打开分组弹窗
@@ -310,28 +345,33 @@ export default {
     groupPopupSelecctBtn(e) {
       this.$refs.yunConfig.inputValue = "";
       console.log(e);
-      this.searchUserName = ""
+      this.searchUserName = "";
       if (e.group_name !== "不限") {
         this.group = e;
-        this.getPassengerData(e.id);
+        this.groupId = e.id;
+        this.passengerListStatus = false;
+        this.getPassengerData();
+        this.page = 1;
       } else {
         this.group = {};
+        this.groupId = "";
+        this.passengerListStatus = false;
         this.getPassengerData();
       }
     },
 
     // 锁定选中乘机人数据
-    lockingChecked(){
-      if(this.checkePassenger.length> 0){
-        this.checkePassenger.forEach(item => {
-          this.passengerList.forEach(oitem => {
-            if(item.id === oitem.id){
-              oitem.checked = true
+    lockingChecked() {
+      if (this.checkePassenger.length > 0) {
+        this.checkePassenger.forEach((item) => {
+          this.passengerList.forEach((oitem) => {
+            if (item.id === oitem.id) {
+              oitem.checked = true;
             }
-          })
-        })
+          });
+        });
       }
-      this.notList = this.passengerList.length < 1
+      this.notList = this.passengerList.length < 1;
     },
 
     // 选中乘机人
@@ -485,7 +525,7 @@ export default {
         display: inline-flex;
         align-items: center;
         justify-content: right;
-        .username_search{
+        .username_search {
           margin-right: 40upx;
           width: 30vw;
           overflow: hidden;

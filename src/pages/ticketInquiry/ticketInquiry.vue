@@ -328,7 +328,7 @@ export default {
                 "-" +
                 moment(day).add(dayNumber, "d").format("DD")
               : moment(day).add(dayNumber, "d").format("DD"),
-          status: +moment() < +moment(day).add(dayNumber, "d"),
+          status: moment(day).add(dayNumber, "d").format('YYYY-MM-DD') === moment(+moment()).format('YYYY-MM-DD')? true: +moment(day).add(dayNumber, "d") > +moment(),
         });
         dayNumber += 1;
       }

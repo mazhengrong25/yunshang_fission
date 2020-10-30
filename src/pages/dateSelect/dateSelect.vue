@@ -71,7 +71,7 @@
             <text class="round_text text_from" v-if="oitem.fromChecked">
               {{oitem.fromChecked?'返程':''}}
             </text>
-            {{  oitem.active?'今天':oitem.day }}
+            <text class="to_day_text">{{  oitem.active?'今天':oitem.day }}</text>
             <text
               class="lunar lunar_day"
               v-if="oitem.lunar.lunarDay !== '初一'"
@@ -144,7 +144,7 @@ export default {
             (i + 1 < 10 ? "0" + (i + 1) : i + 1),
           status:
             currentDate === nextDate
-              ? i + 1 > Number(moment().format("D"))
+              ? i + 1 >= Number(moment().format("D"))
               : true,
           active:
             currentDate === nextDate
@@ -333,6 +333,7 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
                     nextWeek: "ddd",
                     sameElse: "ddd",
@@ -350,6 +351,7 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
                     nextWeek: "ddd",
                     sameElse: "ddd",
@@ -394,6 +396,7 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
                     nextWeek: "ddd",
                     sameElse: "ddd",
@@ -411,6 +414,7 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
                     nextWeek: "ddd",
                     sameElse: "ddd",
@@ -453,9 +457,10 @@ export default {
           let fromNow = moment(moment(day.date).format("YYYY-MM-DD")).calendar(
             null,
             {
+              sameDay: '[今天]',
               nextDay: "[明天]",
-              nextWeek: "ddd",
-              sameElse: "ddd",
+              // nextWeek: "ddd",
+              // sameElse: "ddd",
             }
           );
 
@@ -616,6 +621,16 @@ export default {
             font-size: 22upx;
             font-weight: 500;
             color: rgba(0, 112, 226, 1) !important;
+            &.to{
+              .to_day_text{
+                display: none;
+              }
+            }
+            &.from{
+              .to_day_text{
+                display: none;
+              }
+            }
           }
           &.is_before {
             box-shadow: none;

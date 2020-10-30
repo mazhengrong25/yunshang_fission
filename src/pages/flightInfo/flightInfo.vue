@@ -433,6 +433,7 @@ export default {
               }
             }
           });
+          this.depHeaderDiaplay = this.depCabinHeader.length !== 2;
           this.headerDiaplay = this.cabinHeader.length !== 2;
           this.showData = true;
         } else {

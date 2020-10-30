@@ -9,7 +9,7 @@
   <view class="user_info">
     <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="我的"></yun-header>
     <view class="header">
-      <view class="version_number">v1.0.32</view>
+      <view class="version_number">v1.0.35</view>
       <view class="info_box">
         <view class="info_left">
           <view class="avatar">

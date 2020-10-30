@@ -27,6 +27,9 @@
           class="content_view"
           @change="bindChange"
         >
+        <picker-view-column>
+            <view class="item" v-for="(item,index) in years" :key="index">{{item}}年</view>
+          </picker-view-column>
           <picker-view-column>
             <view class="item" v-for="(item,index) in dataList" :key="index">{{dataItem?item[dataItem]:item}}</view>
           </picker-view-column>
@@ -212,9 +215,10 @@ export default {
       .user_search_btn{
         display: flex;
         align-items: center;
-        padding: 8upx 40upx;
-        border: 2upx solid #F1F3F5;
+        padding: 12upx 40upx;
+        border: 2upx solid #f1f3f5;
         font-size: 28upx;
+        border-radius: 10upx;
         color: #AFB9C4;
       }
       .submit_btn {
