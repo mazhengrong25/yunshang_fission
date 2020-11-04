@@ -2,8 +2,8 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-09-29 16:06:10
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-04 13:39:54
+ * @LastEditors: Please set LastEditors
  */
 
 const request = (config, type) => {
@@ -21,9 +21,9 @@ const request = (config, type) => {
   let baseUrl;
   if (type === 'user') {
     // 调用用户信息地址
-    baseUrl = 'https://fxxcx.ystrip.cn/user';
+    baseUrl = 'http://192.168.0.187/user';
   } else {
-    baseUrl = 'https://fxxcx.ystrip.cn';
+    baseUrl = 'http://192.168.0.187';
   }
   config.url = baseUrl + config.url;
 

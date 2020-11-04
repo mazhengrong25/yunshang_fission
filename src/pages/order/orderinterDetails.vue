@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-09-30 09:25:16
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-04 18:22:24
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_details">
@@ -72,7 +72,7 @@
       </view>
 
       <view class="order_option">
-        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
+        <view @click="sendMessage()" class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
           >发送短信</view
         >
         <view
@@ -344,6 +344,12 @@ export default {
       });
     },
 
+    // 发送短信
+    sendMessage() {
+      uni.navigateTo({
+        url:"/pages/order/sendMessage?orderId=" + JSON.stringify(orderId),
+      })
+    },
 
     // 已预订 取消订单弹窗
     getCancel() {

@@ -43,6 +43,12 @@
       }
     },
     {
+      "path": "pages/order/sendMessage",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/flightReservation/passengerList",
       "style": {
         "navigationStyle": "custom"

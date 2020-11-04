@@ -2,13 +2,8 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
-<<<<<<< HEAD
- * @LastEditTime: 2020-09-29 17:28:58
- * @LastEditors: wish.WuJunLong
-=======
- * @LastEditTime: 2020-09-28 15:45:46
+ * @LastEditTime: 2020-10-09 10:23:36
  * @LastEditors: mazhengrong
->>>>>>> 0fe8e088eb6bb74c567b0cf30edab30ca6acdfaf
 -->
 <template>
   <view class="filter">

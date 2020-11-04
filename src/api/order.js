@@ -2,8 +2,8 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-09-18 11:56:26
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-04 18:31:17
+ * @LastEditors: Please set LastEditors
  */
 import request from '@/api/request';
 
@@ -90,6 +90,15 @@ function cancleInterRefund(data) {
 	})
 }
 
+// 发送短信
+function sendMessage(data) {
+	return request({
+		method:'POST',
+		url:'/api/admin_msg/sendMsg',
+		data: data
+	})
+}
+
 export default{
   orderList,
   orderInterList,
@@ -99,6 +108,7 @@ export default{
   cancleInterRefund,
   refundSubmit,
   orderRefundList,
-  getFilghtData
+  getFilghtData,
+  sendMessage
 
 }

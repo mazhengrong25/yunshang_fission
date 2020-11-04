@@ -2,8 +2,8 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-09-22 11:17:14
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-04 14:35:44
+ * @LastEditors: Please set LastEditors
 --> 
 <template>
   <view

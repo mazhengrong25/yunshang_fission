@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-09-30 09:10:38
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-10-10 10:28:06
+ * @LastEditors: mazhengrong
 -->
 <template>
   <view class="order_list">
@@ -156,16 +156,16 @@
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
-            <view class="time_text">剩余支付时间：</view>
-            <view class="time_number"
-              >{{
+            <view class="time_text">剩余支付时间：</view>   
+            <view class="time_number">
+              {{
                 $timeDiff(
                   new Date(item.updated_at).getTime() + 30 * 60 * 1000,
                   new Date(),
                   "minutes"
                 )
-              }}分钟</view
-            >
+              }}分钟
+            </view>
           </view>
           <view
             class="item_btn_box"
