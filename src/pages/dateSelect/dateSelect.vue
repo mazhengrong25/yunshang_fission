@@ -335,6 +335,7 @@ export default {
                   ).calendar(null, {
                     sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -353,6 +354,7 @@ export default {
                   ).calendar(null, {
                     sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -398,6 +400,7 @@ export default {
                   ).calendar(null, {
                     sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -416,6 +419,7 @@ export default {
                   ).calendar(null, {
                     sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -459,8 +463,9 @@ export default {
             {
               sameDay: '[今天]',
               nextDay: "[明天]",
-              // nextWeek: "ddd",
-              // sameElse: "ddd",
+              lastWeek: "ddd",
+              nextWeek: "ddd",
+              sameElse: "ddd",
             }
           );
 
