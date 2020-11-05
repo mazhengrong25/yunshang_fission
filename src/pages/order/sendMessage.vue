@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-04 11:42:48
- * @LastEditTime: 2020-11-04 18:42:49
+ * @LastEditTime: 2020-11-05 14:44:15
  * @LastEditors: Please set LastEditors
  * @Description: 发送短信
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\pages\order\sendMessage.vue
@@ -14,13 +14,13 @@
             <view class="message_item">
                 <view class="message_title">发送对象</view>
                 <view class="message_action">
-                    <radio-group class="bottom_radio_list" @click="radioChange(item)">
+                    <radio-group class="bottom_radio_list" @change="radioChange">
                         <label
                         class="radio"
                         v-for="(item, index) in radioItems"
                         :key="index"
                         >
-                        <radio :color="'#0070E2'" :checked="item.checked"></radio>
+                        <radio :color="'#0070E2'" :value="item.key" :checked="item.checked"></radio>
                         <text>{{ item.value }}</text>
                         </label>
                     </radio-group>
@@ -40,29 +40,36 @@
                 <view class="message_title">发送内容</view>
                 <view class="message_action">
                     <textarea 
+                    :maxlength="200"
                     placeholder-style="color:#DFDFDF" style="padding:10px"
                     @input="getContent" 
                     v-model="content" placeholder="请填写发送内容"/>
                     <view class="message_count">
-                        <p>{{content.length}}</p>/100
+                        <p>{{content.length}}</p>/200
                     </view>
                 </view>
             </view>
             
-            <button class="message_btn" @click="open" @click.stop="getSend()">立即发送</button>
+            <button class="message_btn" @click="getSend()">立即发送</button>
 
             <!-- 选择模板 -->
             <flight-filter-dialog ref="filterDialog" 
             @ticketFilterData="submitTemplateBtn"
             :flightType="false" 
             :checkboxGroup="typeGroup"
+            keyTitle="model_name"
             ></flight-filter-dialog>
             
             <!-- 短信发送成功 -->
-            <uni-popup ref="popup" type="dialog">
+            <uni-popup ref="sendMessage" type="dialog">
                 <view class="message_box">
-                    <view class="message_icon"><img src="@/static/message_right.png"></img></view>
-                    <view class="message_send">短信已成功发送</view>
+                    <view class="message_icon" v-if="message_true">
+                        <img src="@/static/message_right.png"></img>
+                    </view>
+                    <view class="message_icon" v-if="!message_true">
+                        <img src="@/static/message_error.png"></img>
+                    </view>
+                    <view class="message_send">{{message_true?'短信已成功发送':('短信发送失败：' + message_msg)}}</view>
                     <view class="message_bottom" @click="close">知道了</view>
                 </view>
             </uni-popup>
@@ -72,7 +79,10 @@
 
 <script>
 import orderApi from "@/api/order.js";
+import moment from "../../moment";
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 选择模板弹窗
+
+moment.locale("zh-cn");
 export default {
     components: {
 
@@ -87,28 +97,33 @@ export default {
             radioItems: [
                 {
                     value: "联系人",
-                    checked: "true",
+                    checked: true,
+                    key: 1
                 },
                 {
                     value: "乘机人",
+                    key: 2
                 },
             ],
 
+            radioValue: "",
+
             //  选择模块选择
-            typeGroup: [
-               
-                "预定成功模板",
-                "支付成功待出票模板",
-                "已出票模板",
-                "已出票模板",
-            ],
+            typeGroup: [],
             select:'', //模块选择
 
             content: '', // 输入内容
 
             phone: '', //手机号
 
-       
+            isTimer: '', // 发送类型
+
+            send_timer: '', // 发送时间
+
+            select_id: '', // 选择模板id
+
+            message_true: false,  // 提交状态
+            message_msg: '', // 错误信息
         }
     },
     methods: {
@@ -119,9 +134,7 @@ export default {
         },
         // 单选点击
         radioChange(e) {
-            
-            this.radioItems[checked] = e
-            console.log(e)
+            this.radioValue = e.detail.value
         },
 
         //  打开弹窗
@@ -137,33 +150,78 @@ export default {
         // 确认选择模块
         submitTemplateBtn(val) {
             console.log(val)
-            this.select = val;
+            this.select = val.model_name;
+            this.content = val.msg
+            this.select_id = val.id
+        },
+
+        getTemplateList(){
+               orderApi.sendMessageSelect(this.order_no).then((res) => {
+                   console.log(res)
+                   this.radioValue = res.user_type
+                   this.phone = res.passenger_phone
+                   this.isTimer = res.is_timer
+
+                   this.typeGroup = res.modelList
+            })
         },
 
         // 打开短信发送成功
         open() {
-             this.$refs.popup.open()
+             this.$refs.sendMessage.open()
         },
         close() {
-             this.$refs.popup.close()
+             this.$refs.sendMessage.close()
         },
 
 
         // 发送短信
         getSend() {
+            if(!this.content || !this.select_id){
+                return uni.showToast({
+                    title: '请输入完整信息',
+                    icon: 'none'
+                })
+            }
+
+
+            let url = this.order_no
             let data = {
 
+                user_type: this.radioValue,
+                phone: this.phone,
+                is_timer: this.isTimer,
+                send_timer: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+                msg_model_id: this.select_id,
+                msg_content: this.content,
+                
+                // msg_content: this.content,
+                // phone: this.phone,
+                // msg_model_id: this.select,
+                // user_type: this.radioItems
+                
             }
-            // orderApi.sendMessage(data).then((res) => {
-
-            // })
+            console.log(data)
+            orderApi.sendMessage(data,url).then((res) => {
+                this.message_true = res.errorcode === 10000
+                if(res.errorcode === 10000){
+                    
+                }else{
+                this.message_msg = res.msg
+                }
+                this.open()
+            })
         }
 
     },
 
     onLoad(data) {
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-        console.log(data)
+        console.log('发送短信',data)
+        this.order_no = data.orderId;
+        console.log(this.order_no)
+
+        this.getTemplateList()
     }
     
 }
@@ -233,6 +291,13 @@ export default {
                 opacity: 1;
                 border-radius: 10px;
                 margin-top: 10px;
+                position: relative;
+                textarea{
+                    padding: 10px 10px 30px;
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box;
+                }
             }
             .message_count {
                 display: flex;
@@ -241,6 +306,10 @@ export default {
                 font-weight: 400;
                 color: #333333;
                 padding: 10px 10px;
+                position: absolute;
+                width: 100%;
+                bottom: 0;
+                box-sizing: border-box;
                
                 p {
                     
@@ -299,9 +368,9 @@ export default {
         height: 90upx;
         border-top: 2upx solid #EAEAEA;
         margin-top: 40upx;
-font-size: 28upx;
-font-weight: 400;
-color: #333333;
+        font-size: 28upx;
+        font-weight: 400;
+        color: #333333;
     }
     
 }

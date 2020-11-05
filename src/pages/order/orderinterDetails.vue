@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-04 18:22:24
+ * @LastEditTime: 2020-11-05 18:35:23
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -36,7 +36,8 @@
           }}
         </view>
 
-        <view class="order_price" v-if="JSON.stringify(orderDetails) !== '{}'">
+        <view class="order_price" v-if="JSON.stringify(orderDetails) !== '{}'"
+        @click="openTotalOrder()">
           <text class="price_text">总价&yen;</text>
           <text>{{ orderDetails.total_price || "" }}</text>
         </view>
@@ -72,8 +73,9 @@
       </view>
 
       <view class="order_option">
-        <view @click="sendMessage()" class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
-          >发送短信</view
+        <view  class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
+        @click="sendMessage"
+        >发送短信</view
         >
         <view
           class="option_btn"
@@ -100,7 +102,7 @@
         <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 3"
           >报销凭证</view
         >
-        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 3"
+        <view @click="sendMessage" class="option_btn" v-if="orderDetails.status === 3"
           >发送短信</view
         >
         <view
@@ -256,6 +258,66 @@
       content="您是否要取消此订单"
       submitIndex="right"
     ></yun-config>
+
+    <!-- 订单总价弹窗 -->
+    <uni-popup ref="totalOrder" type="bottom">
+      <view class="price_info">
+        <view class="title">
+            订单总价
+          <view class="close_btn" @click="closeTotalOrder()"></view>
+        </view>
+        <view class="info_box">
+
+          <view class="info_content">
+
+            <view class="info_top">
+              <view class="list_title">订单总价</view>
+              <view class="list_message">
+                <text>&yen; {{ priceInfo.totalPrice }}</text>
+              </view>
+            </view>
+
+            <view class="info_list">
+              <view class="list_title">票价</view>
+              <view class="list_message">
+                <text>&yen; {{ priceInfo.adtPrice }}</text>
+                <text>×{{ passengerNumber.adt }}人</text>
+              </view>
+            </view>
+    
+            <view class="info_list">
+              <view class="list_title">机建+燃油</view>
+              <view class="list_message">
+                <text>&yen; {{ priceInfo.buildPrice }}</text>
+                <text>×{{ passengerNumber.adt }}人</text>
+              </view>
+            </view>
+          
+            <view class="info_list">
+              <view class="list_title">保险</view>
+              <view class="list_message">
+                <text
+                  >&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text
+                >
+                <text
+                  >×{{ passengerNumber.ins ? passengerNumber.ins : 0 }}份</text
+                >
+              </view>
+            </view>
+
+            <view class="info_bottom">
+              <view class="list_title">奖励金</view>
+              <view class="list_message">
+                <text>&yen; {{ priceInfo.reward }}</text>
+              </view>
+            </view>
+          
+          </view>
+
+        </view>
+      </view>
+
+    </uni-popup>
   </view>
 </template>
 
@@ -309,30 +371,49 @@ export default {
           food: "", // 餐饮
           cabin: "", // 舱位信息
           baggage: "", // 行李额
-        },
-        flightRoundData: {
-          // 往返航班信息
-          flightType: "", // 航程类型
-          time: "", // 航程日期
-          week: "", // 航程星期
-          fromTime: "", // 出发时间
-          fromAddress: "", // 出发机场
-          duration: "", // 飞行时长
-          toTime: "", // 到达时间
-          toAddress: "", // 到达机场
-          airIcon: "", // 航司图片
-          airline: "", // 航司
-          model: "", // 机型
-          food: "", // 餐饮
-          cabin: "", // 舱位信息
-          baggage: "", // 行李额
-        },
+      },
+
+      flightRoundData: {
+        // 往返航班信息
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        week: "", // 航程星期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
+        airIcon: "", // 航司图片
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
+        cabin: "", // 舱位信息
+        baggage: "", // 行李额
+      },
 
       cancelType: false, // 取消订单状态
 
       ticketOrder: { //再次预定
           
       },
+
+      priceInfo: {
+        // 金额数据
+        totalPrice: 0, // 总价
+        adtPrice: 0, //票价
+        buildPrice: 0, // 机建燃油费
+        insPrice: 0, // 保险票价
+        buildPrice: 0, // 机建燃油费
+        reward: 0, // 奖励金额
+      },
+
+      passengerNumber: {
+        // 乘机人数量
+        adt: 0, //成人
+        ins: 0, //保险
+      }, 
+
+      passengerInfo: {},
     };
   },
   methods: {
@@ -345,10 +426,21 @@ export default {
     },
 
     // 发送短信
-    sendMessage() {
+    sendMessage(data) {
+      console.log('发送短信',data)
       uni.navigateTo({
-        url:"/pages/order/sendMessage?orderId=" + JSON.stringify(orderId),
+        url:"/pages/order/sendMessage?orderId=" + this.orderId,
       })
+    },
+
+    // 订单总价 弹窗
+    openTotalOrder() {
+      this.$refs.totalOrder.open();
+    },
+
+    // 订单总价  关闭弹窗
+    closeTotalOrder() {
+      this.$refs.totalOrder.close();
     },
 
     // 已预订 取消订单弹窗
@@ -476,6 +568,8 @@ export default {
       orderApi.orderDetails(data).then((res) => {
         if (res.result === 10000) {
           this.orderDetails = res.data.order_msg;
+          this.passengerInfo = res.data.order_msg.ticket_passenger;
+          console.log('passengerInfo',this.passengerInfo)
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;
           }
@@ -486,6 +580,25 @@ export default {
             flightType: this.type ? this.type === "0" ?'去程':'返程' : '单程',
             data: this.orderDetails.ticket_segments, // 单程信息
             cabinInfo: this.orderDetails.ticket_segments, //退票规则
+          };
+
+          // 组装订单总价
+          this.priceInfo = {
+              totalPrice:this.orderDetails.total_price, // 订单总价
+              buildPrice:this.orderDetails.build_total, // 机建票价
+              insPrice:this.orderDetails.insurance_total, // 保险票价
+              adtPrice:this.orderDetails.ticket_price, // 成人票价
+              reward:this.orderDetails.reward_price, // 奖励金
+          };
+
+          this.passengerNumber = {
+
+              adt: this.passengerInfo.filter((u) => u.PassengerType === "ADT").length, //成人
+              ins: this.passengerInfo.filter((u) => u.insurance_total).length > 0
+                      ? this.passengerInfo.filter((u) => u.insurance_total).length
+                      : 0, // 保险
+
+
           };
 
 
@@ -1010,6 +1123,127 @@ export default {
         background: #e5e9f2;
       }
     }
+    }
+  }
+}
+
+.price_info {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -120upx;
+    width: 100%;
+    height: 120upx;
+    background-color: #fff;
+  }
+  .title {
+    height: 140upx;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 80upx 80upx 0 0;
+    position: relative;
+    border-bottom: 2upx solid rgba(217, 225, 234, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #333333;
+    font-size: 36upx;
+    .close_btn {
+      position: absolute;
+      background: url(@/static/popup_close.png) no-repeat;
+      background-size: contain;
+      width: 30upx;
+      height: 30upx;
+      top: 54upx;
+      right: 44upx;
+    }
+  }
+
+  .info_box {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+   
+
+    .info_content {
+       
+        background: #F9F9F9;
+        padding: 40upx;
+       
+        .info_list {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 40upx;
+          .list_title {
+            font-size: 28upx;
+            font-weight: 400;      
+            color: #333333;
+            margin-right: auto;
+          }
+          .list_message {
+            font-size: 28upx;
+            font-weight: 500;
+            text {
+              display: inline-flex;
+              &:first-child {
+                color: rgba(255, 0, 0, 1);
+              }
+              &:last-child {
+                margin-left: 20upx;
+                color: rgba(153, 153, 153, 1);
+              }
+            }
+          }
+        }
+        .info_bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40upx;
+            .list_title {
+              font-size: 28upx;
+              font-weight: bold;      
+              color: #333333;
+              margin-right: 24upx;
+            }
+            .list_message {
+              font-size: 28upx;
+              font-weight: 500;
+              text {
+                display: inline-flex;
+                &:first-child {
+                  color: rgba(255, 0, 0, 1);
+                }
+            
+              }
+            }
+        }
+        .info_top {
+            display: flex;
+            margin-bottom: 40upx;
+            .list_title {
+              font-size: 28upx;
+              font-weight: bold;      
+              color: #333333;
+              margin-right: 24upx;
+            }
+            .list_message {
+              font-size: 36upx;
+              font-weight: bold;;
+              text {
+                display: inline-flex;
+                &:first-child {
+                  color: rgba(255, 0, 0, 1);
+                }
+            
+              }
+            }&:first-child {
+              
+              border-bottom: 1px solid #EAEAEA;
+            }
+        }
     }
   }
 }

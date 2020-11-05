@@ -2,7 +2,7 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-11-04 18:31:17
+ * @LastEditTime: 2020-11-05 11:57:10
  * @LastEditors: Please set LastEditors
  */
 import request from '@/api/request';
@@ -91,11 +91,19 @@ function cancleInterRefund(data) {
 }
 
 // 发送短信
-function sendMessage(data) {
+function sendMessage(data,url) {
 	return request({
 		method:'POST',
-		url:'/api/admin_msg/sendMsg',
+		url:'/api/admin_msg/sendMsg/'+url,
 		data: data
+	})
+}
+
+// 发送短信   选择模板
+function sendMessageSelect(url) {
+	return request({
+		method:'get',
+		url:'/api/admin_msg/sendMsg/'+url,
 	})
 }
 
@@ -109,6 +117,7 @@ export default{
   refundSubmit,
   orderRefundList,
   getFilghtData,
-  sendMessage
+  sendMessage,
+  sendMessageSelect
 
 }
