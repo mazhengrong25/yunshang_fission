@@ -12,7 +12,6 @@
         "navigationStyle": "custom"
       }
     },
-<<<<<<< HEAD
     {
       "path": "pages/order/refundList",
       "style": {
@@ -44,9 +43,6 @@
       }
     },
 
-=======
-    
->>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac
     {
       "path": "pages/ticketInquiry/ticketInquiry",
       "style": {

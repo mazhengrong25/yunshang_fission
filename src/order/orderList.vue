@@ -2,13 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
-<<<<<<< HEAD:src/pages/order/orderList.vue
- * @LastEditTime: 2020-10-10 10:28:06
- * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-10-19 15:47:59
- * @LastEditors: wish.WuJunLong
->>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac:src/order/orderList.vue
+ * @LastEditTime: 2020-11-06 16:19:05
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_list">
