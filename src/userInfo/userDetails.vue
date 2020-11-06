@@ -113,7 +113,7 @@ export default {
 		// 跳转登录密码页面
 		jumpEditPassword(){
 			uni.navigateTo({
-					url: '/pages/userInfo/editPassword'
+					url: '/userInfo/editPassword'
 			});
 		},
   },

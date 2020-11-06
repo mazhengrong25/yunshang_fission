@@ -2,8 +2,8 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-09-18 11:58:36
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-10-19 15:47:12
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_list">
@@ -132,7 +132,7 @@ export default {
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/pages/order/filter?type=" + type,
+        url: "/order/filter?type=" + type,
       });
       this.getOrderList();
     },
@@ -141,9 +141,7 @@ export default {
       this.orderPageStatus = true;
       let data = {
         dis_id: uni.getStorageSync("userInfo").dis_id,
-        start_date: moment()
-          .subtract(7, "days")
-          .format("YYYY-MM-DD"),
+        start_date: moment().subtract(7, "days").format("YYYY-MM-DD"),
         end_date: moment().format("YYYY-MM-DD"),
         order_status:
           this.headerActive === 0
@@ -166,10 +164,10 @@ export default {
             this.refundOrderList = res.data.data;
           }
         } else {
-          //     uni.showToast({
-          // 	    title: res.msg,
-          // 	    icon: "none",
-          // });
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
         }
       });
     },
@@ -184,7 +182,7 @@ export default {
     // 跳转订单详情
     jumpOrderDetails(data) {
       uni.navigateTo({
-        url: "/pages/order/refundDetails?refundData=" + JSON.stringify(data),
+        url: "/order/refundDetails?refundData=" + JSON.stringify(data),
       });
     },
 

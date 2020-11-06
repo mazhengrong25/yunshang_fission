@@ -2,8 +2,13 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
+<<<<<<< HEAD:src/pages/order/orderList.vue
  * @LastEditTime: 2020-10-10 10:28:06
  * @LastEditors: mazhengrong
+=======
+ * @LastEditTime: 2020-10-19 15:47:59
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac:src/order/orderList.vue
 -->
 <template>
   <view class="order_list">
@@ -23,35 +28,52 @@
     </view>
 
     <view class="order_filter">
-      <view :class="['filter_list', { active: sortType === 'create' }]" @click="sorTime('create')">
+      <view
+        :class="['filter_list', { active: sortType === 'create' }]"
+        @click="sorTime('create')"
+      >
         <view class="list_icon">
-          <image v-if="sortType === 'create'" src="@/static/filter_time_active.png" mode="contain" />
+          <image
+            v-if="sortType === 'create'"
+            src="@/static/filter_time_active.png"
+            mode="contain"
+          />
           <image v-else src="@/static/filter_time.png" mode="contain" />
         </view>
-        <view class="list_title"
-          >预定(早-晚)</view
-        >
+        <view class="list_title">预定(早-晚)</view>
       </view>
 
-      <view :class="['filter_list', { active: sortType === 'fly' }]" @click="sorTime('depart')">
+      <view
+        :class="['filter_list', { active: sortType === 'fly' }]"
+        @click="sorTime('depart')"
+      >
         <view class="list_icon">
-          <image v-if="sortType === 'fly'" src="@/static/filter_setoff_active.png" mode="contain" />
+          <image
+            v-if="sortType === 'fly'"
+            src="@/static/filter_setoff_active.png"
+            mode="contain"
+          />
           <image v-else src="@/static/filter_setoff.png" mode="contain" />
         </view>
-        <view class="list_title"
-          >出发(早-晚)</view
-        >
+        <view class="list_title">出发(早-晚)</view>
       </view>
 
-      <view :class="['filter_list',{ active: JSON.stringify(this.orderListFilter) !== '{}' }]" @click="goFilter('0')">
+      <view
+        :class="[
+          'filter_list',
+          { active: JSON.stringify(this.orderListFilter) !== '{}' },
+        ]"
+        @click="goFilter('0')"
+      >
         <view class="list_icon">
-          <image v-if="JSON.stringify(this.orderListFilter) !== '{}'" src="@/static/filter_btn_active.png" mode="contain" />
+          <image
+            v-if="JSON.stringify(this.orderListFilter) !== '{}'"
+            src="@/static/filter_btn_active.png"
+            mode="contain"
+          />
           <image v-else src="@/static/filter_btn.png" mode="contain" />
         </view>
-        <view
-          class="list_title"
-          >筛选</view
-        >
+        <view class="list_title">筛选</view>
       </view>
     </view>
 
@@ -146,13 +168,7 @@
             </view>
           </view>
 
-          <view
-            class="item_time"
-            v-if="
-              item.pay_status === 1 &&
-              item.status
-            "
-          >
+          <view class="item_time" v-if="item.pay_status === 1 && item.status">
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
@@ -169,10 +185,7 @@
           </view>
           <view
             class="item_btn_box"
-            v-if="
-              item.pay_status === 1 &&
-              item.status
-            "
+            v-if="item.pay_status === 1 && item.status"
           >
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 0)"
               >取消订单</view
@@ -269,10 +282,7 @@
 
           <view
             class="item_time"
-            v-if="
-              item.from_pay_status === 1 &&
-              item.from_status
-            "
+            v-if="item.from_pay_status === 1 && item.from_status"
           >
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
@@ -290,10 +300,7 @@
           </view>
           <view
             class="item_btn_box"
-            v-if="
-              item.from_pay_status === 1 &&
-              item.from_status
-            "
+            v-if="item.from_pay_status === 1 && item.from_status"
           >
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 1)"
               >取消订单</view
@@ -314,15 +321,19 @@
         :key="index"
         @click="jumpOrderDetails(item)"
       >
-        <view class="list_tyle">{{
-          item.routing_type === 1
-            ? "单程机票"
-            : item.routing_type === 2
-            ? "往返机票"
-            : item.routing_type === 3
-            ? "多程机票"
-            : ""
-        }}</view>
+        <!--单程  往返  多程 -->
+        <view class="list_item_header">
+          <view class="list_tyle">{{
+            item.routing_type === 1
+              ? "单程机票"
+              : item.routing_type === 2
+              ? "往返机票"
+              : ""
+          }}</view>
+          <view class="scheduled_time">{{
+            $dateTool(item.updated_at, "YYYY-MM-DD HH:mm")
+          }}</view>
+        </view>
         <view class="multiple_trips_header" v-if="item.routing_type !== 1">
           <view class="header_title">{{
             item.routing_type === 2
@@ -500,10 +511,7 @@ export default {
     removeOrder(data, index) {
       let orderNo = index === 0 ? data.order_no : data.from_order_no;
       uni.navigateTo({
-        url:
-          "/pages/order/orderinterDetails?orderNo=" +
-          orderNo +
-          "&cancel=cancel",
+        url: "/order/orderinterDetails?orderNo=" + orderNo + "&cancel=cancel",
       });
     },
 
@@ -528,7 +536,7 @@ export default {
 
       uni.navigateTo({
         url:
-          "/pages/flightReservation/orderPay?orderId=" +
+          "/flightReservation/orderPay?orderId=" +
           JSON.stringify(orderId) +
           "&flightData=" +
           JSON.stringify(flightData) +
@@ -545,7 +553,7 @@ export default {
     goFilter(type) {
       uni.navigateTo({
         url:
-          "/pages/order/filter?type=" +
+          "/order/filter?type=" +
           type +
           "&filterData=" +
           JSON.stringify(this.orderListFilter),
@@ -599,7 +607,8 @@ export default {
               : this.headerActive === 4
               ? 5
               : this.headerActive,
-          pay_status: this.headerActive === 1 ? 1 :this.headerActive === 2 ? 2 : "",
+          pay_status:
+            this.headerActive === 1 ? 1 : this.headerActive === 2 ? 2 : "",
           created_at:
             this.orderListFilter.Timestart ||
             moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
@@ -695,9 +704,14 @@ export default {
     jumpOrderDetails(data, index, type) {
       console.log("详情", data);
       if (this.orderListType === "3") {
+        return uni.showToast({
+          title: "国际机票功能开发中，请等待后续版本更新",
+          icon: "none",
+          duration: 3000,
+        });
         uni.navigateTo({
           url:
-            "/pages/order/orderDetails?orderData=" +
+            "/order/orderDetails?orderData=" +
             JSON.stringify(data) +
             "&type=" +
             this.orderListType,
@@ -706,7 +720,7 @@ export default {
         // 国内
         uni.navigateTo({
           url:
-            "/pages/order/orderinterDetails?orderNo=" +
+            "/order/orderinterDetails?orderNo=" +
             data.order_no +
             "&type=" +
             this.orderListType +
@@ -791,17 +805,14 @@ export default {
     this.orderListFilter = uni.getStorageSync("orderListFilter")
       ? JSON.parse(uni.getStorageSync("orderListFilter"))
       : {};
-    uni.removeStorageSync("orderListFilter");
     if (JSON.stringify(this.orderListFilter) !== "{}") {
       //订单状态筛选
       if (this.orderListFilter.status !== null) {
         this.checkedHeaderActive(this.orderListFilter.status);
-      }else{
-        this.checkedHeaderActive(0)
+      } else {
+        this.checkedHeaderActive(0);
       }
       console.log("订单列表筛选", this.orderListFilter, this.innerList);
-
-      uni.removeStorageSync("orderListFilter");
     } else {
       this.headerActive = 0;
       this.getOrderList();
@@ -866,9 +877,9 @@ export default {
       flex: 1;
       padding: 10upx 40upx;
       &.active {
-        .list_title{
-          color: #0070E2;
-        }  
+        .list_title {
+          color: #0070e2;
+        }
       }
       &:not(:last-child) {
         border-right: 2upx solid #eaeaea;
@@ -887,7 +898,7 @@ export default {
       .list_title {
         font-size: 22upx;
         font-weight: 400;
-        color:#AFB9C4;
+        color: #959da7;
       }
     }
   }

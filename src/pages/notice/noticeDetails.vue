@@ -15,7 +15,7 @@
 			<text>{{noticeDetail.created_at}}</text>
 		</view>
 		<view class="content">
-			<rich-text :nodes="noticeDetail.content"></rich-text>
+			<rich-text :nodes="noticeContent"></rich-text>
 		</view>
 	</view>
 </template>
@@ -26,6 +26,7 @@ import noticeApi from "@/api/notice"; // 公告api
 		data() {
 			return {
 				noticeDetail: {},
+				noticeContent: ''
 			};
 		},
 		methods: {
@@ -33,6 +34,8 @@ import noticeApi from "@/api/notice"; // 公告api
 			getNoticeDetails(id){
 				noticeApi.getNotice(id).then((res) => {
         if (res.errorcode === 10000) {
+					let content = res.data.content
+					this.noticeContent = content.indexOf('scr="http') >= 0 ? content:content.replace(/src[^=]*?=[^"]*?"/,'src="https://fxxcx.ystrip.cn')
 					this.noticeDetail = res.data;
         }
       }); 

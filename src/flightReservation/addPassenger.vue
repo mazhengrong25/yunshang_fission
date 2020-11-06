@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-09-29 14:45:21
+ * @LastEditTime: 2020-10-14 16:51:05
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -115,7 +115,7 @@
 
               <input
                 class="item_input"
-                type="idcard"
+                :type="item.cert_type === '护照'?'text':'idcard'"
                 placeholder="请保持与证件一致"
                 v-model="item.cert_no"
                 placeholder-class="input_placeholder"
@@ -477,12 +477,18 @@ export default {
           icon: "none",
         });
       }
-      if (!this.group.id) {
-        return uni.showToast({
-          title: "请选择分组",
-          icon: "none",
-        });
-      }
+      // if (!this.group.id) {
+      //   return uni.showToast({
+      //     title: "请选择分组",
+      //     icon: "none",
+      //   });
+      // }
+      this.certificateList.forEach((item, index) =>{
+        if(!item.cert_no){
+          this.certificateList.splice(index, 1)
+        }
+      })
+      console.log(this.certificateList)
       this.$refs.returnSubmitDialog.open();
       this.$forceUpdate()
     },
@@ -516,6 +522,7 @@ export default {
               });
               setTimeout(() => {
                 uni.navigateBack();
+                uni.setStorageSync('addPassenger', true)
               }, 500);
               if(this.flightEdit){
                  uni.setStorageSync("editPassengerList", JSON.stringify(data));

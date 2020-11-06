@@ -2,8 +2,8 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-09-21 10:29:32
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-10-19 15:38:49
+ * @LastEditors: wish.WuJunLong
 -->
 
 <template>
@@ -252,7 +252,7 @@
 
 <script>
 import orderApi from "@/api/order.js";
-import moment from "../../moment";
+import moment from "moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 moment.locale("zh-cn");
 export default {

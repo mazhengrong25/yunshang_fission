@@ -2,8 +2,13 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
+<<<<<<< HEAD:src/pages/order/orderinterDetails.vue
  * @LastEditTime: 2020-11-06 10:24:10
  * @LastEditors: Please set LastEditors
+=======
+ * @LastEditTime: 2020-10-19 15:46:46
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac:src/order/orderinterDetails.vue
 -->
 <template>
   <view class="order_details">
@@ -198,18 +203,18 @@
 
           <view class="contact">
             <view class="contact_list">
+              <view class="list_title">已购保险</view>
+              <view class="list_message"
+                >{{ orderDetails.insurance_total?orderDetails.insurance_total + '元': '' }}</view
+              >
+            </view>
+            <view class="contact_list">
               <view class="list_title">联系人</view>
               <view class="list_message">{{ orderDetails.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
               <view class="list_message">{{ orderDetails.phone }}</view>
-            </view>
-            <view class="contact_list">
-              <view class="list_title">已购保险</view>
-              <view class="list_message"
-                >{{ orderDetails.insurance_total?orderDetails.insurance_total + '元': '' }}</view
-              >
             </view>
           </view>
         </view>
@@ -324,7 +329,7 @@
 
 <script>
 import orderApi from "@/api/order.js";
-import moment from "../../moment";
+import moment from "moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
 
@@ -477,7 +482,7 @@ export default {
 
       uni.navigateTo({
         url:
-          "/pages/flightReservation/orderPay?orderId=" +
+          "/flightReservation/orderPay?orderId=" +
           JSON.stringify(orderId) +
           "&flightData=" +
           JSON.stringify(this.flightData) +
@@ -621,7 +626,7 @@ export default {
       console.log("退票", this.orderDetails);
       uni.navigateTo({
         url:
-          "/pages/order/refund?refundData=" + JSON.stringify(this.orderDetails),
+          "/order/refund?refundData=" + JSON.stringify(this.orderDetails),
       });
     },
 

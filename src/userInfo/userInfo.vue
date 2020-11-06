@@ -2,14 +2,14 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-10-20 12:22:59
+ * @LastEditTime: 2020-10-19 15:08:11
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="user_info">
     <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="我的"></yun-header>
     <view class="header">
-      <view class="version_number">v1.0.36</view>
+      <view class="version_number">v0.0.69</view>
       <view class="info_box">
         <view class="info_left">
           <view class="avatar">
@@ -145,8 +145,12 @@ export default {
 
     // 获取用户信息
     getUserInfo() {
-      this.userInfo = uni.getStorageSync('userInfo');
-      this.getWallet();
+      userInfo.getUserInfo().then((res) => {
+        console.log(res);
+        this.userInfo = res;
+        uni.setStorageSync("userInfo", this.userInfo);
+        this.getWallet();
+      });
     },
 
     // 获取钱包详情

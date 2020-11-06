@@ -7,25 +7,42 @@
 --> 
 <template>
   <view
-    :class="['yun_header',{'white': headerColor}]"
-    :style="{paddingTop: statusHeight + 'px',marginBottom: headerBottom + 'px'}"
+    :class="['yun_header', { white: headerColor }]"
+    :style="{
+      paddingTop: statusHeight + 'px',
+      marginBottom: headerBottom + 'px',
+    }"
   >
     <view v-if="showReturn" class="go_back" @click="goBack"></view>
-    <view class="center_title" v-if="centerTitle">{{centerTitle}}</view>
+    <view class="center_title" v-if="centerTitle">{{ centerTitle }}</view>
     <view class="title" v-else>
       <view class="title_left">
-        {{headerAddress.to_type === 'air'? headerAddress.to.air_port_name :
-            headerAddress.to_type === 'hot' && headerAddress.to.city_name === "上海" ? headerAddress.to.city_name + headerAddress.to.air_port_name :
-            headerAddress.to_type === 'hot' && headerAddress.to.city_name === "北京" ? headerAddress.to.city_name + '首都' :
-            headerAddress.to.city_name}}
+        {{
+          headerAddress.to_type === "air"
+            ? headerAddress.to.air_port_name
+            : headerAddress.to_type === "hot" &&
+              headerAddress.to.city_name === "上海"
+            ? headerAddress.to.city_name + headerAddress.to.air_port_name
+            : headerAddress.to_type === "hot" &&
+              headerAddress.to.city_name === "北京"
+            ? headerAddress.to.city_name + "首都"
+            : headerAddress.to.city_name
+        }}
       </view>
       <view class="title_icon" v-if="!statusType"></view>
       <view class="title_icon roundTripIcon" v-else></view>
       <view class="title_right">
-        {{headerAddress.from_type === 'air'? headerAddress.from.air_port_name:
-            headerAddress.from_type === 'hot' && headerAddress.from.city_name === "上海" ? headerAddress.from.city_name + headerAddress.from.air_port_name :
-            headerAddress.from_type === 'hot' && headerAddress.from.city_name === "北京" ? headerAddress.from.city_name + '首都' :
-            headerAddress.from.city_name}}
+        {{
+          headerAddress.from_type === "air"
+            ? headerAddress.from.air_port_name
+            : headerAddress.from_type === "hot" &&
+              headerAddress.from.city_name === "上海"
+            ? headerAddress.from.city_name + headerAddress.from.air_port_name
+            : headerAddress.from_type === "hot" &&
+              headerAddress.from.city_name === "北京"
+            ? headerAddress.from.city_name + "首都"
+            : headerAddress.from.city_name
+        }}
       </view>
     </view>
   </view>
@@ -86,8 +103,7 @@ export default {
       }
     },
   },
-  mounted(){
-  },
+  mounted() {},
 };
 </script>
 

@@ -67,7 +67,7 @@ export default {
     // 跳转订单详情页
     jumpOrderDetails() {
       uni.reLaunch({
-        url: "/pages/order/orderinterDetails?orderNo=" + this.orderInfo.payId[0],
+        url: "/order/orderinterDetails?orderNo=" + this.orderInfo.payId[0],
       });
     },
   },

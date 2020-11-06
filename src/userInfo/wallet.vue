@@ -1,15 +1,8 @@
 <!--
- * @Description: 
- * @Author: wish.WuJunLong
- * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-07 16:28:39
- * @LastEditors: wish.WuJunLong
--->
-<!--
  * @Description: 钱包流水
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-08-04 09:38:11
+ * @LastEditTime: 2020-10-30 14:51:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -56,13 +49,28 @@
                   />
                   <image v-if="false" src="@/static/wallet_type_2.png" mode="contain" />
                   <image
-                    v-if="item.trans_type === 1 || item.trans_type === 3 || item.trans_type === 11"
+                    v-if="item.trans_type === 1 || item.trans_type === 11"
                     src="@/static/wallet_type_3.png"
                     mode="contain"
                   />
                   <image
-                    v-if="item.trans_type === 8 || item.trans_type === 9"
+                    v-else-if="item.trans_type === 8 || item.trans_type === 9"
                     src="@/static/wallet_type_4.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-else-if="item.trans_type === 4 || item.trans_type === 3"
+                    src="@/static/wallet_type_6.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-else-if="item.trans_type === 7"
+                    src="@/static/wallet_type_7.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-else
+                    src="@/static/wallet_type_5.png"
                     mode="contain"
                   />
                 </view>
@@ -85,8 +93,8 @@
                 </view>
               </view>
               <view class="list_right">
-                {{item.after_balance > item.before_balance? '+': item.after_balance < item.before_balance? '-': ''}}
-                {{item.amount.toFixed(2)}}
+                {{item.after_balance > item.before_balance? '+': item.before_balance > item.after_balance ? '-': ''}}
+                {{Number(item.amount).toFixed(2)}}
               </view>
             </view>
           </scroll-view>
@@ -152,6 +160,7 @@ export default {
           year: moment().format('YYYY'),
           month: moment().format('MM')
         }
+        console.log(data)
         this.submitFilterBtn(data)
       } else if (this.headerActive === 2) {
         this.filterDate = moment().format('第Q季度');
@@ -200,7 +209,7 @@ export default {
         time = e.year + "-" + e.month;
         this.filterDate = e.year + "年" + e.month + "月";
         this.startTime = time + "-1";
-        this.endTime = time + "-" + moment(time).format('YYYY-MM').daysInMonth();
+        this.endTime = time + "-" + moment(time).daysInMonth();
       } else if (this.headerActive === 2) {
         if(e === '第1季度'){
           this.startTime = moment().format('YYYY') + "-1-1";
@@ -289,7 +298,7 @@ export default {
       //   data: JSON.parse(val)
       // }
       uni.navigateTo({
-        url: '/pages/userInfo/walletDetails?data= '+ val
+        url: '/userInfo/walletDetails?data= '+ val
     });
     },
   },

@@ -289,7 +289,7 @@ export default {
                   };
                   uni.reLaunch({
                     url:
-                      "/pages/flightReservation/payResult?orderData=" +
+                      "/flightReservation/payResult?orderData=" +
                       JSON.stringify(orderInfo),
                   });
                 }
@@ -309,7 +309,7 @@ export default {
                 };
                 uni.reLaunch({
                   url:
-                    "/pages/flightReservation/payResult?orderData=" +
+                    "/flightReservation/payResult?orderData=" +
                     JSON.stringify(orderInfo),
                 });
               }

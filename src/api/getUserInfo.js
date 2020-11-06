@@ -19,27 +19,27 @@ function getUserInfo () {
 function getWallet (data) {
 	return request({
 		method: "POST",
-		url: '/wallet/get_msg',
+		url: '/api/wallet/get_msg',
 		data: data
-	},'user')
+	})
 }
 
 // 修改用户密码
 function editPassword(data){
 	return request({
 		method: "POST",
-		url: '/user/editPwd',
+		url: '/api/user/editPwd',
 		data: data
-	},'user')
+	})
 }
 
 // 钱包流水
 function getWalletList (data) {
 	return request({
 		method: "POST",
-		url: '/trans/list',
+		url: '/api/trans/list',
 		data: data
-	},'user')
+	})
 }
 
 // 订单支付方式 - 国内

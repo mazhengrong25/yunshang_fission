@@ -2,12 +2,21 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
+<<<<<<< HEAD
  * @LastEditTime: 2020-10-09 14:25:20
  * @LastEditors: mazhengrong
+=======
+ * @LastEditTime: 2020-10-19 15:41:27
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac
 -->
 <template>
   <view class="order">
-    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="订单"></yun-header>
+    <yun-header
+      :showReturn="false"
+      :statusHeight="iStatusBarHeight"
+      centerTitle="订单"
+    ></yun-header>
 
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
       <view class="order_list">
@@ -20,7 +29,9 @@
         <view class="order_right">
           <view class="list_item" @click="jumpOrderList('0')">国内订单</view>
           <view class="list_item" @click="goRefundList()">国内退票订单</view>
-          <view class="list_item" @click="jumpOrderList('2')">国内改签订单</view>
+          <view class="list_item" @click="jumpOrderList('2')"
+            >国内改签订单</view
+          >
         </view>
       </view>
       <view class="order_list">
@@ -28,12 +39,16 @@
           <view class="order_icon">
             <image src="@/static/order_2.png" mode="aspectFit" />
           </view>
-          <view class="order_title">国际机票</view> 
+          <view class="order_title">国际机票</view>
         </view>
         <view class="order_right">
           <view class="list_item" @click="jumpOrderList('3')">国际订单</view>
-          <view class="list_item" @click="jumpOrderList('4')">国际退票订单</view>
-          <view class="list_item" @click="jumpOrderList('5')">国际改签订单</view>
+          <view class="list_item" @click="jumpOrderList('4')"
+            >国际退票订单</view
+          >
+          <view class="list_item" @click="jumpOrderList('5')"
+            >国际改签订单</view
+          >
         </view>
       </view>
     </scroll-view>
@@ -49,19 +64,34 @@ export default {
   },
   methods: {
     jumpOrderList(type) {
+      if (type === "2") {
+        return uni.showToast({
+          title: "当前功能开发中，请等待后续版本更新",
+          duration: 3000,
+          icon: "none",
+        });
+      }
       uni.navigateTo({
-        url: "/pages/order/orderList?type="+type,
+        url: "/order/orderList?type=" + type,
       });
     },
     // 跳转到国内退票订单
     goRefundList() {
+      return uni.showToast({
+        title: "当前功能开发中，请等待后续版本更新",
+        duration: 3000,
+        icon: "none",
+      });
       uni.navigateTo({
-        url: "/pages/order/refundList",
-      })
-    }
+        url: "/order/refundList",
+      });
+    },
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+  },
+  onShow() {
+    uni.removeStorageSync("orderListFilter");
   },
 };
 </script>

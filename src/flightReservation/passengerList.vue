@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-09-30 11:41:51
+ * @LastEditTime: 2020-10-10 11:14:40
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -26,6 +26,10 @@
       <view class="mian_header">
         <view class="title">常用乘机人</view>
         <view class="filter" @click="openGroupSelect">
+          <text v-if="searchUserName" class="username_search"
+            >姓名筛选：{{ searchUserName }}</text
+          >
+
           <text>{{ group.group_name ? group.group_name : "筛选" }}</text>
           <image
             class="filter_icon"
@@ -39,7 +43,12 @@
         :enable-back-to-top="true"
         :scroll-y="true"
         class="mian_list"
+        :scroll-top="scrollTop"
+        @scrolltolower="nextPageData()"
       >
+        <view v-if="notList && !showDefault" class="not_passenger_list"
+          >您还没有当前筛选状态的旅客信息</view
+        >
         <uni-swipe-action :disabled="passengerType">
           <uni-swipe-action-item
             v-for="(item, index) in passengerList"
@@ -87,8 +96,10 @@
     <default-page
       style="flex: 1"
       v-if="showDefault"
+      showAddPassenger="true"
       @returnBtn="getTicketData()"
       :defaultType="showDefaultType"
+      @addPassengerBtn="jumpAddPassenger()"
     ></default-page>
 
     <!-- 筛选弹窗 -->
@@ -136,45 +147,72 @@ export default {
 
       passengerList: [], // 乘机人列表
 
+      oldPassgengerList: [], // 备份乘机人列表
+
       checkePassenger: [], // 已选择乘客列表
 
       chdinfNumber: {}, // 航司规定乘客数量
       flightPassengerList: [], // 预定页面切换乘机人
 
       searchUserName: "", // 用户名筛选
+
+      notList: false, // 乘客列表为空
+
+      page: 1,
+      passengerListStatus: false, // 加载状态
+      groupId: "",
+      scrollTop: 0,
     };
   },
   methods: {
     // 跳转新增乘机人
     jumpAddPassenger() {
       uni.navigateTo({
-        url: "/pages/flightReservation/addPassenger",
+        url: "/flightReservation/addPassenger",
       });
     },
 
-    compare(property) {
-      
-     
+    nextPageData() {
+      this.page = this.page + 1;
+      this.getPassengerData();
     },
+
+    compare(property) {},
 
     /**
      * @Description: 获取旅客列表信息
      * @author Wish
      * @date 2020/8/14
      */
-    getPassengerData(id) {
-      let data;
-      if (id) {
-        data = {
-          group_id: id,
-        };
-      }
+    getPassengerData() {
+      let data = {
+        group_id: this.groupId,
+        page: this.page,
+        name: this.searchUserName,
+      };
       passenger.getPassenger(data).then((res) => {
         if (res.errorcode === 10000) {
-          this.passengerList = res.data.data;
+          if (this.passengerListStatus) {
+            if(res.data.data.length < 1){
+              return uni.showToast({
+                title: '到底了',
+                icon: 'none',
+                duration: 2000
+              });
+            }
+            this.passengerList.push.apply(this.passengerList, res.data.data);
+            
+          } else {
+            this.passengerListStatus = true;
+            this.passengerList = res.data.data;
+            this.$nextTick(() => {
+              this.scrollTop = 0;
+            });
+            this.getGroupList();
+          }
 
           this.passengerList.forEach((item) => {
-            item.name = item.name?item.name:null
+            item.name = item.name ? item.name : null;
             item["type"] =
               moment().diff(item.birthday, "years") < 12 &&
               moment().diff(item.birthday, "years") >= 2
@@ -185,10 +223,9 @@ export default {
           });
 
           let reg = /[a-zA-Z0-9]/;
-          this.passengerList.sort((a,b) => {
-            return reg.test(a.name) - reg.test(b.name)
-          })
-
+          this.passengerList.sort((a, b) => {
+            return reg.test(a.name) - reg.test(b.name);
+          });
 
           if (this.flightPassengerList.length > 0) {
             this.checkePassenger = this.flightPassengerList;
@@ -202,9 +239,7 @@ export default {
           }
           this.showDefault = false;
 
-
-          
-
+          this.lockingChecked();
         }
       });
     },
@@ -214,7 +249,7 @@ export default {
       console.log(val);
       uni.navigateTo({
         url:
-          "/pages/flightReservation/addPassenger?type=edit&data=" +
+          "/flightReservation/addPassenger?type=edit&data=" +
           JSON.stringify(val),
       });
     },
@@ -228,6 +263,14 @@ export default {
           uni.showToast({
             title: "删除成功",
             icon: "success",
+          });
+          this.checkePassenger.forEach((item) => {
+            if (item.id === val.id) {
+              this.checkePassenger.splice(
+                this.checkePassenger.findIndex((item) => item.id === val.id),
+                1
+              );
+            }
           });
         } else {
           uni.showToast({
@@ -251,14 +294,13 @@ export default {
             });
           });
           this.groupList.unshift({ group_name: "不限" });
-
-          
         } else {
           uni.showToast({
             title: "分组列表获取失败，" + res.msg,
             icon: "none",
           });
         }
+        this.oldPassgengerList = JSON.parse(JSON.stringify(this.passengerList));
       });
     },
 
@@ -271,22 +313,28 @@ export default {
     // 用户名筛选
     submitConfig(val) {
       console.log(val);
-      if (val) {
-        let newArr = [];
-        this.passengerList.forEach((item, index) => {
-          let username = item.name + item.en_first_name + item.en_last_name;
-          if (
-            JSON.stringify(username)
-              .toLowerCase()
-              .indexOf(val.toLowerCase()) !== -1
-          ) {
-            newArr.push(item);
-          }
-        });
-        this.passengerList = newArr;
-      } else {
-        this.getPassengerData();
-      }
+      this.searchUserName = val;
+      this.page = 1;
+      this.passengerListStatus = false;
+      // if (val) {
+      //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
+      //   let newArr = [];
+      //   this.passengerList.forEach((item, index) => {
+      //     let username = item.name + item.en_first_name + item.en_last_name;
+      //     if (
+      //       JSON.stringify(username)
+      //         .toLowerCase()
+      //         .indexOf(val.toLowerCase()) !== -1
+      //     ) {
+      //       newArr.push(item);
+      //     }
+      //   });
+      //   this.passengerList = newArr;
+      // } else {
+      //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
+      // }
+      this.getPassengerData();
+      this.lockingChecked();
     },
 
     // 打开分组弹窗
@@ -297,13 +345,33 @@ export default {
     groupPopupSelecctBtn(e) {
       this.$refs.yunConfig.inputValue = "";
       console.log(e);
+      this.searchUserName = "";
       if (e.group_name !== "不限") {
         this.group = e;
-        this.getPassengerData(e.id);
+        this.groupId = e.id;
+        this.passengerListStatus = false;
+        this.getPassengerData();
+        this.page = 1;
       } else {
         this.group = {};
+        this.groupId = "";
+        this.passengerListStatus = false;
         this.getPassengerData();
       }
+    },
+
+    // 锁定选中乘机人数据
+    lockingChecked() {
+      if (this.checkePassenger.length > 0) {
+        this.checkePassenger.forEach((item) => {
+          this.passengerList.forEach((oitem) => {
+            if (item.id === oitem.id) {
+              oitem.checked = true;
+            }
+          });
+        });
+      }
+      this.notList = this.passengerList.length < 1;
     },
 
     // 选中乘机人
@@ -337,7 +405,7 @@ export default {
       console.log(this.checkePassenger);
 
       this.checkePassenger.forEach((item) => {
-        item['adtType'] = item.type === '成人'
+        item["adtType"] = item.type === "成人";
         atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
         chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
         infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
@@ -375,8 +443,8 @@ export default {
         }
       }
 
-      this.checkePassenger.sort((a, b) => b.adtType - a.adtType)
-      console.log('乘客类型排序',this.checkePassenger)
+      this.checkePassenger.sort((a, b) => b.adtType - a.adtType);
+      console.log("乘客类型排序", this.checkePassenger);
 
       uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
       uni.navigateBack();
@@ -388,7 +456,6 @@ export default {
       this.getPassengerData();
       uni.removeStorageSync("addPassenger");
     }
-    this.getGroupList();
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -397,13 +464,6 @@ export default {
     this.flightPassengerList = data.editPassengerList
       ? JSON.parse(data.editPassengerList)
       : [];
-
-    // this.chdinfNumber = {
-    //   air_line: "CA",
-    //   cnn_number: 2,
-    //   has_inf_cnn_number: 1,
-    //   has_inf_inf_number: 1,
-    // };
     console.log(this.chdinfNumber);
     this.getPassengerData();
   },
@@ -462,6 +522,17 @@ export default {
         font-size: 24upx;
         font-weight: bold;
         color: rgba(0, 112, 226, 1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: right;
+        .username_search {
+          margin-right: 40upx;
+          width: 30vw;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          white-space: nowrap;
+        }
         .filter_icon {
           width: 16upx;
           height: 12upx;
@@ -474,6 +545,15 @@ export default {
       overflow-y: auto;
       height: 100%;
       flex: 1;
+      .not_passenger_list {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32upx;
+        font-weight: 400;
+        color: #666666;
+      }
       .list_item {
         background: rgba(255, 255, 255, 1);
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);

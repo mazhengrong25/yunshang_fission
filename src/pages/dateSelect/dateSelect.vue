@@ -2,7 +2,7 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-09-29 10:12:50
+ * @LastEditTime: 2020-10-16 14:56:25
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -64,8 +64,23 @@
             ]"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
-            >{{ oitem.day }}</view
           >
+            <text class="round_text text_to" v-if="oitem.toChecked">
+              {{oitem.toChecked?'去程':''}}
+            </text>
+            <text class="round_text text_from" v-if="oitem.fromChecked">
+              {{oitem.fromChecked?'返程':''}}
+            </text>
+            <text class="to_day_text">{{  oitem.active?'今天':oitem.day }}</text>
+            <text
+              class="lunar lunar_day"
+              v-if="oitem.lunar.lunarDay !== '初一'"
+              >{{ oitem.lunar.lunarDay }}</text
+            >
+            <text class="lunar lunar_month" v-else>{{
+              oitem.lunar.lunarMonth
+            }}</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -100,12 +115,14 @@ export default {
 
       checkedRoundTime: false,
 
-      checkedToTime: '', // 已选择出发日期
+      checkedToTime: "", // 已选择出发日期
     };
   },
   methods: {
     // 日期列表处理
     getDateList() {
+      const lunar = require("@tony801015/chinese-lunar");
+
       let currentDate = moment().format("YYYY年MM月"); // 当前月份
       let nextDate = moment().add(this.nextIndex, "M").format("YYYY年MM月"); // 下一月份
       let nextDateNumber = moment().add(this.nextIndex, "M").daysInMonth(); // 下一月份天数
@@ -114,6 +131,9 @@ export default {
         .startOf("month")
         .format("d"); // 下月1号星期
       let nextList = [];
+
+      console.log(lunar("2020", "01", "09").getJson());
+
       for (let i = 0; i < nextDateNumber; i++) {
         nextList.push({
           day: i + 1,
@@ -124,7 +144,7 @@ export default {
             (i + 1 < 10 ? "0" + (i + 1) : i + 1),
           status:
             currentDate === nextDate
-              ? i + 1 > Number(moment().format("D"))
+              ? i + 1 >= Number(moment().format("D"))
               : true,
           active:
             currentDate === nextDate
@@ -147,6 +167,12 @@ export default {
                 (i + 1 < 10 ? "0" + (i + 1) : i + 1) ===
               this.roundData.fromTime.date
             : false,
+
+          lunar: lunar(
+            String(moment().add(this.nextIndex, "M").format("YYYY")),
+            String(moment().add(this.nextIndex, "M").format("MM")),
+            String(i + 1 < 10 ? "0" + (i + 1) : i + 1)
+          ).getJson(), // 阴历
         });
       }
       this.dateList.push({
@@ -156,10 +182,12 @@ export default {
       });
       this.nextIndex = this.nextIndex + 1;
 
-      if(this.checkedRoundTime){
-        this.getClickRoundStatus()
-      }else{
-        this.getRoundStatus()
+      console.log(this.dateList);
+
+      if (this.checkedRoundTime) {
+        this.getClickRoundStatus();
+      } else {
+        this.getRoundStatus();
       }
     },
     // 滚动底部加载下一月日历
@@ -177,10 +205,13 @@ export default {
       if (this.roundTimeStatus) {
         this.dateList.forEach((item) => {
           item.data.forEach((oitem) => {
-              if (moment(this.roundData.toTime.date).isBefore(oitem.date) && moment(oitem.date).isBefore(this.roundData.fromTime.date)) {
-                oitem["roundStatus"] = true;
-              }
-            });
+            if (
+              moment(this.roundData.toTime.date).isBefore(oitem.date) &&
+              moment(oitem.date).isBefore(this.roundData.fromTime.date)
+            ) {
+              oitem["roundStatus"] = true;
+            }
+          });
         });
       }
     },
@@ -190,10 +221,13 @@ export default {
       if (this.roundTimeStatus) {
         this.dateList.forEach((item) => {
           item.data.forEach((oitem) => {
-            if (moment(this.checkedDay.date).isBefore(oitem.date) && moment(oitem.date).isBefore(this.ftromCheckedDay.date)) {
+            if (
+              moment(this.checkedDay.date).isBefore(oitem.date) &&
+              moment(oitem.date).isBefore(this.ftromCheckedDay.date)
+            ) {
               oitem["roundStatus"] = true;
-            }else{
-              delete oitem["roundStatus"]
+            } else {
+              delete oitem["roundStatus"];
             }
           });
         });
@@ -204,64 +238,80 @@ export default {
     checkedDayBtn(month, day) {
       console.log("时间点击", month, day);
       if (day.status) {
-        if(this.timeStatus === 'end' && this.checkedToTime && moment(day.date).isBefore(this.checkedToTime)){
+        if (
+          this.timeStatus === "end" &&
+          this.checkedToTime &&
+          moment(day.date).isBefore(this.checkedToTime)
+        ) {
           return uni.showToast({
-            title: '已选返程： '+this.checkedToTime+' 低于去程时间，请重新选择',
-            icon: 'none',
-            duration: 3000
+            title:
+              "已选返程： " + this.checkedToTime + " 低于去程时间，请重新选择",
+            icon: "none",
+            duration: 3000,
           });
-        }else if(this.timeStatus === 'start' && this.checkedToTime && moment(this.checkedToTime).isBefore(day.date)){
+        } else if (
+          this.timeStatus === "start" &&
+          this.checkedToTime &&
+          moment(this.checkedToTime).isBefore(day.date)
+        ) {
           return uni.showToast({
-            title: '已选去程：'+ this.checkedToTime +' 高于返程时间，请重新选择',
-            icon: 'none',
-            duration: 3000
+            title:
+              "已选去程：" + this.checkedToTime + " 高于返程时间，请重新选择",
+            icon: "none",
+            duration: 3000,
           });
         }
 
-
         if (this.roundTimeStatus) {
-
-          if(!this.roundTripStatus){
+          if (!this.roundTripStatus) {
             return uni.showToast({
-              title: '请在上方选择卡中选择去程或返程',
-              icon: 'none',
-              duration: 3000
+              title: "请在上方选择卡中选择去程或返程",
+              icon: "none",
+              duration: 3000,
             });
           }
 
-
-          this.checkedRoundTime = true
-          let start_time 
-          let end_time
+          this.checkedRoundTime = true;
+          let start_time;
+          let end_time;
           this.dateList.forEach((item) => {
             item.data.forEach((oitem) => {
               if (oitem.toChecked) {
-                start_time = oitem.date
+                start_time = oitem.date;
                 // start_time = moment(oitem.date).add(2, 'days').format('YYYY-MM-DD')
               }
-              if(oitem.fromChecked){
-                end_time = oitem.date
+              if (oitem.fromChecked) {
+                end_time = oitem.date;
                 // end_time = moment(oitem.date).subtract(2, 'days').format('YYYY-MM-DD')
               }
             });
           });
-          console.log(moment(day.date).isBefore(end_time),start_time,end_time,day.date)
-          if(this.roundTripStatus === "start" && !moment(day.date).isBefore(end_time)){
+          console.log(
+            moment(day.date).isBefore(end_time),
+            start_time,
+            end_time,
+            day.date
+          );
+          if (
+            this.roundTripStatus === "start" &&
+            !moment(day.date).isBefore(end_time)
+          ) {
             return uni.showToast({
-              title: '请选择小于返程时间的日期',
-              icon: 'none',
-              duration: 2000
+              title: "请选择小于返程时间的日期",
+              icon: "none",
+              duration: 2000,
             });
           }
-          if(this.roundTripStatus === "end" && !moment(start_time).isBefore(day.date)){
+          if (
+            this.roundTripStatus === "end" &&
+            !moment(start_time).isBefore(day.date)
+          ) {
             return uni.showToast({
-              title: '请选择大于去程时间的日期',
-              icon: 'none',
-              duration: 2000
+              title: "请选择大于去程时间的日期",
+              icon: "none",
+              duration: 2000,
             });
           }
-
-
 
           if (this.roundTripStatus === "start") {
             this.dateList.forEach((item) => {
@@ -279,12 +329,13 @@ export default {
             this.dateList.forEach((item) => {
               item.data.forEach((oitem) => {
                 if (oitem.toChecked) {
-                  
                   console.log(oitem);
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -301,7 +352,9 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -345,7 +398,9 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -362,7 +417,9 @@ export default {
                   let fromNow = moment(
                     moment(oitem.date).format("YYYY-MM-DD")
                   ).calendar(null, {
+                    sameDay: '[今天]',
                     nextDay: "[明天]",
+                    lastWeek: "ddd",
                     nextWeek: "ddd",
                     sameElse: "ddd",
                   });
@@ -404,7 +461,9 @@ export default {
           let fromNow = moment(moment(day.date).format("YYYY-MM-DD")).calendar(
             null,
             {
+              sameDay: '[今天]',
               nextDay: "[明天]",
+              lastWeek: "ddd",
               nextWeek: "ddd",
               sameElse: "ddd",
             }
@@ -431,7 +490,7 @@ export default {
     // 组装单程日期更换
     this.ticketData = data.ticketType ? JSON.parse(data.ticketType) : {};
 
-    this.checkedToTime = data.checkedToTime
+    this.checkedToTime = data.checkedToTime;
 
     console.log(data.roundDate);
     // 组装往返日期
@@ -562,15 +621,20 @@ export default {
             box-shadow: none;
           }
           &.active {
-            color: transparent !important;
             position: relative;
             border: 4upx solid rgba(0, 112, 226, 0.2);
-            &::before {
-              content: "今天";
-              position: absolute;
-              font-size: 22upx;
-              font-weight: 500;
-              color: rgba(0, 112, 226, 1);
+            font-size: 22upx;
+            font-weight: 500;
+            color: rgba(0, 112, 226, 1) !important;
+            &.to{
+              .to_day_text{
+                display: none;
+              }
+            }
+            &.from{
+              .to_day_text{
+                display: none;
+              }
             }
           }
           &.is_before {
@@ -585,57 +649,92 @@ export default {
             background: #e4f1ff;
             box-shadow: none;
             border-radius: 0;
+            position: relative;
+            &::before {
+              content: "";
+              position: absolute;
+              right: -13upx;
+              top: -4upx;
+              height: 95upx;
+              width: 15upx;
+              background: #e4f1ff;
+            }
+            &::after {
+              content: "";
+              position: absolute;
+              left: -13upx;
+              top: -4upx;
+              height: 95upx;
+              width: 15upx;
+              background: #e4f1ff;
+            }
           }
           &.to {
             background: #e4f1ff;
             box-shadow: none;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
+            &::before{
+              content: '';
+              background: #e4f1ff;
+              right: -13upx;
+              height: 95upx;
+              width: 15upx;
+              position: absolute;
+            }
             &.start {
               background: #0070e2;
               box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
               color: #fff;
               border-radius: 20upx;
-              &::before {
+              .text_to {
                 color: #fff;
               }
-            }
-            &::before {
-              content: "去程";
-              position: absolute;
-              font-size: 18upx;
-              font-weight: 500;
-              color: #2a2a2a;
-              top: 0;
+              &::before{
+                display: none;
+              }
             }
           }
           &.from {
-            background: #e4f1ff;
+             background: #e4f1ff;
             box-shadow: none;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
+            &::before{
+              content: '';
+              background: #e4f1ff;
+              left: -13upx;
+              height: 95upx;
+              width: 15upx;
+              position: absolute;
+            }
             &.end {
               background: #0070e2;
               box-shadow: 0 6upx 20upx rgba(0, 112, 226, 0.1);
               color: #fff;
               border-radius: 20upx;
-              &::before {
+              .text_from {
                 color: #fff;
               }
+              &::before{
+                display: none;
+              }
             }
-            &::before {
-              content: "返程";
-              position: absolute;
+            // &.to {
+            //   &::before {
+            //     content: "去程返程";
+            //   }
+            // }
+          }
+          .round_text{
               font-size: 18upx;
               font-weight: 500;
               color: #2a2a2a;
-              top: 0;
             }
-            &.to{
-              &::before{
-                content: "去程返程";
-              }
-            }
+          .lunar {
+            font-size: 10px;
+            font-weight: 500;
+            color: #afb9c4;
           }
         }
       }
