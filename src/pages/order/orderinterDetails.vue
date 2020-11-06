@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-05 18:35:23
+ * @LastEditTime: 2020-11-06 10:24:10
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -318,6 +318,7 @@
       </view>
 
     </uni-popup>
+
   </view>
 </template>
 

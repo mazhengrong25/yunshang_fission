@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-04 11:42:48
- * @LastEditTime: 2020-11-05 14:44:15
+ * @LastEditTime: 2020-11-06 11:21:57
  * @LastEditors: Please set LastEditors
  * @Description: 发送短信
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\pages\order\sendMessage.vue
@@ -106,7 +106,7 @@ export default {
                 },
             ],
 
-            radioValue: "",
+            radioValue: "", //单选选择值
 
             //  选择模块选择
             typeGroup: [],
@@ -134,6 +134,7 @@ export default {
         },
         // 单选点击
         radioChange(e) {
+            console.log(e)
             this.radioValue = e.detail.value
         },
 
@@ -155,13 +156,13 @@ export default {
             this.select_id = val.id
         },
 
+        // 获取选择模板
         getTemplateList(){
                orderApi.sendMessageSelect(this.order_no).then((res) => {
                    console.log(res)
                    this.radioValue = res.user_type
                    this.phone = res.passenger_phone
                    this.isTimer = res.is_timer
-
                    this.typeGroup = res.modelList
             })
         },
@@ -177,14 +178,13 @@ export default {
 
         // 发送短信
         getSend() {
+
             if(!this.content || !this.select_id){
                 return uni.showToast({
                     title: '请输入完整信息',
                     icon: 'none'
                 })
             }
-
-
             let url = this.order_no
             let data = {
 
@@ -194,12 +194,7 @@ export default {
                 send_timer: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
                 msg_model_id: this.select_id,
                 msg_content: this.content,
-                
-                // msg_content: this.content,
-                // phone: this.phone,
-                // msg_model_id: this.select,
-                // user_type: this.radioItems
-                
+    
             }
             console.log(data)
             orderApi.sendMessage(data,url).then((res) => {
