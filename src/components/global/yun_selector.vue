@@ -27,9 +27,9 @@
           class="content_view"
           @change="bindChange"
         >
-        <picker-view-column>
+        <!-- <picker-view-column>
             <view class="item" v-for="(item,index) in years" :key="index">{{item}}年</view>
-          </picker-view-column>
+          </picker-view-column> -->
           <picker-view-column>
             <view class="item" v-for="(item,index) in dataList" :key="index">{{dataItem?item[dataItem]:item}}</view>
           </picker-view-column>
