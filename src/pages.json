@@ -12,37 +12,7 @@
         "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/order/refundList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/order/refundDetails",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/order/sendMessage",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/passengerList",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/flightReservation/addPassenger",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-
+    
     {
       "path": "pages/ticketInquiry/ticketInquiry",
       "style": {
