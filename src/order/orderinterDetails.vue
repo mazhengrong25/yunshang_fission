@@ -2,13 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
-<<<<<<< HEAD:src/pages/order/orderinterDetails.vue
- * @LastEditTime: 2020-11-06 10:24:10
+ * @LastEditTime: 2020-11-06 16:58:56
  * @LastEditors: Please set LastEditors
-=======
- * @LastEditTime: 2020-10-19 15:46:46
- * @LastEditors: wish.WuJunLong
->>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac:src/order/orderinterDetails.vue
 -->
 <template>
   <view class="order_details">
@@ -223,6 +218,10 @@
           <view class="main_list_title">订单信息</view>
           <view class="message_list">
             <view class="list_item">
+              <view class="item_title">票号</view>
+              <view class="item_message">{{ segmentDetails.ticket_no }}</view>
+            </view>
+            <view class="list_item">
               <view class="item_title">订单编号</view>
               <view class="item_message">{{ orderDetails.order_no }}</view>
             </view>
@@ -420,6 +419,7 @@ export default {
       }, 
 
       passengerInfo: {},
+      segmentDetails: {}, // 票号
     };
   },
   methods: {
@@ -575,6 +575,7 @@ export default {
         if (res.result === 10000) {
           this.orderDetails = res.data.order_msg;
           this.passengerInfo = res.data.order_msg.ticket_passenger;
+          this.segmentDetails = res.data.order_msg.ticket_passenger.ticket_segment_passenter
           console.log('passengerInfo',this.passengerInfo)
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;

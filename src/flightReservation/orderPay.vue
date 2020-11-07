@@ -2,8 +2,8 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-09-28 11:38:31
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-06 17:51:59
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_pay">
@@ -39,6 +39,10 @@
       </view>
 
       <view class="order_message box-shadow-style">
+        <view class="message_list">
+          <view class="list_title">{{passengerList.PassengerName}}</view>
+          <view class="list_text">{{passengerList.CredentialNo}}</view>
+        </view>
         <view
           class="message_list"
           v-for="(item, index) in payOrder"
@@ -172,6 +176,8 @@ export default {
       childPayStatus: false, // 儿童票支付状态
 
       headerType: true,  // 航班信息状态
+
+      passengerList:{}, //乘客信息
     };
   },
   methods: {
@@ -331,7 +337,8 @@ export default {
     },
   },
   onLoad(data) {
-    console.log(data.flightData);
+    console.log(data);
+    console.log('确认支付',data)
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.payOrder = JSON.parse(data.orderId);
     this.flightData = JSON.parse(data.flightData);
@@ -339,7 +346,7 @@ export default {
     this.priceList = JSON.parse(data.priceList);
     
     this.orderType = JSON.parse(data.type);
-
+    this.passengerList = JSON.parse(data.passMessage);
     if(data.headerType){
       this.headerType = false
     }

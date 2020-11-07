@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-11-06 16:19:05
+ * @LastEditTime: 2020-11-07 10:21:44
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -160,6 +160,16 @@
                   ? "已取消"
                   : ""
               }}
+            </view>
+
+          </view>
+
+          <!-- 乘客姓名 -->
+          <view class="passenger_item">
+            <view class="item_title"
+              v-for="(oitem, oindex) in item.ticket_passenger"
+                  :key="oindex">
+              <text>{{oitem.PassengerName}}</text>
             </view>
           </view>
 
@@ -666,6 +676,8 @@ export default {
               }
             });
 
+            
+
             //日期条件排序
             if (this.orderListFilter.date !== null) {
               this.sorTime(this.orderListFilter.date);
@@ -774,7 +786,6 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.orderListType = data.type;
     console.log(this.orderListType);
-    console.log(data);
     this.orderHeaderTitle =
       this.orderListType === "0"
         ? "国内订单"
@@ -1081,6 +1092,30 @@ export default {
             color: rgba(42, 42, 42, 1);
           }
         }
+
+        //乘客姓名
+        .passenger_item {
+           display: flex;
+           justify-content: flex-start;
+           margin: 14rpx 4rpx;
+           width: 50%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+           .item_title {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              color: rgba(42, 42, 42, 1);
+              border: 2rpx solid #AFB9C4;
+              border-radius: 20rpx;
+              font-size: 24rpx;
+              width: 90rpx;
+              height: 30rpx;
+              margin-right: 10rpx;
+           }
+        }
+
         .item_time {
           margin: 34upx 0;
           height: 64upx;

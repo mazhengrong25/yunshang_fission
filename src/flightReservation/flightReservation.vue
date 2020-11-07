@@ -2,8 +2,8 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-09-30 16:48:26
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-06 17:49:38
+ * @LastEditors: Please set LastEditors
 --> 
 <template>
   <view class="flight_reservation">
@@ -1179,7 +1179,9 @@ export default {
                   JSON.stringify(priceList) +
                   "&price=" +
                   priceNumber +
-                  "&type=true",
+                  "&type=true" +
+                  "&passengerList =" +
+                  JSON.stringify(this.passengerList),
               });
               console.log(res.data, this.flightData);
             } else {
@@ -1233,14 +1235,16 @@ export default {
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
         };
-        console.log(this.relatedKey, JSON.stringify(data));
+        console.log('人',this.relatedKey, JSON.stringify(data));
         ticket
           .createOrder(this.relatedKey, data, this.price)
           .then((res) => {
+            console.log('确认支付',res)
             if (res.errorcode === 10000) {
               let orderId = [];
               let priceList = [];
               let priceNumber = 0;
+              
               res.data.forEach((item) => {
                 orderId.push(item.order_no);
                 priceList.push(item.need_pay_amount);
@@ -1259,7 +1263,9 @@ export default {
                   JSON.stringify(priceList) +
                   "&price=" +
                   priceNumber +
-                  "&type=false",
+                  "&type=false" +
+                  "&passMessage=" +
+                  JSON.stringify(data),
               });
               console.log(res.data, this.flightData);
             } else {
