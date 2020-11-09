@@ -6,17 +6,8 @@
  * @LastEditors: wish.WuJunLong
 --> 
 <script>
-// import Vue from 'vue'
 export default {
   onLaunch: function () {
-    // var that = this;
-    //     wx.getSystemInfo({
-    //       success(res) {
-    //         that.globalData.statusBarHeight = res.statusBarHeight;
-    //         console.log(res.statusBarHeight, 'statusBarHeight')
-    //       }
-    //     })
-
     const updateManager = uni.getUpdateManager();
 
     updateManager.onCheckForUpdate(function (res) {
@@ -50,7 +41,7 @@ export default {
   onShow: function () {
     console.log("App Show");
   },
-  onHide: function () {
+  onHide: function () { 
     console.log("App Hide");
   },
 };
