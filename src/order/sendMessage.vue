@@ -40,12 +40,12 @@
                 <view class="message_title">发送内容</view>
                 <view class="message_action">
                     <textarea 
-                    :maxlength="200"
+                    :maxlength="500"
                     placeholder-style="color:#DFDFDF" style="padding:10px"
                     @input="getContent" 
                     v-model="content" placeholder="请填写发送内容"/>
                     <view class="message_count">
-                        <p>{{content.length}}</p>/200
+                        <p>{{content.length}}</p>/500
                     </view>
                 </view>
             </view>
@@ -69,7 +69,7 @@
                     <view class="message_icon" v-if="!message_true">
                         <img src="@/static/message_error.png"></img>
                     </view>
-                    <view class="message_send">{{message_true?'短信已成功发送':('短信发送失败：' + message_msg)}}</view>
+                    <view class="message_send">{{message_msg}}</view>
                     <view class="message_bottom" @click="backPage">知道了</view>
                 </view>
             </uni-popup>
@@ -174,7 +174,9 @@ export default {
 
     backPage() {
       this.$refs.sendMessage.close();
-      uni.navigateBack();
+      if(this.message_true){
+        uni.navigateBack();
+      }
     },
 
     // 发送短信
@@ -197,10 +199,7 @@ export default {
       console.log(data);
       orderApi.sendMessage(data, url).then((res) => {
         this.message_true = res.errorcode === 10000;
-        if (res.errorcode === 10000) {
-        } else {
-          this.message_msg = res.msg;
-        }
+        this.message_msg = res.msg;
         this.open();
       });
     },
@@ -270,7 +269,8 @@ export default {
       }
       .message_action {
         width: 355px;
-        height: 230px;
+        height: 200px;
+        padding-bottom: 40rpx;
         background: #f9f9f9;
         border: 1px solid #eaeaea;
         opacity: 1;
@@ -342,6 +342,7 @@ export default {
     font-size: 24upx;
     font-weight: 400;
     color: #0070e2;
+    padding: 0 60rpx;
   }
   .message_bottom {
     display: flex;

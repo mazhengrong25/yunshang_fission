@@ -21,9 +21,9 @@ const request = (config, type) => {
   let baseUrl;
 
   if (process.env.NODE_ENV === 'development') {
-    baseUrl = 'http://192.168.0.187';
+    baseUrl = 'http://192.168.0.187';  // 开发环境
   } else {
-    baseUrl = 'https://fxxcx.ystrip.cn';
+    baseUrl = 'https://fxxcx.ystrip.cn';  // 生产环境
   }
 
   config.url = baseUrl + config.url;

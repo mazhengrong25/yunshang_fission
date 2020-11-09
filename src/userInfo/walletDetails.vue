@@ -43,7 +43,7 @@
           walletData.trans_type === 12? '预付款调整': ""}}
         </view>
         <view class="header_peice">
-          {{walletData.after_balance > walletData.before_balance? '+': walletData.after_balance < walletData.before_balance? '-': ''}}
+          {{Number(walletData.after_balance).toFixed(2) > Number(walletData.before_balance).toFixed(2)? '+': Number(walletData.before_balance).toFixed(2) > Number(walletData.after_balance).toFixed(2) ? '-': ''}}
           {{Number(walletData.amount).toFixed(2)}}
         </view>
       </view>

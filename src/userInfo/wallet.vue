@@ -93,7 +93,7 @@
                 </view>
               </view>
               <view class="list_right">
-                {{item.after_balance > item.before_balance? '+': item.before_balance > item.after_balance ? '-': ''}}
+                {{Number(item.after_balance).toFixed(2) > Number(item.before_balance).toFixed(2)? '+': Number(item.before_balance).toFixed(2) > Number(item.after_balance).toFixed(2) ? '-': ''}}
                 {{Number(item.amount).toFixed(2)}}
               </view>
             </view>

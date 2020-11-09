@@ -836,6 +836,7 @@ export default {
       height: 100%;
       position: relative;
       z-index: 2;
+      padding-top: 20rpx;
       // &::after {
       //   content: "";
       //   display: block;
