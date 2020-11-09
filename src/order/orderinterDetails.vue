@@ -832,27 +832,35 @@ export default {
     flex: 1;
     height: 100%;
     overflow-y: auto;
-    &::after {
-      content: "";
-      display: block;
-      background: #0070e2;
-      width: 100%;
-      height: 90upx;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
     .content {
       height: 100%;
-      z-index: 1;
       position: relative;
+      z-index: 2;
+      // &::after {
+      //   content: "";
+      //   display: block;
+      //   background: #0070e2;
+      //   width: 100%;
+      //   height: 90upx;
+      //   position: absolute;
+      //   top: 0;
+      //   left: 0;
+      //   z-index: 0;
+      // }
+
+      /deep/.fight_header {
+        position: relative;
+        z-index: 2;
+      }
+
       .main_list {
         background: rgba(255, 255, 255, 1);
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
         border-radius: 20upx;
         margin: 0 20upx 20upx;
         padding: 24upx 20upx 20upx;
+        position: relative;
+        z-index: 2;
         .main_list_title {
           font-size: 32upx;
           font-weight: bold;

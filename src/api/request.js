@@ -23,8 +23,8 @@ const request = (config, type) => {
     // 调用用户信息地址
     baseUrl = 'http://192.168.0.187/user';
   } else {
-    // baseUrl = 'http://192.168.0.187';
-    baseUrl = 'https://fxxcx.ystrip.cn';
+    baseUrl = 'http://192.168.0.187';
+    // baseUrl = 'https://fxxcx.ystrip.cn';
   }
   config.url = baseUrl + config.url;
 
