@@ -120,7 +120,12 @@
             "navigationStyle": "custom"
           }
         },
-    
+        {
+          "path": "serviceDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
         {
           "path": "wallet",
           "style": {

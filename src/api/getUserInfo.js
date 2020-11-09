@@ -2,8 +2,8 @@
  * @Description: 获取用户信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 10:34:01
- * @LastEditTime: 2020-08-10 13:52:46
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-09 15:12:36
+ * @LastEditors: Please set LastEditors
  */ 
 import request from '@/api/request';
 
@@ -42,6 +42,16 @@ function getWalletList (data) {
 	})
 }
 
+// 客服服务列表
+function getServiceList () {
+
+	return request({
+		method: "GET",
+		url: '/api/kf/list',
+		
+	})
+}
+
 // 订单支付方式 - 国内
 function getOrderPay (data) {
 	return request({
@@ -73,6 +83,7 @@ export default{
 	getWallet,
 	editPassword,
 	getWalletList,
+	getServiceList,
 	getOrderPay,
 	getOrderInterPay,
 	signOut
