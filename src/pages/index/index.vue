@@ -481,9 +481,9 @@ export default {
         this.currentTab === 0 &&
         JSON.stringify(this.airMessage.fromTime) === "{}"
       ) {
-        jumpUrl = "/pages/ticketInquiry/ticketInquiry";
+        jumpUrl = "/ticketInquiry/ticketInquiry";
       } else if (this.currentTab === 2 && this.airMessage.fromTime) {
-        jumpUrl = "/pages/ticketInquiry/ticketRoundTrip";
+        jumpUrl = "/ticketInquiry/ticketRoundTrip";
       }
       uni.navigateTo({
         url: jumpUrl + "?data=" + JSON.stringify(this.airMessage),

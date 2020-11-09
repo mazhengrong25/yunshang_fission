@@ -81,9 +81,10 @@
 
         <view class="ticket_right">
           <view class="ticket_price">
-            <text class="currency" v-if="item.available_cabin > 0 && item.available_cabin !== 0">&yen;</text>
-            <view v-if="item.available_cabin > 0 && item.available_cabin !== 0">{{item.min_price}}</view>
+            <text class="currency" v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">&yen;</text>
+            <view v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">{{item.min_price}}</view>
             <view class="sold_out" v-if="item.available_cabin === 0">售罄</view>
+            <view class="sold_out" v-if="item.min_price === 0">手动获取</view>
             <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>

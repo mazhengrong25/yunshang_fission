@@ -2,13 +2,8 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
-<<<<<<< HEAD:src/pages/order/filter.vue
  * @LastEditTime: 2020-10-09 10:23:36
  * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-10-19 15:37:46
- * @LastEditors: wish.WuJunLong
->>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac:src/order/filter.vue
 -->
 <template>
   <view class="filter">

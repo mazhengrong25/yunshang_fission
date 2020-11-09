@@ -7,11 +7,23 @@
 --> 
 <template>
   <view class="add_passenger">
-    <yun-header :statusHeight="iStatusBarHeight" :headerBottom="Number(10)" centerTitle="新增乘机人"></yun-header>
-    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="pssenger_main">
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      :headerBottom="Number(10)"
+      centerTitle="新增乘机人"
+    ></yun-header>
+    <scroll-view
+      :enable-back-to-top="true"
+      :scroll-y="true"
+      class="pssenger_main"
+    >
       <view class="box-shadow-style">
         <view class="user_message_btn">
-          <image class="user_message_btn_icon" src="@/static/add_passenger_icon.png" mode="contain" />
+          <image
+            class="user_message_btn_icon"
+            src="@/static/add_passenger_icon.png"
+            mode="contain"
+          />
           <text>填写说明</text>
         </view>
         <view class="list_item">
@@ -25,7 +37,12 @@
             placeholder-class="input_placeholder"
             v-model="passenger.name"
           />
-          <view class="checked_pinyin" v-if="addPassengerType" @click="switchPinyin()">转拼音</view>
+          <view
+            class="checked_pinyin"
+            v-if="addPassengerType"
+            @click="switchPinyin()"
+            >转拼音</view
+          >
         </view>
         <view class="list_item" v-if="addPassengerType">
           <view class="item_title">
@@ -69,7 +86,7 @@
             placeholder-class="input_placeholder"
           />
         </view>
-        <view class="list_item input-right-arrow">
+        <!-- <view class="list_item input-right-arrow">
           <view class="item_title">
             <text>出生日期</text>
           </view>
@@ -87,7 +104,7 @@
           <view class="item_input" @click="openSexSelector()">
             <text>{{passenger.sex}}</text>
           </view>
-        </view>
+        </view> -->
       </view>
 
       <uni-swipe-action>
@@ -98,13 +115,17 @@
           :disabled="certificateList.length <= 1"
         >
           <view class="box-shadow-style certificate">
-            <view class="certificate_number" v-if="certificateList.length > 1">{{index + 1}}</view>
+            <view
+              class="certificate_number"
+              v-if="certificateList.length > 1"
+              >{{ index + 1 }}</view
+            >
             <view class="list_item">
               <view class="item_title">
                 <text>证件类型</text>
               </view>
               <view class="id_card_type" @click="openSelector(index)">
-                <text>{{item.cert_type}}</text>
+                <text>{{ item.cert_type }}</text>
               </view>
             </view>
 
@@ -115,45 +136,68 @@
 
               <input
                 class="item_input"
-                :type="item.cert_type === '护照'?'text':'idcard'"
+                :type="item.cert_type === '护照' ? 'text' : 'idcard'"
                 placeholder="请保持与证件一致"
                 v-model="item.cert_no"
                 placeholder-class="input_placeholder"
+                @blur="validID(item.cert_no, item.cert_type)"
               />
             </view>
 
-            <view class="list_item input-right-arrow" v-if="item.cert_type === '护照'">
+            <view
+              class="list_item input-right-arrow"
+              v-if="item.cert_type === '护照'"
+            >
               <view class="item_title">
                 <text>证件有效期</text>
               </view>
 
-              <view class="item_input" @click="openBirthdaySelector(passenger.cert_ex_date,'cardTime')">
-                <text v-if="passenger.cert_ex_date">{{passenger.cert_ex_date}}</text>
-                <text class="input_placeholder" v-else>请选择证件有效截至日期</text>
+              <view
+                class="item_input"
+                @click="
+                  openBirthdaySelector(passenger.cert_ex_date, 'cardTime')
+                "
+              >
+                <text v-if="passenger.cert_ex_date">{{
+                  passenger.cert_ex_date
+                }}</text>
+                <text class="input_placeholder" v-else
+                  >请选择证件有效截至日期</text
+                >
               </view>
             </view>
 
-            <view class="list_item input-right-arrow" v-if="item.cert_type === '护照'">
+            <view
+              class="list_item input-right-arrow"
+              v-if="item.cert_type === '护照'"
+            >
               <view class="item_title">
                 <text>证件签发国</text>
               </view>
 
               <view class="item_input" @click="notMessage">
-                <text v-if="passenger.nationality">{{passenger.nationality}}</text>
+                <text v-if="passenger.nationality">{{
+                  passenger.nationality
+                }}</text>
                 <text class="input_placeholder" v-else>请选择证件签发国家</text>
               </view>
             </view>
 
             <view
               class="add_card"
-              v-if="certificateList.length === (index + 1) && !pageType"
+              v-if="certificateList.length === index + 1 && !pageType"
               @click="addCertificate()"
-            >+ 添加证件</view>
+              >+ 添加证件</view
+            >
           </view>
           <template v-slot:right>
             <view class="option_box">
               <view class="delete_btn" @click="removeCertificate(item, index)">
-                <image class="delete_btn_icon" src="@/static/delete_btn.png" mode="contain" />
+                <image
+                  class="delete_btn_icon"
+                  src="@/static/delete_btn.png"
+                  mode="contain"
+                />
                 <text>删除</text>
               </view>
             </view>
@@ -167,7 +211,7 @@
             <text>乘机人分组</text>
           </view>
           <view class="openGroup" @click="openGroupSelect">
-            <text v-if="group.group_name">{{group.group_name}}</text>
+            <text v-if="group.group_name">{{ group.group_name }}</text>
             <text v-else class="not_message">请选择分组</text>
           </view>
         </view>
@@ -175,11 +219,23 @@
     </scroll-view>
 
     <!-- 手机区号选择弹窗 -->
-    <yun-selector ref="areaCodePopup" :dataList="areaCodeList" @submitDialog="areaCodeSelectBtn()"></yun-selector>
+    <yun-selector
+      ref="areaCodePopup"
+      :dataList="areaCodeList"
+      @submitDialog="areaCodeSelectBtn()"
+    ></yun-selector>
     <!-- 乘客性别选择弹窗 -->
-    <yun-selector ref="sexPopup" :dataList="sexList" @submitDialog="sexSelecctBtn()"></yun-selector>
+    <yun-selector
+      ref="sexPopup"
+      :dataList="sexList"
+      @submitDialog="sexSelecctBtn()"
+    ></yun-selector>
     <!-- 乘客出生日期选择框 -->
-    <yun-selector ref="birthdayPopup" selectType="date" @submitDialog="birthdaySelecctBtn()"></yun-selector>
+    <yun-selector
+      ref="birthdayPopup"
+      selectType="date"
+      @submitDialog="birthdaySelecctBtn()"
+    ></yun-selector>
     <!-- 证件类型选择弹窗 -->
     <yun-selector
       ref="selectorPopup"
@@ -228,27 +284,36 @@
 
         <view class="retuen_content">
           <view class="content_title">
-            <text>若姓名证件号错误将影响登机，</text>请你仔细核对，确保信息与乘机证件一致
+            <text>若姓名证件号错误将影响登机，</text
+            >请你仔细核对，确保信息与乘机证件一致
           </view>
           <view class="content_userinfo">
             <view>
               <text>姓名</text>
-              <text>{{passenger.name}}</text>
+              <text>{{ passenger.name }}</text>
             </view>
             <view v-if="passenger.en_first_name || passenger.en_last_name">
               <text>Surname/Given name</text>
-              <text>{{passenger.en_first_name}}/{{passenger.en_last_name}}</text>
+              <text
+                >{{ passenger.en_first_name }}/{{
+                  passenger.en_last_name
+                }}</text
+              >
             </view>
             <view v-for="(item, index) in certificateList" :key="index">
-              <text>{{item.cert_type}}</text>
-              <text>{{item.cert_no}}</text>
+              <text>{{ item.cert_type }}</text>
+              <text>{{ item.cert_no }}</text>
             </view>
           </view>
         </view>
 
         <view class="btn_box">
-          <view class="submit_btn return_btn" @click="editUserinfo">修改信息</view>
-          <view class="submit_btn submit_post" @click="submitUserinfo">确认保存</view>
+          <view class="submit_btn return_btn" @click="editUserinfo"
+            >修改信息</view
+          >
+          <view class="submit_btn submit_post" @click="submitUserinfo"
+            >确认保存</view
+          >
         </view>
       </view>
     </uni-popup>
@@ -281,7 +346,7 @@ export default {
         },
       ],
 
-      checkedTimeType: '', // 时间选择器类型
+      checkedTimeType: "", // 时间选择器类型
 
       certificateIndex: "", // 更改证件类型下标
 
@@ -296,24 +361,29 @@ export default {
       group: {}, // 分组
       groupList: [], // 分组列表
       addGroupName: "", // 添加分组列表名称
+
+      baseInfo: {},
     };
   },
   methods: {
-    notMessage(){
+    notMessage() {
       uni.showToast({
-        title: '国际功能开发中，请等待后续版本更新',
-        icon: 'none',
-        duration: 3000
+        title: "国际功能开发中，请等待后续版本更新",
+        icon: "none",
+        duration: 3000,
       });
     },
-
 
     // 姓名转拼音
     switchPinyin() {
       let name = this.passenger.name;
-      this.$set(this.passenger,'en_first_name',pinyin.getFullChars(name[0]))
-      this.$set(this.passenger,'en_last_name',pinyin.getFullChars(name.substr(1)))
-      this.$forceUpdate()
+      this.$set(this.passenger, "en_first_name", pinyin.getFullChars(name[0]));
+      this.$set(
+        this.passenger,
+        "en_last_name",
+        pinyin.getFullChars(name.substr(1))
+      );
+      this.$forceUpdate();
       console.log(this.passenger);
     },
 
@@ -336,20 +406,19 @@ export default {
     },
 
     // 打开出生日期选择框
-    openBirthdaySelector(data,type) {
-      this.checkedTimeType = type
+    openBirthdaySelector(data, type) {
+      this.checkedTimeType = type;
       this.$refs.birthdayPopup.openDialog();
     },
     // 确认出生日期 || 证件有效期
     birthdaySelecctBtn(e) {
       console.log(e);
-      let time = e.year + "-" + e.month + "-" + e.day
-      if(this.checkedTimeType === 'birthday'){
-        this.$set(this.passenger, 'birthday',time)
-      }else if(this.checkedTimeType === 'cardTime'){
-        this.$set(this.passenger, 'cert_ex_date',time)
+      let time = e.year + "-" + e.month + "-" + e.day;
+      if (this.checkedTimeType === "birthday") {
+        this.$set(this.passenger, "birthday", time);
+      } else if (this.checkedTimeType === "cardTime") {
+        this.$set(this.passenger, "cert_ex_date", time);
       }
-      
     },
 
     // 打开证件类型选择框
@@ -359,7 +428,7 @@ export default {
     },
     // 确认证件类型
     certificateSelecctBtn(e) {
-      console.log('确认证件类型',e);
+      console.log("确认证件类型", e);
       this.certificateList[this.certificateIndex].cert_type = e;
       this.certificateList.forEach((item) => {
         if (item.cert_type === "护照") {
@@ -370,6 +439,75 @@ export default {
           this.passenger.en_last_name = "";
         }
       });
+    },
+
+    // 身份证验证
+    async validID(value, type) {
+      if (type === "身份证") {
+        // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
+        let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+        if (reg.test(value)) {
+          await this.go(value.length, value);
+        } else {
+          return uni.showToast({
+            title: "身份证号码不正确",
+            duration: 2000,
+            icon: "none",
+          });
+        }
+      }
+    },
+
+    // 根据身份证获取生日年龄性别
+    go(val, idCard) {
+      console.log(val, idCard);
+      let iden = idCard;
+      let sex = null;
+      let birth = null;
+      let myDate = new Date();
+      let month = myDate.getMonth() + 1;
+      let day = myDate.getDate();
+      let age = 0;
+
+      if (val === 18) {
+        age = myDate.getFullYear() - iden.substring(6, 10) - 1;
+        sex = iden.substring(16, 17);
+        birth =
+          iden.substring(6, 10) +
+          "-" +
+          iden.substring(10, 12) +
+          "-" +
+          iden.substring(12, 14);
+        if (
+          iden.substring(10, 12) < month ||
+          (iden.substring(10, 12) == month && iden.substring(12, 14) <= day)
+        )
+          age++;
+      }
+      if (val === 15) {
+        age = myDate.getFullYear() - iden.substring(6, 8) - 1901;
+        sex = iden.substring(13, 14);
+        birth =
+          "19" +
+          iden.substring(6, 8) +
+          "-" +
+          iden.substring(8, 10) +
+          "-" +
+          iden.substring(10, 12);
+        if (
+          iden.substring(8, 10) < month ||
+          (iden.substring(8, 10) == month && iden.substring(10, 12) <= day)
+        )
+          age++;
+      }
+
+      if (sex % 2 === 0) sex = 0;
+      else sex = 1;
+      this.baseInfo["sex"] = sex; //性别  1男 0女
+      this.baseInfo["age"] = age; //年龄
+      this.baseInfo["birthday"] = birth; //生日
+
+      console.log(this.baseInfo);
     },
 
     // 打开添加分组弹窗
@@ -431,7 +569,7 @@ export default {
     },
     // 确认分组
     groupPopupSelecctBtn(e) {
-      console.log(e)
+      console.log(e);
       this.group = e;
     },
 
@@ -463,7 +601,7 @@ export default {
       if (
         !this.passenger.name ||
         !this.passenger.phone ||
-        !this.passenger.birthday ||
+        // !this.passenger.birthday ||
         !this.certificateList[0].cert_no
       ) {
         return uni.showToast({
@@ -483,14 +621,14 @@ export default {
       //     icon: "none",
       //   });
       // }
-      this.certificateList.forEach((item, index) =>{
-        if(!item.cert_no){
-          this.certificateList.splice(index, 1)
+      this.certificateList.forEach((item, index) => {
+        if (!item.cert_no) {
+          this.certificateList.splice(index, 1);
         }
-      })
-      console.log(this.certificateList)
+      });
+      console.log(this.certificateList);
       this.$refs.returnSubmitDialog.open();
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
 
     // 二次确认信息取消
@@ -500,17 +638,33 @@ export default {
     // 二次确认信息提交
     submitUserinfo() {
       this.certificateList.forEach((item) => {
-        let data = JSON.parse(JSON.stringify(this.passenger));
-        data.sex = data.sex === "男" ? 1 : 0;
-        data["cert_type"] = item.cert_type;
-        data["cert_no"] = item.cert_no;
-        data["group_id"] = this.group.id;
-        data["group"] = this.group.group_name
-        data["nationality"] = "CN";
-        if (item.cert_type !== "护照") {
-          delete data.en_first_name;
-          delete data.en_last_name;
-        }
+        // console.log(this.passenger);
+        // JSON.parse(JSON.stringify(this.passenger))
+        let data = {
+          name: this.passenger.name,
+          phone: this.passenger.phone,
+          sex: this.baseInfo.sex,
+          birthday: this.baseInfo.birthday,
+          cert_type: item.cert_type,
+          cert_no: item.cert_no,
+          group_id: this.group.id || 0,
+          group: this.group.group_name || '',
+          nationality: "CN",
+          en_first_name: this.passenger.en_first_name || '',
+          en_last_name: this.passenger.en_last_name || '',
+        };
+        // data.sex = this.baseInfo.sex;
+        // data["cert_type"] = item.cert_type;
+        // data["cert_no"] = item.cert_no;
+        // data["group_id"] = this.group.id;
+        // data["group"] = this.group.group_name;
+        // data["nationality"] = "CN";
+        // if (item.cert_type !== "护照") {
+        //   delete data.en_first_name;
+        //   delete data.en_last_name;
+        // }
+
+        console.log(data)
 
         if (this.pageType) {
           // 编辑乘机人
@@ -522,10 +676,10 @@ export default {
               });
               setTimeout(() => {
                 uni.navigateBack();
-                uni.setStorageSync('addPassenger', true)
+                uni.setStorageSync("addPassenger", true);
               }, 500);
-              if(this.flightEdit){
-                 uni.setStorageSync("editPassengerList", JSON.stringify(data));
+              if (this.flightEdit) {
+                uni.setStorageSync("editPassengerList", JSON.stringify(data));
               }
             } else {
               uni.showToast({
@@ -560,7 +714,7 @@ export default {
 
   onLoad(val) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.flightEdit = val.status?true:false
+    this.flightEdit = val.status ? true : false;
     console.log(val.type);
     if (val.type === "edit") {
       this.pageType = val.type === "edit";
@@ -575,7 +729,7 @@ export default {
         sex: this.pageData.sex === 1 ? "男" : "女",
         id: this.pageData.id,
         type: this.pageData.type,
-        checked: this.pageData.checked || false
+        checked: this.pageData.checked || false,
       };
       this.certificateList[0] = {
         cert_type: this.pageData.cert_type, // 证件类型

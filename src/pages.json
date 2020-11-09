@@ -12,13 +12,6 @@
         "navigationStyle": "custom"
       }
     },
-    
-    {
-      "path": "pages/ticketInquiry/ticketInquiry",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
     {
       "path": "pages/dateSelect/dateSelect",
       "style": {
@@ -62,21 +55,7 @@
       "style": {
         "navigationStyle": "custom"
       }
-    },
-    {
-      "path": "pages/ticketInquiry/ticketForeign",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-   
-    {
-      "path": "pages/ticketInquiry/ticketRoundTrip",
-      "style": {
-        "navigationStyle": "custom"
-      }
     }
-    
   ],
 
   "subPackages": [
@@ -121,6 +100,11 @@
         },
         {
           "path": "refundDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },{
+          "path": "sendMessage",
           "style": {
             "navigationStyle": "custom"
           }
@@ -216,6 +200,30 @@
             "navigationStyle": "custom"
           }
         }
+      ]
+    },
+    {
+      "root": "ticketInquiry",
+      "pages": [
+        {
+          "path": "ticketRoundTrip",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "ticketForeign",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "ticketInquiry",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      
       ]
     }
   ],

@@ -38,11 +38,21 @@
           <view></view>
       </view>
 
-      <view class="order_message box-shadow-style">
-        <view class="message_list">
-          <view class="list_title">{{passengerList.PassengerName}}</view>
-          <view class="list_text">{{passengerList.CredentialNo}}</view>
+      <view class="order_message box-shadow-style" style="margin-bottom: 20rpx">
+        <view class="message_list" v-for="(item, index) in passengerList" :key="index">
+          <view>
+            <text class="list_title">乘客：</text>
+            <text class="list_text">{{item.PassengerName}}</text>
+          </view>
+          <view>
+            <text class="list_title">证件号：</text>
+            <text class="list_text">{{item.CredentialNo}}</text>
+          </view>
+          <!-- <view class="list_text">{{item.CredentialNo}}</view> -->
         </view>
+      </view>
+
+      <view class="order_message box-shadow-style">
         <view
           class="message_list"
           v-for="(item, index) in payOrder"
@@ -177,7 +187,7 @@ export default {
 
       headerType: true,  // 航班信息状态
 
-      passengerList:{}, //乘客信息
+      passengerList: [], //乘客信息
     };
   },
   methods: {
@@ -346,7 +356,7 @@ export default {
     this.priceList = JSON.parse(data.priceList);
     
     this.orderType = JSON.parse(data.type);
-    this.passengerList = JSON.parse(data.passMessage);
+    this.passengerList = data.passMessage?JSON.parse(data.passMessage):[];
     if(data.headerType){
       this.headerType = false
     }

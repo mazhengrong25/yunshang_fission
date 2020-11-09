@@ -161,15 +161,16 @@
                   : ""
               }}
             </view>
-
           </view>
 
           <!-- 乘客姓名 -->
           <view class="passenger_item">
-            <view class="item_title"
+            <view
+              class="item_title"
               v-for="(oitem, oindex) in item.ticket_passenger"
-                  :key="oindex">
-              <text>{{oitem.PassengerName}}</text>
+              :key="oindex"
+            >
+              <text>{{ oitem.PassengerName }}</text>
             </view>
           </view>
 
@@ -177,7 +178,7 @@
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
-            <view class="time_text">剩余支付时间：</view>   
+            <view class="time_text">剩余支付时间：</view>
             <view class="time_number">
               {{
                 $timeDiff(
@@ -549,6 +550,8 @@ export default {
           JSON.stringify(priceList) +
           "&price=" +
           priceNumber +
+          "&passMessage=" +
+          JSON.stringify(val.ticket_passenger) +
           "&headerType=false" +
           "&type=false",
       });
@@ -566,8 +569,8 @@ export default {
     },
     //获取国内外列表
     getOrderList() {
-      this.sortType = "";
-      this.backScroll();
+      
+      
       this.orderPageStatus = true;
       if (this.orderListType === "3") {
         let data = {
@@ -623,6 +626,7 @@ export default {
           order_no: this.orderListFilter.orderNumber || "", // 订单号
           flight_no: this.orderListFilter.flightNumber || "", // 航班号
           book_user: this.orderListFilter.book_user || "", // 订票员
+          page: this.orderPageNumber,
         };
 
         if (this.orderListFilter.Citystart) {
@@ -675,8 +679,6 @@ export default {
                 });
               }
             });
-
-            
 
             //日期条件排序
             if (this.orderListFilter.date !== null) {
@@ -822,6 +824,8 @@ export default {
     } else {
       this.headerActive = 0;
       this.getOrderList();
+      this.backScroll();
+      this.sortType = "";
     }
   },
 };
@@ -1095,25 +1099,24 @@ export default {
 
         //乘客姓名
         .passenger_item {
-           display: flex;
-           justify-content: flex-start;
-           margin: 14rpx 4rpx;
-           width: 50%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-           .item_title {
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              color: rgba(42, 42, 42, 1);
-              border: 2rpx solid #AFB9C4;
-              border-radius: 20rpx;
-              font-size: 24rpx;
-              width: 90rpx;
-              height: 30rpx;
+          display: flex;
+          justify-content: flex-start;
+          margin-top: 20upx;
+          .item_title {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(42, 42, 42, 1);
+            border: 2rpx solid #D9E1EA;
+            border-radius: 20rpx;
+            font-size: 22rpx;
+            padding: 0 10upx;
+            height: 30rpx; 
+            color: #6E6E6E;
+            &:not(:last-child){
               margin-right: 10rpx;
-           }
+            }
+          }
         }
 
         .item_time {

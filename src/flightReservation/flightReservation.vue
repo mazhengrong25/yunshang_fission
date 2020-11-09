@@ -1181,7 +1181,7 @@ export default {
                   priceNumber +
                   "&type=true" +
                   "&passengerList =" +
-                  JSON.stringify(this.passengerList),
+                  JSON.stringify(this.passengerData),
               });
               console.log(res.data, this.flightData);
             } else {
@@ -1265,7 +1265,7 @@ export default {
                   priceNumber +
                   "&type=false" +
                   "&passMessage=" +
-                  JSON.stringify(data),
+                  JSON.stringify(passengerData),
               });
               console.log(res.data, this.flightData);
             } else {

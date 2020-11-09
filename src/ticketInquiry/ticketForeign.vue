@@ -48,7 +48,7 @@
             </view>
 
             <view class="airlines">
-              <image class="airlines_logo" src="../../static/ticket_icon.png" mode="contain" />
+              <image class="airlines_logo" src="@/static/ticket_icon.png" mode="contain" />
               <text>{{item.topAir}}</text>
               <text class="airlines_type" v-if="item.topAirType">{{item.topAirType}}</text>
             </view>
@@ -86,7 +86,7 @@
             </view>
 
             <view class="airlines">
-              <image class="airlines_logo" src="../../static/ticket_icon.png" mode="contain" />
+              <image class="airlines_logo" src="@/static/ticket_icon.png" mode="contain" />
               <text>{{item.btmAir}}</text>
               <text class="airlines_type" v-if="item.btmAirType">{{item.btmAirType}}</text>
             </view>
@@ -602,7 +602,7 @@ export default {
                 color: rgba(175, 185, 196, 1);
               }
               .line_img {
-                background: url(../../static/ticket_path.png) no-repeat center
+                background: url(@/static/ticket_path.png) no-repeat center
                   center;
                 background-size: contain;
                 width: 112upx;

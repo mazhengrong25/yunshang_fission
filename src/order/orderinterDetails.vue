@@ -19,48 +19,54 @@
           {{
             orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
-            $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000) &&
+            $timeBefore(
+              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
+            ) &&
             orderDetails.pay_status === 1
               ? "已预订"
-              : orderDetails.status === 1
-              && orderDetails.pay_status === 2
+              : orderDetails.status === 1 && orderDetails.pay_status === 2
               ? "待出票"
               : orderDetails.status === 3
               ? "已出票"
               : orderDetails.status === 5
               ? "已取消"
-              : orderDetails.status === 1 && 
-              !$timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
+              : orderDetails.status === 1 &&
+                !$timeBefore(
+                  new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
+                )
               ? "已取消"
-              : ''
+              : ""
           }}
         </view>
 
-        <view class="order_price" v-if="JSON.stringify(orderDetails) !== '{}'"
-        @click="openTotalOrder()">
+        <view
+          class="order_price"
+          v-if="JSON.stringify(orderDetails) !== '{}'"
+          @click="openTotalOrder()"
+        >
           <text class="price_text">总价&yen;</text>
           <text>{{ orderDetails.total_price || "" }}</text>
         </view>
 
-        <view class="price_other" v-else>
-          数据获取中
-        </view>
-        
+        <view class="price_other" v-else> 数据获取中 </view>
       </view>
       <!-- 剩余时间  已预订 -->
       <view
         class="remaining_time"
         v-if="
           orderDetails.status !== 0 &&
-            orderDetails.status !== 5 &&
-            orderDetails.pay_status === 1 &&
-            $timeBefore(new Date(orderDetails.updated_at).getTime() + 30 * 60 * 1000)
+          orderDetails.status !== 5 &&
+          orderDetails.pay_status === 1 &&
+          $timeBefore(
+            new Date(orderDetails.updated_at).getTime() + 30 * 60 * 1000
+          )
         "
       >
         <image
           class="time_icon"
           src="@/static/order_remaining_time.png"
-          mode="aspectFit"/>
+          mode="aspectFit"
+        />
         <text class="time_text"
           >剩余支付时间：{{
             $timeDiff(
@@ -73,17 +79,21 @@
       </view>
 
       <view class="order_option">
-        <view  class="option_btn" v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
-        @click="sendMessage"
-        >发送短信</view
+        <view
+          class="option_btn"
+          v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
+          @click="sendMessage"
+          >发送短信</view
         >
         <view
           class="option_btn"
           v-if="
             orderDetails.status !== 0 &&
-              orderDetails.status !== 5 &&
-              orderDetails.pay_status === 1 &&
-              $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
+            orderDetails.status !== 5 &&
+            orderDetails.pay_status === 1 &&
+            $timeBefore(
+              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
+            )
           "
           @click="getCancel(item)"
           >取消订单</view
@@ -92,17 +102,25 @@
           class="option_btn important_btn"
           v-if="
             orderDetails.status !== 0 &&
-              orderDetails.status !== 5 &&
-              orderDetails.pay_status === 1 &&
-              $timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000)
+            orderDetails.status !== 5 &&
+            orderDetails.pay_status === 1 &&
+            $timeBefore(
+              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
+            )
           "
           @click="jumpOrderPay()"
           >去支付</view
         >
-        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 3"
+        <view
+          @click="notMessage"
+          class="option_btn"
+          v-if="orderDetails.status === 3"
           >报销凭证</view
         >
-        <view @click="sendMessage" class="option_btn" v-if="orderDetails.status === 3"
+        <view
+          @click="sendMessage"
+          class="option_btn"
+          v-if="orderDetails.status === 3"
           >发送短信</view
         >
         <view
@@ -111,9 +129,24 @@
           @click="getRefund()"
           >退票</view
         >
-        <view class="option_btn" @click="notMessage" v-if="orderDetails.status === 3">改签</view>
-        <view class="option_btn" v-if="orderDetails.status === 5 || (orderDetails.pay_status === 1 && orderDetails.status === 1 && !$timeBefore(new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000))"
-        @click="reOrder()">再次预定</view
+        <view
+          class="option_btn"
+          @click="notMessage"
+          v-if="orderDetails.status === 3"
+          >改签</view
+        >
+        <view
+          class="option_btn"
+          v-if="
+            orderDetails.status === 5 ||
+            (orderDetails.pay_status === 1 &&
+              orderDetails.status === 1 &&
+              !$timeBefore(
+                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
+              ))
+          "
+          @click="reOrder()"
+          >再次预定</view
         >
       </view>
     </view>
@@ -124,7 +157,6 @@
       class="details_main"
     >
       <view class="content">
-        
         <flight-header
           v-if="JSON.stringify(orderDetails) !== '{}'"
           :flightData="flightData"
@@ -133,7 +165,6 @@
           :interType="false"
           @openHeadExpPopup="openHeadExpPopup"
         ></flight-header>
-
 
         <view v-else class="not_flight_data">
           <text></text>
@@ -199,9 +230,11 @@
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">已购保险</view>
-              <view class="list_message"
-                >{{ orderDetails.insurance_total?orderDetails.insurance_total + '元': '' }}</view
-              >
+              <view class="list_message">{{
+                orderDetails.insurance_total
+                  ? orderDetails.insurance_total + "元"
+                  : ""
+              }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系人</view>
@@ -253,7 +286,7 @@
         ></flight-explanation>
       </view>
     </scroll-view>
-    
+
     <!-- 取消订单弹窗 -->
     <yun-config
       ref="yunConfig"
@@ -267,62 +300,60 @@
     <uni-popup ref="totalOrder" type="bottom">
       <view class="price_info">
         <view class="title">
-            订单总价
+          订单总价
           <view class="close_btn" @click="closeTotalOrder()"></view>
         </view>
-        <view class="info_box">
+        <div class="price_info_box">
+          <view class="info_box">
+            <view class="info_content">
+              <view class="info_top">
+                <view class="list_title">订单总价</view>
+                <view class="list_message">
+                  <text>&yen;</text>{{ priceInfo.totalPrice }}
+                </view>
+              </view>
 
-          <view class="info_content">
+              <view class="info_list">
+                <view class="list_title">票价</view>
+                <view class="list_message">
+                  <text>&yen; {{ priceInfo.adtPrice }}</text>
+                  <text>×{{ passengerNumber.adt }}人</text>
+                </view>
+              </view>
 
-            <view class="info_top">
-              <view class="list_title">订单总价</view>
-              <view class="list_message">
-                <text>&yen; {{ priceInfo.totalPrice }}</text>
+              <view class="info_list">
+                <view class="list_title">机建+燃油</view>
+                <view class="list_message">
+                  <text>&yen; {{ priceInfo.buildPrice }}</text>
+                  <text>×{{ passengerNumber.adt }}人</text>
+                </view>
               </view>
-            </view>
 
-            <view class="info_list">
-              <view class="list_title">票价</view>
-              <view class="list_message">
-                <text>&yen; {{ priceInfo.adtPrice }}</text>
-                <text>×{{ passengerNumber.adt }}人</text>
+              <view class="info_list">
+                <view class="list_title">保险</view>
+                <view class="list_message">
+                  <text
+                    >&yen;{{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}
+                  </text>
+                  <text
+                    >×{{
+                      passengerNumber.ins ? passengerNumber.ins : 0
+                    }}份</text
+                  >
+                </view>
               </view>
             </view>
-    
-            <view class="info_list">
-              <view class="list_title">机建+燃油</view>
-              <view class="list_message">
-                <text>&yen; {{ priceInfo.buildPrice }}</text>
-                <text>×{{ passengerNumber.adt }}人</text>
-              </view>
-            </view>
-          
-            <view class="info_list">
-              <view class="list_title">保险</view>
-              <view class="list_message">
-                <text
-                  >&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text
-                >
-                <text
-                  >×{{ passengerNumber.ins ? passengerNumber.ins : 0 }}份</text
-                >
-              </view>
-            </view>
-
-            <view class="info_bottom">
-              <view class="list_title">奖励金</view>
-              <view class="list_message">
-                <text>&yen; {{ priceInfo.reward }}</text>
-              </view>
-            </view>
-          
           </view>
 
-        </view>
+          <view class="info_bottom">
+            <view class="list_title">奖励金</view>
+            <view class="list_message">
+              <text>&yen; {{ priceInfo.reward }}</text>
+            </view>
+          </view>
+        </div>
       </view>
-
     </uni-popup>
-
   </view>
 </template>
 
@@ -361,21 +392,21 @@ export default {
       roundTripType: false, // 是否往返
 
       flightData: {
-          // 单程航班信息
-          flightType: "", // 航程类型
-          time: "", // 航程日期
-          week: "", // 航程星期
-          fromTime: "", // 出发时间
-          fromAddress: "", // 出发机场
-          duration: "", // 飞行时长
-          toTime: "", // 到达时间
-          toAddress: "", // 到达机场
-          airIcon: "", // 航司图片
-          airline: "", // 航司
-          model: "", // 机型
-          food: "", // 餐饮
-          cabin: "", // 舱位信息
-          baggage: "", // 行李额
+        // 单程航班信息
+        flightType: "", // 航程类型
+        time: "", // 航程日期
+        week: "", // 航程星期
+        fromTime: "", // 出发时间
+        fromAddress: "", // 出发机场
+        duration: "", // 飞行时长
+        toTime: "", // 到达时间
+        toAddress: "", // 到达机场
+        airIcon: "", // 航司图片
+        airline: "", // 航司
+        model: "", // 机型
+        food: "", // 餐饮
+        cabin: "", // 舱位信息
+        baggage: "", // 行李额
       },
 
       flightRoundData: {
@@ -398,8 +429,8 @@ export default {
 
       cancelType: false, // 取消订单状态
 
-      ticketOrder: { //再次预定
-          
+      ticketOrder: {
+        //再次预定
       },
 
       priceInfo: {
@@ -416,27 +447,26 @@ export default {
         // 乘机人数量
         adt: 0, //成人
         ins: 0, //保险
-      }, 
+      },
 
       passengerInfo: {},
       segmentDetails: {}, // 票号
     };
   },
   methods: {
-    notMessage(){
+    notMessage() {
       uni.showToast({
-        title: '相关功能开发中，请等待后续版本更新',
-        icon: 'none',
-        duration: 3000
+        title: "相关功能开发中，请等待后续版本更新",
+        icon: "none",
+        duration: 3000,
       });
     },
 
     // 发送短信
     sendMessage(data) {
-      console.log('发送短信',data)
       uni.navigateTo({
-        url:"/pages/order/sendMessage?orderId=" + this.orderId,
-      })
+        url: "/order/sendMessage?orderId=" + this.orderId,
+      });
     },
 
     // 订单总价 弹窗
@@ -451,7 +481,6 @@ export default {
 
     // 已预订 取消订单弹窗
     getCancel() {
-     
       this.$refs.yunConfig.openConfigPopup();
     },
 
@@ -477,8 +506,8 @@ export default {
     // 去支付
     jumpOrderPay() {
       let orderId = [this.orderDetails.order_no];
-      let priceList = [this.orderDetails.need_pay_amount]
-      let priceNumber = this.orderDetails.need_pay_amount
+      let priceList = [this.orderDetails.need_pay_amount];
+      let priceNumber = this.orderDetails.need_pay_amount;
 
       uni.navigateTo({
         url:
@@ -490,6 +519,8 @@ export default {
           JSON.stringify(priceList) +
           "&price=" +
           priceNumber +
+          "&passMessage=" +
+          JSON.stringify(this.orderDetails.ticket_passenger) +
           "&headerType=false" +
           "&type=false",
       });
@@ -528,7 +559,6 @@ export default {
       // 组装退改信息
       let gaugeMessage = this.orderDetails.ticket_segments[0].gaugeType
         .gauge_type_value;
-      console.log("数据", gaugeMessage);
 
       this.ruleInfos = {
         filght: filghtMessage,
@@ -566,7 +596,6 @@ export default {
 
     // 获取订单详情
     getOrderDetails() {
-      console.log("国内订单详情", this.orderListType);
       let data = {
         order_no: this.orderId, //订单号
       };
@@ -575,43 +604,44 @@ export default {
         if (res.result === 10000) {
           this.orderDetails = res.data.order_msg;
           this.passengerInfo = res.data.order_msg.ticket_passenger;
-          this.segmentDetails = res.data.order_msg.ticket_passenger.ticket_segment_passenter
-          console.log('passengerInfo',this.passengerInfo)
+          this.segmentDetails =
+            res.data.order_msg.ticket_passenger.ticket_segment_passenter;
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;
           }
-        
+
           // 组装航程信息
           this.flightData = {
-  
-            flightType: this.type ? this.type === "0" ?'去程':'返程' : '单程',
+            flightType: this.type
+              ? this.type === "0"
+                ? "去程"
+                : "返程"
+              : "单程",
             data: this.orderDetails.ticket_segments, // 单程信息
             cabinInfo: this.orderDetails.ticket_segments, //退票规则
           };
 
           // 组装订单总价
           this.priceInfo = {
-              totalPrice:this.orderDetails.total_price, // 订单总价
-              buildPrice:this.orderDetails.build_total, // 机建票价
-              insPrice:this.orderDetails.insurance_total, // 保险票价
-              adtPrice:this.orderDetails.ticket_price, // 成人票价
-              reward:this.orderDetails.reward_price, // 奖励金
+            totalPrice: this.orderDetails.total_price, // 订单总价
+            buildPrice: this.orderDetails.build_total, // 机建票价
+            insPrice: this.orderDetails.insurance_total, // 保险票价
+            adtPrice: this.orderDetails.ticket_price, // 成人票价
+            reward: this.orderDetails.reward_price, // 奖励金
           };
 
           this.passengerNumber = {
-
-              adt: this.passengerInfo.filter((u) => u.PassengerType === "ADT").length, //成人
-              ins: this.passengerInfo.filter((u) => u.insurance_total).length > 0
-                      ? this.passengerInfo.filter((u) => u.insurance_total).length
-                      : 0, // 保险
-
-
+            adt: this.passengerInfo.filter((u) => u.PassengerType === "ADT")
+              .length, //成人
+            ins:
+              this.passengerInfo.filter((u) => u.insurance_total).length > 0
+                ? this.passengerInfo.filter((u) => u.insurance_total).length
+                : 0, // 保险
           };
 
-
-          if(this.cancelType){
-            this.cancelType = false
-            this.getCancel()
+          if (this.cancelType) {
+            this.cancelType = false;
+            this.getCancel();
           }
         } else {
           uni.showToast({
@@ -624,60 +654,70 @@ export default {
 
     // 跳转退票
     getRefund(data) {
-      console.log("退票", this.orderDetails);
       uni.navigateTo({
-        url:
-          "/order/refund?refundData=" + JSON.stringify(this.orderDetails),
+        url: "/order/refund?refundData=" + JSON.stringify(this.orderDetails),
       });
     },
 
     // 再次预定
     reOrder() {
-      console.log('再次预定',this.ticketOrder)
-
       this.ticketOrder = {
         to: {
-            city_code: this.orderDetails.ticket_segments[0].departure,
-            city_name: this.orderDetails.ticket_segments[0].departure_CN.city_name,
-            country_code: this.orderDetails.ticket_segments[0].departure_CN.country_code,
-            province: this.orderDetails.ticket_segments[0].departure_CN.province,
-          },
-          from: {
-            city_code: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive,
-            city_name: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive_CN.city_name,
-            country_code: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive_CN.country_code,
-            province: this.orderDetails.ticket_segments[this.orderDetails.ticket_segments.length - 1].arrive_CN.province,
-          },
-          toTime: {
-            date: moment(this.orderDetails.ticket_segments[0].departure_time).format("YYYY-MM-DD"),
-            month: moment(this.orderDetails.ticket_segments[0].departure_time).format("M月DD日"),
-            status: "start",
-            type: "time",
-            week: moment(this.orderDetails.ticket_segments[0].departure_time).format("ddd"),
-          },
-          fromTime: {},
-          to_type: '',
-          from_type: '',
-      }
+          city_code: this.orderDetails.ticket_segments[0].departure,
+          city_name: this.orderDetails.ticket_segments[0].departure_CN
+            .city_name,
+          country_code: this.orderDetails.ticket_segments[0].departure_CN
+            .country_code,
+          province: this.orderDetails.ticket_segments[0].departure_CN.province,
+        },
+        from: {
+          city_code: this.orderDetails.ticket_segments[
+            this.orderDetails.ticket_segments.length - 1
+          ].arrive,
+          city_name: this.orderDetails.ticket_segments[
+            this.orderDetails.ticket_segments.length - 1
+          ].arrive_CN.city_name,
+          country_code: this.orderDetails.ticket_segments[
+            this.orderDetails.ticket_segments.length - 1
+          ].arrive_CN.country_code,
+          province: this.orderDetails.ticket_segments[
+            this.orderDetails.ticket_segments.length - 1
+          ].arrive_CN.province,
+        },
+        toTime: {
+          date: moment(
+            this.orderDetails.ticket_segments[0].departure_time
+          ).format("YYYY-MM-DD"),
+          month: moment(
+            this.orderDetails.ticket_segments[0].departure_time
+          ).format("M月DD日"),
+          status: "start",
+          type: "time",
+          week: moment(
+            this.orderDetails.ticket_segments[0].departure_time
+          ).format("ddd"),
+        },
+        fromTime: {},
+        to_type: "",
+        from_type: "",
+      };
 
-      this.ticketOrder['type'] = 0
+      this.ticketOrder["type"] = 0;
       uni.navigateTo({
-        url:"/pages/ticketInquiry/ticketInquiry?data=" + JSON.stringify(this.ticketOrder)
-      })
+        url:
+          "/ticketInquiry/ticketInquiry?data=" +
+          JSON.stringify(this.ticketOrder),
+      });
     },
 
-
-
     onLoad(data) {
-      console.log("国内", data);
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.orderId = data.orderNo; //订单编号
       console.log(this.orderId);
 
       this.type = data.roundType; //去程  返程
-      this.cancelType = data.cancel?data.cancel:false  //取消订单
-      this.cancelOrderType = data.cancel !== ''
-      console.log('取消订单',this.cancelType,data.cancel)
+      this.cancelType = data.cancel ? data.cancel : false; //取消订单
+      this.cancelOrderType = data.cancel !== "";
 
       this.orderListType = data.type;
       this.orderHeaderTitle =
@@ -1085,51 +1125,51 @@ export default {
         }
       }
       .not_flight_data {
-      border-radius: 20rpx;
-      background: #ffffff;
-      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
-      padding: 30rpx 20rpx 22rpx;
-      margin: 0 20rpx 20rpx;
-      height: 144upx;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      &::before {
-        content: "";
-        display: block;
-        width: 44upx;
-        height: 200%;
-        position: absolute;
-        top: -30%;
-        transform: rotate(30deg);
-        background: #fff;
-        left: -30%;
-        animation: skeleton 3s infinite;
-        -webkit-animation: skeleton 3s infinite;
-      }
-      @keyframes skeleton {
-        from {
+        border-radius: 20rpx;
+        background: #ffffff;
+        box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+        padding: 30rpx 20rpx 22rpx;
+        margin: 0 20rpx 20rpx;
+        height: 144upx;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        &::before {
+          content: "";
+          display: block;
+          width: 44upx;
+          height: 200%;
+          position: absolute;
+          top: -30%;
+          transform: rotate(30deg);
+          background: #fff;
           left: -30%;
+          animation: skeleton 3s infinite;
+          -webkit-animation: skeleton 3s infinite;
         }
-        to {
-          left: 120%;
+        @keyframes skeleton {
+          from {
+            left: -30%;
+          }
+          to {
+            left: 120%;
+          }
+        }
+        text {
+          display: block;
+          width: 80%;
+          height: 28upx;
+          background: #e5e9f2;
+          margin-bottom: 10upx;
+        }
+        view {
+          width: 80%;
+          height: 40upx;
+          margin: auto auto 0;
+          background: #e5e9f2;
         }
       }
-      text {
-        display: block;
-        width: 80%;
-        height: 28upx;
-        background: #e5e9f2;
-        margin-bottom: 10upx;
-      }
-      view {
-        width: 80%;
-        height: 40upx;
-        margin: auto auto 0;
-        background: #e5e9f2;
-      }
-    }
     }
   }
 }
@@ -1142,7 +1182,6 @@ export default {
     bottom: -120upx;
     width: 100%;
     height: 120upx;
-    background-color: #fff;
   }
   .title {
     height: 140upx;
@@ -1167,27 +1206,30 @@ export default {
     }
   }
 
-  .info_box {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-   
+  .price_info_box {
+    background-color: #fff;
+    padding-bottom: var(--status-bar-height);
+    .info_box {
+      display: flex;
+      flex-direction: column;
+      padding: 20upx;
+      background: #fff;
 
-    .info_content {
-       
-        background: #F9F9F9;
-        padding: 40upx;
-       
+      .info_content {
+        background: #f9f9f9;
+        padding: 40upx 20upx;
+
         .info_list {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 40upx;
+          &:not(:last-child) {
+            margin-bottom: 40upx;
+          }
           .list_title {
             font-size: 28upx;
-            font-weight: 400;      
+            font-weight: 400;
             color: #333333;
-            margin-right: auto;
           }
           .list_message {
             font-size: 28upx;
@@ -1204,53 +1246,56 @@ export default {
             }
           }
         }
-        .info_bottom {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 40upx;
-            .list_title {
-              font-size: 28upx;
-              font-weight: bold;      
-              color: #333333;
-              margin-right: 24upx;
-            }
-            .list_message {
-              font-size: 28upx;
-              font-weight: 500;
-              text {
-                display: inline-flex;
-                &:first-child {
-                  color: rgba(255, 0, 0, 1);
-                }
-            
-              }
-            }
-        }
+
         .info_top {
-            display: flex;
-            margin-bottom: 40upx;
-            .list_title {
+          display: flex;
+          align-items: center;
+          padding-bottom: 24upx;
+          margin-bottom: 28upx;
+          .list_title {
+            font-size: 28upx;
+            font-weight: bold;
+            color: #333333;
+            margin-right: 24upx;
+          }
+          .list_message {
+            font-size: 36upx;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: baseline;
+            color: #ff0000;
+            text {
+              margin-right: 8upx;
               font-size: 28upx;
-              font-weight: bold;      
-              color: #333333;
-              margin-right: 24upx;
             }
-            .list_message {
-              font-size: 36upx;
-              font-weight: bold;;
-              text {
-                display: inline-flex;
-                &:first-child {
-                  color: rgba(255, 0, 0, 1);
-                }
-            
-              }
-            }&:first-child {
-              
-              border-bottom: 1px solid #EAEAEA;
-            }
+          }
+          &:first-child {
+            border-bottom: 1px solid #eaeaea;
+          }
         }
+      }
+    }
+    .info_bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 92upx;
+      padding: 0 40upx;
+      .list_title {
+        font-size: 28upx;
+        font-weight: bold;
+        color: #333333;
+      }
+      .list_message {
+        font-size: 28upx;
+        font-weight: 500;
+        text {
+          display: inline-flex;
+          &:first-child {
+            color: rgba(255, 0, 0, 1);
+          }
+        }
+      }
     }
   }
 }
