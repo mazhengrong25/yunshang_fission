@@ -2,8 +2,8 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-09-22 15:49:40
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-10 17:52:17
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="refund">
@@ -16,7 +16,7 @@
       <!-- 退票信息 -->
       <refundTop :dataList="list" @submitBtn="submit"></refundTop>
       <!-- 特别提醒 -->
-      <view class="sep_list">
+      <!-- <view class="sep_list">
         <view class="list_icon">
           <image src="@/static/refund_warn.png" mode="aspectFit" />
         </view>
@@ -24,22 +24,22 @@
         <view class="list_right">
           <image src="../../static/refund_right.png" mode="aspectFit"></image>
         </view>
-      </view>
+      </view> -->
       <!-- 航班信息 -->
       <view
         class="main_list filght_info"
-        v-for="(item, index) in orderDetails.ticket_segments"
+        v-for="(item, index) in refundList.ticket_segments"
         :key="index"
       >
-        <view class="main_list_title">航班信息</view>
+        <view class="main_list_title" style="margin-bottom:50rpx;">航班信息</view>
         <view class="info_header">
           <view class="header_type">
             {{
-              orderDetails.segment_type === 1
+              refundList.segment_type === 1
                 ? "单程"
-                : orderDetails.segment_type === 2
+                : refundList.segment_type === 2
                 ? "往返"
-                : orderDetails.segment_type === 3
+                : refundList.segment_type === 3
                 ? "多程"
                 : ""
             }}</view
@@ -114,14 +114,14 @@
       <view class="main_list passenger">
         <view class=main_list_first>
           <view class="main_list_title">出行信息</view>
-          <view :class="['main_content', {active:orderDetails.ticket_passenger }]" 
+          <view :class="['main_content', {active:refundList.ticket_passenger }]" 
           @click="checkedAll()">全选</view>
           <view class="list_click"></view>
         </view>
         <view class="passenger_list">
           <view
             :class="['list_item', { active: item.active }]"
-            v-for="(item, index) in orderDetails.ticket_passenger"
+            v-for="(item, index) in refundList.ticket_passenger"
             :key="index"
             @click="checkedPassenger(item, index)" >
             <view class="list_info">
@@ -148,15 +148,15 @@
         <view class="contact">
           <view class="contact_list">
             <view class="list_title">联系人</view>
-            <view class="list_message">{{ orderDetails.out_ticket_name }}</view>
+            <view class="list_message">{{ refundList.contact }}</view>
           </view>
           <view class="contact_list">
             <view class="list_title">联系电话</view>
-            <view class="list_message">{{ orderDetails.phone }}</view>
+            <view class="list_message">{{ refundList.phone }}</view>
           </view>
           <view class="contact_list">
             <view class="list_title">已购保险</view>
-            <view class="list_message">{{ orderDetails.insurance_total }}元</view>
+            <view class="list_message">{{ refundList.insurance_total }}元</view>
           </view>
         </view>
       </view>
@@ -168,15 +168,15 @@
           <view
             class="message_bottom input-right-arrow" @click="openExp">
             <text class="logo">&yen;</text>
-			      <text class="total_price">{{ orderDetails.total_price }}</text>
+			      <text class="total_price">{{ refundList.total_price }}</text>
           </view>
         </view>
         <view class="middle_message">
           <view class="message_first">退废票备注</view>
           <view
-            class="message_bottom input-right-arrow">
-            <text v-if="group" class="group_message">{{ group }}</text>
-            <text v-else class="not_message">点开添加备注后显示在这...</text>
+            class="message_bottom input-right-arrow" @click="openRemark">
+            <text v-if="remark" class="group_message">{{ remark }}</text>
+            <text v-else class="not_message">备注</text>
           </view>
         </view>
       </view>
@@ -186,19 +186,19 @@
         <view class="message_list">
           <view class="list_item">
             <view class="item_title">订单编号</view>
-            <view class="item_message">{{ orderDetails.order_no }}</view>
+            <view class="item_message">{{ refundList.order_no }}</view>
           </view>
           <view class="list_item">
             <view class="item_title">PNR</view>
-            <view class="item_message">{{ orderDetails.pnr_code }}</view>
+            <view class="item_message">{{ refundList.pnr_code }}</view>
           </view>
           <view class="list_item">
             <view class="item_title">订票员</view>
-            <view class="item_message">{{ orderDetails.book_user }}</view>
+            <view class="item_message">{{ refundList.book_user }}</view>
           </view>
           <view class="list_item">
             <view class="item_title">预定时间</view>
-            <view class="item_message">{{ orderDetails.created_at }}</view>
+            <view class="item_message">{{ refundList.created_at }}</view>
             <!-- 时间 -->
           </view>
           <view class="list_item">
@@ -210,7 +210,7 @@
 
       
       <!-- 退改信息弹窗 -->
-      <refund-amount ref="refundAmountRefer"></refund-amount>
+      <refund-amount ref="refundAmountRefer" :refundInfo="refundList"></refund-amount>
       
     </scroll-view>
     <!-- 提交申请按钮 -->
@@ -236,9 +236,11 @@ export default {
     return {
       iStatusBarHeight: 0,
 
-      orderDetails: {}, // 订单详情
-
       checkedPassengerlist: [], // 选中乘客列表
+
+      refundList: {}, // 退票详情列表
+
+      remark:'', // 备注
 
     };
   },
@@ -251,12 +253,6 @@ export default {
     // 提交申请
     submitRefund(data) {
       
-      // 联系人选择
-      // if(!checkedPassenger) {
-
-
-      // }
-
       console.log('提交申请',data)
       orderApi.refundSubmit()
         .then(res =>{
@@ -266,7 +262,7 @@ export default {
 
     // 打开退改签说明弹窗
     openExp() {
-      
+
       this.$refs.refundAmountRefer.openExp();
     },
 
@@ -275,14 +271,21 @@ export default {
       this.$refs.refundAmountRefer.closeExp();
     },
 
+    // 跳转备注页面
+    openRemark() {
+        uni.navigateTo({
+            url:'/order/addRemark',
+        })
+    },
+
     // 选择联系人
     checkedPassenger(val, index) {
 		console.log(val, index)
 		// 判断当前数据是否有active属性，如果有，就赋值为相反状态
-      this.$set(this.orderDetails.ticket_passenger[index],"active",!val.active);
+      this.$set(this.refundList.ticket_passenger[index],"active",!val.active);
 	
 		// 判断当前数据active状态
-      if (this.orderDetails.ticket_passenger[index].active) {
+      if (this.refundList.ticket_passenger[index].active) {
 		//   如果为true就push进选中列表
         this.checkedPassengerlist.push(val);
       } else {
@@ -301,28 +304,35 @@ export default {
       if (this.orderDetails.ticket_passenger.length === this.checkedPassengerlist.length) {
 		//   如果相同 清空选中列表 并且遍历乘客数组 将状态全部赋值为false
         this.checkedPassengerlist = [];
-        this.orderDetails.ticket_passenger.forEach((item) => {
+        this.refundList.ticket_passenger.forEach((item) => {
           item.active = false;
         });
       } else {
 		//   如果不相同 遍历乘客列表 全部赋值为 true ，并将乘客列表数组赋值给选中乘客列表
-		  this.orderDetails.ticket_passenger.forEach((item) => {
+		  this.refundList.ticket_passenger.forEach((item) => {
           item.active = true;
 		});
 		// 双向绑定   splice
-		this.checkedPassengerlist = JSON.parse(JSON.stringify(this.orderDetails.ticket_passenger)) 
+		this.checkedPassengerlist = JSON.parse(JSON.stringify(this.refundList.ticket_passenger)) 
         
       }
 	console.log(this.checkedPassengerlist)
       this.$forceUpdate();
     },
   },
+  onShow(){
+
+    if(uni.getStorageSync('remark_key')){
+      
+      this.remark = uni.getStorageSync('remark_key')
+      uni.removeStorageSync('remark_key')
+    }
+  },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    // let refundData = JSON.parse("'data.refundData'");
-    let refundData = this.orderDetails;
-    console.log("refund", refundData);
-    this.orderDetails = refundData;
+    console.log('退票信息',data)
+    this.refundList = JSON.parse(data.refundData)
+    console.log(this.refundList)
   },
 };
 </script>

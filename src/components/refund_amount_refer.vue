@@ -2,8 +2,8 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-09-23 14:42:05
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-10 16:34:00
+ * @LastEditors: Please set LastEditors
 -->
 
 <template>
@@ -22,19 +22,71 @@
           <view class="top_yellow">
             *以下退票金额仅供参考，请以实际退票金额为准
           </view>
-          <view class="center">
-            <view class="center_text">
-              <view class="center_order">订单总价</view>
-              <view class="center_order">成人销售价</view>
-              <view class="center_order">机建+燃油</view>
-              <view class="center_order">保险</view>
+          <div class="price_info_box">
+            
+            <view class="info_box">
+              <view class="info_content">
+                <view class="info_top">
+                  <view class="list_title">订单总价</view>
+                  <view class="list_message">
+                    <text>&yen;</text>{{ refundInfo.total_price }}
+                  </view>
+                </view>
+
+                <view class="info_list">
+                  <view class="list_title">销售价</view>
+                  <view class="list_message">
+                    <text>&yen; {{ refundInfo.ticket_price }}</text>
+                    <text>×{{ refundInfo.ticket_segments.length }}人</text>
+                  </view>
+                </view>
+
+                <view class="info_list">
+                  <view class="list_title">机建+燃油</view>
+                  <view class="list_message">
+                    <text>&yen; {{ refundInfo.fuel_total + refundInfo.build_total }}</text>
+                    <text>×{{ refundInfo.ticket_segments.length }}人</text>
+                  </view>
+                </view>
+
+                <view class="info_list">
+                  <view class="list_title">保险</view>
+                  <view class="list_message">
+                    <text
+                      >&yen;{{ refundInfo.insurance_total ? refundInfo.insurance_total : 0 }}
+                    </text>
+                    <text
+                      >×{{
+                        passengerNumber.ins ? passengerNumber.ins : 0
+                      }}份</text
+                    >
+                  </view>
+                </view>
+              </view>
             </view>
-          </view>
-          <view class="last">
-            <view class="last_refund">退票费率</view>
-            <view class="last_refund">参考退票费</view>
-            <view class="last_refund">参考退票金额</view>
-          </view>
+
+            <view class="info_bottom">
+              <view class="list_title">退票费率</view>
+              <view class="list_message">
+                <text>{{ refundInfo.reward }}%</text>
+              </view>
+            </view>
+
+            <view class="info_bottom">
+              <view class="list_title">参考退票费</view>
+              <view class="list_message">
+                <text>&yen; {{ refundInfo.reward }}</text>
+              </view>
+            </view>
+
+            <view class="info_bottom">
+              <view class="list_title">参考退票金额</view>
+              <view class="list_message">
+                <text>&yen; {{ refundInfo.reward }}</text>
+              </view>
+            </view>
+          
+          </div>
         </view>
       </view>
     </uni-popup>
@@ -42,7 +94,14 @@
 </template>
 <script>
 export default {
-  props: {},
+  props: {
+  
+      refundInfo: {
+        type: Object,
+        default:() => ({})
+      }
+
+  },
   data() {
     return {
       popupCurrent: "info",
@@ -139,38 +198,97 @@ export default {
       font-weight: 400;
       color: rgba(251, 152, 38, 1);
     }
-    .center {
-      padding: 20upx;
+    .price_info_box {
+      
+      background-color: #fff;
+      padding-bottom: var(--status-bar-height);
+      .info_box {
+        display: flex;
+        flex-direction: column;
+        padding: 20upx;
+        background: #fff;
 
-      .center_text {
-        padding: 24upx 20upx 20upx;
-        background: #f9f9f9;
-      }
-      .center_order {
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 22px;
-        color: #333333;
-        opacity: 1;
-        padding: 20upx 20upx 20upx 10upx;
-        &:first-child {
-          border-bottom: 1px solid #eaeaea;
+        .info_content {
+          background: #f9f9f9;
+          padding: 40upx 20upx;
+
+          .info_list {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            &:not(:last-child) {
+              margin-bottom: 40upx;
+            }
+            .list_title {
+              font-size: 28upx;
+              font-weight: 400;
+              color: #333333;
+            }
+            .list_message {
+              font-size: 28upx;
+              font-weight: 500;
+              text {
+                display: inline-flex;
+                &:first-child {
+                  color: rgba(255, 0, 0, 1);
+                }
+                &:last-child {
+                  margin-left: 20upx;
+                  color: rgba(153, 153, 153, 1);
+                }
+              }
+            }
+          }
+
+          .info_top {
+            display: flex;
+            align-items: center;
+            padding-bottom: 24upx;
+            margin-bottom: 28upx;
+            .list_title {
+              font-size: 28upx;
+              font-weight: bold;
+              color: #333333;
+              margin-right: 24upx;
+            }
+            .list_message {
+              font-size: 36upx;
+              font-weight: bold;
+              display: inline-flex;
+              align-items: baseline;
+              color: #ff0000;
+              text {
+                margin-right: 8upx;
+                font-size: 28upx;
+              }
+            }
+            &:first-child {
+              border-bottom: 1px solid #eaeaea;
+            }
+          }
         }
       }
-    }
-
-    .last {
-      background: #ffffff;
-      opacity: 1;
-      margin: 20upx 20upx 20upx;
-      padding: 24upx 20upx 20upx;
-      .last_refund {
-        font-size: 14px;
-        font-weight: bold;
-        line-height: 22px;
-        color: #333333;
-        opacity: 1;
-        padding: 20upx 20upx 20upx 10upx;
+      .info_bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 92upx;
+        padding: 0 40upx;
+        .list_title {
+          font-size: 28upx;
+          font-weight: bold;
+          color: #333333;
+        }
+        .list_message {
+          font-size: 28upx;
+          font-weight: 500;
+          text {
+            display: inline-flex;
+            &:first-child {
+              color: rgba(255, 0, 0, 1);
+            }
+          }
+        }
       }
     }
   }
