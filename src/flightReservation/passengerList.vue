@@ -193,15 +193,14 @@ export default {
       passenger.getPassenger(data).then((res) => {
         if (res.errorcode === 10000) {
           if (this.passengerListStatus) {
-            if(res.data.data.length < 1){
+            if (res.data.data.length < 1) {
               return uni.showToast({
-                title: '到底了',
-                icon: 'none',
-                duration: 2000
+                title: "到底了",
+                icon: "none",
+                duration: 2000,
               });
             }
             this.passengerList.push.apply(this.passengerList, res.data.data);
-            
           } else {
             this.passengerListStatus = true;
             this.passengerList = res.data.data;
@@ -242,6 +241,8 @@ export default {
           this.lockingChecked();
         }
       });
+
+      this.$forceUpdate();
     },
 
     // 跳转修改乘机人列表
@@ -259,6 +260,7 @@ export default {
       console.log(val);
       passenger.removePassenger(val.id).then((res) => {
         if (res.errorcode === 10000) {
+          this.passengerList = [];
           this.getPassengerData();
           uni.showToast({
             title: "删除成功",
@@ -452,6 +454,7 @@ export default {
   },
   onShow() {
     if (uni.getStorageSync("addPassenger")) {
+      this.passengerList = [];
       console.log("新增返回");
       this.getPassengerData();
       uni.removeStorageSync("addPassenger");

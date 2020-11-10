@@ -10,7 +10,7 @@
     <yun-header
       :statusHeight="iStatusBarHeight"
       :headerBottom="Number(10)"
-      centerTitle="新增乘机人"
+      :centerTitle="(pageType ? '编辑' : '新增') + '乘机人'"
     ></yun-header>
     <scroll-view
       :enable-back-to-top="true"
@@ -140,7 +140,6 @@
                 placeholder="请保持与证件一致"
                 v-model="item.cert_no"
                 placeholder-class="input_placeholder"
-                @blur="validID(item.cert_no, item.cert_type)"
               />
             </view>
 
@@ -448,12 +447,6 @@ export default {
         let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
         if (reg.test(value)) {
           await this.go(value.length, value);
-        } else {
-          return uni.showToast({
-            title: "身份证号码不正确",
-            duration: 2000,
-            icon: "none",
-          });
         }
       }
     },
@@ -609,12 +602,14 @@ export default {
           icon: "none",
         });
       }
+
       if (!/^1[3456789]\d{9}$/.test(this.passenger.phone)) {
         return uni.showToast({
           title: "手机号码格式错误，请检查是否填写正确",
           icon: "none",
         });
       }
+
       // if (!this.group.id) {
       //   return uni.showToast({
       //     title: "请选择分组",
@@ -626,8 +621,21 @@ export default {
           this.certificateList.splice(index, 1);
         }
       });
-      console.log(this.certificateList);
-      this.$refs.returnSubmitDialog.open();
+
+      this.certificateList.forEach((item) => {
+        if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(item.cert_no)) {
+          return uni.showToast({
+            title: "身份证号码不正确",
+            duration: 2000,
+            icon: "none",
+          });
+        }else {
+          this.validID(item.cert_no, item.cert_type);
+
+          this.$refs.returnSubmitDialog.open();
+        }
+      });
+      
       this.$forceUpdate();
     },
 
@@ -648,10 +656,10 @@ export default {
           cert_type: item.cert_type,
           cert_no: item.cert_no,
           group_id: this.group.id || 0,
-          group: this.group.group_name || '',
+          group: this.group.group_name || "",
           nationality: "CN",
-          en_first_name: this.passenger.en_first_name || '',
-          en_last_name: this.passenger.en_last_name || '',
+          en_first_name: this.passenger.en_first_name || "",
+          en_last_name: this.passenger.en_last_name || "",
         };
         // data.sex = this.baseInfo.sex;
         // data["cert_type"] = item.cert_type;
@@ -664,7 +672,7 @@ export default {
         //   delete data.en_last_name;
         // }
 
-        console.log(data)
+        console.log(data);
 
         if (this.pageType) {
           // 编辑乘机人
@@ -698,7 +706,7 @@ export default {
               });
               setTimeout(() => {
                 uni.navigateBack();
-                uni.setStorageSync('addPassenger', true)
+                uni.setStorageSync("addPassenger", true);
               }, 500);
             } else {
               uni.showToast({
