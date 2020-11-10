@@ -250,9 +250,9 @@
         <view class="main_list order_message">
           <view class="main_list_title">订单信息</view>
           <view class="message_list">
-            <view class="list_item">
+            <view class="list_item" v-if="orderDetails.status === 3" v-for="(item, index) in orderDetails.ticket_passenger" :key="index">
               <view class="item_title">票号</view>
-              <view class="item_message">{{ segmentDetails.ticket_no }}</view>
+              <view class="item_message">{{ item.ticket_no }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">订单编号</view>
@@ -1121,6 +1121,9 @@ export default {
                 font-weight: 400;
                 color: rgba(153, 153, 153, 1);
                 width: 100upx;
+                text{
+                  font-size: 20upx;
+                }
               }
               .item_message {
                 flex: 1;
