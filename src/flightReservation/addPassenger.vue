@@ -86,25 +86,6 @@
             placeholder-class="input_placeholder"
           />
         </view>
-        <!-- <view class="list_item input-right-arrow">
-          <view class="item_title">
-            <text>出生日期</text>
-          </view>
-
-          <view class="item_input" @click="openBirthdaySelector(passenger.birthday,'birthday')">
-            <text v-if="passenger.birthday">{{passenger.birthday}}</text>
-            <text class="input_placeholder" v-else>请选择出生年月日</text>
-          </view>
-        </view>
-        <view class="list_item input-right-arrow">
-          <view class="item_title">
-            <text>性别</text>
-          </view>
-
-          <view class="item_input" @click="openSexSelector()">
-            <text>{{passenger.sex}}</text>
-          </view>
-        </view> -->
       </view>
 
       <uni-swipe-action>
@@ -203,6 +184,31 @@
           </template>
         </uni-swipe-action-item>
       </uni-swipe-action>
+
+      <view class="box-shadow-style">
+        <view class="list_item input-right-arrow">
+          <view class="item_title">
+            <text>出生日期</text>
+          </view>
+
+          <view
+            class="item_input"
+            @click="openBirthdaySelector(passenger.birthday, 'birthday')"
+          >
+            <text v-if="passenger.birthday">{{ passenger.birthday }}</text>
+            <text class="input_placeholder" v-else>请选择出生年月日</text>
+          </view>
+        </view>
+        <view class="list_item input-right-arrow">
+          <view class="item_title">
+            <text>性别</text>
+          </view>
+
+          <view class="item_input" @click="openSexSelector()">
+            <text>{{ passenger.sex }}</text>
+          </view>
+        </view>
+      </view>
 
       <view class="box-shadow-style">
         <view class="list_item">
@@ -629,13 +635,13 @@ export default {
             duration: 2000,
             icon: "none",
           });
-        }else {
+        } else {
           this.validID(item.cert_no, item.cert_type);
 
           this.$refs.returnSubmitDialog.open();
         }
       });
-      
+
       this.$forceUpdate();
     },
 

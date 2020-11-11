@@ -198,7 +198,7 @@
                   class="is_insurance"
                   v-if="Number(item.insurance_total) > 0"
                 >
-                  <image src="@/static/insurance_icon.png" mode="contain" />
+                  <image src="@/static/insurance_icon.png" mode="aspectFit" />
                 </view>
                 <view class="group_type">员工</view>
               </view>
@@ -223,6 +223,11 @@
                 }}</view>
                 <view class="message_number">{{ item.CredentialNo }}</view>
                 <!-- 身份证号码 -->
+              </view>
+
+              <view class="ticket_no" v-if="orderDetails.status === 3">
+                <view class="ticket_no_title">票号</view>
+                <view>{{item.ticket_no}}</view>
               </view>
             </view>
           </view>
@@ -250,10 +255,6 @@
         <view class="main_list order_message">
           <view class="main_list_title">订单信息</view>
           <view class="message_list">
-            <view class="list_item" v-if="orderDetails.status === 3" v-for="(item, index) in orderDetails.ticket_passenger" :key="index">
-              <view class="item_title">票号</view>
-              <view class="item_message">{{ item.ticket_no }}</view>
-            </view>
             <view class="list_item">
               <view class="item_title">订单编号</view>
               <view class="item_message">{{ orderDetails.order_no }}</view>
@@ -1001,7 +1002,7 @@ export default {
             margin-top: 46upx;
             .list_item {
               &:not(:last-child) {
-                margin-bottom: 60upx;
+                margin-bottom: 30upx;
               }
               &:last-child {
                 padding-bottom: 32upx;
@@ -1011,7 +1012,7 @@ export default {
               .list_info {
                 display: flex;
                 align-items: center;
-                margin-bottom: 34upx;
+                margin-bottom: 20upx;
                 .info_type {
                   width: 100upx;
                   height: 30upx;
@@ -1056,12 +1057,24 @@ export default {
                   font-size: 28upx;
                   font-weight: 400;
                   color: rgba(42, 42, 42, 1);
-                  margin-right: 32upx;
+                  width: 114upx;
                 }
                 .message_number {
                   font-size: 28upx;
                   font-weight: bold;
                   color: rgba(42, 42, 42, 1);
+                }
+              }
+              .ticket_no{
+                margin-top: 20upx;
+                display: flex;
+                align-items: center;
+                font-size: 28upx;
+                color: rgba(42, 42, 42, 1);
+                font-weight: bold;
+                .ticket_no_title{
+                  width: 114upx;
+                  font-weight: 400;
                 }
               }
             }

@@ -172,6 +172,7 @@
             >
               <text>{{ oitem.PassengerName }}</text>
             </view>
+            <view class="" v-if="item.ticket_passenger.length > 4">...</view>
           </view>
 
           <view class="item_time" v-if="item.pay_status === 1 && item.status">
@@ -610,8 +611,6 @@ export default {
               ? "-1"
               : this.headerActive === 2
               ? 1
-              : this.headerActive === 3
-              ? 4
               : this.headerActive === 4
               ? 5
               : this.headerActive,
@@ -1113,6 +1112,10 @@ export default {
             padding: 0 10upx;
             height: 30rpx; 
             color: #6E6E6E;
+            min-width: 68upx;
+            &:nth-child(n+5){
+              display: none;
+            }
             &:not(:last-child){
               margin-right: 10rpx;
             }

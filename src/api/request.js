@@ -21,9 +21,9 @@ const request = (config, type) => {
   let baseUrl;
 
   if (process.env.NODE_ENV === 'development') {
-    baseUrl = 'http://192.168.0.187';  // 开发环境
+    baseUrl = 'http://192.168.0.187'; // 开发环境
   } else {
-    baseUrl = 'https://fxxcx.ystrip.cn';  // 生产环境
+    baseUrl = 'https://fxxcx.ystrip.cn'; // 生产环境
   }
 
   config.url = baseUrl + config.url;
@@ -68,16 +68,18 @@ const request = (config, type) => {
                 uni.hideLoading();
                 // 异常
                 if (responses[1].data.msg ? responses[1].data.msg.indexOf('Token') >= 0 || responses[1].data.msg.indexOf('Invalid') >= 0 : false) {
+                  setTimeout(() => {
+                    if (uni.getStorageSync('loginInfo')) {
+                      uni.showToast({
+                        title: '用户信息获取失败，请重新登录',
+                        icon: 'none',
+                        duration: 3000,
+                      });
+                    }
+                  }, 1000);
                   uni.reLaunch({
                     url: '/pages/login/login',
                   });
-                  setTimeout(() => {
-                    uni.showToast({
-                      title: '用户信息获取失败，请重新登录',
-                      icon: 'none',
-                      duration: 3000,
-                    });
-                  }, 1000);
                   return false;
                 }
                 if (responses[0]) {
@@ -101,18 +103,21 @@ const request = (config, type) => {
                 reject(error);
               });
           } else {
+            setTimeout(() => {
+              if (uni.getStorageSync('loginInfo')) {
+                uni.showToast({
+                  title: '用户信息获取失败，请重新登录',
+                  icon: 'none',
+                  duration: 3000,
+                });
+              }
+            }, 1000);
             uni.removeStorageSync('loginInfo');
             uni.removeStorageSync('userInfo');
             uni.reLaunch({
               url: '/pages/login/login',
             });
-            setTimeout(() => {
-              uni.showToast({
-                title: '用户信息获取失败，请重新登录',
-                icon: 'none',
-                duration: 3000,
-              });
-            }, 1000);
+
             return false;
           }
         },
@@ -128,11 +133,13 @@ const request = (config, type) => {
               url: '/pages/login/login',
             });
             setTimeout(() => {
-              uni.showToast({
-                title: '用户信息获取失败，请重新登录',
-                icon: 'none',
-                duration: 3000,
-              });
+              if (uni.getStorageSync('loginInfo')) {
+                uni.showToast({
+                  title: '用户信息获取失败，请重新登录',
+                  icon: 'none',
+                  duration: 3000,
+                });
+              }
             }, 1000);
             return false;
           }
