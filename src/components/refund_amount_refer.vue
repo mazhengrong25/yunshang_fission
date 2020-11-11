@@ -2,7 +2,7 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-11-10 16:34:00
+ * @LastEditTime: 2020-11-11 15:44:50
  * @LastEditors: Please set LastEditors
 -->
 
@@ -37,7 +37,7 @@
                   <view class="list_title">销售价</view>
                   <view class="list_message">
                     <text>&yen; {{ refundInfo.ticket_price }}</text>
-                    <text>×{{ refundInfo.ticket_segments.length }}人</text>
+                    <text>×{{ refundInfo.ticket_passenger.length }}人</text>
                   </view>
                 </view>
 
@@ -45,7 +45,7 @@
                   <view class="list_title">机建+燃油</view>
                   <view class="list_message">
                     <text>&yen; {{ refundInfo.fuel_total + refundInfo.build_total }}</text>
-                    <text>×{{ refundInfo.ticket_segments.length }}人</text>
+                    <text>×{{ refundInfo.ticket_passenger.length }}人</text>
                   </view>
                 </view>
 
@@ -57,7 +57,8 @@
                     </text>
                     <text
                       >×{{
-                        passengerNumber.ins ? passengerNumber.ins : 0
+                        (refundInfo.insurance_total).length > 0
+                        ? (refundInfo.insurance_total).length :0
                       }}份</text
                     >
                   </view>
@@ -99,12 +100,16 @@ export default {
       refundInfo: {
         type: Object,
         default:() => ({})
-      }
+      },
+
+
 
   },
   data() {
     return {
       popupCurrent: "info",
+
+      insureNumber:{}
     };
   },
   created() {},

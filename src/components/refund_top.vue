@@ -53,7 +53,7 @@ export default {
       radioItems: [
         {
           value: "是",
-          checked: "true",
+          checked: true,
           key:1,
         },
         {
@@ -96,8 +96,9 @@ export default {
 
     // 单选点击
     radioChange(e) {
-      console.log(e);
       this.radioValue = e.detail.value;
+      console.log('是否自愿',this.radioValue);
+      this.$emit('voluntary',this.radioValue)
     },
    
     // 打开理由选择弹窗
@@ -109,6 +110,7 @@ export default {
     groupPopupSelecctBtn(e) {
       console.log(e);
       this.group = e;
+      this.$emit('reason',this.group)
     },
   },
 };
