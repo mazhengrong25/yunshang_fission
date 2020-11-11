@@ -5,13 +5,13 @@
       <view class="middle_message">
         <view class="message_first">是否自愿</view>
         <view class="message_bottom_radio">
-          <radio-group class="bottom_radio_list" @click="radioChange(item)">
+          <radio-group class="bottom_radio_list" @change="radioChange">
             <label
               class="radio"
               v-for="(item, index) in radioItems"
               :key="index"
             >
-              <radio :color="'#0070E2'" :checked="item.checked"></radio>
+              <radio :color="'#0070E2'" :checked="item.checked" :value="item.key" />
               <text>{{ item.value }}</text>
             </label>
           </radio-group>
@@ -53,12 +53,16 @@ export default {
       radioItems: [
         {
           value: "是",
-          checked: "true",
+          checked: true,
+          key:1,
         },
         {
           value: "否",
+          key:2,
         },
       ],
+
+      radioValue: "", //单选选择值
 
       // 理由   之前是{} 出现bug
       group: "",
@@ -89,12 +93,14 @@ export default {
     };
   },
   methods: {
-   
+
     // 单选点击
     radioChange(e) {
-        console.log(e)
-        this.radioItems[checked] = e
+      this.radioValue = e.detail.value;
+      console.log('是否自愿',this.radioValue);
+      this.$emit('voluntary',this.radioValue)
     },
+   
     // 打开理由选择弹窗
     openGroupSelect() {
       this.$refs.groupPopup.openDialog();
@@ -104,6 +110,7 @@ export default {
     groupPopupSelecctBtn(e) {
       console.log(e);
       this.group = e;
+      this.$emit('reason',this.group)
     },
   },
 };
