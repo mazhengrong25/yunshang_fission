@@ -361,7 +361,7 @@ export default {
       this.headerType = false
     }
 
-    console.log('航班信息',this.flightData,'航班头部状态',this.headerType);
+    console.log('航班信息',this.flightData,'航班头部状态',this.headerType,'乘客信息',this.passengerList);
 
     if (this.orderType) {
       this.flightRoundData = JSON.parse(data.flightRoundData);

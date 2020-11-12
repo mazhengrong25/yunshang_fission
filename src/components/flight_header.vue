@@ -24,7 +24,7 @@
             class="address"
           >
           {{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}
-          {{flightData.data[0][interType?'depTerminal':'departure_terminal']}}
+          {{flightData.data[0][interType?'depTerminal':'departure_terminal'] || ''}}
           </view>
         </view>
         <view class="center_message">
@@ -45,7 +45,7 @@
           <view
             class="address"
           >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}
-          {{flightData.data[0][interType?'arrTerminal':'arrive_terminal']}}
+          {{flightData.data[0][interType?'arrTerminal':'arrive_terminal'] || ''}}
           </view>
           
         </view>

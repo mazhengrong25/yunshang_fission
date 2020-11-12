@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-11-10 09:50:51
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-12 09:22:03
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_list">
@@ -125,11 +125,13 @@
               {{
                 item.status !== 0 && item.status !== 5 && item.pay_status === 1
                   ? "已预订"
-                  : item.status === 1
+                  : item.status === 1 && item.pay_status === 2
                   ? "待出票"
                   : item.status === 3
                   ? "已出票"
                   : item.status === 5
+                  ? "已取消"
+                  : item.status === 1 && item.left_min < 0
                   ? "已取消"
                   : ""
               }}
@@ -150,13 +152,15 @@
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
-                item.status !== 0 && item.status !== 5 && item.pay_status === 1
+                  item.status !== 0 && item.status !== 5 && item.pay_status === 1 && item.left_min > 0
                   ? "已预订"
-                  : item.status === 1
+                  : item.status === 1 && item.pay_status === 2
                   ? "待出票"
                   : item.status === 3
                   ? "已出票"
                   : item.status === 5
+                  ? "已取消"
+                  : item.status === 1 && item.left_min <= 0
                   ? "已取消"
                   : ""
               }}
@@ -175,24 +179,20 @@
             <view class="" v-if="item.ticket_passenger.length > 4">...</view>
           </view>
 
-          <view class="item_time" v-if="item.pay_status === 1 && item.status">
+          <view class="item_time" v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0">
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
             <view class="time_text">剩余支付时间：</view>
             <view class="time_number">
               {{
-                $timeDiff(
-                  new Date(item.updated_at).getTime() + 30 * 60 * 1000,
-                  new Date(),
-                  "minutes"
-                )
+                item.left_min
               }}分钟
             </view>
           </view>
           <view
             class="item_btn_box"
-            v-if="item.pay_status === 1 && item.status"
+            v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0"
           >
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 0)"
               >取消订单</view
@@ -607,8 +607,10 @@ export default {
         // 国内
         let data = {
           status:
-            this.headerActive === 0
+              this.headerActive === 0
               ? "-1"
+              : this.headerActive === 1
+              ? 'pay_success'
               : this.headerActive === 2
               ? 1
               : this.headerActive === 4
@@ -618,7 +620,7 @@ export default {
             this.headerActive === 1 ? 1 : this.headerActive === 2 ? 2 : "",
           created_at:
             this.orderListFilter.Timestart ||
-            moment().subtract(2, "years").format("YYYY-MM-DD"), // 预定日期开始
+            moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
           created_at_end:
             this.orderListFilter.Timend || moment().format("YYYY-MM-DD"), // 预定日期结束
           pnr_code: this.orderListFilter.pnr || "", // pnr
@@ -677,6 +679,8 @@ export default {
                   }
                 });
               }
+
+              item['timeLeft'] = moment(item.updated_at).add(30, 'm').diff(moment(new Date()), 'm')
             });
 
             //日期条件排序

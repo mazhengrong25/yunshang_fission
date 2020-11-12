@@ -19,9 +19,7 @@
           {{
             orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
-            $timeBefore(
-              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
-            ) &&
+            orderDetails.left_min > 0 &&
             orderDetails.pay_status === 1
               ? "已预订"
               : orderDetails.status === 1 && orderDetails.pay_status === 2
@@ -30,10 +28,7 @@
               ? "已出票"
               : orderDetails.status === 5
               ? "已取消"
-              : orderDetails.status === 1 &&
-                !$timeBefore(
-                  new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
-                )
+              : orderDetails.status === 1 && orderDetails.left_min <= 0
               ? "已取消"
               : ""
           }}
@@ -57,9 +52,7 @@
           orderDetails.status !== 0 &&
           orderDetails.status !== 5 &&
           orderDetails.pay_status === 1 &&
-          $timeBefore(
-            new Date(orderDetails.updated_at).getTime() + 30 * 60 * 1000
-          )
+          orderDetails.left_min > 0
         "
       >
         <image
@@ -68,13 +61,7 @@
           mode="aspectFit"
         />
         <text class="time_text"
-          >剩余支付时间：{{
-            $timeDiff(
-              new Date(orderDetails.updated_at).getTime() + 30 * 60 * 1000,
-              new Date(),
-              "minutes"
-            )
-          }}分钟</text
+          >剩余支付时间：{{ orderDetails.left_min }}分钟</text
         >
       </view>
 
@@ -91,9 +78,7 @@
             orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
             orderDetails.pay_status === 1 &&
-            $timeBefore(
-              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
-            )
+            orderDetails.left_min > 0
           "
           @click="getCancel(item)"
           >取消订单</view
@@ -104,9 +89,7 @@
             orderDetails.status !== 0 &&
             orderDetails.status !== 5 &&
             orderDetails.pay_status === 1 &&
-            $timeBefore(
-              new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
-            )
+            orderDetails.left_min > 0
           "
           @click="jumpOrderPay()"
           >去支付</view
@@ -141,9 +124,7 @@
             orderDetails.status === 5 ||
             (orderDetails.pay_status === 1 &&
               orderDetails.status === 1 &&
-              !$timeBefore(
-                new Date(orderDetails.created_at).getTime() + 30 * 60 * 1000
-              ))
+              orderDetails.left_min <= 0)
           "
           @click="reOrder()"
           >再次预定</view
@@ -227,7 +208,7 @@
 
               <view class="ticket_no" v-if="orderDetails.status === 3">
                 <view class="ticket_no_title">票号</view>
-                <view>{{item.ticket_no}}</view>
+                <view>{{ item.ticket_no }}</view>
               </view>
             </view>
           </view>
@@ -253,7 +234,14 @@
         </view>
         <!-- 订单信息 -->
         <view class="main_list order_message">
-          <view class="main_list_title">订单信息</view>
+          <view class="main_list_title">
+            <text>订单信息</text>
+            <view
+              class="showPriceInfo input-right-arrow"
+              @click="openTotalOrder()"
+              >查看订单金额明细</view
+            >
+          </view>
           <view class="message_list">
             <view class="list_item">
               <view class="item_title">订单编号</view>
@@ -269,7 +257,7 @@
             </view>
             <view class="list_item">
               <view class="item_title">预定时间</view>
-              <view class="item_message">{{ orderDetails.created_at }}</view>
+              <view class="item_message">{{ orderDetails.updated_at }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">备注</view>
@@ -304,55 +292,84 @@
           订单总价
           <view class="close_btn" @click="closeTotalOrder()"></view>
         </view>
-        <div class="price_info_box">
-          <view class="info_box">
-            <view class="info_content">
-              <view class="info_top">
-                <view class="list_title">订单总价</view>
-                <view class="list_message">
-                  <text>&yen;</text>{{ priceInfo.totalPrice }}
+        <view class="price_info_box">
+          <view class="total_price_header">
+            <view class="header_left">
+              <view class="total_price_title">订单总价</view>
+              <view class="total_price_message">
+                <text>&yen;</text>{{ orderDetails.total_price }}
+              </view>
+            </view>
+
+            <view class="header_right">
+              <view class="total_price_title">奖励金</view>
+              <view class="total_price_message">
+                <text>&yen;</text>{{ orderDetails.reward_price }}
+              </view>
+            </view>
+          </view>
+
+          <scroll-view :scroll-y="true" class="price_info_main">
+            <view
+              :class="[
+                'price_info_list',
+                { active: priceInfoChecket === index },
+              ]"
+              v-for="(item, index) in orderDetails.ticket_passenger"
+              :key="index"
+            >
+              <view class="list_title" @click="openPriceInfo(index)">
+                <view class="title_name">{{ item.PassengerName }}</view>
+
+                <view class="title_price">
+                  <view class="title_text">总金额</view>
+                  <view class="peice_style">
+                    <text>&yen; {{ item.total_price }}</text>
+                    <view class="price_arrow">
+                      <image src="@/static/unfold.png" mode="aspectFit" />
+                    </view>
+                  </view>
                 </view>
               </view>
 
-              <view class="info_list">
-                <view class="list_title">票价</view>
-                <view class="list_message">
-                  <text>&yen; {{ priceInfo.adtPrice }}</text>
-                  <text>×{{ passengerNumber.adt }}人</text>
+              <view class="list_main">
+                <view class="list_item">
+                  <view class="item_title">票面价</view>
+                  <view class="item_message"
+                    >&yen; {{ item.ticket_price }}</view
+                  >
                 </view>
-              </view>
 
-              <view class="info_list">
-                <view class="list_title">机建+燃油</view>
-                <view class="list_message">
-                  <text>&yen; {{ priceInfo.buildPrice }}</text>
-                  <text>×{{ passengerNumber.adt }}人</text>
+                <view class="list_item">
+                  <view class="item_title">机建/燃油</view>
+                  <view class="item_message">{{
+                    "&yen; " + item.build_total + " / &yen; " + item.fuel_total
+                  }}</view>
                 </view>
-              </view>
 
-              <view class="info_list">
-                <view class="list_title">保险</view>
-                <view class="list_message">
-                  <text
-                    >&yen;{{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}
-                  </text>
-                  <text
-                    >×{{
-                      passengerNumber.ins ? passengerNumber.ins : 0
-                    }}份</text
+                <view class="list_item">
+                  <view class="item_title">保险</view>
+                  <view class="item_message"
+                    >&yen; {{ item.insurance_total }}</view
+                  >
+                </view>
+
+                <view class="list_item">
+                  <view class="item_title">服务费</view>
+                  <view class="item_message"
+                    >&yen; {{ item.service_price }}</view
+                  >
+                </view>
+                <view class="list_item">
+                  <view class="item_title">奖励金</view>
+                  <view class="item_message"
+                    >&yen; {{ item.reward_price }}</view
                   >
                 </view>
               </view>
             </view>
-          </view>
-
-          <view class="info_bottom">
-            <view class="list_title">奖励金</view>
-            <view class="list_message">
-              <text>&yen; {{ priceInfo.reward }}</text>
-            </view>
-          </view>
-        </div>
+          </scroll-view>
+        </view>
       </view>
     </uni-popup>
   </view>
@@ -434,24 +451,9 @@ export default {
         //再次预定
       },
 
-      priceInfo: {
-        // 金额数据
-        totalPrice: 0, // 总价
-        adtPrice: 0, //票价
-        buildPrice: 0, // 机建燃油费
-        insPrice: 0, // 保险票价
-        buildPrice: 0, // 机建燃油费
-        reward: 0, // 奖励金额
-      },
+      priceInfoChecket: null, // 订单金额明细展开值
 
-      passengerNumber: {
-        // 乘机人数量
-        adt: 0, //成人
-        ins: 0, //保险
-      },
-
-      passengerInfo: {},
-      segmentDetails: {}, // 票号
+      listCancelType: "", // 列表页传递取消订单值
     };
   },
   methods: {
@@ -461,6 +463,11 @@ export default {
         icon: "none",
         duration: 3000,
       });
+    },
+
+    // 展开订单金额详情信息
+    openPriceInfo(i) {
+      this.priceInfoChecket = i;
     },
 
     // 发送短信
@@ -603,10 +610,7 @@ export default {
 
       orderApi.orderDetails(data).then((res) => {
         if (res.result === 10000) {
-          this.orderDetails = res.data.order_msg;
-          this.passengerInfo = res.data.order_msg.ticket_passenger;
-          this.segmentDetails =
-            res.data.order_msg.ticket_passenger.ticket_segment_passenter;
+          this.orderDetails = res.data;
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;
           }
@@ -618,32 +622,35 @@ export default {
                 ? "去程"
                 : "返程"
               : "单程",
-            data: this.orderDetails.ticket_segments, // 单程信息
-            cabinInfo: this.orderDetails.ticket_segments, //退票规则
+            data: this.orderDetails.ticket_segments || [], // 单程信息
+            cabinInfo: this.orderDetails.ticket_segments || [], //退票规则
           };
 
-          // 组装订单总价
-          this.priceInfo = {
-            totalPrice: this.orderDetails.total_price, // 订单总价
-            buildPrice: this.orderDetails.build_total, // 机建票价
-            insPrice: this.orderDetails.insurance_total, // 保险票价
-            adtPrice: this.orderDetails.ticket_price, // 成人票价
-            reward: this.orderDetails.reward_price, // 奖励金
-          };
+          if (this.orderDetails.ticket_passenger.length < 3) {
+            this.priceInfoChecket = 0;
+          }
 
-          this.passengerNumber = {
-            adt: this.passengerInfo.filter((u) => u.PassengerType === "ADT")
-              .length, //成人
-            ins:
-              this.passengerInfo.filter((u) => u.insurance_total).length > 0
-                ? this.passengerInfo.filter((u) => u.insurance_total).length
-                : 0, // 保险
-          };
+          if (this.listCancelType) {
+            if (this.orderDetails.left_min > 0) {
+              this.cancelType = true; //取消订单
+            } else {
+              uni.showToast({
+                title: "当前订单已取消",
+                icon: "none",
+              });
+            }
+          }
+
+          console.log(this.flightData);
 
           if (this.cancelType) {
             this.cancelType = false;
             this.getCancel();
           }
+
+          this.orderDetails["timeLeft"] = moment(this.orderDetails.updated_at)
+            .add(30, "m")
+            .diff(moment(new Date()), "m");
         } else {
           uni.showToast({
             title: res.msg,
@@ -717,8 +724,8 @@ export default {
       console.log(this.orderId);
 
       this.type = data.roundType; //去程  返程
-      this.cancelType = data.cancel ? data.cancel : false; //取消订单
-      this.cancelOrderType = data.cancel !== "";
+
+      this.listCancelType = data.cancel;
 
       this.orderListType = data.type;
       this.orderHeaderTitle =
@@ -867,6 +874,15 @@ export default {
           font-size: 32upx;
           font-weight: bold;
           color: rgba(42, 42, 42, 1);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .showPriceInfo {
+            text-align: right;
+            font-size: 24upx;
+            font-weight: 400;
+            color: #2a2a2a;
+          }
         }
         &.filght_info {
           .info_header {
@@ -1002,7 +1018,7 @@ export default {
             margin-top: 46upx;
             .list_item {
               &:not(:last-child) {
-                margin-bottom: 30upx;
+                margin-bottom: 50upx;
               }
               &:last-child {
                 padding-bottom: 32upx;
@@ -1065,14 +1081,14 @@ export default {
                   color: rgba(42, 42, 42, 1);
                 }
               }
-              .ticket_no{
+              .ticket_no {
                 margin-top: 20upx;
                 display: flex;
                 align-items: center;
                 font-size: 28upx;
                 color: rgba(42, 42, 42, 1);
                 font-weight: bold;
-                .ticket_no_title{
+                .ticket_no_title {
                   width: 114upx;
                   font-weight: 400;
                 }
@@ -1134,7 +1150,7 @@ export default {
                 font-weight: 400;
                 color: rgba(153, 153, 153, 1);
                 width: 100upx;
-                text{
+                text {
                   font-size: 20upx;
                 }
               }
@@ -1207,6 +1223,7 @@ export default {
     bottom: -120upx;
     width: 100%;
     height: 120upx;
+    background-color: #fff;
   }
   .title {
     height: 140upx;
@@ -1233,91 +1250,146 @@ export default {
 
   .price_info_box {
     background-color: #fff;
-    padding-bottom: var(--status-bar-height);
-    .info_box {
+    .total_price_header {
       display: flex;
-      flex-direction: column;
-      padding: 20upx;
-      background: #fff;
-
-      .info_content {
-        background: #f9f9f9;
-        padding: 40upx 20upx;
-
-        .info_list {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          &:not(:last-child) {
-            margin-bottom: 40upx;
-          }
-          .list_title {
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28upx;
+      padding: 56upx 24upx 0;
+      .header_left {
+        display: inline-flex;
+        align-items: center;
+        .total_price_title {
+          font-size: 32upx;
+          font-weight: bold;
+          color: #333333;
+          margin-right: 20upx;
+        }
+        .total_price_message {
+          font-size: 36upx;
+          font-weight: bold;
+          color: #ff0000;
+          text {
             font-size: 28upx;
-            font-weight: 400;
-            color: #333333;
-          }
-          .list_message {
-            font-size: 28upx;
-            font-weight: 500;
-            text {
-              display: inline-flex;
-              &:first-child {
-                color: rgba(255, 0, 0, 1);
-              }
-              &:last-child {
-                margin-left: 20upx;
-                color: rgba(153, 153, 153, 1);
-              }
-            }
           }
         }
-
-        .info_top {
-          display: flex;
-          align-items: center;
-          padding-bottom: 24upx;
-          margin-bottom: 28upx;
-          .list_title {
+      }
+      .header_right {
+        display: inline-flex;
+        align-items: center;
+        .total_price_title {
+          font-size: 26upx;
+          color: #333333;
+          margin-right: 20upx;
+        }
+        .total_price_message {
+          font-size: 30upx;
+          font-weight: bold;
+          color: #333;
+          text {
             font-size: 28upx;
-            font-weight: bold;
-            color: #333333;
-            margin-right: 24upx;
-          }
-          .list_message {
-            font-size: 36upx;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: baseline;
-            color: #ff0000;
-            text {
-              margin-right: 8upx;
-              font-size: 28upx;
-            }
-          }
-          &:first-child {
-            border-bottom: 1px solid #eaeaea;
           }
         }
       }
     }
-    .info_bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 92upx;
-      padding: 0 40upx;
-      .list_title {
-        font-size: 28upx;
-        font-weight: bold;
-        color: #333333;
-      }
-      .list_message {
-        font-size: 28upx;
-        font-weight: 500;
-        text {
-          display: inline-flex;
-          &:first-child {
-            color: rgba(255, 0, 0, 1);
+
+    .price_info_main {
+      max-height: 60vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+
+      .price_info_list {
+        background: #f9f9f9;
+        padding: 0 16upx 0 24upx;
+        margin: 0 24upx 20upx;
+        &:last-child{
+          margin-bottom: var(--status-bar-height);
+        }
+        &.active {
+          .list_title {
+            .title_price {
+              .peice_style {
+                .price_arrow {
+                  transform: rotate(180deg);
+                }
+              }
+            }
+          }
+          .list_main {
+            height: auto !important;
+            padding: 40upx 0 46upx;
+            border-top: 2upx solid #eaeaea;
+          }
+        }
+        .list_title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 96upx;
+
+          .title_name {
+            font-size: 28upx;
+            font-weight: bold;
+            color: #333333;
+          }
+
+          .title_price {
+            display: flex;
+            align-items: center;
+            .title_text {
+              font-size: 28upx;
+              font-weight: 400;
+              color: #666666;
+              margin-right: 16upx;
+            }
+            .peice_style {
+              display: inline-flex;
+              align-items: center;
+              text {
+                font-size: 28upx;
+                font-weight: bold;
+                color: #ff0000;
+              }
+              .price_arrow {
+                transition: all 0.3s;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 22upx;
+                height: 12upx;
+                margin-left: 16upx;
+                image {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: contain;
+                }
+              }
+            }
+          }
+        }
+
+        .list_main {
+          overflow: hidden;
+          height: 0;
+          transition: all 0.3s;
+          border-top: 2upx solid transparent;
+          .list_item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            &:not(:last-child) {
+              margin-bottom: 30upx;
+            }
+            .item_title {
+              font-size: 28upx;
+              font-weight: 400;
+              color: #333333;
+            }
+            .item_message {
+              font-size: 28upx;
+              font-weight: 500;
+              color: #333333;
+            }
           }
         }
       }

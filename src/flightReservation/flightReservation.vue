@@ -1143,6 +1143,7 @@ export default {
           email: this.orderPassenger.email || "",
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
+          adt_ticket_no: ''
         };
 
         console.log(data);
@@ -1181,13 +1182,13 @@ export default {
                   priceNumber +
                   "&type=true" +
                   "&passengerList =" +
-                  JSON.stringify(this.passengerData),
+                  JSON.stringify(passengerData),
               });
               console.log(res.data, this.flightData);
             } else {
               this.trueSubmitOrder = false;
               uni.showToast({
-                title: res.msg || "接口数据错误，请联系客服处理",
+                title: res.data || "接口数据错误，请联系客服处理",
                 icon: "none",
                 duration: 3000,
               });

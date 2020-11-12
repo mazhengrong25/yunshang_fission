@@ -121,6 +121,7 @@
                 placeholder="请保持与证件一致"
                 v-model="item.cert_no"
                 placeholder-class="input_placeholder"
+                @blur="idRardGetBirthdy(item.cert_no,item.cert_type)"
               />
             </view>
 
@@ -407,7 +408,28 @@ export default {
     },
     // 确认性别
     sexSelecctBtn(e) {
-      this.passenger.sex = e;
+      console.log(e)
+      if(this.baseInfo.sex && (e !== this.baseInfo.sex)){
+          uni.showModal({
+            title: '提示',
+            content: '当前选择性别与身份证性别不相同',
+            success: (res) => {
+                if (res.confirm) {
+                  this.baseInfo.sex = e;
+                  this.passenger.sex = e
+                  this.$forceUpdate()
+                } else if (res.cancel) {
+                    this.baseInfo.sex = this.baseInfo.sex;
+                    this.passenger.sex = this.baseInfo.sex;
+                    this.$forceUpdate()
+                }
+            }
+          });
+        }else{
+          this.passenger.sex = e;
+          this.baseInfo.sex = e
+        }
+
     },
 
     // 打开出生日期选择框
@@ -421,6 +443,28 @@ export default {
       let time = e.year + "-" + e.month + "-" + e.day;
       if (this.checkedTimeType === "birthday") {
         this.$set(this.passenger, "birthday", time);
+        
+        // 判断是否通过身份证判断出出生日期 如果有则判断身份证日期与选中日期是否相同 并 弹窗提示 确定则使用选择器生日，取消则使用身份证生日
+        if(this.baseInfo.birthday && (this.passenger.birthday !== this.baseInfo.birthday)){
+          uni.showModal({
+            title: '提示',
+            content: '当前选择生日与身份证生日不相同',
+            success: (res) => {
+              console.log(this.passenger.birthday ,this.baseInfo.birthday)
+                if (res.confirm) {
+                  this.baseInfo.birthday = time;
+                  this.$forceUpdate()
+                } else if (res.cancel) {
+                    this.baseInfo.birthday = this.baseInfo.birthday;
+                    this.passenger.birthday = this.baseInfo.birthday;
+                    this.$forceUpdate()
+                }
+            }
+          });
+        }
+
+        
+
       } else if (this.checkedTimeType === "cardTime") {
         this.$set(this.passenger, "cert_ex_date", time);
       }
@@ -446,15 +490,30 @@ export default {
       });
     },
 
+
+    // 身份证转出生日期
+    idRardGetBirthdy(id,type){
+      if(type === '身份证'){
+        if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(id)) {
+          return uni.showToast({
+            title: "身份证号码不正确",
+            duration: 2000,
+            icon: "none",
+          });
+        } else {
+          this.validID(id, type);
+        }
+      }
+      
+    },
+
     // 身份证验证
     async validID(value, type) {
-      if (type === "身份证") {
         // 身份证号码为15位或者18位，15位时全为数字，18位前17位为数字，最后一位是校验位，可能为数字或字符X
         let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
         if (reg.test(value)) {
           await this.go(value.length, value);
         }
-      }
     },
 
     // 根据身份证获取生日年龄性别
@@ -500,13 +559,18 @@ export default {
           age++;
       }
 
-      if (sex % 2 === 0) sex = 0;
-      else sex = 1;
+      if (sex % 2 === 0) sex = '女';
+      else sex = '男';
       this.baseInfo["sex"] = sex; //性别  1男 0女
       this.baseInfo["age"] = age; //年龄
       this.baseInfo["birthday"] = birth; //生日
 
+      this.passenger.birthday = birth; //生日
+      this.passenger.sex = sex;
+
       console.log(this.baseInfo);
+
+      this.$forceUpdate()
     },
 
     // 打开添加分组弹窗
@@ -628,19 +692,8 @@ export default {
         }
       });
 
-      this.certificateList.forEach((item) => {
-        if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(item.cert_no)) {
-          return uni.showToast({
-            title: "身份证号码不正确",
-            duration: 2000,
-            icon: "none",
-          });
-        } else {
-          this.validID(item.cert_no, item.cert_type);
-
-          this.$refs.returnSubmitDialog.open();
-        }
-      });
+      
+        this.$refs.returnSubmitDialog.open();
 
       this.$forceUpdate();
     },
@@ -657,7 +710,7 @@ export default {
         let data = {
           name: this.passenger.name,
           phone: this.passenger.phone,
-          sex: this.baseInfo.sex,
+          sex: this.baseInfo.sex === '男'? 1: 0,
           birthday: this.baseInfo.birthday,
           cert_type: item.cert_type,
           cert_no: item.cert_no,
@@ -745,6 +798,12 @@ export default {
         type: this.pageData.type,
         checked: this.pageData.checked || false,
       };
+      this.baseInfo = {
+        birthday: this.pageData.birthday,
+        sex: this.pageData.sex === 1 ? "男" : "女", 
+      }
+
+
       this.certificateList[0] = {
         cert_type: this.pageData.cert_type, // 证件类型
         cert_no: this.pageData.cert_no, // 证件号码
@@ -753,6 +812,8 @@ export default {
         group_name: this.pageData.group,
         id: this.pageData.group_id,
       };
+
+
     }
     console.log(this.passenger);
 
