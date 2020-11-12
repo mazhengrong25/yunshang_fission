@@ -197,13 +197,14 @@
       <refund-amount ref="refundAmountRefer" :refundInfo="refundList"></refund-amount>
 
       <!-- 退票申请发送成功 -->
-      <uni-popup ref="refundMessage" type="dialog">
+      <uni-popup ref="refundMessage" type="dialog" :maskClick="false">
           <view class="refund_message_box">
-              <view class="refund_message_icon" v-if="!message_true">
-                  <img src="@/static/message_right.png"></img>
-              </view>
+              
               <view class="refund_message_icon" v-if="message_true">
                   <img src="@/static/message_error.png"></img>
+              </view>
+              <view class="refund_message_icon" v-else>
+                  <img src="@/static/message_right.png"></img>
               </view>
               <view class="refund_message_send">{{message_msg}}</view>
               <view class="refund_message_bottom" @click="backPage">知道了</view>
@@ -274,8 +275,10 @@ export default {
     },
 
     backPage() {
+      console.log(this.message_true)
       this.$refs.refundMessage.close();
       if(this.message_true){
+        console.log('返回上一页')
         uni.navigateBack();
       }
     },
@@ -322,7 +325,7 @@ export default {
       console.log(data)
       orderApi.refundSubmit(data).then((res) =>{
           
-          this.message_true = res.status === 1;
+          this.message_true = res.status === '1';
           this.message_msg = res.msg;
           this.open();
           console.log(res)
@@ -343,7 +346,7 @@ export default {
     // 跳转备注页面
     openRemark() {
         uni.navigateTo({
-            url:'/order/addRemark',
+            url:'/order/addRemark?remark='+this.remark,
         })
     },
 
@@ -859,16 +862,16 @@ export default {
       .message_bottom {
         font-size: 28upx;
         color: rgba(42, 42, 42, 1);
-        width: 240px;
         display: inline-flex;
         justify-content: flex-end;
         flex: 1;
+        min-height: 40upx;
         .group_message {
           flex: 1;
           overflow: hidden;
           text-overflow: ellipsis;
           text-align: right;
-          color: #AFB9C4;
+          max-width: 40vw;
 		}
 		.total_price {
 			color: rgba(255, 0, 0, 1);

@@ -29,7 +29,7 @@
           >
         </view>
       </view>
-      <view class="order_list">
+      <view class="order_list" v-if="false">
         <view class="order_left">
           <view class="order_icon">
             <image src="@/static/order_2.png" mode="aspectFit" />
