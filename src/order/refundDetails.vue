@@ -2,16 +2,13 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-10-19 15:38:49
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-11 18:27:30
+ * @LastEditors: Please set LastEditors
 -->
 
 <template>
   <view class="order_details">
-    <yun-header
-      :statusHeight="iStatusBarHeight"
-      centerTitle="退票单详情"
-    ></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票单详情"></yun-header>
 
     <view class="details_header">
       <view class="header_top">
@@ -98,17 +95,17 @@
         <view class="main_list filght_info">
           <view class="info_header">
             <view class="header_type">{{
-              flightData.segment_type === 1
+              refundDetail.segment_type === 1
                 ? "单程"
-                : flightData.segment_type === 2
+                : refundDetail.segment_type === 2
                 ? "往返"
-                : flightData.segment_type === 3
+                : refundDetail.segment_type === 3
                 ? "多程"
                 : ""
             }}</view>
             <view class="header_time">
-              <!-- {{ item.departure_time.substring(0, 10) }} -->
-              <!-- <text>{{ $dateTool(item.ticket_segment.departure_time, "ddd") }}</text> -->
+              <!-- <text>{{ flightData[ticket_segments].departure_time }}</text>
+              <text>{{ $dateTool(flightData.ticket_segment.departure_time, "ddd") }}</text> -->
             </view>
           </view>
           <view class="info_message">
@@ -117,8 +114,8 @@
                 item.departure_time.substring(11, 16)
               }}</view> -->
               <view class="address"
-                >{{ item.departure_CN.city_name
-                }}{{ item.departure_CN.air_port_name }}</view
+                >{{ flightData.departure_CN.city_name
+                }}{{ flightData.departure_CN.air_port_name }}</view
               >
             </view>
 
@@ -129,14 +126,14 @@
                 }}m</view
               > -->
               <view class="center_icon"></view>
-              <view class="type">直飞</view>
+              <!-- <view class="type">直飞</view> -->
             </view>
 
             <view class="message_box">
               <!-- <view class="date">{{ item.arrive_time.substring(11, 16) }}</view> -->
               <view class="address"
-                >{{ item.arrive_CN.city_name
-                }}{{ item.arrive_CN.air_port_name }}</view
+                >{{ flightData.arrive_CN.city_name
+                }}{{ flightData.arrive_CN.air_port_name }}</view
               >
             </view>
           </view>
@@ -150,20 +147,20 @@
                 mode="aspectFill"
               /> -->
             </view>
-            <view class="message_list">{{ item.flight_no }}</view>
-            <view class="message_list">{{ item.model }}</view>
+            <view class="message_list">{{ flightData.flight_no }}</view>
+            <view class="message_list">{{ flightData.model }}</view>
             <view class="message_list">有早餐</view>
           </view>
 
           <view class="filght_bottom">
             <view class="bottom_list"
-              >{{ item.cabin
+              >{{ flightData.cabin
               }}{{
-                item.cabin_level === "ECONOMY"
+                flightData.cabin_level === "ECONOMY"
                   ? "经济舱"
-                  : item.cabin_level === "FIRST"
+                  : flightData.cabin_level === "FIRST"
                   ? "头等舱"
-                  : item.cabin_level === "BUSINESS"
+                  : flightData.cabin_level === "BUSINESS"
                   ? "公务舱"
                   : ""
               }}</view
@@ -173,6 +170,7 @@
           </view>
         </view>
 
+        <!-- 出行信息 -->
         <view class="main_list passenger">
           <view class="main_list_title">出行信息</view>
           <view class="passenger_list">
@@ -206,44 +204,40 @@
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{ flightData.contact }}</view>
+              <view class="list_message">{{ refundDetail.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
-              <view class="list_message">{{ flightData.phone }}</view>
+              <view class="list_message">{{ refundDetail.phone }}</view>
             </view>
           </view>
         </view>
-        <view class="main_list order_message"
-         v-for="(oitem, oindex) in flightData.ticket_refund_passenger"
-         :key="oindex">
-          <view class="main_list_title">订单信息</view>
+        <!-- 退票信息 -->
+        <view class="main_list order_message">
+          <view class="main_list_title">退票信息</view>
           <view class="message_list">
             <view class="list_item">
-              <view class="item_title">订单编号</view>
-              <view class="item_message">{{ flightData.order_no }}</view>
+              <view class="item_title">退票单号</view>
+              <view class="item_message">{{ refundDetail.ticket_refund_passenger.ticket_order_no }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">PNR</view>
-              <view class="item_message">{{ flightData.pnr_code }}</view>
+              <view class="item_message">{{ refundDetail.pnr_code }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">分销商</view>
-              <view class="item_message">{{ flightData.admin_name }}</view>
+              <view class="item_message">{{ refundDetail.admin_name }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">申请时间</view>
-              <view class="item_message">{{ oitem.refund_time }}</view>
+              <view class="item_message">{{ refundDetail[ticket_refund_passenger].refund_time }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">退废票备注</view>
-              <view class="item_message input-right-arrow">{{ flightData.remark }}</view>
+              <view class="item_message input-right-arrow">{{ refundDetail.remark }}</view>
             </view>
           </view>
         </view>
-
-        <!-- 产品说明  退改签   行李额 -->
-        <flight-explanation ref="flightExplanation" :ruleInfos="ruleInfos"></flight-explanation>
 
       </scroll-view>
     </view>
@@ -264,14 +258,13 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0,
-      flightData: [], // 航班信息
+
+      flightData: {}, // 航班信息 列表
+
       orderId: "", // 订单号
-      ruleInfos: { // 退改签信息
-        gauge: {
-          refund: [],
-          change: []
-        }
-      },
+
+      refundDetail: {}, // 退票单详情
+
     };
   },
   methods: {
@@ -285,7 +278,8 @@ export default {
 
       orderApi.orderInterRefund(data).then((res) => {
         if (res.result === 10000) {
-          this.flightData = res.data.data;
+          this.refundDetail = res.data;
+          console.log('this.refundDetail',this.refundDetail)
         } else {
           uni.showToast({
             title: res.msg,
@@ -295,53 +289,9 @@ export default {
       });
     },
 
-    // 打开退改签说明弹窗
-    openExpPupop(data) {
-      console.log(data);
-      this.getGaugeInfo(data);
-
-      console.log("完整信息", this.ruleInfos);
-      this.$refs.flightExplanation.openExp();
-    },
-
-    // 关闭产品说明弹窗
-    closePopup() {
-      this.$refs.flightExplanation.closeExp();
-    },
-
-    // 组装退改信息
-    getGaugeInfo(data) {
-
-      // 组装航班数据
-      let filghtMessage = {
-        time: moment(data.data.routing.segments[0].depTime).format(
-          "YYYY-MM-DD HH:mm:ss"
-        ), // 起飞时间
-        code: data.data.routing.segments[0].flightNumber, // 航班号
-        address:
-          data.data.routing.segments[0].depAirport_CN.city_name +
-          " " +
-          data.data.routing.segments[0].depAirport_CN.city_code +
-          " - " +
-          data.data.routing.segments[0].arrAirport_CN.city_name +
-          " " +
-          data.data.routing.segments[0].arrAirport_CN.city_code, // 行程
-        cabin: data.cabin, // 舱位
-        price: data.data.cabinPrices.ADT.rulePrice.price, // 票面价
-        baggage: data.baggage,
-      };
-
-       // 组装退改信息
-      let gaugeMessage = data.ruleInfos;
-
-      this.ruleInfos = {
-        filght: filghtMessage,
-        gauge: gaugeMessage,
-      };
-    },
+    
 
     onLoad(data) {
-      console.log('退票',data)
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.flightData = JSON.parse(data.refundData);
       this.orderId = this.flightData.refund_no;

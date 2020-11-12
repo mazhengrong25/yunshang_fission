@@ -2,13 +2,8 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
-<<<<<<< HEAD
- * @LastEditTime: 2020-10-09 14:25:20
- * @LastEditors: mazhengrong
-=======
- * @LastEditTime: 2020-10-19 15:41:27
- * @LastEditors: wish.WuJunLong
->>>>>>> 90e84853af5d10935ea117de419266ae76d6e1ac
+ * @LastEditTime: 2020-11-11 16:02:59
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order">
@@ -77,11 +72,7 @@ export default {
     },
     // 跳转到国内退票订单
     goRefundList() {
-      return uni.showToast({
-        title: "当前功能开发中，请等待后续版本更新",
-        duration: 3000,
-        icon: "none",
-      });
+
       uni.navigateTo({
         url: "/order/refundList",
       });
