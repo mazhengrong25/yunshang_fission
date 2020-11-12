@@ -72,7 +72,11 @@ export default {
     },
     // 跳转到国内退票订单
     goRefundList() {
-
+       return uni.showToast({
+          title: "当前功能开发中，请等待后续版本更新",
+          duration: 3000,
+          icon: "none",
+        });
       uni.navigateTo({
         url: "/order/refundList",
       });

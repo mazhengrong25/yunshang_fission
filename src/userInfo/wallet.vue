@@ -7,94 +7,154 @@
 --> 
 <template>
   <view class="wallet">
-    <yun-header :statusHeight="iStatusBarHeight" :headerColor="true" centerTitle="钱包流水"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      :headerColor="true"
+      centerTitle="钱包流水"
+    ></yun-header>
     <scroll-view scroll-x="true" class="wallet_header">
       <view
-        :class="['header_list',{'active':headerActive === index}]"
-        v-for="(item ,index) in headerList"
+        :class="['header_list', { active: headerActive === index }]"
+        v-for="(item, index) in headerList"
         :key="index"
         @click="checkedWallet(item, index)"
-      >{{item}}</view>
+        >{{ item }}</view
+      >
     </scroll-view>
 
     <view class="filter_box">
       <view class="box_title">日期筛选</view>
-      <view class="filter_message" @click="filterDialogBtn()">{{filterDate}}</view>
+      <view class="filter_message" @click="filterDialogBtn()">{{
+        filterDate
+      }}</view>
     </view>
 
     <view class="wallet_box">
       <view class="wallet_box_header">
         <view
-          :class="['header_list',{'active':walletPageIndex === index}]"
-          v-for="(item ,index) in walletHeaderList"
+          :class="['header_list', { active: walletPageIndex === index }]"
+          v-for="(item, index) in walletHeaderList"
           :key="index"
           @click="checkedWalletSwiper(item, index)"
-        >{{item}}</view>
+          >{{ item }}</view
+        >
       </view>
-      <swiper class="wallet_swiper" :current="walletPageIndex" @change="changeSwiper">
-        <swiper-item 
-          v-for="(v ,i) in walletHeaderList"
-          :key="i">
-          <scroll-view :enable-back-to-top="true" scroll-y="true" class="swiper-item" @scrolltolower="nextPageData()">
-            <view class="item_list" 
-            v-for="(item, index) in (i === 0?walletTotal:i === 1?walletIncome:i === 2?walletExpenditure:[])" 
-            :key="index"
-            @click="jumpDetails(JSON.stringify(item))">
+      <swiper
+        class="wallet_swiper"
+        :current="walletPageIndex"
+        @change="changeSwiper"
+      >
+        <swiper-item v-for="(v, i) in walletHeaderList" :key="i">
+          <scroll-view
+            :enable-back-to-top="true"
+            scroll-y="true"
+            class="swiper-item"
+            @scrolltolower="nextPageData()"
+          >
+            <view
+              class="item_list"
+              v-for="(item, index) in i === 0
+                ? walletTotal
+                : i === 1
+                ? walletIncome
+                : i === 2
+                ? walletExpenditure
+                : []"
+              :key="index"
+              @click="jumpDetails(JSON.stringify(item))"
+            >
               <view class="list_left">
                 <view class="list_icon">
                   <image
-                    v-if="item.after_balance < item.before_balance"
+                    v-if="item.trans_type === 2"
                     src="@/static/wallet_type_1.png"
                     mode="contain"
                   />
-                  <image v-if="false" src="@/static/wallet_type_2.png" mode="contain" />
                   <image
-                    v-if="item.trans_type === 1 || item.trans_type === 11"
+                    v-if="item.trans_type === 5 || item.trans_type === 12"
+                    src="@/static/wallet_type_2.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-if="item.trans_type === 1"
                     src="@/static/wallet_type_3.png"
                     mode="contain"
                   />
                   <image
-                    v-else-if="item.trans_type === 8 || item.trans_type === 9"
+                    v-if="item.trans_type === 8 || item.trans_type === 9"
                     src="@/static/wallet_type_4.png"
                     mode="contain"
                   />
                   <image
-                    v-else-if="item.trans_type === 4 || item.trans_type === 3"
+                    v-if="item.trans_type === 4 || item.trans_type === 3"
                     src="@/static/wallet_type_6.png"
                     mode="contain"
                   />
                   <image
-                    v-else-if="item.trans_type === 7"
+                    v-if="item.trans_type === 7"
                     src="@/static/wallet_type_7.png"
                     mode="contain"
                   />
                   <image
-                    v-else
+                    v-if="item.trans_type === 6"
                     src="@/static/wallet_type_5.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-if="item.trans_type === 11"
+                    src="@/static/wallet_type_9.png"
+                    mode="contain"
+                  />
+                  <image
+                    v-if="item.trans_type === 10"
+                    src="@/static/wallet_type_8.png"
                     mode="contain"
                   />
                 </view>
                 <view class="list_message">
                   <view class="message_title">
-                    {{item.trans_type === 1? '钱包充值':
-                    item.trans_type === 2? '钱包消费':
-                    item.trans_type === 3? '短信充值':
-                    item.trans_type === 4? '短信消费':
-                    item.trans_type === 5? '信用额度调整':
-                    item.trans_type === 6? '冻结金额调整':
-                    item.trans_type === 7? '三方支付':
-                    item.trans_type === 8? '三方支付全退':
-                    item.trans_type === 9? '三方支付部分退':
-                    item.trans_type === 10? '提现':
-                    item.trans_type === 11? '流量充值':
-                    item.trans_type === 12? '预付款调整': ""}}
+                    {{
+                      item.trans_type === 1
+                        ? "钱包充值"
+                        : item.trans_type === 2
+                        ? "钱包消费"
+                        : item.trans_type === 3
+                        ? "短信充值"
+                        : item.trans_type === 4
+                        ? "短信消费"
+                        : item.trans_type === 5
+                        ? "信用额度调整"
+                        : item.trans_type === 6
+                        ? "冻结金额调整"
+                        : item.trans_type === 7
+                        ? "三方支付"
+                        : item.trans_type === 8
+                        ? "三方支付全退"
+                        : item.trans_type === 9
+                        ? "三方支付部分退"
+                        : item.trans_type === 10
+                        ? "提现"
+                        : item.trans_type === 11
+                        ? "流量充值"
+                        : item.trans_type === 12
+                        ? "预付款调整"
+                        : ""
+                    }}
                   </view>
-                  <view class="message_item">{{item.updated_at}}</view>
+                  <view class="message_item">{{ item.updated_at }}</view>
                 </view>
               </view>
               <view class="list_right">
-                {{Number(item.after_balance).toFixed(2) > Number(item.before_balance).toFixed(2)? '+': Number(item.before_balance).toFixed(2) > Number(item.after_balance).toFixed(2) ? '-': ''}}
-                {{Number(item.amount).toFixed(2)}}
+                {{
+                  item.after_balance >
+                  item.before_balance
+                    ? "+"
+                    : item.before_balance >
+                      item.after_balance
+                    ? "-"
+                    : ""
+                }}
+                {{ Number(item.amount).toFixed(2) }}
               </view>
             </view>
           </scroll-view>
@@ -148,38 +208,38 @@ export default {
         this.isFilter = false;
         this.startTime = "";
         this.endTime = "";
-        this.filterDate = moment().format('YYYY年MM月DD日');
+        this.filterDate = moment().format("YYYY年MM月DD日");
         this.selectType = "date";
         this.dateType = 3;
-        this.getWalletData()
+        this.getWalletData();
       } else if (this.headerActive === 1) {
-        this.filterDate = moment().format('YYYY年MM月');
+        this.filterDate = moment().format("YYYY年MM月");
         this.selectType = "date";
         this.dateType = 2;
         let data = {
-          year: moment().format('YYYY'),
-          month: moment().format('MM')
-        }
-        console.log(data)
-        this.submitFilterBtn(data)
+          year: moment().format("YYYY"),
+          month: moment().format("MM"),
+        };
+        console.log(data);
+        this.submitFilterBtn(data);
       } else if (this.headerActive === 2) {
-        this.filterDate = moment().format('第Q季度');
+        this.filterDate = moment().format("第Q季度");
         this.selectType = "text";
         this.groupList = ["第1季度", "第2季度", "第3季度", "第4季度"];
-        this.submitFilterBtn(this.filterDate)
+        this.submitFilterBtn(this.filterDate);
       } else if (this.headerActive === 3) {
-        this.filterDate = moment().format('Q') > 2 ? "下半年" : "上半年";
+        this.filterDate = moment().format("Q") > 2 ? "下半年" : "上半年";
         this.selectType = "text";
         this.groupList = ["上半年", "下半年"];
-        this.submitFilterBtn(this.filterDate)
+        this.submitFilterBtn(this.filterDate);
       } else if (this.headerActive === 4) {
-        this.filterDate = moment().format('YYYY年');
+        this.filterDate = moment().format("YYYY年");
         this.selectType = "date";
         this.dateType = 1;
         let data = {
-          year: moment().format('YYYY')
-        }
-        this.submitFilterBtn(data)
+          year: moment().format("YYYY"),
+        };
+        this.submitFilterBtn(data);
       }
     },
 
@@ -211,37 +271,59 @@ export default {
         this.startTime = time + "-1";
         this.endTime = time + "-" + moment(time).daysInMonth();
       } else if (this.headerActive === 2) {
-        if(e === '第1季度'){
-          this.startTime = moment().format('YYYY') + "-1-1";
-          this.endTime = moment().format('YYYY') + "-3-" + moment(moment().format('YYYY')+'-3', "YYYY-MM").daysInMonth();
-        }else if(e === '第2季度'){
-          this.startTime = moment().format('YYYY') + "-4-1";
-          this.endTime = moment().format('YYYY') + "-6-" + moment(moment().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
-        }else if(e === '第3季度'){
-          this.startTime = moment().format('YYYY') + "-7-1";
-          this.endTime = moment().format('YYYY') + "-9-" + moment(moment().format('YYYY')+'-9', "YYYY-MM").daysInMonth();
-        }else if(e === '第4季度'){
-          this.startTime = moment().format('YYYY') + "-8-1";
-          this.endTime = moment().format('YYYY') + "-12-" + moment(moment().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
+        if (e === "第1季度") {
+          this.startTime = moment().format("YYYY") + "-1-1";
+          this.endTime =
+            moment().format("YYYY") +
+            "-3-" +
+            moment(moment().format("YYYY") + "-3", "YYYY-MM").daysInMonth();
+        } else if (e === "第2季度") {
+          this.startTime = moment().format("YYYY") + "-4-1";
+          this.endTime =
+            moment().format("YYYY") +
+            "-6-" +
+            moment(moment().format("YYYY") + "-6", "YYYY-MM").daysInMonth();
+        } else if (e === "第3季度") {
+          this.startTime = moment().format("YYYY") + "-7-1";
+          this.endTime =
+            moment().format("YYYY") +
+            "-9-" +
+            moment(moment().format("YYYY") + "-9", "YYYY-MM").daysInMonth();
+        } else if (e === "第4季度") {
+          this.startTime = moment().format("YYYY") + "-8-1";
+          this.endTime =
+            moment().format("YYYY") +
+            "-12-" +
+            moment(moment().format("YYYY") + "-12", "YYYY-MM").daysInMonth();
         }
         this.filterDate = e;
-      }else if(this.headerActive === 3){
-        if(e === '上半年'){
-          this.startTime = moment().format('YYYY') + "-1-1";
-          this.endTime = moment().format('YYYY') + "-6-" + moment(moment().format('YYYY')+'-6', "YYYY-MM").daysInMonth();
-        }else if(e === '上半年'){
-          this.startTime = moment().format('YYYY') + "-7-1";
-          this.endTime = moment().format('YYYY') + "-12-" + moment(moment().format('YYYY')+'-12', "YYYY-MM").daysInMonth();
+      } else if (this.headerActive === 3) {
+        if (e === "上半年") {
+          this.startTime = moment().format("YYYY") + "-1-1";
+          this.endTime =
+            moment().format("YYYY") +
+            "-6-" +
+            moment(moment().format("YYYY") + "-6", "YYYY-MM").daysInMonth();
+        } else if (e === "上半年") {
+          this.startTime = moment().format("YYYY") + "-7-1";
+          this.endTime =
+            moment().format("YYYY") +
+            "-12-" +
+            moment(moment().format("YYYY") + "-12", "YYYY-MM").daysInMonth();
         }
         this.filterDate = e;
-      }else if(this.headerActive === 4){
+      } else if (this.headerActive === 4) {
+        this.startTime = e.year + "-1-1";
+        this.endTime =
+          e.year +
+          "-12-" +
+          moment(e.year + "-12")
+            .format("YYYY-MM")
+            .daysInMonth();
 
-          this.startTime = e.year + "-1-1";
-          this.endTime = e.year + "-12-" + moment(e.year+'-12').format("YYYY-MM").daysInMonth();
-       
-          this.filterDate = e.year+ '年';
+        this.filterDate = e.year + "年";
       }
-      this.walletTotal = []
+      this.walletTotal = [];
       this.getWalletData(this.startTime, this.endTime);
       console.log(e);
     },
@@ -270,6 +352,8 @@ export default {
             this.walletIncome = [];
             this.walletExpenditure = [];
             this.walletTotal.forEach((item) => {
+              item.after_balance = Number(item.after_balance)
+              item.before_balance = Number(item.before_balance)
               if (item.after_balance > item.before_balance) {
                 this.walletIncome.push(item);
               }
@@ -292,14 +376,14 @@ export default {
     },
 
     // 跳转钱包流水详情
-    jumpDetails(val){
-      console.log(JSON.parse(val))
+    jumpDetails(val) {
+      console.log(JSON.parse(val));
       // let data = {
       //   data: JSON.parse(val)
       // }
       uni.navigateTo({
-        url: '/userInfo/walletDetails?data= '+ val
-    });
+        url: "/userInfo/walletDetails?data= " + val,
+      });
     },
   },
   created() {

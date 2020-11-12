@@ -7,18 +7,30 @@
 -->
 <template>
   <view class="wallet_details">
-    <yun-header :statusHeight="iStatusBarHeight" :headerColor="true" centerTitle="详情"></yun-header>
-    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="details_view">
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      :headerColor="true"
+      centerTitle="详情"
+    ></yun-header>
+    <scroll-view
+      :enable-back-to-top="true"
+      :scroll-y="true"
+      class="details_view"
+    >
       <view class="details_header">
         <view class="header_icon">
           <image
-            v-if="walletData.after_balance < walletData.before_balance"
+            v-if="walletData.trans_type === 2"
             src="@/static/wallet_type_1.png"
             mode="contain"
           />
-          <image v-if="false" src="@/static/wallet_type_2.png" mode="contain" />
           <image
-            v-if="walletData.trans_type === 1 || walletData.trans_type === 3 || walletData.trans_type === 11"
+            v-if="walletData.trans_type === 5 || walletData.trans_type === 12"
+            src="@/static/wallet_type_2.png"
+            mode="contain"
+          />
+          <image
+            v-if="walletData.trans_type === 1"
             src="@/static/wallet_type_3.png"
             mode="contain"
           />
@@ -27,76 +39,149 @@
             src="@/static/wallet_type_4.png"
             mode="contain"
           />
+          <image
+            v-if="walletData.trans_type === 4 || walletData.trans_type === 3"
+            src="@/static/wallet_type_6.png"
+            mode="contain"
+          />
+          <image
+            v-if="walletData.trans_type === 7"
+            src="@/static/wallet_type_7.png"
+            mode="contain"
+          />
+          <image
+            v-if="walletData.trans_type === 6"
+            src="@/static/wallet_type_5.png"
+            mode="contain"
+          />
+          <image
+            v-if="walletData.trans_type === 11"
+            src="@/static/wallet_type_9.png"
+            mode="contain"
+          />
+          <image
+            v-if="walletData.trans_type === 10"
+            src="@/static/wallet_type_8.png"
+            mode="contain"
+          />
         </view>
         <view class="header_type">
-          {{walletData.trans_type === 1? '钱包充值':
-          walletData.trans_type === 2? '钱包消费':
-          walletData.trans_type === 3? '短信充值':
-          walletData.trans_type === 4? '短信消费':
-          walletData.trans_type === 5? '信用额度调整':
-          walletData.trans_type === 6? '冻结金额调整':
-          walletData.trans_type === 7? '三方支付':
-          walletData.trans_type === 8? '三方支付全退':
-          walletData.trans_type === 9? '三方支付部分退':
-          walletData.trans_type === 10? '提现':
-          walletData.trans_type === 11? '流量充值':
-          walletData.trans_type === 12? '预付款调整': ""}}
+          {{
+            walletData.trans_type === 1
+              ? "钱包充值"
+              : walletData.trans_type === 2
+              ? "钱包消费"
+              : walletData.trans_type === 3
+              ? "短信充值"
+              : walletData.trans_type === 4
+              ? "短信消费"
+              : walletData.trans_type === 5
+              ? "信用额度调整"
+              : walletData.trans_type === 6
+              ? "冻结金额调整"
+              : walletData.trans_type === 7
+              ? "三方支付"
+              : walletData.trans_type === 8
+              ? "三方支付全退"
+              : walletData.trans_type === 9
+              ? "三方支付部分退"
+              : walletData.trans_type === 10
+              ? "提现"
+              : walletData.trans_type === 11
+              ? "流量充值"
+              : walletData.trans_type === 12
+              ? "预付款调整"
+              : ""
+          }}
         </view>
         <view class="header_peice">
-          {{Number(walletData.after_balance).toFixed(2) > Number(walletData.before_balance).toFixed(2)? '+': Number(walletData.before_balance).toFixed(2) > Number(walletData.after_balance).toFixed(2) ? '-': ''}}
-          {{Number(walletData.amount).toFixed(2)}}
+          {{
+            walletData.after_balance >
+            walletData.before_balance
+              ? "+"
+              : walletData.before_balance >
+                walletData.after_balance
+              ? "-"
+              : ""
+          }}
+          {{ Number(walletData.amount).toFixed(2) }}
         </view>
       </view>
 
       <view class="details_box">
         <view class="box_list">
           <view class="list_title">流水编号</view>
-          <view class="list_message">{{walletData.id}}</view>
+          <view class="list_message">{{ walletData.id }}</view>
         </view>
         <view class="box_list">
           <view class="list_title">订单编号</view>
-          <view class="list_message">{{walletData.order_no}}</view>
+          <view class="list_message">{{ walletData.order_no }}</view>
         </view>
         <view class="box_list">
           <view class="list_title">订单类型</view>
           <view class="list_message">
-            {{walletData.order_type === 1? '国内正常单':
-            walletData.order_type === 2? '国际正常单':
-            walletData.order_type === 3? '国内退票单':
-            walletData.order_type === 4? '国际退票单':
-            walletData.order_type === 5? '国内改签单':
-            walletData.order_type === 6? '国际改签单':
-            walletData.order_type === 7? '短信':
-            walletData.order_type === 8? '流量':
-            walletData.order_type === 9? '保险单':
-            walletData.order_type === 10? '现金充值':
-            walletData.order_type === 11? '余额冻结':
-            walletData.order_type === 12? '余额提现':
-            walletData.order_type === 13? '国内反冲':
-            walletData.order_type === 14? '国际反冲': ""}}
+            {{
+              walletData.order_type === 1
+                ? "国内正常单"
+                : walletData.order_type === 2
+                ? "国际正常单"
+                : walletData.order_type === 3
+                ? "国内退票单"
+                : walletData.order_type === 4
+                ? "国际退票单"
+                : walletData.order_type === 5
+                ? "国内改签单"
+                : walletData.order_type === 6
+                ? "国际改签单"
+                : walletData.order_type === 7
+                ? "短信"
+                : walletData.order_type === 8
+                ? "流量"
+                : walletData.order_type === 9
+                ? "保险单"
+                : walletData.order_type === 10
+                ? "现金充值"
+                : walletData.order_type === 11
+                ? "余额冻结"
+                : walletData.order_type === 12
+                ? "余额提现"
+                : walletData.order_type === 13
+                ? "国内反冲"
+                : walletData.order_type === 14
+                ? "国际反冲"
+                : ""
+            }}
           </view>
         </view>
-        <view class="box_list">
+        <!-- <view class="box_list">
           <view class="list_title">支付方式</view>
-          <view
-            class="list_message"
-          >{{payType === 1? '预存款': payType === 2? '授信支付':payType === 3? '易宝在线支付':''}}</view>
-        </view>
+          <view class="list_message">{{
+            payType === 1
+              ? "预存款"
+              : payType === 2
+              ? "授信支付"
+              : payType === 3
+              ? "易宝在线支付"
+              : ""
+          }}</view>
+        </view> -->
         <view class="box_list">
           <view class="list_title">支付时间</view>
-          <view class="list_message">{{walletData.created_at}}</view>
+          <view class="list_message">{{ walletData.created_at }}</view>
         </view>
         <view class="box_list">
           <view class="list_title">操作员</view>
-          <view class="list_message">{{walletData.userinfo.contact}}</view>
+          <view class="list_message">{{ walletData.userinfo.contact }}</view>
         </view>
         <view class="box_list">
           <view class="list_title">员工工号</view>
-          <view class="list_message">{{walletData.userinfo.create_user_id}}</view>
+          <view class="list_message">{{
+            walletData.userinfo.create_user_id
+          }}</view>
         </view>
         <view class="box_list">
           <view class="list_title">备注</view>
-          <view class="list_message">{{walletData.remark}}</view>
+          <view class="list_message">{{ walletData.remark }}</view>
         </view>
       </view>
     </scroll-view>
@@ -116,46 +201,52 @@ export default {
   methods: {
     // 获取订单支付方式
     getOrderType(val) {
-      console.log(val[0]);
+      console.log(val);
       let data = {
         order_no: val,
       };
       if (Number(val[0]) >= 6) {
-        userInfo.getOrderInterPay(data).then((res) => {
-          if (res.result === 10000) {
-            this.payType = res.data.order_msg.pay_type;
-          } else {
-            uni.showToast({
-              title: res.msg,
-              icon: "none",
-            });
-          }
-        }).catch(() =>{
-         setTimeout(() =>{
-            uni.showToast({
-              title: '获取数据错误，请稍后再试',
-              icon: "none",
-            });
-          },200)
-        });
+        userInfo
+          .getOrderInterPay(data)
+          .then((res) => {
+            if (res.result === 10000) {
+              this.payType = res.data.order_msg.pay_type;
+            } else {
+              uni.showToast({
+                title: res.msg,
+                icon: "none",
+              });
+            }
+          })
+          .catch(() => {
+            setTimeout(() => {
+              uni.showToast({
+                title: "获取数据错误，请稍后再试",
+                icon: "none",
+              });
+            }, 200);
+          });
       } else if (Number(val[0]) <= 6) {
-        userInfo.getOrderPay(data).then((res) => {
-          if (res.result === 10000) {
-            this.payType = res.data.order_msg.pay_type;
-          } else {
-            uni.showToast({
-              title: res.msg,
-              icon: "none",
-            });
-          }
-        }).catch(() =>{
-          setTimeout(() =>{
-            uni.showToast({
-              title: '获取数据错误，请稍后再试',
-              icon: "none",
-            });
-          },200)
-        });
+        userInfo
+          .getOrderPay(data)
+          .then((res) => {
+            if (res.result === 10000) {
+              this.payType = res.data.order_msg.pay_type;
+            } else {
+              uni.showToast({
+                title: res.msg,
+                icon: "none",
+              });
+            }
+          })
+          .catch(() => {
+            setTimeout(() => {
+              uni.showToast({
+                title: "获取数据错误，请稍后再试",
+                icon: "none",
+              });
+            }, 200);
+          });
       }
     },
   },
@@ -163,7 +254,7 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.walletData = JSON.parse(data.data);
 
-    this.getOrderType(this.walletData.order_no);
+    // this.getOrderType(this.walletData.order_no);
     console.log(this.walletData);
   },
 };
