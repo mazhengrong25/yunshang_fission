@@ -2,8 +2,8 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-10-09 10:23:36
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2020-11-12 17:56:17
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="filter">
@@ -160,13 +160,6 @@
           placeholder-class="input_placeholder"
         />
       </view>
-      <!-- <view class="list_item list_input" v-if="filterType === '0'">
-        <view class="item_title">订票员</view>
-        <view class="item_input input-right-arrow" @click="openFilterDialog">
-          <text v-if="booker">{{booker}}</text>
-          <text v-else>请选择</text>
-        </view> 
-      </view> -->
 
       <view class="list_item list_input" v-if="filterType === '1'">
         <view class="item_title">乘机人</view>

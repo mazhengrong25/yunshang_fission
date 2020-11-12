@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-11-12 09:22:03
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-12 16:33:51
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_list">
@@ -620,7 +620,7 @@ export default {
             this.headerActive === 1 ? 1 : this.headerActive === 2 ? 2 : "",
           created_at:
             this.orderListFilter.Timestart ||
-            moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
+            moment().subtract(3, "years").format("YYYY-MM-DD"), // 预定日期开始
           created_at_end:
             this.orderListFilter.Timend || moment().format("YYYY-MM-DD"), // 预定日期结束
           pnr_code: this.orderListFilter.pnr || "", // pnr
@@ -754,6 +754,7 @@ export default {
 
     // 预定时间排序
     createSort(t) {
+      console.log(t)
       this.sortType = "create";
       return (m, n) => {
         var a = new Date(m[t]).getTime();

@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-11 15:56:55
+ * @LastEditTime: 2020-11-12 09:44:58
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -67,7 +67,6 @@
               }}m
             </view>
             <view class="center_icon"></view>
-            <view class="type">直飞</view>
           </view>
 
           <view class="message_box">

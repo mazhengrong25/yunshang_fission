@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-11 18:27:30
+ * @LastEditTime: 2020-11-12 15:31:44
  * @LastEditors: Please set LastEditors
 -->
 
@@ -25,14 +25,8 @@
         </view>
 
         <view class="order_price">
-          <view class="price_text" v-if="flightData.order_status === 2">退票金额&yen;</view>
-          <!-- <view class="price_text" v-if="!flightData.order_status === 2">退票金额参考</view> -->
-          <view
-          v-for="(item, index) in flightData.ticket_refund_passenger"
-          :key="index"
-          >{{ item.refund_money && item.refund_money === 0.00 
-              ? "退票金额参考"
-              :""}}</view>
+          <view class="price_text" v-if="flightData.order_status === 2">退票金额&yen;{{Number(flightData.ticket_refund_passenger[0].refund_money).toFixed(0)}}</view>
+          <view class="price_text" v-if="flightData.order_status === 1 || flightData.order_status === 3">退票金额参考</view>
         </view>
       </view>
       <!-- 状态提示 -->
@@ -47,52 +41,14 @@
             : ""
         }}</text>
       </view>
-
-      <!-- <view class="order_option">
-        <view class="option_btn" v-if="orderDetails.status === 1"
-          >发送短信</view
-        >
-        <view
-          class="option_btn"
-          v-if="
-            orderDetails.status !== 0 &&
-              orderDetails.status !== 5 &&
-              orderDetails.pay_status === 1
-          "
-          @click="getCancel(item)"
-          >取消订单</view
-        >
-        <view
-          class="option_btn important_btn"
-          v-if="
-            orderDetails.status !== 0 &&
-              orderDetails.status !== 5 &&
-              orderDetails.pay_status === 1
-          "
-          >去支付</view
-        >
-        <view class="option_btn" v-if="orderDetails.status === 3"
-          >报销凭证</view
-        >
-        <view class="option_btn" v-if="orderDetails.status === 3"
-          >发送短信</view
-        >
-        <view
-          class="option_btn"
-          v-if="orderDetails.status === 3"
-          @click="getRefund()"
-          >退票</view
-        >
-        <view class="option_btn" v-if="orderDetails.status === 3">改签</view>
-        <view class="option_btn" v-if="orderDetails.status === 5"
-          >再次预定</view
-        >
-      </view> -->
     </view>
 
     <view class="details_main">
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
-        <view class="main_list filght_info">
+        <!-- 航班信息  -->
+        <view class="main_list filght_info" 
+        v-for="(item, index) in flightData.ticket_segments" 
+        :key="index">
           <view class="info_header">
             <view class="header_type">{{
               refundDetail.segment_type === 1
@@ -104,72 +60,50 @@
                 : ""
             }}</view>
             <view class="header_time">
-              <!-- <text>{{ flightData[ticket_segments].departure_time }}</text>
-              <text>{{ $dateTool(flightData.ticket_segment.departure_time, "ddd") }}</text> -->
+              <text>{{ $dateTool(item.departure_time,"YYYY-MM-DD") }}</text>
+              <text>{{ $dateTool(item.departure_time, "ddd") }}</text>
             </view>
           </view>
           <view class="info_message">
             <view class="message_box">
-              <!-- <view class="date">{{
+              <view class="date">{{
                 item.departure_time.substring(11, 16)
-              }}</view> -->
+              }}</view>
               <view class="address"
-                >{{ flightData.departure_CN.city_name
-                }}{{ flightData.departure_CN.air_port_name }}</view
-              >
+                >{{ item.departure_CN.city_name
+                }}{{ item.departure_CN.air_port_name }}{{item.departure_terminal}}机场</view>
             </view>
 
             <view class="message_center">
-              <!-- <view class="date"
+              <view class="date"
                 >{{ Math.floor(item.duration / 3600) }}h{{
                   Math.floor((item.duration / 60) % 60)
                 }}m</view
-              > -->
+              >
               <view class="center_icon"></view>
-              <!-- <view class="type">直飞</view> -->
             </view>
 
             <view class="message_box">
-              <!-- <view class="date">{{ item.arrive_time.substring(11, 16) }}</view> -->
+              <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
               <view class="address"
-                >{{ flightData.arrive_CN.city_name
-                }}{{ flightData.arrive_CN.air_port_name }}</view
-              >
+                >{{ item.arrive_CN.city_name
+                }}{{ item.arrive_CN.air_port_name }}{{item.arrive_terminal}}机场</view>
             </view>
           </view>
 
           <view class="filght_message">
             <!-- 航班图标 -->
             <view class="message_icon">
-              <!-- <image
+              <image
                 class="message_icon"
-                :src="'https://fxxcx.ystrip.cn/' + item.image"
+                :src="'https://fxxcx.ystrip.cn/' + refundDetail.image"
                 mode="aspectFill"
-              /> -->
+              />
             </view>
-            <view class="message_list">{{ flightData.flight_no }}</view>
-            <view class="message_list">{{ flightData.model }}</view>
-            <view class="message_list">有早餐</view>
-          </view>
-
-          <view class="filght_bottom">
-            <view class="bottom_list"
-              >{{ flightData.cabin
-              }}{{
-                flightData.cabin_level === "ECONOMY"
-                  ? "经济舱"
-                  : flightData.cabin_level === "FIRST"
-                  ? "头等舱"
-                  : flightData.cabin_level === "BUSINESS"
-                  ? "公务舱"
-                  : ""
-              }}</view
-            >
-            <view class="bottom_list">退改签规则</view>
-            <view class="bottom_list input-right-arrow">每人托运2件，每件23KG</view>
+            <view class="message_list">{{ item.flight_no }}</view>
+            <view class="message_list">{{ item.model }}</view>
           </view>
         </view>
-
         <!-- 出行信息 -->
         <view class="main_list passenger">
           <view class="main_list_title">出行信息</view>
@@ -218,7 +152,7 @@
           <view class="message_list">
             <view class="list_item">
               <view class="item_title">退票单号</view>
-              <view class="item_message">{{ refundDetail.ticket_refund_passenger.ticket_order_no }}</view>
+              <view class="item_message">{{ refundDetail.refund_no }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">PNR</view>
@@ -230,7 +164,7 @@
             </view>
             <view class="list_item">
               <view class="item_title">申请时间</view>
-              <view class="item_message">{{ refundDetail[ticket_refund_passenger].refund_time }}</view>
+              <view class="item_message">{{ refundDetail.created_at }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">退废票备注</view>
@@ -253,13 +187,14 @@ export default {
 
   components: {
     flightExplanation,
+    
   },
 
   data() {
     return {
       iStatusBarHeight: 0,
 
-      flightData: {}, // 航班信息 列表
+      flightData: {}, // 航班信息 从列表传过来的数据
 
       orderId: "", // 订单号
 
@@ -335,6 +270,7 @@ export default {
           height: 21upx;
           display: block;
           margin-left: 14upx;
+          flex:1;
         }
         .price_text {
           font-size: 24upx;
@@ -688,6 +624,53 @@ export default {
               }
             }
           }
+        }
+      }
+
+      .not_flight_data {
+        border-radius: 20rpx;
+        background: #ffffff;
+        box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+        padding: 30rpx 20rpx 22rpx;
+        margin: 0 20rpx 20rpx;
+        height: 144upx;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        &::before {
+          content: "";
+          display: block;
+          width: 44upx;
+          height: 200%;
+          position: absolute;
+          top: -30%;
+          transform: rotate(30deg);
+          background: #fff;
+          left: -30%;
+          animation: skeleton 3s infinite;
+          -webkit-animation: skeleton 3s infinite;
+        }
+        @keyframes skeleton {
+          from {
+            left: -30%;
+          }
+          to {
+            left: 120%;
+          }
+        }
+        text {
+          display: block;
+          width: 80%;
+          height: 28upx;
+          background: #e5e9f2;
+          margin-bottom: 10upx;
+        }
+        view {
+          width: 80%;
+          height: 40upx;
+          margin: auto auto 0;
+          background: #e5e9f2;
         }
       }
     }

@@ -2,8 +2,8 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-10-19 15:47:12
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-12 18:21:18
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_list">
@@ -25,9 +25,9 @@
     <view class="order_filter">
       <view class="filter_list">
         <view class="list_icon">
-          <image src="@/static/filter_time_active.png" mode="contain" />
+          <image src="@/static/filter_apply_btn.png" mode="contain" />
         </view>
-        <view class="list_title" @click="sorTime('create')">申请(早-晚)</view>
+        <view class="list_title" @click="sorTime()">申请(早-晚)</view>
       </view>
 
       <view class="filter_list">
@@ -116,7 +116,10 @@ export default {
 
       orderHeaderTitle: "国内退票单", // 订单列表页头部标题
       refundOrderList: [], //国内退票列表
-      orderListFilter: {}, // 筛选条件
+      refundListFilter: {}, // 筛选条件
+
+      scrollTop: 0, // 列表滚动值
+      oldScrollTop: 0,
     };
   },
   methods: {
@@ -124,7 +127,7 @@ export default {
       this.headerActive = index;
       this.orderPageNumber = 1;
       this.refundOrderList = [];
-      if (JSON.stringify(this.orderListFilter) !== "{}") {
+      if (JSON.stringify(this.refundListFilter) !== "{}") {
         this.getOrderList();
       }
     },
@@ -141,7 +144,7 @@ export default {
       this.orderPageStatus = true;
       let data = {
         dis_id: uni.getStorageSync("userInfo").dis_id,
-        start_date: moment().subtract(7, "days").format("YYYY-MM-DD"),
+        start_date: moment().subtract(3, "years").format("YYYY-MM-DD"),
         end_date: moment().format("YYYY-MM-DD"),
         order_status:
           this.headerActive === 0
@@ -151,6 +154,9 @@ export default {
             : this.headerActive === 2
             ? "2"
             : this.headerActive,
+
+            // 筛选条件
+            
       };
       orderApi.orderRefundList(data).then((res) => {
         console.log(res);
@@ -186,32 +192,38 @@ export default {
       });
     },
 
-    // 起飞时间排序
-    departSort(d) {
-      return (m, n) => {
-        var a = new Date(m.ticket_segments[0][d]).getTime();
-        var b = new Date(n.ticket_segments[0][d]).getTime();
-        return a - b;
-      };
-    },
-
-    // 预定时间排序
+    // 申请时间排序
     createSort(t) {
+      console.log('t',t)
       return (m, n) => {
         var a = new Date(m[t]).getTime();
         var b = new Date(n[t]).getTime();
         return a - b;
       };
+      console.log(m,n)
     },
 
     //时间排序
-    sorTime(val) {
-      if (val === "create") {
+    sorTime() { 
         this.refundOrderList.sort(this.createSort("created_at"));
-      } else if (val === "depart") {
-        this.refundOrderList.sort(this.departSort("departure_time"));
-      }
+        this.backScroll();
     },
+
+    // 航班信息滚动
+    scroll(e) {
+      this.oldScrollTop = e.detail.scrollTop;
+    },
+
+    // 航班信息返回顶部
+    backScroll() {
+      this.scrollTop = this.oldScrollTop;
+      this.$nextTick(() => {
+        this.scrollTop = 0;
+      });
+    },
+
+    
+    
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
