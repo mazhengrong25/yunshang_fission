@@ -718,6 +718,10 @@ export default {
       });
     },
 
+    onShow(){
+      this.getOrderDetails();
+    },
+
     onLoad(data) {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.orderId = data.orderNo; //订单编号
@@ -742,7 +746,6 @@ export default {
           : this.orderListType === "5"
           ? "国际改签订单"
           : "";
-      this.getOrderDetails();
     },
   },
 };

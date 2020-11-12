@@ -29,7 +29,7 @@
           >
         </view>
       </view>
-      <view class="order_list">
+      <view class="order_list" v-if="false">
         <view class="order_left">
           <view class="order_icon">
             <image src="@/static/order_2.png" mode="aspectFit" />
@@ -72,7 +72,11 @@ export default {
     },
     // 跳转到国内退票订单
     goRefundList() {
-
+       return uni.showToast({
+          title: "当前功能开发中，请等待后续版本更新",
+          duration: 3000,
+          icon: "none",
+        });
       uni.navigateTo({
         url: "/order/refundList",
       });
