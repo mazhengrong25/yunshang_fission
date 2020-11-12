@@ -22,47 +22,47 @@
           <image
             v-if="walletData.trans_type === 2"
             src="@/static/wallet_type_1.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 5 || walletData.trans_type === 12"
             src="@/static/wallet_type_2.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 1"
             src="@/static/wallet_type_3.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 8 || walletData.trans_type === 9"
             src="@/static/wallet_type_4.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 4 || walletData.trans_type === 3"
             src="@/static/wallet_type_6.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 7"
             src="@/static/wallet_type_7.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 6"
             src="@/static/wallet_type_5.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 11"
             src="@/static/wallet_type_9.png"
-            mode="contain"
+            mode="aspectFit"
           />
           <image
             v-if="walletData.trans_type === 10"
             src="@/static/wallet_type_8.png"
-            mode="contain"
+            mode="aspectFit"
           />
         </view>
         <view class="header_type">
