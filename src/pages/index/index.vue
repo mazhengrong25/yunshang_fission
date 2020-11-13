@@ -2,8 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-10-20 11:33:15
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-13 16:07:20
+ * @LastEditors: Please set LastEditors
 --> 
 <template>
   <view class="index">
@@ -258,21 +258,31 @@ export default {
 
       checkTickedType: false, // 切换往返地
 
-      swiperList: [
+      // banner 列表
+      // swiperList: [  
+      //   {
+      //     // 轮播图数据
+      //     url: require("@/static/header_swiper.png"),
+      //   },
+      //   {
+      //     url: require("@/static/header_swiper.png"),
+      //   },
+      //   {
+      //     url: require("@/static/header_swiper.png"),
+      //   },
+      //   {
+      //     url: require("@/static/header_swiper.png"),
+      //   },
+      // ],
+
+      // banner 列表
+      swiperList:[
         {
-          // 轮播图数据
-          url: require("@/static/header_swiper.png"),
-        },
-        {
-          url: require("@/static/header_swiper.png"),
-        },
-        {
-          url: require("@/static/header_swiper.png"),
-        },
-        {
-          url: require("@/static/header_swiper.png"),
-        },
+         
+        }
       ],
+
+      adType:"100", // 广告类型
 
       currentTab: 0, // tab默认值
       tabsList: ["国内", "国际", "往返", "多程"], // tab切换内容
@@ -505,6 +515,23 @@ export default {
       });
     },
 
+    // 获取banner列表
+    getBannerList() {
+
+      let data = {
+
+          type:this.adType
+      };
+
+      console.log(data)
+
+       userInfo.getAdvertisement(data).then((res) => {
+          if (res.errorcode === 10000) {
+            
+          }
+       })
+    },
+
     getUserInfo(){
       userInfo.getUserInfo().then((res) => {
         console.log(res);
@@ -519,6 +546,8 @@ export default {
     this.getUserInfo()
 
     this.getNoticeList();
+
+    this.getBannerList(); // 获取banner
 
   },
   onShareAppMessage(res) {

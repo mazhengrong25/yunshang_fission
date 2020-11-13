@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-12 18:21:18
+ * @LastEditTime: 2020-11-13 17:46:48
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -155,7 +155,11 @@ export default {
             ? "2"
             : this.headerActive,
 
-            // 筛选条件
+            // 筛选条件  refundListFilter
+            pnr_code: this.refundListFilter.pnr || '', // pnr
+            admin_name: this.refundListFilter.admin_name || '', //申请人
+
+
             
       };
       orderApi.orderRefundList(data).then((res) => {
@@ -168,6 +172,7 @@ export default {
             );
           } else {
             this.refundOrderList = res.data.data;
+            console.log('列表',this.refundOrderList)
           }
         } else {
           uni.showToast({
@@ -230,86 +235,16 @@ export default {
     this.getOrderList();
   },
   onShow() {
-    this.orderListFilter = uni.getStorageSync("orderListFilter");
-    if (this.orderListFilter) {
-      this.orderListFilter = JSON.parse(this.orderListFilter);
+    this.refundListFilter = uni.getStorageSync("refundListFilter");
+    if (this.refundListFilter) {
+      this.refundListFilter = JSON.parse(this.refundListFilter);
       //pnr筛选
-      if (this.orderListFilter.pnr) {
+      if (this.refundListFilter.pnr) {
         this.refundOrderList = this.refundOrderList.filter(
-          (item) => item.pnr_code === this.orderListFilter.pnr
+          (item) => item.pnr_code === this.refundListFilter.pnr
         );
       }
-      //订单编号筛选
-      if (this.orderListFilter.orderNumber) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) => item.order_no === this.orderListFilter.orderNumber
-        );
-      }
-
-      //航班号筛选
-      if (this.orderListFilter.flightNumber) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) =>
-            item.ticket_segments[0].flight_no ===
-            this.orderListFilter.flightNumber
-        );
-      }
-
-      //订票员  选择框
-      if (this.orderListFilter.booker) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) => item.book_user === this.created_at.booker
-        );
-      }
-
-      //出发城市筛选
-      if (this.orderListFilter.Citystart) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) =>
-            item.ticket_segments[0].departure_msg.province ===
-            this.orderListFilter.Citystart
-        );
-      }
-
-      //到达城市筛选
-      if (this.orderListFilter.Cityend) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) =>
-            item.ticket_segments[0].arrive_msg.province ===
-            this.orderListFilter.Cityend
-        );
-      }
-
-      //日始时间筛选
-      if (this.orderListFilter.Timestart) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) =>
-            moment(item.ticket_segments[0].departure_time).format(
-              "YYYY-MM-DD"
-            ) === this.orderListFilter.Timestart
-        );
-      }
-
-      //日止时间筛选
-      if (this.orderListFilter.Timend) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) =>
-            moment(item.ticket_segments[0].departure_time).format(
-              "YYYY-MM-DD"
-            ) === this.orderListFilter.Timend
-        );
-      }
-
-      //预定日期排序
-      if (this.orderListFilter.date !== null) {
-        this.sorTime(this.orderListFilter.date);
-      }
-
-      //订单状态筛选
-      if (this.orderListFilter.status !== null) {
-        this.checkedHeaderActive(this.orderListFilter.status);
-      }
-
+      
       uni.removeStorageSync("orderListFilter");
     }
   },

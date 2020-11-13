@@ -2,14 +2,14 @@
  * @Description: 首页轮播图组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:57:57
- * @LastEditTime: 2020-07-22 17:25:20
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-13 16:06:05
+ * @LastEditors: Please set LastEditors
 --> 
 <template>
 	<view class="model_swiper">
 		<swiper autoplay circular class="model_swiper_box" @change="change">
 			<swiper-item v-for="(item, index) in swiperList" :key="index" class="swiper_item">
-				<image :src="item.url" class="swiper_image" mode="contain" />
+				<image :src="'https://fxxcx.'+item.path" class="swiper_image" mode="contain" />
 			</swiper-item>
 		</swiper>
 

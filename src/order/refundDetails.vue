@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-12 15:31:44
+ * @LastEditTime: 2020-11-13 10:31:25
  * @LastEditors: Please set LastEditors
 -->
 
@@ -65,7 +65,7 @@
             </view>
           </view>
           <view class="info_message">
-            <view class="message_box">
+            <view class="left_message">
               <view class="date">{{
                 item.departure_time.substring(11, 16)
               }}</view>
@@ -389,7 +389,22 @@ export default {
             align-items: center;
             justify-content: space-between;
             margin-bottom: 26upx;
+            .left_message {
+              text-align:left;
+              .date {
+                font-size: 36upx;
+                font-weight: bold;
+                color: rgba(42, 42, 42, 1);
+                margin-bottom: 4upx;
+              }
+              .address {
+                font-size: 24upx;
+                font-weight: 400;
+                color: rgba(42, 42, 42, 1);
+              }
+            }
             .message_box {
+              text-align:right;
               .date {
                 font-size: 36upx;
                 font-weight: bold;

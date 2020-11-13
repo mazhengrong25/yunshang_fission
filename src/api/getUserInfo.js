@@ -2,7 +2,7 @@
  * @Description: 获取用户信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 10:34:01
- * @LastEditTime: 2020-11-09 15:12:36
+ * @LastEditTime: 2020-11-13 14:42:24
  * @LastEditors: Please set LastEditors
  */ 
 import request from '@/api/request';
@@ -52,6 +52,17 @@ function getServiceList () {
 	})
 }
 
+// 获得广告列表
+function getAdvertisement (data) {
+
+	return request({
+		method: "POST",
+		url: '/api/ad',
+		data:data
+		
+	})
+}
+
 // 订单支付方式 - 国内
 function getOrderPay (data) {
 	return request({
@@ -86,5 +97,6 @@ export default{
 	getServiceList,
 	getOrderPay,
 	getOrderInterPay,
-	signOut
+	signOut,
+	getAdvertisement
 }
