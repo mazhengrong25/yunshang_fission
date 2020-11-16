@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-13 17:46:48
+ * @LastEditTime: 2020-11-16 18:24:24
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -23,18 +23,18 @@
     </view>
 
     <view class="order_filter">
-      <view class="filter_list">
+      <view class="filter_list" @click="sorTime()">
         <view class="list_icon">
           <image src="@/static/filter_apply_btn.png" mode="contain" />
         </view>
-        <view class="list_title" @click="sorTime()">申请(早-晚)</view>
+        <view class="list_title">申请(早-晚)</view>
       </view>
 
-      <view class="filter_list">
+      <view class="filter_list" @click="goFilter('1')">
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="contain" />
         </view>
-        <view class="list_title" @click="goFilter('1')">筛选</view>
+        <view class="list_title">筛选</view>
       </view>
     </view>
 
@@ -54,7 +54,7 @@
           <view class="item_header">
             <view
               class="item_title"
-              v-for="(oitem, oindex) in item.ticket_segments"
+              v-for="(oitem, oindex) in item.ticket_segments.length < 1 ?item.ticket_change_segments:item.ticket_segments"
               :key="oindex"
             >
               <view class="title"
@@ -137,9 +137,10 @@ export default {
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/order/filter?type=" + type,
+        url: "/order/filter?type=" + type +
+        "&refundData=" +
+          JSON.stringify(this.refundListFilter),
       });
-      this.getOrderList();
     },
     //获取国内退票列表
     getOrderList() {
@@ -156,12 +157,13 @@ export default {
             : this.headerActive === 2
             ? "2"
             : this.headerActive,
-
-            // 筛选条件  refundListFilter
-            pnr_code: this.refundListFilter.pnr || '', // pnr
-            admin_name: this.refundListFilter.admin_name || '', //申请人
         page: this.orderListPage,
 
+        // 筛选条件  refundListFilter
+        pnr_code: this.refundListFilter.pnr || '', // pnr
+        admin_name: this.refundListFilter.admin_name || '', //申请人
+        ticket_no: this.refundListFilter.ticket_no || '',
+        xxxx: ''
             
       };
       orderApi.orderRefundList(data).then((res) => {
@@ -177,9 +179,10 @@ export default {
             this.orderLishStuats = true;
           }
 
+
           if (this.orderListPage >= res.data.last_page) {
               this.orderPageStatus = false;
-            }
+          }
         } else {
           uni.showToast({
             title: res.msg,
@@ -203,20 +206,9 @@ export default {
       });
     },
 
-    // 申请时间排序
-    createSort(t) {
-      console.log('t',t)
-      return (m, n) => {
-        var a = new Date(m[t]).getTime();
-        var b = new Date(n[t]).getTime();
-        return a - b;
-      };
-      console.log(m,n)
-    },
-
     //时间排序
     sorTime() { 
-        this.refundOrderList.sort(this.createSort("created_at"));
+       
         this.backScroll();
     },
 
@@ -238,21 +230,26 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.getOrderList();
   },
   onShow() {
-    this.refundListFilter = uni.getStorageSync("refundListFilter");
-    if (this.refundListFilter) {
-      this.refundListFilter = JSON.parse(this.refundListFilter);
-      //pnr筛选
-      if (this.refundListFilter.pnr) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) => item.pnr_code === this.refundListFilter.pnr
-        );
+    // 判断进入页面 缓存中是否存在筛选数据 如果有则组装筛选数据 并删除缓存
+    
+    if(uni.getStorageSync("orderListFilter")){
+      this.refundListFilter = JSON.parse(uni.getStorageSync("orderListFilter"))
+      uni.removeStorageSync('orderListFilter')
+      if (this.refundListFilter.order_status !== null) {
+        this.checkedHeaderActive(this.refundListFilter.order_status);
+      }else {
+        this.checkedHeaderActive(0);
       }
-      
-      uni.removeStorageSync("orderListFilter");
+      console.log(this.refundListFilter)
+    }else{
+      this.headerActive = 0;
+      this.getOrderList();
+      this.backScroll();
     }
+    
+    
   },
 };
 </script>

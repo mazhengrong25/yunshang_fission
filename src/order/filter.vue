@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-12 17:56:17
+ * @LastEditTime: 2020-11-16 18:23:40
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -166,7 +166,7 @@
         <input
           type="text"
           class="item_input"
-          v-model="flightNumber"
+          v-model="flightPassenger"
           placeholder="请填写乘机人"
           placeholder-class="input_placeholder"
         />
@@ -177,7 +177,7 @@
         <input
           type="text"
           class="item_input"
-          v-model="flightNumber"
+          v-model="flightApplicant"
           placeholder="请填写申请人"
           placeholder-class="input_placeholder"
         />
@@ -330,6 +330,10 @@ export default {
     refundStatus: null, // 退票状态
     passengerStatus: null, //乘客状态
     orderType: null, //订单状态
+
+    // 退票筛选
+    flightPassenger:"", // 乘机人
+    flightApplicant:"", // 申请人
     };
   },
   methods: {
@@ -401,6 +405,10 @@ export default {
       this.orderNumber = "";
       this.flightNumber = "";
       this.booker = "";
+
+      // 退票筛选
+      this.flightPassenger = ""; 
+      this.flightApplicant = "";
       let data = {}
       uni.setStorageSync('orderListFilter',JSON.stringify(data));
       uni.navigateBack();
@@ -409,7 +417,10 @@ export default {
     // 确定筛选
     yesBtn() {
        
-      let data = {
+      let data 
+      // 国内列表筛选
+      if(this.filterType === '0'){
+        data = {
         pnr: this.pnr, //pnr
         orderNumber: this.orderNumber, //订单号
         flightNumber: this.flightNumber, // 航班号
@@ -421,7 +432,14 @@ export default {
         status: this.activeStatus, // 订单状态
         date: this.dateStatus, //日期条件
   
+        }
+      }else if(this.filterType === '1'){
+        // 国内退票筛选
+        data = {
+          admin_name: this.flightApplicant
+        }
       }
+      
     uni.setStorageSync('orderListFilter',JSON.stringify(data));
     uni.navigateBack();
     },
@@ -493,7 +511,10 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.filterType = data.type
-    if(data.filterData !== '{}'){
+    console.log(data)
+    this.is_order_fliter = data.filterData?true: data.refundData? false: undefined
+    // 国内筛选 如果国内筛选字段 不为 空值 并且 拥有国内筛选这个字段 才进入数据组装
+    if(data.filterData !== '{}' && this.filterType === '0'){
       let fliterData = JSON.parse(data.filterData)
       console.log('筛选条件',fliterData)
       this.pnr = fliterData.pnr //pnr
@@ -510,6 +531,10 @@ export default {
       this.orderStatus.forEach(item => item.active = item.id === fliterData.status)
       this.dateFilter[1].active = fliterData.date === 'depart'
       this.dateFilter[0].active = fliterData.date === 'create'
+    }
+    if(this.filterType === '1' && data.refundData !== '{}'){
+      let refundList = JSON.parse(data.refundData)
+      this.flightApplicant = refundList.admin_name // 申请人
     }
     
     console.log('筛选类型',this.filterType)

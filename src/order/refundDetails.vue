@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-13 10:31:25
+ * @LastEditTime: 2020-11-16 14:02:56
  * @LastEditors: Please set LastEditors
 -->
 
@@ -28,20 +28,15 @@
         </view>
 
         <view class="order_price">
-          <view class="price_text" v-if="flightData.order_status === 2"
-            >退票金额&yen;{{
-              Number(
-                flightData.ticket_refund_passenger[0].refund_money
-              ).toFixed(0)
-            }}</view
-          >
-          <view
-            class="price_text"
-            v-if="
-              flightData.order_status === 1 || flightData.order_status === 3
-            "
-            >退票金额参考</view
-          >
+          <view class="price_text" v-if="flightData.order_status === 2">退票金额&nbsp;&yen;</view>
+          <view class="price_text"
+            v-if="flightData.order_status === 1 || flightData.order_status === 3"
+          >退票金额参考</view>
+          <view class="price_total" v-if="flightData.order_status === 2">
+            {{
+              Number(flightData.ticket_refund_passenger[0].refund_total).toFixed(0) || ''
+            }}
+          </view>
         </view>
       </view>
       <!-- 状态提示 -->
@@ -192,7 +187,7 @@
             </view>
             <view class="list_item">
               <view class="item_title">PNR</view>
-              <view class="item_message">{{ refundDetail.pnr_code }}</view>
+              <view class="item_message">{{ refundDetail.pnr_code || ''}}</view>
             </view>
             <view class="list_item">
               <view class="item_title">分销商</view>
@@ -202,10 +197,14 @@
               <view class="item_title">申请时间</view>
               <view class="item_message">{{ refundDetail.created_at }}</view>
             </view>
+            <view class="list_item" v-if="flightData.order_status === 2">
+              <view class="item_title">退款时间</view>
+              <view class="item_message">{{ refundDetail.ticket_refund_passenger[0].refund_time }}</view>
+            </view>
             <view class="list_item">
               <view class="item_title">退废票备注</view>
-              <view class="item_message input-right-arrow">{{
-                refundDetail.remark
+              <view class="item_message">{{
+                refundDetail.remark || '无'
               }}</view>
             </view>
           </view>
@@ -657,7 +656,6 @@ export default {
                 font-size: 24upx;
                 font-weight: 400;
                 color: rgba(153, 153, 153, 1);
-                // width: 100upx;
               }
               .item_message {
                 flex: 1;
@@ -665,6 +663,10 @@ export default {
                 font-size: 24upx;
                 font-weight: 400;
                 color: rgba(42, 42, 42, 1);
+                width: 25%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
           }
