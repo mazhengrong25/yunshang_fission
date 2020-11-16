@@ -8,31 +8,46 @@
 
 <template>
   <view class="order_details">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票单详情"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      centerTitle="退票单详情"
+    ></yun-header>
 
     <view class="details_header">
       <view class="header_top">
         <view class="order_type">
           {{
-           flightData.order_status === 1
-            ? "申请中"
-            : flightData.order_status === 2
-            ? "成功"
-            : flightData.order_status === 3
-            ? "已取消"
-            : ""
+            flightData.order_status === 1
+              ? "申请中"
+              : flightData.order_status === 2
+              ? "成功"
+              : flightData.order_status === 3
+              ? "已取消"
+              : ""
           }}
         </view>
 
         <view class="order_price">
-          <view class="price_text" v-if="flightData.order_status === 2">退票金额&yen;{{Number(flightData.ticket_refund_passenger[0].refund_money).toFixed(0)}}</view>
-          <view class="price_text" v-if="flightData.order_status === 1 || flightData.order_status === 3">退票金额参考</view>
+          <view class="price_text" v-if="flightData.order_status === 2"
+            >退票金额&yen;{{
+              Number(
+                flightData.ticket_refund_passenger[0].refund_money
+              ).toFixed(0)
+            }}</view
+          >
+          <view
+            class="price_text"
+            v-if="
+              flightData.order_status === 1 || flightData.order_status === 3
+            "
+            >退票金额参考</view
+          >
         </view>
       </view>
       <!-- 状态提示 -->
       <view class="remaining_time">
         <text class="time_text">{{
-             flightData.order_status === 1
+          flightData.order_status === 1
             ? "您的申请已提交，等待后台审核"
             : flightData.order_status === 2
             ? "您的订单已成功退款"
@@ -46,9 +61,11 @@
     <view class="details_main">
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
         <!-- 航班信息  -->
-        <view class="main_list filght_info" 
-        v-for="(item, index) in flightData.ticket_segments" 
-        :key="index">
+        <view
+          class="main_list filght_info"
+          v-for="(item, index) in flightData.ticket_segments"
+          :key="index"
+        >
           <view class="info_header">
             <view class="header_type">{{
               refundDetail.segment_type === 1
@@ -60,7 +77,7 @@
                 : ""
             }}</view>
             <view class="header_time">
-              <text>{{ $dateTool(item.departure_time,"YYYY-MM-DD") }}</text>
+              <text>{{ $dateTool(item.departure_time, "YYYY-MM-DD") }}</text>
               <text>{{ $dateTool(item.departure_time, "ddd") }}</text>
             </view>
           </view>
@@ -70,8 +87,18 @@
                 item.departure_time.substring(11, 16)
               }}</view>
               <view class="address"
-                >{{ item.departure_CN.city_name
-                }}{{ item.departure_CN.air_port_name }}{{item.departure_terminal}}机场</view>
+                >{{
+                  item.departure_CN.city_name
+                    ? item.departure_CN.city_name
+                    : ""
+                }}{{
+                  item.departure_CN.air_port_name
+                    ? item.departure_CN.air_port_name
+                    : ""
+                }}{{
+                  item.departure_terminal ? item.departure_terminal : ""
+                }}</view
+              >
             </view>
 
             <view class="message_center">
@@ -86,8 +113,15 @@
             <view class="message_box">
               <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
               <view class="address"
-                >{{ item.arrive_CN.city_name
-                }}{{ item.arrive_CN.air_port_name }}{{item.arrive_terminal}}机场</view>
+                >{{ item.arrive_CN.city_name ? item.arrive_CN.city_name : ""
+                }}{{
+                  item.arrive_CN.air_port_name
+                    ? item.arrive_CN.air_port_name
+                    : ""
+                }}{{
+                  item.arrive_terminal ? item.arrive_terminal : ""
+                }}</view
+              >
             </view>
           </view>
 
@@ -125,9 +159,11 @@
                       : ""
                   }}票</view
                 >
-                <view class="info_name">{{ oitem.ticket_passenger.PassengerName }}</view>
+                <view class="info_name">{{
+                  oitem.ticket_passenger.PassengerName
+                }}</view>
                 <view class="is_insurance" v-if="oitem.insure_count !== 0">
-                    <image src="@/static/insurance_icon.png" mode="contain" />
+                  <image src="@/static/insurance_icon.png" mode="aspectFill" />
                 </view>
                 <view class="group_type">票号</view>
                 <view class="group_number">{{ oitem.ticket_no }}</view>
@@ -168,11 +204,12 @@
             </view>
             <view class="list_item">
               <view class="item_title">退废票备注</view>
-              <view class="item_message input-right-arrow">{{ refundDetail.remark }}</view>
+              <view class="item_message input-right-arrow">{{
+                refundDetail.remark
+              }}</view>
             </view>
           </view>
         </view>
-
       </scroll-view>
     </view>
   </view>
@@ -184,10 +221,8 @@ import moment from "moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
 moment.locale("zh-cn");
 export default {
-
   components: {
     flightExplanation,
-    
   },
 
   data() {
@@ -199,14 +234,11 @@ export default {
       orderId: "", // 订单号
 
       refundDetail: {}, // 退票单详情
-
     };
   },
   methods: {
-
-     // 获取订单详情
+    // 获取订单详情
     getOrderDetails() {
-     
       let data = {
         refund_no: this.orderId,
       };
@@ -214,7 +246,7 @@ export default {
       orderApi.orderInterRefund(data).then((res) => {
         if (res.result === 10000) {
           this.refundDetail = res.data;
-          console.log('this.refundDetail',this.refundDetail)
+          console.log("this.refundDetail", this.refundDetail);
         } else {
           uni.showToast({
             title: res.msg,
@@ -224,13 +256,11 @@ export default {
       });
     },
 
-    
-
     onLoad(data) {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.flightData = JSON.parse(data.refundData);
       this.orderId = this.flightData.refund_no;
-      console.log('退票详情',this.flightData);
+      console.log("退票详情", this.flightData);
       this.getOrderDetails();
     },
   },
@@ -270,7 +300,7 @@ export default {
           height: 21upx;
           display: block;
           margin-left: 14upx;
-          flex:1;
+          flex: 1;
         }
         .price_text {
           font-size: 24upx;
@@ -390,7 +420,7 @@ export default {
             justify-content: space-between;
             margin-bottom: 26upx;
             .left_message {
-              text-align:left;
+              text-align: left;
               .date {
                 font-size: 36upx;
                 font-weight: bold;
@@ -404,7 +434,7 @@ export default {
               }
             }
             .message_box {
-              text-align:right;
+              text-align: right;
               .date {
                 font-size: 36upx;
                 font-weight: bold;
@@ -533,28 +563,27 @@ export default {
                   margin-right: 8upx;
                 }
                 .is_insurance {
-                  
-                    width: 30upx;
-                    height: 30upx;
-                    margin-right: 8upx;
-                    display: flex;
-                    image {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }
+                  width: 30upx;
+                  height: 30upx;
+                  margin-right: 8upx;
+                  display: flex;
+                  image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                  }
                 }
                 .group_type {
-                    margin-left: 28upx;
-                    font-size: 28upx;
-                    font-weight: 400;
-                    color: #333333;
-                    margin-right: 10px;
+                  margin-left: 28upx;
+                  font-size: 28upx;
+                  font-weight: 400;
+                  color: #333333;
+                  margin-right: 10px;
                 }
                 .group_number {
-                    font-weight: bold;
-                    font-size: 14px;
-                    color: #2a2a2a;
+                  font-weight: bold;
+                  font-size: 14px;
+                  color: #2a2a2a;
                 }
               }
               .list_message {

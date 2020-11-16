@@ -259,30 +259,14 @@ export default {
       checkTickedType: false, // 切换往返地
 
       // banner 列表
-      // swiperList: [  
-      //   {
-      //     // 轮播图数据
-      //     url: require("@/static/header_swiper.png"),
-      //   },
-      //   {
-      //     url: require("@/static/header_swiper.png"),
-      //   },
-      //   {
-      //     url: require("@/static/header_swiper.png"),
-      //   },
-      //   {
-      //     url: require("@/static/header_swiper.png"),
-      //   },
-      // ],
-
-      // banner 列表
-      swiperList:[
+      swiperList: [
         {
-         
-        }
+          path: require("@/static/header_swiper.jpg"),
+          title: "云上航空，心之所愿",
+          url: "#",
+          swiper_type: true
+        },
       ],
-
-      adType:"100", // 广告类型
 
       currentTab: 0, // tab默认值
       tabsList: ["国内", "国际", "往返", "多程"], // tab切换内容
@@ -517,22 +501,17 @@ export default {
 
     // 获取banner列表
     getBannerList() {
-
       let data = {
-
-          type:this.adType
+        type: "100",
       };
-
-      console.log(data)
-
-       userInfo.getAdvertisement(data).then((res) => {
-          if (res.errorcode === 10000) {
-            
-          }
-       })
+      userInfo.getAdvertisement(data).then((res) => {
+        if (res.errorcode === 10000) {
+          this.swiperList = res.data;
+        }
+      });
     },
 
-    getUserInfo(){
+    getUserInfo() {
       userInfo.getUserInfo().then((res) => {
         console.log(res);
         uni.setStorageSync("userInfo", res);
@@ -543,12 +522,11 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.setSwiperHeight();
 
-    this.getUserInfo()
+    this.getUserInfo();
 
     this.getNoticeList();
 
     this.getBannerList(); // 获取banner
-
   },
   onShareAppMessage(res) {
     return {

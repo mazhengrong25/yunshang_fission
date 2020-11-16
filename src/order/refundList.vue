@@ -114,6 +114,8 @@ export default {
       orderPageStatus: true, // 是否允许加载下一页数据
       orderList: [], // 订单列表数据
 
+      orderListPage: 1,
+
       orderHeaderTitle: "国内退票单", // 订单列表页头部标题
       refundOrderList: [], //国内退票列表
       refundListFilter: {}, // 筛选条件
@@ -158,22 +160,26 @@ export default {
             // 筛选条件  refundListFilter
             pnr_code: this.refundListFilter.pnr || '', // pnr
             admin_name: this.refundListFilter.admin_name || '', //申请人
-
+        page: this.orderListPage,
 
             
       };
       orderApi.orderRefundList(data).then((res) => {
         console.log(res);
         if (res.result === 10000) {
-          if (this.refundOrderList.length > 0) {
+          if (this.orderPageStatus) {
             this.refundOrderList.push.apply(
               this.refundOrderList,
               res.data.data
             );
           } else {
             this.refundOrderList = res.data.data;
-            console.log('列表',this.refundOrderList)
+            this.orderLishStuats = true;
           }
+
+          if (this.orderListPage >= res.data.last_page) {
+              this.orderPageStatus = false;
+            }
         } else {
           uni.showToast({
             title: res.msg,
@@ -185,7 +191,7 @@ export default {
     // 下一页数据
     nextPageData() {
       if (this.orderPageStatus) {
-        this.orderPageNumber = this.orderPageNumber + 1;
+        this.orderListPage = this.orderListPage + 1;
         this.getOrderList();
       }
     },

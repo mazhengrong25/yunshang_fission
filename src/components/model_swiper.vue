@@ -9,7 +9,7 @@
 	<view class="model_swiper">
 		<swiper autoplay circular class="model_swiper_box" @change="change">
 			<swiper-item v-for="(item, index) in swiperList" :key="index" class="swiper_item">
-				<image :src="'https://fxxcx.'+item.path" class="swiper_image" mode="contain" />
+				<image :src="(item.swiper_type?'':'http://fxxcx.ystrip.cn')+item.path" class="swiper_image" mode="aspectFit" :title="item.title" />
 			</swiper-item>
 		</swiper>
 
