@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-09 14:11:33
- * @LastEditTime: 2020-11-09 18:19:47
+ * @LastEditTime: 2020-11-16 09:57:28
  * @LastEditors: Please set LastEditors
  * @Description: 客服服务列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\userInfo\serviceDetails.vue
@@ -36,9 +36,9 @@
                 </view>
 
                 <view class="edit_btn" @click="jumpPhoneCall(item)">
-                    <view class="edit_icon">
-                        <image src="@/static/call_icon.png" mode="contain" />
-                    </view>
+                    
+                    <image src="@/static/call_icon.png" mode="contain" />
+                    
                 </view>
             </view>
 
@@ -156,15 +156,10 @@ export default {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    .edit_icon {
-                        width: 30upx;
-                        height: 30upx;
-                        border-radius: 50%;
-                        image {
-                            width:100%;
-                            height:100%;
-                            object-fit: contain;
-                        }
+                    image {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
                     }
 
                 }
