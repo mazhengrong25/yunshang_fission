@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-16 18:23:40
+ * @LastEditTime: 2020-11-17 16:24:12
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -29,7 +29,7 @@
             :class="['checkbox_item',{'active': item.active}]"
             v-for="item in refundFilter"
             :key="item"
-            @click="activeDate(item)"
+            @click="activeRefundFilter(item)"
           >{{item.name}}</view>
         </view>
       </view>
@@ -53,18 +53,18 @@
             @click="openlimitdaySelector('start')"
           >{{timeLimit.start?timeLimit.start:'预定日始'}}</view>
           <view v-if="filterType === '1'"
-            :class="['dialog_view',{input_placeholder: !timeLimit.start}]"
+            :class="['dialog_view',{input_placeholder: !refundTime.start}]"
             @click="openlimitdaySelector('start')"
-          >{{timeLimit.start?timeLimit.start:'申请日始'}}</view>
+          >{{refundTime.start?refundTime.start:'申请日始'}}</view>
           <view class="dialog_line">—</view>
           <view v-if="filterType === '0'"
             :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
             @click="openlimitdaySelector('end')"
           >{{timeLimit.end?timeLimit.end:'预定日止'}}</view>
           <view v-if="filterType === '1'"
-            :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
+            :class="['dialog_view',{input_placeholder: !refundTime.end}]"
             @click="openlimitdaySelector('end')"
-          >{{timeLimit.end?timeLimit.end:'申请日止'}}</view>
+          >{{refundTime.end?refundTime.end:'申请日止'}}</view>
         </view>
       </view>
 
@@ -75,7 +75,7 @@
             :class="['checkbox_item',{'active': item.active}]"
             v-for="item in passengerFilter"
             :key="item"
-            @click="activeDate(item)"
+            @click="activeDate(item,'passenger')"
           >{{item.name}}</view>
         </view>
       </view>
@@ -87,7 +87,7 @@
             :class="['checkbox_item',{'active': item.active}]"
             v-for="item in orderFilter"
             :key="item"
-            @click="activeDate(item)"
+            @click="activeDate(item,'orderType')"
           >{{item.name}}</view>
         </view>
       </view>
@@ -124,7 +124,7 @@
         <input
           type="text"
           class="item_input"
-          v-model="pnr"
+          v-model="ticket_Number"
           placeholder="请填写票号"
           placeholder-class="input_placeholder"
         />
@@ -232,14 +232,17 @@ export default {
         //退票状态筛选列表
         {
           name: "申请中",
+          id:1,
           active:false,
         },
         {
           name: "成功",
+          id:2,
           active:false,
         },
         {
           name: "已取消",
+          id:3,
           active:false,
         }
       ],
@@ -248,14 +251,17 @@ export default {
         //乘客类型筛选列表
         {
           name: "成人",
+          value: 'ADT',
           active:false,
         },
         {
           name: "儿童",
+          value: 'CNN',
           active:false,
         },
         {
           name: "婴儿",
+          value: 'INF',
           active:false,
         }
       ],
@@ -264,10 +270,12 @@ export default {
         // 订单类型筛选列表
         {
           name: "客户单",
+          id:0,
           active:false,
         },
         {
           name: "手工单",
+          id:1,
           active:false,
         },
       ],
@@ -299,6 +307,11 @@ export default {
         start: "",
         end: "",
       },
+      // 退票申请时间开始结束
+      refundTime: {
+        start:"",
+        end:"",
+      },
       citySelect: {
         // 城市选择
         start: "",
@@ -327,18 +340,21 @@ export default {
 
     activeStatus: null, // 订单状态
     dateStatus: null, //  日期状态
-    refundStatus: null, // 退票状态
     passengerStatus: null, //乘客状态
     orderType: null, //订单状态
 
     // 退票筛选
     flightPassenger:"", // 乘机人
     flightApplicant:"", // 申请人
+    refundStatus: null, // 退票订单状态
+    ticket_Number:"", // 票号
+
+    passengerType: "",
     };
   },
   methods: {
     // 条件选择
-    activeDate(val) {
+    activeDate(val,type) {
       if(this.filterType === "0"){
             // 日期选择
             this.dateFilter.forEach((item) => {
@@ -351,24 +367,19 @@ export default {
             }
           });
       }else if(this.filterType === "1") {
-        // 退票状态
-         this.refundFilter.forEach((item) => {
-            if (item.name === val.name) {
-              item.active = !val.active;
-              this.refundStatus = item.active?val.id:null
-            } else {
-              item.active = false;
-            }
-          });
+
+        if(type === "passenger"){
           // 乘客状态
           this.passengerFilter.forEach((item) => {
             if (item.name === val.name) {
               item.active = !val.active;
-              this.passengerStatus = item.active?val.id:null
+              this.passengerStatus = item.active?val.value: null
             } else {
               item.active = false;
             }
           });
+        }else if(type === "orderType"){
+
           // 订单状态
           this.orderFilter.forEach((item) => {
             if (item.name === val.name) {
@@ -378,10 +389,13 @@ export default {
               item.active = false;
             }
           });
+
+        }
+            
       }
     
     },
-    // 订单状态选择
+    // 订单状态选择  国内订单
     activeOrderStatus(val) {
       this.orderStatus.forEach((item) => {
         if (item.name === val.name) {
@@ -391,6 +405,18 @@ export default {
           item.active = false;
         }
       });
+    },
+
+    // 订单状态   退票列表
+    activeRefundFilter(val) {
+      this.refundFilter.forEach((item) => {
+        if(item.name === val.name) {
+          item.active = !val.active;
+          this.refundStatus = item.active?val.id:null
+        }else {
+          item.active = false;
+        }
+      })
     },
 
     // 重置筛选
@@ -407,8 +433,15 @@ export default {
       this.booker = "";
 
       // 退票筛选
-      this.flightPassenger = ""; 
-      this.flightApplicant = "";
+      this.refundFilter.forEach((item) => (item.active = false));
+      this.refundStatus=null;
+      this.flightPassenger = "";  // 乘机人
+      this.flightApplicant = "";  // 申请人
+      this.ticket_Number = "";  // 票号
+      this.refundTime.start = ""; //时间范围
+      this.refundTime.end = "";
+      this.orderType = ""; // 客户单  手工单
+      this.passengerStatus = ""; // 旅客类型
       let data = {}
       uni.setStorageSync('orderListFilter',JSON.stringify(data));
       uni.navigateBack();
@@ -436,7 +469,15 @@ export default {
       }else if(this.filterType === '1'){
         // 国内退票筛选
         data = {
-          admin_name: this.flightApplicant
+          // admin_name: this.flightApplicant, // 申请人
+          passenger_name:this.flightPassenger, // 乘机人
+          order_status: this.refundStatus, // 订单状态
+          ticket_no: this.ticket_Number, // 票号
+          pnr: this.pnr, //pnr
+          start_date:this.refundTime.start, //申请日始
+          end_date:this.refundTime.end, //申请日止
+          passenger_type: this.passengerStatus, // 旅客类型
+          order_type: this.orderType, // 客户单  手工单
         }
       }
       
@@ -469,9 +510,24 @@ export default {
           icon: 'none'
         })
         }
+      }else if(this.dateType === 'end' && this.refundTime.start) {
+        if(new Date(start).getTime() < new Date(this.refundTime.start).getTime()){
+          return uni.showToast({
+            title:'请选择大于起始时间',
+            icon:'none'
+          })
+        }
+      }else if(this.dateType === 'start' && this.refundTime.end) {
+        if(new Date(start).getTime() > new Date(this.refundTime.end).getTime()){
+          return uni.showToast({
+            title:'请选择小于结束时间',
+            icon:'none'
+          })
+        }
       }
 
       this.$set(this.timeLimit,this.dateType,start)
+      this.$set(this.refundTime,this.dateType,start)
     },
 
     //城市选择  出发城市
@@ -532,12 +588,24 @@ export default {
       this.dateFilter[1].active = fliterData.date === 'depart'
       this.dateFilter[0].active = fliterData.date === 'create'
     }
+    // 退票列表
     if(this.filterType === '1' && data.refundData !== '{}'){
       let refundList = JSON.parse(data.refundData)
-      this.flightApplicant = refundList.admin_name // 申请人
+      // this.flightApplicant = refundList.admin_name // 申请人
+      this.flightPassenger = refundList.passenger_name // 乘机人
+      this.refundStatus = refundList.order_status // 订单状态
+      this.ticket_Number = refundList.ticket_no // 票号
+      this.pnr = refundList.pnr  // pnr
+      this.refundTime.start = refundList.start_date, //申请日始
+      this.refundTime.end = refundList.end_date, //申请日止
+      this.passengerStatus = refundList.passenger_type, // 旅客类型
+      this.orderType = refundList.order_type, // 客户单 手工单
+
+      this.refundFilter.forEach(item => item.active = item.id === refundList.order_status)
+      this.passengerFilter.forEach(item => item.active = item.value === refundList.passenger_type)
+      this.orderFilter.forEach(item => item.active = item.id === refundList.order_type)
     }
     
-    console.log('筛选类型',this.filterType)
   },
 
   onShow() {

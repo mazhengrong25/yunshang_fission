@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-16 18:24:24
+ * @LastEditTime: 2020-11-17 18:30:52
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -22,6 +22,7 @@
       >
     </view>
 
+    <!-- 筛选条件 -->
     <view class="order_filter">
       <view class="filter_list" @click="sorTime()">
         <view class="list_icon">
@@ -112,7 +113,6 @@ export default {
       headerActive: 0, // 订单类别默认值 全部
       orderPageNumber: 1, // 当前订单页数
       orderPageStatus: true, // 是否允许加载下一页数据
-      orderList: [], // 订单列表数据
 
       orderListPage: 1,
 
@@ -122,16 +122,16 @@ export default {
 
       scrollTop: 0, // 列表滚动值
       oldScrollTop: 0,
+
+      orderFilterList: 'desc'
     };
   },
   methods: {
     checkedHeaderActive(index) {
       this.headerActive = index;
       this.orderPageNumber = 1;
-      this.refundOrderList = [];
-      if (JSON.stringify(this.refundListFilter) !== "{}") {
-        this.getOrderList();
-      }
+      this.refundOrderList = []; //退票列表
+      this.getOrderList();
     },
 
     //跳转到筛选页面
@@ -147,8 +147,8 @@ export default {
       this.orderPageStatus = true;
       let data = {
         dis_id: uni.getStorageSync("userInfo").dis_id,
-        start_date: moment().subtract(3, "years").format("YYYY-MM-DD"),
-        end_date: moment().format("YYYY-MM-DD"),
+        start_date: this.refundListFilter.start_date || moment().subtract(3, "years").format("YYYY-MM-DD"),
+        end_date: this.refundListFilter.end_date || moment().format("YYYY-MM-DD"),
         order_status:
           this.headerActive === 0
             ? ""
@@ -159,11 +159,17 @@ export default {
             : this.headerActive,
         page: this.orderListPage,
 
-        // 筛选条件  refundListFilter
+        // 筛选条件 
         pnr_code: this.refundListFilter.pnr || '', // pnr
-        admin_name: this.refundListFilter.admin_name || '', //申请人
-        ticket_no: this.refundListFilter.ticket_no || '',
-        xxxx: ''
+        // admin_id: this.refundListFilter.admin_name || '', //申请人
+        ticket_no: this.refundListFilter.ticket_no || '', // 票号
+        PassengerName:this.refundListFilter.passenger_name || '', // 乘机人
+        passenger_type: this.refundListFilter.passenger_type || "", // 乘客类型
+        order_type: this.refundListFilter.order_type || "", // 客户单 手工单
+
+        order_by: this.orderFilterList, // desc倒叙，asc升序
+        order_by_field: 'created_at'
+        
             
       };
       orderApi.orderRefundList(data).then((res) => {
@@ -178,7 +184,7 @@ export default {
             this.refundOrderList = res.data.data;
             this.orderLishStuats = true;
           }
-
+        
 
           if (this.orderListPage >= res.data.last_page) {
               this.orderPageStatus = false;
@@ -189,7 +195,10 @@ export default {
             icon: "none",
           });
         }
+        this.$forceUpdate();
       });
+
+      this.$forceUpdate();
     },
     // 下一页数据
     nextPageData() {
@@ -208,7 +217,10 @@ export default {
 
     //时间排序
     sorTime() { 
-       
+        this.orderFilterList = 'asc'
+        this.getOrderList();
+        this.$set(this.refundOrderList,"order_by_field",true);
+        this.$forceUpdate();
         this.backScroll();
     },
 
@@ -237,12 +249,12 @@ export default {
     if(uni.getStorageSync("orderListFilter")){
       this.refundListFilter = JSON.parse(uni.getStorageSync("orderListFilter"))
       uni.removeStorageSync('orderListFilter')
-      if (this.refundListFilter.order_status !== null) {
+      if (this.refundListFilter.order_status && this.refundListFilter.order_status !== null) {
         this.checkedHeaderActive(this.refundListFilter.order_status);
       }else {
         this.checkedHeaderActive(0);
       }
-      console.log(this.refundListFilter)
+      console.log('退票筛选条件',this.refundListFilter)
     }else{
       this.headerActive = 0;
       this.getOrderList();
