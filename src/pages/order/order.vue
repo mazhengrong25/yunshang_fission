@@ -2,7 +2,7 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2020-11-16 09:58:05
+ * @LastEditTime: 2020-11-18 13:40:46
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -24,8 +24,7 @@
         <view class="order_right">
           <view class="list_item" @click="jumpOrderList('0')">国内订单</view>
           <view class="list_item" @click="goRefundList()">国内退票订单</view>
-          <view class="list_item" @click="jumpOrderList('2')"
-            >国内改签订单</view
+          <view class="list_item" @click="goChangeList()">国内改签订单</view
           >
         </view>
       </view>
@@ -59,13 +58,13 @@ export default {
   },
   methods: {
     jumpOrderList(type) {
-      if (type === "2") {
-        return uni.showToast({
-          title: "当前功能开发中，请等待后续版本更新",
-          duration: 3000,
-          icon: "none",
-        });
-      }
+      
+      // return uni.showToast({
+      //   title: "当前功能开发中，请等待后续版本更新",
+      //   duration: 3000,
+      //   icon: "none",
+      // });
+      
       uni.navigateTo({
         url: "/order/orderList?type=" + type,
       });
@@ -80,6 +79,21 @@ export default {
       uni.navigateTo({
         url: "/order/refundList",
       });
+    },
+
+    //跳转到国内改签订单
+    goChangeList() {
+
+      // return uni.showToast({
+      //   title: "当前功能开发中，请等待后续版本更新",
+      //   duration: 3000,
+      //   icon: "none",
+      // });
+
+      uni.navigateTo({
+        url: "/order/changeList",
+      });
+      
     },
   },
   onLoad() {

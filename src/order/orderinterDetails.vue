@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-06 16:58:56
+ * @LastEditTime: 2020-11-18 09:48:48
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -114,7 +114,7 @@
         >
         <view
           class="option_btn"
-          @click="notMessage"
+          @click="getChange()"
           v-if="orderDetails.status === 3"
           >改签</view
         >
@@ -665,6 +665,13 @@ export default {
       uni.navigateTo({
         url: "/order/refund?refundData=" + JSON.stringify(this.orderDetails),
       });
+    },
+
+    // 跳转改签
+    getChange() {
+      uni.navigateTo({
+        url:"/order/change?changeData=" + JSON.stringify(this.orderDetails),
+      })
     },
 
     // 再次预定

@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-17 16:24:12
+ * @LastEditTime: 2020-11-18 14:55:42
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -431,6 +431,7 @@ export default {
       this.orderNumber = "";
       this.flightNumber = "";
       this.booker = "";
+      
 
       // 退票筛选
       this.refundFilter.forEach((item) => (item.active = false));

@@ -1,8 +1,27 @@
 <template>
   <view class="refund_top">
     <view>
-      <view class="top_message">退票信息</view>
+
+      <view class="top_message" v-if="topStatus === 'change'">改签信息</view>
+      <view class="top_message" v-else>退票信息</view>
+
       <view class="middle_message">
+        <view class="message_first" v-if="topStatus === 'change'">改签类型</view>
+        <view class="message_first" v-else>是否自愿</view>
+        <view class="message_bottom_radio">
+          <radio-group class="bottom_radio_list" @change="radioChange">
+            <label
+              class="radio"
+              v-for="(item, index) in radioItems"
+              :key="index"
+            >
+              <radio :color="'#0070E2'" :checked="item.checked" :value="item.key" />
+              <text>{{ topStatus === 'change'?item.change:item.value }}</text>
+            </label>
+          </radio-group>
+        </view>
+      </view>
+      <view class="middle_message" v-if="topStatus === 'change'">
         <view class="message_first">是否自愿</view>
         <view class="message_bottom_radio">
           <radio-group class="bottom_radio_list" @change="radioChange">
@@ -12,14 +31,23 @@
               :key="index"
             >
               <radio :color="'#0070E2'" :checked="item.checked" :value="item.key" />
-              <text>{{ item.value }}</text>
+              <text>{{ item.voluntary }}</text>
             </label>
           </radio-group>
         </view>
       </view>
-      <view class="middle_message">
-        <view class="message_first">退票理由</view>
-        <view class="message_bottom input-right-arrow" @click="openGroupSelect">
+      <view :class="['middle_message message_box',{is_show: radioValue === '1'}]">
+        <view class="message_first" v-if="topStatus === 'change'">改签原因</view>
+        <view class="message_first" v-else>退票理由</view>
+        <view class="message_bottom input-right-arrow" 
+        v-if="topStatus === 'change'"
+        @click="openGroupChange">
+          <text v-if="changeGroup" class="group_message">{{ changeGroup }}</text>
+          <text v-else class="not_message">请选择</text>
+        </view>
+        <view class="message_bottom input-right-arrow"
+        v-else 
+        @click="openGroupSelect">
           <text v-if="group" class="group_message">{{ group }}</text>
           <text v-else class="not_message">请选择</text>
         </view>
@@ -30,6 +58,12 @@
       ref="groupPopup"
       :dataList="reasonGroup"
       @submitDialog="groupPopupSelecctBtn()"
+    ></yun-selector>
+    <!-- 改签原因选择 -->
+    <yun-selector
+      ref="changeGroupPopup"
+      :dataList="causeGroup"
+      @submitDialog="changeGroupPopupSelecctBtn()"
     ></yun-selector>
   </view>
 </template>
@@ -46,26 +80,35 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    topStatus: {  //区别退票和改签
+      type: String,
+      default: () => ''
+    }
   },
   data() {
     return {
       /* 单选框*/
       radioItems: [
         {
+          voluntary: '自愿',
+          change: '改期',
           value: "是",
           checked: true,
           key:1,
         },
         {
+          voluntary: '非自愿',
+          change: '升舱',
           value: "否",
           key:2,
         },
       ],
 
-      radioValue: "", //单选选择值
+      radioValue: '1', //单选选择值
 
       // 理由   之前是{} 出现bug
       group: "",
+      changeGroup: "",
 
       // 理由选择
       reasonGroup: [
@@ -90,6 +133,13 @@ export default {
         "关爱计划退票",
         "过期客票私自退，未告知客人",
       ],
+
+      // 原因选择
+      causeGroup:[
+        "【自愿】旅客自愿改签",
+        "【改名】乘客姓名错误修改",
+        "【非自愿】非自愿改签",
+      ]
     };
   },
   methods: {
@@ -99,11 +149,18 @@ export default {
       this.radioValue = e.detail.value;
       console.log('是否自愿',this.radioValue);
       this.$emit('voluntary',this.radioValue)
+      this.$forceUpdate()
     },
    
     // 打开理由选择弹窗
     openGroupSelect() {
       this.$refs.groupPopup.openDialog();
+    },
+
+    //打开改签理由选择弹窗
+    openGroupChange() {
+
+      this.$refs.changeGroupPopup.openDialog();
     },
 
     // 确认理由
@@ -112,6 +169,12 @@ export default {
       this.group = e;
       this.$emit('reason',this.group)
     },
+
+    // 确认原因
+    changeGroupPopupSelecctBtn(e) {
+      console.log('原因',e)
+      this.changeGroup = e;
+    }
   },
 };
 </script>
@@ -140,8 +203,11 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     height: 100upx;
-    &:not(:last-child) {
-      border-bottom: 2upx solid #f1f3f5;
+    &.message_box{
+      border-top: 2upx solid #f1f3f5;
+    }
+    &.is_show{
+      display: none;
     }
     &:first-child {
       padding-bottom: 34upx;

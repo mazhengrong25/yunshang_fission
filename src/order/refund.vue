@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-12 09:44:58
+ * @LastEditTime: 2020-11-18 18:18:12
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -176,17 +176,25 @@
             <view class="item_message">{{ refundList.pnr_code }}</view>
           </view>
           <view class="list_item">
+            <view class="item_title">YATP订单号</view>
+            <view class="item_message">{{ refundList.yatp_order_id }}</view>
+          </view>
+          <view class="list_item">
             <view class="item_title">订票员</view>
             <view class="item_message">{{ refundList.book_user }}</view>
           </view>
           <view class="list_item">
+            <view class="item_title">出票员</view>
+            <view class="item_message">{{ refundList.out_ticket_name }}</view>
+          </view>
+          <view class="list_item">
             <view class="item_title">预定时间</view>
             <view class="item_message">{{ refundList.created_at }}</view>
-            <!-- 时间 -->
           </view>
           <view class="list_item">
             <view class="item_title">备注</view>
-            <view class="item_message input-right-arrow">无</view>
+            <view v-if="remark" class="item_message">{{ refundList.remark }}</view>
+            <view v-else class="item_message">无</view>
           </view>
         </view>
       </view>
@@ -290,16 +298,17 @@ export default {
           title: "请选择退票人员信息",
           icon: "none",
         });
-      }
-
-      if(!this.group || !this.remark) {
+      } 
+      console.log(this.radioValue)
+ 
+      if((String(this.radioValue) === '2' && !this.group) || !this.remark) {
 
         return uni.showToast({
-          title: !this.group?"请选择退票理由":!this.remark?"请输入备注信息":"请完善退票信息",
+          title: (String(this.radioValue) === '2' && !this.group)?"请选择退票理由":!this.remark?"请输入备注信息":"请完善退票信息",
           icon: "none",
         });
       }
-
+ 
       let params = {
         is_abandon:1,                //类型：Number  必有字段  备注：1：退票 2：废票
         contact:this.refundList.contact,                //类型：String  必有字段  备注：联系人
@@ -322,13 +331,13 @@ export default {
       }
       
       console.log(data)
-      orderApi.refundSubmit(data).then((res) =>{
+      // orderApi.refundSubmit(data).then((res) =>{
           
-          this.message_true = res.status === '1';
-          this.message_msg = res.msg;
-          this.open();
-          console.log(res)
-      })
+      //     this.message_true = res.status === '1';
+      //     this.message_msg = res.msg;
+      //     this.open();
+      //     console.log(res)
+      // })
     },
 
     // 打开退改签说明弹窗
@@ -787,7 +796,7 @@ export default {
             font-size: 24upx;
             font-weight: 400;
             color: rgba(153, 153, 153, 1);
-            width: 100upx;
+            width: 133upx;
           }
           .item_message {
             flex: 1;

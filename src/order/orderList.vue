@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-11-12 16:33:51
+ * @LastEditTime: 2020-11-18 11:31:06
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -799,7 +799,7 @@ export default {
         : this.orderListType === "1"
         ? "国内退票订单"
         : this.orderListType === "2"
-        ? "国内改签订单"
+        ? "国内改签单"
         : this.orderListType === "3"
         ? "国际订单"
         : this.orderListType === "4"
