@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-06 16:58:56
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-18 10:52:42
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -28,7 +28,7 @@
               ? "已出票"
               : orderDetails.status === 5
               ? "已取消"
-              : orderDetails.status === 1 && orderDetails.left_min <= 0
+              : orderDetails.status === 1 && 1 > orderDetails.left_min
               ? "已取消"
               : ""
           }}
@@ -68,11 +68,11 @@
       <view class="order_option">
         <view
           class="option_btn"
-          v-if="orderDetails.status === 1 && orderDetails.pay_status === 2"
-          @click="sendMessage"
+          v-if="orderDetails.status !== 5 && orderDetails.status !== 3"
+          @click="sendMessage" 
           >发送短信</view
         >
-        <view
+        <view 
           class="option_btn"
           v-if="
             orderDetails.status !== 0 &&
@@ -368,6 +368,40 @@
                 </view>
               </view>
             </view>
+
+            <view class="price_info_list active">
+              <view class="list_title">
+                <view class="title_name">所有乘客票面总价</view>
+              </view>
+               <view class="list_main">
+                <view class="list_item">
+                  <view class="item_title">总票面价</view>
+                  <view class="item_message"
+                    >&yen; {{ totalPrice.ticket_price }}</view
+                  >
+                </view>
+                <view class="list_item">
+                  <view class="item_title">总机建/燃油</view>
+                  <view class="item_message"
+                    >&yen; {{ totalPrice.build_total + '/' +  totalPrice.fuel_total}}</view
+                  >
+                </view>
+                 <view class="list_item">
+                  <view class="item_title">总保险</view>
+                  <view class="item_message"
+                    >&yen; {{ totalPrice.insurance_total}}</view
+                  >
+                </view>
+                <view class="list_item">
+                  <view class="item_title">总服务费</view>
+                  <view class="item_message"
+                    >&yen; {{ totalPrice.service_price}}</view
+                  >
+                </view>
+              </view>
+            </view>
+
+            
           </scroll-view>
         </view>
       </view>
@@ -454,6 +488,14 @@ export default {
       priceInfoChecket: null, // 订单金额明细展开值
 
       listCancelType: "", // 列表页传递取消订单值
+
+      totalPrice: { // 订单总价计算
+        ticket_price: 0,
+        build_total: 0,
+        fuel_total: 0,
+        insurance_total: 0,
+        service_price: 0,
+      }, 
     };
   },
   methods: {
@@ -467,7 +509,8 @@ export default {
 
     // 展开订单金额详情信息
     openPriceInfo(i) {
-      this.priceInfoChecket = i;
+      this.priceInfoChecket = this.priceInfoChecket === i ? null : i;
+      this.$forceUpdate();
     },
 
     // 发送短信
@@ -629,6 +672,13 @@ export default {
           if (this.orderDetails.ticket_passenger.length < 3) {
             this.priceInfoChecket = 0;
           }
+          this.orderDetails.ticket_passenger.forEach(item => {
+            this.totalPrice.ticket_price += item.ticket_price
+            this.totalPrice.build_total += item.build_total
+            this.totalPrice.fuel_total += item.fuel_total
+            this.totalPrice.insurance_total += item.insurance_total
+            this.totalPrice.service_price += item.service_price
+          });
 
           if (this.listCancelType) {
             if (this.orderDetails.left_min > 0) {
@@ -718,7 +768,7 @@ export default {
       });
     },
 
-    onShow(){
+    onShow() {
       this.getOrderDetails();
     },
 
@@ -1296,6 +1346,24 @@ export default {
       }
     }
 
+    @keyframes openMain {
+      from {
+        margin-top: -100%;
+      }
+      to {
+        margin-top: 0;
+      }
+    }
+
+    @keyframes closeMain {
+      from {
+        margin-top: 0;
+      }
+      to {
+        margin-top: -100%;
+      }
+    }
+
     .price_info_main {
       max-height: 60vh;
       overflow-y: auto;
@@ -1305,7 +1373,9 @@ export default {
         background: #f9f9f9;
         padding: 0 16upx 0 24upx;
         margin: 0 24upx 20upx;
-        &:last-child{
+        min-height: 96rpx;
+        overflow: hidden;
+        &:last-child {
           margin-bottom: var(--status-bar-height);
         }
         &.active {
@@ -1319,7 +1389,7 @@ export default {
             }
           }
           .list_main {
-            height: auto !important;
+            animation: openMain .4s forwards;
             padding: 40upx 0 46upx;
             border-top: 2upx solid #eaeaea;
           }
@@ -1329,6 +1399,9 @@ export default {
           align-items: center;
           justify-content: space-between;
           height: 96upx;
+          position: relative;
+          z-index: 5;
+          background: #f9f9f9;
 
           .title_name {
             font-size: 28upx;
@@ -1370,11 +1443,10 @@ export default {
             }
           }
         }
-
         .list_main {
           overflow: hidden;
-          height: 0;
-          transition: all 0.3s;
+          margin-top: -100%;
+          animation: closeMain .4s forwards;
           border-top: 2upx solid transparent;
           .list_item {
             display: flex;
