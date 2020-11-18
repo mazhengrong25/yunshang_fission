@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-13 17:46:48
+ * @LastEditTime: 2020-11-17 18:30:52
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -22,19 +22,20 @@
       >
     </view>
 
+    <!-- 筛选条件 -->
     <view class="order_filter">
-      <view class="filter_list">
+      <view class="filter_list" @click="sorTime()">
         <view class="list_icon">
           <image src="@/static/filter_apply_btn.png" mode="contain" />
         </view>
-        <view class="list_title" @click="sorTime()">申请(早-晚)</view>
+        <view class="list_title">申请(早-晚)</view>
       </view>
 
-      <view class="filter_list">
+      <view class="filter_list" @click="goFilter('1')">
         <view class="list_icon">
           <image src="@/static/filter_btn_active.png" mode="contain" />
         </view>
-        <view class="list_title" @click="goFilter('1')">筛选</view>
+        <view class="list_title">筛选</view>
       </view>
     </view>
 
@@ -54,7 +55,7 @@
           <view class="item_header">
             <view
               class="item_title"
-              v-for="(oitem, oindex) in item.ticket_segments"
+              v-for="(oitem, oindex) in item.ticket_segments.length < 1 ?item.ticket_change_segments:item.ticket_segments"
               :key="oindex"
             >
               <view class="title"
@@ -112,7 +113,6 @@ export default {
       headerActive: 0, // 订单类别默认值 全部
       orderPageNumber: 1, // 当前订单页数
       orderPageStatus: true, // 是否允许加载下一页数据
-      orderList: [], // 订单列表数据
 
       orderListPage: 1,
 
@@ -122,32 +122,33 @@ export default {
 
       scrollTop: 0, // 列表滚动值
       oldScrollTop: 0,
+
+      orderFilterList: 'desc'
     };
   },
   methods: {
     checkedHeaderActive(index) {
       this.headerActive = index;
       this.orderPageNumber = 1;
-      this.refundOrderList = [];
-      if (JSON.stringify(this.refundListFilter) !== "{}") {
-        this.getOrderList();
-      }
+      this.refundOrderList = []; //退票列表
+      this.getOrderList();
     },
 
     //跳转到筛选页面
     goFilter(type) {
       uni.navigateTo({
-        url: "/order/filter?type=" + type,
+        url: "/order/filter?type=" + type +
+        "&refundData=" +
+          JSON.stringify(this.refundListFilter),
       });
-      this.getOrderList();
     },
     //获取国内退票列表
     getOrderList() {
       this.orderPageStatus = true;
       let data = {
         dis_id: uni.getStorageSync("userInfo").dis_id,
-        start_date: moment().subtract(3, "years").format("YYYY-MM-DD"),
-        end_date: moment().format("YYYY-MM-DD"),
+        start_date: this.refundListFilter.start_date || moment().subtract(3, "years").format("YYYY-MM-DD"),
+        end_date: this.refundListFilter.end_date || moment().format("YYYY-MM-DD"),
         order_status:
           this.headerActive === 0
             ? ""
@@ -156,12 +157,19 @@ export default {
             : this.headerActive === 2
             ? "2"
             : this.headerActive,
-
-            // 筛选条件  refundListFilter
-            pnr_code: this.refundListFilter.pnr || '', // pnr
-            admin_name: this.refundListFilter.admin_name || '', //申请人
         page: this.orderListPage,
 
+        // 筛选条件 
+        pnr_code: this.refundListFilter.pnr || '', // pnr
+        // admin_id: this.refundListFilter.admin_name || '', //申请人
+        ticket_no: this.refundListFilter.ticket_no || '', // 票号
+        PassengerName:this.refundListFilter.passenger_name || '', // 乘机人
+        passenger_type: this.refundListFilter.passenger_type || "", // 乘客类型
+        order_type: this.refundListFilter.order_type || "", // 客户单 手工单
+
+        order_by: this.orderFilterList, // desc倒叙，asc升序
+        order_by_field: 'created_at'
+        
             
       };
       orderApi.orderRefundList(data).then((res) => {
@@ -176,17 +184,21 @@ export default {
             this.refundOrderList = res.data.data;
             this.orderLishStuats = true;
           }
+        
 
           if (this.orderListPage >= res.data.last_page) {
               this.orderPageStatus = false;
-            }
+          }
         } else {
           uni.showToast({
             title: res.msg,
             icon: "none",
           });
         }
+        this.$forceUpdate();
       });
+
+      this.$forceUpdate();
     },
     // 下一页数据
     nextPageData() {
@@ -203,20 +215,12 @@ export default {
       });
     },
 
-    // 申请时间排序
-    createSort(t) {
-      console.log('t',t)
-      return (m, n) => {
-        var a = new Date(m[t]).getTime();
-        var b = new Date(n[t]).getTime();
-        return a - b;
-      };
-      console.log(m,n)
-    },
-
     //时间排序
     sorTime() { 
-        this.refundOrderList.sort(this.createSort("created_at"));
+        this.orderFilterList = 'asc'
+        this.getOrderList();
+        this.$set(this.refundOrderList,"order_by_field",true);
+        this.$forceUpdate();
         this.backScroll();
     },
 
@@ -238,21 +242,26 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.getOrderList();
   },
   onShow() {
-    this.refundListFilter = uni.getStorageSync("refundListFilter");
-    if (this.refundListFilter) {
-      this.refundListFilter = JSON.parse(this.refundListFilter);
-      //pnr筛选
-      if (this.refundListFilter.pnr) {
-        this.refundOrderList = this.refundOrderList.filter(
-          (item) => item.pnr_code === this.refundListFilter.pnr
-        );
+    // 判断进入页面 缓存中是否存在筛选数据 如果有则组装筛选数据 并删除缓存
+    
+    if(uni.getStorageSync("orderListFilter")){
+      this.refundListFilter = JSON.parse(uni.getStorageSync("orderListFilter"))
+      uni.removeStorageSync('orderListFilter')
+      if (this.refundListFilter.order_status && this.refundListFilter.order_status !== null) {
+        this.checkedHeaderActive(this.refundListFilter.order_status);
+      }else {
+        this.checkedHeaderActive(0);
       }
-      
-      uni.removeStorageSync("orderListFilter");
+      console.log('退票筛选条件',this.refundListFilter)
+    }else{
+      this.headerActive = 0;
+      this.getOrderList();
+      this.backScroll();
     }
+    
+    
   },
 };
 </script>
