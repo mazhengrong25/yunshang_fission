@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-19 17:24:34
+ * @LastEditTime: 2020-11-19 18:12:05
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -32,7 +32,6 @@
           :roundTripFlightData="roundTripFlightData"
           :roundTripType="roundTripType"
           :interType="false"
-          @openHeadExpPopup="openHeadExpPopup"
       ></flight-header>
 
       <view v-else class="not_flight_data">
@@ -377,17 +376,11 @@ export default {
     console.log(this.refundList)
 
     // 组装航程信息
-
-    this.type
-              ? this.type === "0"
-                ? "去程"
-                : "返程"
-              : "单程",
     this.flightData = {
       flightType: this.refundList.segment_type
-      ?this.refundList.segment_type === '1'
-      ?"去程"
-      :"返程"
+      ?Number(this.refundList.segment_type) === 2
+      ?"返程"
+      :"去程"
       :"单程",
       data: this.refundList.ticket_segments || [], // 单程信息
       cabinInfo: this.refundList.ticket_segments || [], //退票规则
