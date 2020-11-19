@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-11-18 16:24:08
+ * @LastEditTime: 2020-11-19 15:22:10
  * @LastEditors: Please set LastEditors
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -12,7 +12,11 @@
         <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
 
             <!-- 改签信息 -->
-            <refundTop :dataList="list" @voluntary="volRadio" @reason="reasonSel" topStatus="change"></refundTop>
+            <refundTop :dataList="list" 
+            @voluntary="volRadio" 
+            @cause="causeSel"
+            @change="typeRadio" 
+            topStatus="change"></refundTop>
 
             <!-- 乘机人 -->
             <view class="main_list passenger">
@@ -145,7 +149,7 @@
                 </view>
                 <view class="list_item" @click="openRemark">
                     <view class="item_title">备注</view>
-                    <view v-if="remark" class="item_message">{{ changeDetail.remark }}</view>
+                    <view v-if="changeRemark" class="item_message">{{ changeRemark }}</view>
                     <view v-else class="item_message input-right-arrow"></view>
                 </view>
                 </view>
@@ -176,6 +180,7 @@
 </template>
 
 <script>
+import orderApi from "@/api/order.js";
 import { parse } from 'querystring';
 import refundTop from "@/components/refund_top.vue"; //改签信息
 export default {
@@ -188,49 +193,107 @@ export default {
         return {
             iStatusBarHeight: 0,
 
-            changeDetail:[], // 存放从订单详情返回过来的航班信息
+            changeDetail:{}, // 存放从订单详情返回过来的航班信息
 
             checkedPassengerlist: [], // 选中乘客列表
 
             message_true: false, // 提交状态
             message_msg: "", // 错误信息
+
+            changeRemark:"", //备注
+
+            radioValue:"", //单项框 是否自愿
+            valueType:"", //单选框 改签类型
+
+            cause:"", //改签原因
         }
     },
 
     methods:{
 
+        // 单选框 是否自愿
+        volRadio(val) {
+
+            this.radioValue = val
+            console.log('改签是否自愿',this.radioValue)
+        },
+
+        // 单选框  改签类型
+        typeRadio(val) {
+
+            this.valueType = val;
+            console.log('改签类型',this.valueType)
+        },
+
+        // 改签原因
+        causeSel(val) {
+            this.cause = val
+            console.log('改签原因',this.cause)
+        },
+
         // 跳转备注页面
         openRemark() {
             uni.navigateTo({
-                url:'/order/addRemark',
+                url:'/order/addRemark?changeRemark='+this.changeRemark,
             })
         },
 
-        // 选择联系人
+        // 选择乘机人
         checkedPassenger(val, index) {
-
-        console.log(val, index)
+            
         // 判断当前数据是否有active属性，如果有，就赋值为相反状态
-            this.$set(this.refundList.ticket_passenger[index],"active",!val.active);
+            this.$set(this.changeDetail.ticket_passenger[index],"active",!val.active);
         
         // 判断当前数据active状态
-            if (this.refundList.ticket_passenger[index].active) {
+            if (this.changeDetail.ticket_passenger[index].active) {
         //   如果为true就push进选中列表
             this.checkedPassengerlist.push(val.id);
             } else {
         //   如果为false就从选中列表删除
             this.checkedPassengerlist.splice(this.checkedPassengerlist.findIndex(item => item === val.id),1)
             }
-            this.checkedAllStatus = this.checkedPassengerlist.length === this.refundList.ticket_passenger.length
+            this.checkedAllStatus = this.checkedPassengerlist.length === this.changeDetail.ticket_passenger.length
 
             this.$forceUpdate()
-
-            console.log(this.checkedPassengerlist);
-            // this.checkedPassengerList
         },
         
         // 提交申请
         submitChange() {
+
+            if(this.checkedPassengerlist.length < 1){
+                return uni.showToast({
+                title: "请选择乘机人信息",
+                icon: "none",
+                });
+            } 
+
+            if((String(this.radioValue) === '2' && !this.cause) || !this.changeRemark) {
+
+                return uni.showToast({
+                title: (String(this.radioValue) === '2' && !this.cause)?"请选择改签理由":!this.changeRemark?"请输入备注信息":"请完善改签信息",
+                icon: "none",
+                });
+            }
+
+            let data = {
+                params: params,
+                passenger_ids: passenger_ids,
+                segments: segments
+            }
+
+
+            orderApi.changeSubmit(data).then((res => {
+
+                
+                this.message_true = res.status === '1';
+                this.message_msg = res.msg;
+                this.open();
+                console.log(res)
+
+                
+            }))
+
+
 
         },
 
@@ -252,12 +315,21 @@ export default {
                 uni.navigateBack();
             }
         },
+    },
 
-        onLoad(data){
+    onShow(){
 
-            this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-            this.changeDetail = JSON.parse(data.changeData)
+        // 改签   改签备注内容
+        if(uni.getStorageSync('remark_key')){
+        this.changeRemark = uni.getStorageSync('remark_key')
+        uni.removeStorageSync('remark_key')
         }
+    },
+
+    onLoad(data){
+
+        this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+        this.changeDetail = JSON.parse(data.changeData)
     }
     
 }

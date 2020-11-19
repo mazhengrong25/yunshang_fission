@@ -1,27 +1,28 @@
 <template>
   <view class="refund_top">
-    <view>
-
-      <view class="top_message" v-if="topStatus === 'change'">改签信息</view>
-      <view class="top_message" v-else>退票信息</view>
+      
+     
+    <!-- 改签 -->
+    <view v-if="topStatus === 'change'">
+      <view class="top_message">改签信息</view>
 
       <view class="middle_message">
-        <view class="message_first" v-if="topStatus === 'change'">改签类型</view>
-        <view class="message_first" v-else>是否自愿</view>
+        <view class="message_first">改签类型</view>
         <view class="message_bottom_radio">
-          <radio-group class="bottom_radio_list" @change="radioChange">
+          <radio-group class="bottom_radio_list" @change="changeRadio">
             <label
               class="radio"
-              v-for="(item, index) in radioItems"
+              v-for="(item, index) in changeType"
               :key="index"
             >
               <radio :color="'#0070E2'" :checked="item.checked" :value="item.key" />
-              <text>{{ topStatus === 'change'?item.change:item.value }}</text>
+              <text>{{ item.value }}</text>
             </label>
           </radio-group>
         </view>
       </view>
-      <view class="middle_message" v-if="topStatus === 'change'">
+
+      <view class="middle_message">
         <view class="message_first">是否自愿</view>
         <view class="message_bottom_radio">
           <radio-group class="bottom_radio_list" @change="radioChange">
@@ -36,23 +37,49 @@
           </radio-group>
         </view>
       </view>
+
       <view :class="['middle_message message_box',{is_show: radioValue === '1'}]">
-        <view class="message_first" v-if="topStatus === 'change'">改签原因</view>
-        <view class="message_first" v-else>退票理由</view>
+        <view class="message_first">改签原因</view>
         <view class="message_bottom input-right-arrow" 
-        v-if="topStatus === 'change'"
-        @click="openGroupChange">
-          <text v-if="changeGroup" class="group_message">{{ changeGroup }}</text>
-          <text v-else class="not_message">请选择</text>
-        </view>
-        <view class="message_bottom input-right-arrow"
-        v-else 
-        @click="openGroupSelect">
-          <text v-if="group" class="group_message">{{ group }}</text>
-          <text v-else class="not_message">请选择</text>
+          @click="openGroupChange">
+            <text v-if="changeGroup" class="group_message">{{ changeGroup }}</text>
+            <text v-else class="not_message">请选择</text>
         </view>
       </view>
+
     </view>
+    <!-- 退票 -->
+    <view v-else>
+        <view class="top_message">退票信息</view>
+
+        <view class="middle_message">
+          <view class="message_first">是否自愿</view>
+          <view class="message_bottom_radio">
+            <radio-group class="bottom_radio_list" @change="radioChange">
+              <label
+                class="radio"
+                v-for="(item, index) in radioItems"
+                :key="index"
+              >
+                <radio :color="'#0070E2'" :checked="item.checked" :value="item.key" />
+                <text>{{ item.value }}</text>
+              </label>
+            </radio-group>
+          </view>
+        </view>
+
+        <view :class="['middle_message message_box',{is_show: radioValue === '1'}]">
+          <view class="message_first">退票理由</view>
+          <view class="message_bottom input-right-arrow"
+          @click="openGroupSelect">
+            <text v-if="group" class="group_message">{{ group }}</text>
+            <text v-else class="not_message">请选择</text>
+          </view>
+        </view>
+
+
+    </view>
+
     <!-- 退票理由选择 -->
     <yun-selector
       ref="groupPopup"
@@ -87,28 +114,43 @@ export default {
   },
   data() {
     return {
-      /* 单选框*/
+      /* 单选框 自愿与非自愿*/
       radioItems: [
         {
           voluntary: '自愿',
-          change: '改期',
           value: "是",
           checked: true,
           key:1,
         },
         {
           voluntary: '非自愿',
-          change: '升舱',
           value: "否",
           key:2,
         },
       ],
 
+      // 改签类型
+      changeType:[
+        {
+          value:"改期",
+          key:3,
+          checked: true,
+        },
+        {
+          value:"升舱",
+          key:4,
+          
+        }
+      ],
+
+      
+
       radioValue: '1', //单选选择值
+      radio_value:'', // 改签选择值
 
       // 理由   之前是{} 出现bug
       group: "",
-      changeGroup: "",
+      changeGroup: "", // 原因
 
       // 理由选择
       reasonGroup: [
@@ -151,6 +193,13 @@ export default {
       this.$emit('voluntary',this.radioValue)
       this.$forceUpdate()
     },
+
+    // 改签选择
+    changeRadio(e) {
+
+      this.radio_value = e.detail.value;
+      this.$emit('change',this.radio_value)
+    },
    
     // 打开理由选择弹窗
     openGroupSelect() {
@@ -174,6 +223,7 @@ export default {
     changeGroupPopupSelecctBtn(e) {
       console.log('原因',e)
       this.changeGroup = e;
+      this.$emit('cause',this.changeGroup)
     }
   },
 };

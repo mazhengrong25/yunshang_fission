@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-10 11:14:42
- * @LastEditTime: 2020-11-10 17:25:56
+ * @LastEditTime: 2020-11-19 10:37:27
  * @LastEditors: Please set LastEditors
  * @Description: 添加备注
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\addRemark.vue
@@ -59,8 +59,13 @@ export default {
 
     onLoad(data) {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-
-      this.content = data.remark? data.remark: ''
+      if(data.remark) {
+        this.content = data.remark? data.remark: '';
+      }
+      if(data.changeRemark) {
+        this.content = data.changeRemark? data.changeRemark:'';
+      }
+     
     },
   },
 };
