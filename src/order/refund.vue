@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-18 18:18:12
+ * @LastEditTime: 2020-11-19 17:24:34
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -26,70 +26,19 @@
         </view>
       </view> -->
       <!-- 航班信息 -->
-      <view
-        class="main_list filght_info"
-        v-for="(item, index) in refundList.ticket_segments"
-        :key="index"
-      >
-        <view class="main_list_title" style="margin-bottom:50rpx;">航班信息</view>
-        <view class="info_header">
-          <view class="header_type">
-            {{
-              refundList.segment_type === 1
-                ? "单程"
-                : refundList.segment_type === 2
-                ? "往返"
-                : refundList.segment_type === 3
-                ? "多程"
-                : ""
-            }}</view
-          >
-          <view class="header_time">
-            {{ item.departure_time.substring(0, 10) }}
-            <text>{{ $dateTool(item.departure_time, "ddd") }}</text>
-          </view>
-        </view>
-        <view class="info_message">
-          <view class="message_box">
-            <view class="date">{{
-              item.departure_time.substring(11, 16)
-            }}</view>
-            <view class="address"
-              >{{ item.departure_CN.city_name
-              }}{{ item.departure_CN.air_port_name }}</view
-            >
-          </view>
+      <flight-header
+          v-if="flightData.data.length > 0"
+          :flightData="flightData"
+          :roundTripFlightData="roundTripFlightData"
+          :roundTripType="roundTripType"
+          :interType="false"
+          @openHeadExpPopup="openHeadExpPopup"
+      ></flight-header>
 
-          <view class="message_center">
-            <view class="date">
-              {{ Math.floor(item.duration / 3600) }}h{{
-                Math.floor((item.duration / 60) % 60)
-              }}m
-            </view>
-            <view class="center_icon"></view>
-          </view>
-
-          <view class="message_box">
-            <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
-            <view class="address"
-              >{{ item.arrive_CN.city_name
-              }}{{ item.arrive_CN.air_port_name }}</view
-            >
-          </view>
-        </view>
-
-        <view class="filght_message">
-          <!-- 航班图标 -->
-          <view class="message_icon">
-            <image
-              class="message_icon"
-              :src="'https://fxxcx.ystrip.cn/' + item.image"
-              mode="contain"
-            />
-          </view>
-          <view class="message_list">{{ item.airline_CN }}{{ item.flight_no }}</view>
-          <view class="message_list">{{ item.model }}</view>
-        </view>
+      <view v-else class="not_flight_data">
+        <text></text>
+        <text></text>
+        <view></view>
       </view>
       <!-- 出行信息 -->
       <view class="main_list passenger">
@@ -233,10 +182,12 @@ import moment from "moment";
 moment.locale("zh-cn");
 import refundTop from "@/components/refund_top.vue"; //退票信息
 import RefundAmount from "@/components/refund_amount_refer.vue"; //退票金额参考
+import flightHeader from "@/components/flight_header.vue"; // 航程信息
 export default {
   components: {
     refundTop,
-    RefundAmount
+    RefundAmount,
+    flightHeader
   },
   data() {
     return {
@@ -244,7 +195,9 @@ export default {
 
       checkedPassengerlist: [], // 选中乘客列表
 
-      refundList: {}, // 退票详情列表
+      refundList: {
+        data: []
+      }, // 退票详情列表
 
       remark:'', // 备注
 
@@ -257,6 +210,10 @@ export default {
 
       checkedAllStatus: false, // 全选状态
 
+      flightData: {},
+
+      roundTripType: false, // 是否往返
+
     };
   },
   methods: {
@@ -264,7 +221,7 @@ export default {
     // 单选框
     volRadio(val) {
       this.radioValue = val
-      console.log('选择',this.radioValue)
+      console.log('退票是否自愿',this.radioValue)
     },
 
     // 退票理由
@@ -331,13 +288,13 @@ export default {
       }
       
       console.log(data)
-      // orderApi.refundSubmit(data).then((res) =>{
+      orderApi.refundSubmit(data).then((res) =>{
           
-      //     this.message_true = res.status === '1';
-      //     this.message_msg = res.msg;
-      //     this.open();
-      //     console.log(res)
-      // })
+          this.message_true = res.status === '1';
+          this.message_msg = res.msg;
+          this.open();
+          console.log(res)
+      })
     },
 
     // 打开退改签说明弹窗
@@ -418,6 +375,23 @@ export default {
     console.log('退票信息',data)
     this.refundList = JSON.parse(data.refundData)
     console.log(this.refundList)
+
+    // 组装航程信息
+
+    this.type
+              ? this.type === "0"
+                ? "去程"
+                : "返程"
+              : "单程",
+    this.flightData = {
+      flightType: this.refundList.segment_type
+      ?this.refundList.segment_type === '1'
+      ?"去程"
+      :"返程"
+      :"单程",
+      data: this.refundList.ticket_segments || [], // 单程信息
+      cabinInfo: this.refundList.ticket_segments || [], //退票规则
+    };
   },
 };
 </script>
@@ -808,6 +782,53 @@ export default {
         }
       }
     }
+  }
+
+  .not_flight_data {
+        border-radius: 20rpx;
+        background: #ffffff;
+        box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+        padding: 30rpx 20rpx 22rpx;
+        margin: 0 20rpx 20rpx;
+        height: 144upx;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        &::before {
+          content: "";
+          display: block;
+          width: 44upx;
+          height: 200%;
+          position: absolute;
+          top: -30%;
+          transform: rotate(30deg);
+          background: #fff;
+          left: -30%;
+          animation: skeleton 3s infinite;
+          -webkit-animation: skeleton 3s infinite;
+        }
+        @keyframes skeleton {
+          from {
+            left: -30%;
+          }
+          to {
+            left: 120%;
+          }
+        }
+        text {
+          display: block;
+          width: 80%;
+          height: 28upx;
+          background: #e5e9f2;
+          margin-bottom: 10upx;
+        }
+        view {
+          width: 80%;
+          height: 40upx;
+          margin: auto auto 0;
+          background: #e5e9f2;
+        }
   }
 
   .refund_top {
