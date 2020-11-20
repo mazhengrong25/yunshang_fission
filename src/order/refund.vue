@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-19 18:12:05
+ * @LastEditTime: 2020-11-20 13:38:13
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -14,7 +14,11 @@
     <!-- 正文 -->
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
       <!-- 退票信息 -->
-      <refundTop :dataList="list" @voluntary="volRadio" @reason="reasonSel"></refundTop>
+      <refundTop 
+      :dataList="list" 
+      @voluntary="volRadio" 
+      @reason="reasonSel"
+      ></refundTop>
       <!-- 特别提醒 -->
       <!-- <view class="sep_list">
         <view class="list_icon">
@@ -32,6 +36,7 @@
           :roundTripFlightData="roundTripFlightData"
           :roundTripType="roundTripType"
           :interType="false"
+          flightTitle="refund"
       ></flight-header>
 
       <view v-else class="not_flight_data">
@@ -377,10 +382,10 @@ export default {
 
     // 组装航程信息
     this.flightData = {
-      flightType: this.refundList.segment_type
-      ?Number(this.refundList.segment_type) === 2
-      ?"返程"
-      :"去程"
+      flightType: this.refundList.ticket_segments.segment_type
+      ?Number(this.refundList.ticket_segments.segment_type) === 2
+      ?"去程"
+      :"返程"
       :"单程",
       data: this.refundList.ticket_segments || [], // 单程信息
       cabinInfo: this.refundList.ticket_segments || [], //退票规则

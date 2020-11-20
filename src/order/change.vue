@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-11-19 17:47:00
+ * @LastEditTime: 2020-11-20 11:59:36
  * @LastEditors: Please set LastEditors
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -12,11 +12,14 @@
         <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
 
             <!-- 改签信息 -->
-            <refundTop :dataList="list" 
+            <refundTop 
+            :dataList="list" 
             @voluntary="volRadio" 
             @cause="causeSel"
             @change="typeRadio" 
-            topStatus="change"></refundTop>
+            topStatus="change"
+            
+            ></refundTop>
 
             <!-- 乘机人 -->
             <view class="main_list passenger">
@@ -59,6 +62,7 @@
                 :roundTripFlightData="roundTripFlightData"
                 :roundTripType="roundTripType"
                 :interType="false"
+                flightTitle="change"
             ></flight-header>
 
             <view v-else class="not_flight_data">
@@ -289,7 +293,11 @@ export default {
          // 组装航程信息
         this.flightData = {
 
-            flightType: "单程",
+            flightType: this.changeDetail.ticket_segments.segment_type
+                ?Number(this.changeDetail.ticket_segments.segment_type) === 2
+                ?"去程"
+                :"返程"
+                :"单程",
             data: this.changeDetail.ticket_segments || [], // 单程信息
             cabinInfo: this.changeDetail.ticket_segments || [], //退票规则
             };

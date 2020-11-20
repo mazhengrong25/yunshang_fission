@@ -2,11 +2,13 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-10-15 15:02:53
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-20 11:56:23
+ * @LastEditors: Please set LastEditors
 --> 
 <template>
   <view class="fight_header">
+    <view class="main_list_title" v-if="flightTitle === 'refund'">航班信息</view>
+    <view class="main_list_title" v-if="flightTitle === 'change'">原航班</view>
     <view class="fight_list">
       <view class="header_message">
         <view :class="['header_type', {'round_trip_type': flightData.flightType === '返程'}]">{{flightData.flightType}}</view>
@@ -270,6 +272,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    flightTitle: {  //区别国内  退票   改签
+      type: String,
+      default: () => ''
+    }
   },
   data() {
     return {
@@ -279,6 +285,9 @@ export default {
   mounted(){
     this.$forceUpdate()
     console.log('航班信息头部',this.flightData,this.roundTripFlightData)
+  },
+  onLoad(){
+    this.console.log(this.flightTitle)
   },
   methods: {
     openHeadExp(val) {
@@ -304,13 +313,23 @@ export default {
   margin: 0 20upx 20upx;
   position: relative;
   z-index: 9;
+  .main_list_title {
+        font-size: 32upx;
+        font-weight: bold;
+        color: rgba(42, 42, 42, 1);
+        margin-bottom: 24rpx;
+        // padding-top: 24rpx;
+        flex: 1;
+        justify-content: flex-end;
+  }
   .fight_list {
-    &:nth-child(2) {
-      margin-top: 30upx;
-      padding-top: 30upx;
-      border-top: 2upx dashed #d9e1ea;
-    }
+    // &:nth-child(2) {
+    //   margin-top: 30upx;
+    //   padding-top: 30upx;
+    //   // border-top: 2upx dashed #d9e1ea;
+    // }
     &.found_fight_list {
+      margin-top: 30upx;
       .flight_reservation_box {
         border: unset;
         margin-top: 18upx;
