@@ -2,8 +2,8 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2020-11-18 13:40:46
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-23 17:26:07
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order">
@@ -58,24 +58,17 @@ export default {
   },
   methods: {
     jumpOrderList(type) {
-      
-      // return uni.showToast({
-      //   title: "当前功能开发中，请等待后续版本更新",
-      //   duration: 3000,
-      //   icon: "none",
-      // });
-      
       uni.navigateTo({
         url: "/order/orderList?type=" + type,
       });
     },
     // 跳转到国内退票订单
     goRefundList() {
-      //  return uni.showToast({
-      //     title: "当前功能开发中，请等待后续版本更新",
-      //     duration: 3000,
-      //     icon: "none",
-      //   });
+       return uni.showToast({
+          title: "当前功能开发中，请等待后续版本更新",
+          duration: 3000,
+          icon: "none",
+        });
       uni.navigateTo({
         url: "/order/refundList",
       });
@@ -84,11 +77,11 @@ export default {
     //跳转到国内改签订单
     goChangeList() {
 
-      // return uni.showToast({
-      //   title: "当前功能开发中，请等待后续版本更新",
-      //   duration: 3000,
-      //   icon: "none",
-      // });
+      return uni.showToast({
+        title: "当前功能开发中，请等待后续版本更新",
+        duration: 3000,
+        icon: "none",
+      });
 
       uni.navigateTo({
         url: "/order/changeList",
