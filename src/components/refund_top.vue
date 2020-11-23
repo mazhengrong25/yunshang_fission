@@ -234,25 +234,22 @@ export default {
   border-radius: 20upx;
   background: rgba(255, 255, 255, 1);
   margin: 20upx 20upx 20upx;
-  padding: 24upx 20upx 20upx;
+  padding: 24upx 20upx 0;
 
   .top_message {
     display: flex;
     align-items: center;
-    margin-bottom: 24upx;
-    padding-top: 24upx;
     color: rgba(42, 42, 42, 1);
     font-size: 32upx;
     font-weight: Bold;
   }
   .middle_message {
-
     display: flex;
     align-items: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    height: 100upx;
+    padding: 30upx 0;
     &.message_box{
       border-top: 2upx solid #f1f3f5;
     }

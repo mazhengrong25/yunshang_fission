@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-18 16:01:58
+ * @LastEditTime: 2020-11-20 14:58:47
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -24,14 +24,14 @@
 
     <!-- 筛选条件 -->
     <view class="order_filter">
-      <view :class="['filter_list',{active: this.orderFilterList === 'asc'}]" @click="sorTime()">
+      <view :class="['filter_list',{active: this.orderFilterList === 'asc'},]" @click="sorTime()">
         <view class="list_icon">
           <image src="@/static/filter_apply_btn.png" mode="contain" />
         </view>
         <view class="list_title">申请(早-晚)</view>
       </view>
-
-      <view :class="['filter_list',{active: JSON.stringify(this.refundListFilter) !== '{}'}]" @click="goFilter('1')">
+    
+      <view :class="['filter_list',{active: JSON.stringify(this.refundListFilter) !== '{}'},]" @click="goFilter('1')">
         <view class="list_icon">
           <image  src="@/static/filter_btn_active.png" mode="contain" />
         </view>
@@ -317,6 +317,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    
     .filter_list {
       display: flex;
       align-items: center;
@@ -345,7 +346,7 @@ export default {
       .list_title {
         font-size: 22upx;
         font-weight: 400;
-        color: rgba(51, 51, 51, 1);
+        color: #959da7;
       }
     }
   }

@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-11-19 15:22:10
+ * @LastEditTime: 2020-11-20 11:59:36
  * @LastEditors: Please set LastEditors
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -12,11 +12,14 @@
         <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
 
             <!-- 改签信息 -->
-            <refundTop :dataList="list" 
+            <refundTop 
+            :dataList="list" 
             @voluntary="volRadio" 
             @cause="causeSel"
             @change="typeRadio" 
-            topStatus="change"></refundTop>
+            topStatus="change"
+            
+            ></refundTop>
 
             <!-- 乘机人 -->
             <view class="main_list passenger">
@@ -53,70 +56,19 @@
             </view>
 
             <!-- 原航班 -->
-            <view
-                class="main_list filght_info"
-                v-for="(item, index) in changeDetail.ticket_segments"
-                :key="index"
-            >
-                <view class="main_list_title" style="margin-bottom:50rpx;">原航班</view>
-                <view class="info_header">
-                <view class="header_type">
-                    {{
-                    changeDetail.segment_type === 1
-                        ? "单程"
-                        : changeDetail.segment_type === 2
-                        ? "往返"
-                        : changeDetail.segment_type === 3
-                        ? "多程"
-                        : ""
-                    }}</view
-                >
-                <view class="header_time">
-                    {{ item.departure_time.substring(0, 10) }}
-                    <text>{{ $dateTool(item.departure_time, "ddd") }}</text>
-                </view>
-                </view>
-                <view class="info_message">
-                <view class="message_box">
-                    <view class="date">{{
-                    item.departure_time.substring(11, 16)
-                    }}</view>
-                    <view class="address"
-                    >{{ item.departure_CN.city_name
-                    }}{{ item.departure_CN.air_port_name }}</view
-                    >
-                </view>
+            <flight-header
+                v-if="flightData.data.length > 0"
+                :flightData="flightData"
+                :roundTripFlightData="roundTripFlightData"
+                :roundTripType="roundTripType"
+                :interType="false"
+                flightTitle="change"
+            ></flight-header>
 
-                <view class="message_center">
-                    <view class="date">
-                    {{ Math.floor(item.duration / 3600) }}h{{
-                        Math.floor((item.duration / 60) % 60)
-                    }}m
-                    </view>
-                    <view class="center_icon"></view>
-                </view>
-
-                <view class="message_box">
-                    <view class="date">{{ item.arrive_time.substring(11, 16) }}</view>
-                    <view class="address"
-                    >{{ item.arrive_CN.city_name
-                    }}{{ item.arrive_CN.air_port_name }}</view
-                    >
-                </view>
-                </view>
-
-                <view class="filght_message">
-                <!-- 航班图标 -->
-                <view class="message_icon">
-                    <image
-                    class="message_icon"
-                    :src="'https://fxxcx.ystrip.cn/' + item.image"
-                    mode="contain"
-                    />
-                </view>
-                <view class="message_list">{{ item.airline_CN }}{{ item.flight_no }}</view>
-                <view class="message_list">{{ item.model }}</view>
-                </view>
+            <view v-else class="not_flight_data">
+                <text></text>
+                <text></text>
+                <view></view>
             </view>
 
             <!-- 订单信息 -->
@@ -183,17 +135,22 @@
 import orderApi from "@/api/order.js";
 import { parse } from 'querystring';
 import refundTop from "@/components/refund_top.vue"; //改签信息
+import flightHeader from "@/components/flight_header.vue"; // 航程信息
 export default {
 
     components: {
         refundTop,
+        flightHeader
     },
 
     data() {
         return {
             iStatusBarHeight: 0,
 
-            changeDetail:{}, // 存放从订单详情返回过来的航班信息
+            changeDetail:{
+
+                data: []
+            }, // 存放从订单详情返回过来的航班信息
 
             checkedPassengerlist: [], // 选中乘客列表
 
@@ -206,6 +163,8 @@ export default {
             valueType:"", //单选框 改签类型
 
             cause:"", //改签原因
+
+            flightData:{}
         }
     },
 
@@ -330,7 +289,19 @@ export default {
 
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
         this.changeDetail = JSON.parse(data.changeData)
-    }
+
+         // 组装航程信息
+        this.flightData = {
+
+            flightType: this.changeDetail.ticket_segments.segment_type
+                ?Number(this.changeDetail.ticket_segments.segment_type) === 2
+                ?"去程"
+                :"返程"
+                :"单程",
+            data: this.changeDetail.ticket_segments || [], // 单程信息
+            cabinInfo: this.changeDetail.ticket_segments || [], //退票规则
+            };
+        }
     
 }
 </script>
@@ -679,6 +650,53 @@ export default {
             }
             }
         }
+        }
+    }
+
+    .not_flight_data {
+        border-radius: 20rpx;
+        background: #ffffff;
+        box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+        padding: 30rpx 20rpx 22rpx;
+        margin: 0 20rpx 20rpx;
+        height: 144upx;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        &::before {
+          content: "";
+          display: block;
+          width: 44upx;
+          height: 200%;
+          position: absolute;
+          top: -30%;
+          transform: rotate(30deg);
+          background: #fff;
+          left: -30%;
+          animation: skeleton 3s infinite;
+          -webkit-animation: skeleton 3s infinite;
+        }
+        @keyframes skeleton {
+          from {
+            left: -30%;
+          }
+          to {
+            left: 120%;
+          }
+        }
+        text {
+          display: block;
+          width: 80%;
+          height: 28upx;
+          background: #e5e9f2;
+          margin-bottom: 10upx;
+        }
+        view {
+          width: 80%;
+          height: 40upx;
+          margin: auto auto 0;
+          background: #e5e9f2;
         }
     }
 

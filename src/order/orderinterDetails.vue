@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-19 17:36:11
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-20 10:29:18
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_details">
@@ -783,6 +783,7 @@ export default {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.orderId = data.orderNo; //订单编号
       console.log(this.orderId);
+      console.log('详情data',data)
 
       this.type = data.roundType; //去程  返程
 
