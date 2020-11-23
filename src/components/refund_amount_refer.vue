@@ -2,8 +2,8 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-11-19 15:44:11
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-19 18:17:52
+ * @LastEditors: wish.WuJunLong
 -->
 
 <template>
@@ -103,7 +103,7 @@
                       <view class="list_item">
                         <view class="item_title">退票费率</view>
                         <view class="item_message"
-                          >{{''}}%</view
+                          >{{refundInfo.ticket_segments[0].refund_rate}}</view
                         >
                       </view>
                       <view class="list_item">
