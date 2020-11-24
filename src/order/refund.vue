@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-23 16:52:29
+ * @LastEditTime: 2020-11-23 18:22:13
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -161,12 +161,6 @@
         </view>
       </view>
 
-      <!-- 退改信息弹窗 -->
-      <refund-amount
-        ref="refundAmountRefer"
-        :refundInfo="refundAmountData"
-      ></refund-amount>
-
       <!-- 退票申请发送成功 -->
       <uni-popup ref="refundMessage" type="dialog" :maskClick="false">
         <view class="refund_message_box">
@@ -185,6 +179,11 @@
     <view class="filter_bottom">
       <view class="bottom_btn submit_btn" @click="submitRefund">提交申请</view>
     </view>
+    <!-- 退改信息弹窗 -->
+    <refund-amount
+      ref="refundAmountRefer"
+      :refundInfo="refundAmountData"
+    ></refund-amount>
   </view>
 </template>
 
@@ -313,35 +312,39 @@ export default {
 
     // 打开退票金额弹窗
     async openExp() {
-      if(this.checkedPassengerlist.length < 1){
+      if (this.checkedPassengerlist.length < 1) {
         return uni.showToast({
-            title: "请至少选择一位需要退票的乘客",
-            icon: "none",
-          });
+          title: "请至少选择一位需要退票的乘客",
+          icon: "none",
+        });
       }
-      let refundPriceList = []  // 退票金额明细选中乘客列表
-      let refundRate = parseInt(this.refundList.ticket_segments[0].refund_rate) || 100
-      let refundPriceTotal = 0  // 退票金额选中乘客总价
-      let refundPriceAmount = 0 // 退票金额选中乘客 服务费+保险+机建-奖励
-      await this.refundList.ticket_passenger.forEach(item =>{
-        this.checkedPassengerlist.forEach(oitem =>{
-          if(item.id === oitem){
-            refundPriceList.push(item)
-            refundPriceTotal += item.total_price
-            refundPriceAmount += (item.build_total + item.insurance_total + item.service_price - item.reward_price)
+      let refundPriceList = []; // 退票金额明细选中乘客列表
+      let refundRate =
+        parseInt(this.refundList.ticket_segments[0].refund_rate) || 100;
+      let refundPriceTotal = 0; // 退票金额选中乘客总价
+      let refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
+      await this.refundList.ticket_passenger.forEach((item) => {
+        this.checkedPassengerlist.forEach((oitem) => {
+          if (item.id === oitem) {
+            refundPriceList.push(item);
+            refundPriceTotal += item.total_price;
+            refundPriceAmount +=
+              item.build_total +
+              item.insurance_total +
+              item.service_price -
+              item.reward_price;
           }
-        })
-      })
-      
-      
+        });
+      });
+
       this.refundAmountData = {
         checkedTotal: refundPriceTotal, // 选中乘客总价
-        refundRate: this.refundList.ticket_segments[0].refund_rate,  // 退票费率
-        passengerList: refundPriceList,  // 乘客列表
-        refundPriceCost: refundPriceTotal * (refundRate / 100),  // 参考退票费
+        refundRate: this.refundList.ticket_segments[0].refund_rate, // 退票费率
+        passengerList: refundPriceList, // 乘客列表
+        refundPriceCost: this.$NumberMul(refundPriceTotal, refundRate / 100), // 参考退票费
         refundPriceAmount: refundPriceAmount, // 参考退票金额
-      }
-      console.log(this.refundAmountData)
+      };
+      console.log(this.refundAmountData);
       await this.$refs.refundAmountRefer.openExp();
     },
 
@@ -378,15 +381,18 @@ export default {
         this.checkedPassengerlist.length ===
         this.refundList.ticket_passenger.length;
 
-
-      this.refundPriceAmount = 0 // 退票金额选中乘客 服务费+保险+机建-奖励
-      this.refundList.ticket_passenger.forEach(item =>{
-        this.checkedPassengerlist.forEach(oitem =>{
-          if(item.id === oitem){
-            this.refundPriceAmount += (item.build_total + item.insurance_total + item.service_price - item.reward_price)
+      this.refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
+      this.refundList.ticket_passenger.forEach((item) => {
+        this.checkedPassengerlist.forEach((oitem) => {
+          if (item.id === oitem) {
+            this.refundPriceAmount +=
+              item.build_total +
+              item.insurance_total +
+              item.service_price -
+              item.reward_price;
           }
-        })
-      })
+        });
+      });
 
       this.$forceUpdate();
 
@@ -417,15 +423,18 @@ export default {
         this.checkedAllStatus = true;
       }
 
-
-      this.refundPriceAmount = 0 // 退票金额选中乘客 服务费+保险+机建-奖励
-      this.refundList.ticket_passenger.forEach(item =>{
-        this.checkedPassengerlist.forEach(oitem =>{
-          if(item.id === oitem){
-            this.refundPriceAmount += (item.build_total + item.insurance_total + item.service_price - item.reward_price)
+      this.refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
+      this.refundList.ticket_passenger.forEach((item) => {
+        this.checkedPassengerlist.forEach((oitem) => {
+          if (item.id === oitem) {
+            this.refundPriceAmount +=
+              item.build_total +
+              item.insurance_total +
+              item.service_price -
+              item.reward_price;
           }
-        })
-      })
+        });
+      });
 
       this.$forceUpdate();
       console.log(this.refundList.ticket_passenger, this.checkedPassengerlist);

@@ -2,7 +2,7 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-11-23 16:49:14
+ * @LastEditTime: 2020-11-23 18:10:53
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -177,6 +177,7 @@ export default {
 <style lang="less" scoped>
 .flight_explanation {
   position: relative;
+  z-index: 8;
   .title {
     height: 60px;
     background: rgba(255, 255, 255, 1);
