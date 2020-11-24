@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-23 10:48:47
+ * @LastEditTime: 2020-11-24 14:01:57
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -14,10 +14,10 @@
     <!-- 正文 -->
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
       <!-- 退票信息 -->
-      <refundTop 
-      :dataList="list" 
-      @voluntary="volRadio" 
-      @reason="reasonSel"
+      <refundTop
+        :dataList="list"
+        @voluntary="volRadio"
+        @reason="reasonSel"
       ></refundTop>
       <!-- 特别提醒 -->
       <!-- <view class="sep_list">
@@ -31,12 +31,12 @@
       </view> -->
       <!-- 航班信息 -->
       <flight-header
-          v-if="flightData.data.length > 0"
-          :flightData="flightData"
-          :roundTripFlightData="roundTripFlightData"
-          :roundTripType="roundTripType"
-          :interType="false"
-          flightTitle="refund"
+        v-if="flightData.data.length > 0"
+        :flightData="flightData"
+        :roundTripFlightData="roundTripFlightData"
+        :roundTripType="roundTripType"
+        :interType="false"
+        flightTitle="refund"
       ></flight-header>
 
       <view v-else class="not_flight_data">
@@ -46,12 +46,15 @@
       </view>
       <!-- 出行信息 -->
       <view class="main_list passenger">
-        <view class=main_list_first>
-          <view class="main_list_title">出行信息</view>   
+        <view class="main_list_first">
+          <view class="main_list_title">出行信息</view>
           <!-- refundList.ticket_passenger.length === checkedPassengerlist.length -->
-          <view @click="checkedAll()" :class="['checked_all_btn',{active: checkedAllStatus}]">
+          <view
+            @click="checkedAll()"
+            :class="['checked_all_btn', { active: checkedAllStatus }]"
+          >
             <view class="main_content">全选</view>
-            <view class="list_click" ></view>
+            <view class="list_click"></view>
           </view>
         </view>
         <view class="passenger_list">
@@ -59,23 +62,29 @@
             :class="['list_item', { active: item.active }]"
             v-for="(item, index) in refundList.ticket_passenger"
             :key="index"
-            @click="checkedPassenger(item, index)" >
+            @click="checkedPassenger(item, index)"
+          >
             <view class="list_info">
-              <view class="info_type"
-                >{{
-                  item.PassengerType === "ADT"
-                    ? "成人"
-                    : item.PassengerType === "CNN"
-                    ? "儿童"
-                    : item.PassengerType === "INF"
-                    ? "婴儿"
-                    : ""
-                }}票</view
-              >
-              <view class="info_name">{{ item.PassengerName }}</view>
-              <view class="is_insurance" v-if="Number(item.insurance_total) > 0"></view>
-              <view class="group_type">票号</view>
-              <view class="group_number">{{ item.ticket_no }}</view>
+              <view class="info_message">
+                <view class="info_type"
+                  >{{
+                    item.PassengerType === "ADT"
+                      ? "成人"
+                      : item.PassengerType === "CNN"
+                      ? "儿童"
+                      : item.PassengerType === "INF"
+                      ? "婴儿"
+                      : ""
+                  }}票</view
+                >
+                <view class="info_name">{{ item.PassengerName }}</view>
+                <view
+                  class="is_insurance"
+                  v-if="Number(item.insurance_total) > 0"
+                ></view>
+                <view class="group_type">票号</view>
+                <view class="group_number">{{ item.ticket_no }}</view>
+              </view>
               <view class="list_click"></view>
             </view>
           </view>
@@ -101,16 +110,14 @@
         <view class="top_message">退票信息</view>
         <view class="middle_message">
           <view class="message_first">退票金额参考</view>
-          <view
-            class="message_bottom input-right-arrow" @click="openExp">
+          <view class="message_bottom input-right-arrow" @click="openExp">
             <text class="logo">&yen;</text>
-			      <text class="total_price">{{ refundList.total_price }}</text>
+            <text class="total_price">{{ refundPriceAmount }}</text>
           </view>
         </view>
         <view class="middle_message">
           <view class="message_first">退废票备注</view>
-          <view
-            class="message_bottom input-right-arrow" @click="openRemark">
+          <view class="message_bottom input-right-arrow" @click="openRemark">
             <text v-if="remark" class="group_message">{{ remark }}</text>
             <text v-else class="not_message"></text>
           </view>
@@ -146,37 +153,38 @@
           </view>
           <view class="list_item">
             <view class="item_title">备注</view>
-            <view v-if="remark" class="item_message">{{ refundList.remark }}</view>
+            <view v-if="remark" class="item_message">{{
+              refundList.remark
+            }}</view>
             <view v-else class="item_message">无</view>
           </view>
         </view>
       </view>
 
-      
-      <!-- 退改信息弹窗 -->
-      <refund-amount ref="refundAmountRefer" :refundInfo="refundList" typeShow="refund"></refund-amount>
-
       <!-- 退票申请发送成功 -->
       <uni-popup ref="refundMessage" type="dialog" :maskClick="false">
-          <view class="refund_message_box">
-              
-              <view class="refund_message_icon" v-if="message_true">
-                  <img src="@/static/message_error.png"></img>
-              </view>
-              <view class="refund_message_icon" v-else>
-                  <img src="@/static/message_right.png"></img>
-              </view>
-              <view class="refund_message_send">{{message_msg}}</view>
-              <view class="refund_message_bottom" @click="backPage">知道了</view>
+        <view class="refund_message_box">
+          <view class="refund_message_icon" v-if="message_true">
+            <img src="@/static/message_error.png" />
           </view>
+          <view class="refund_message_icon" v-else>
+            <img src="@/static/message_right.png" />
+          </view>
+          <view class="refund_message_send">{{ message_msg }}</view>
+          <view class="refund_message_bottom" @click="backPage">知道了</view>
+        </view>
       </uni-popup>
-      
     </scroll-view>
     <!-- 提交申请按钮 -->
     <view class="filter_bottom">
-      <view class="bottom_btn submit_btn"
-      @click="submitRefund">提交申请</view>
+      <view class="bottom_btn submit_btn" @click="submitRefund">提交申请</view>
     </view>
+    <!-- 退改信息弹窗 -->
+    <refund-amount
+      ref="refundAmountRefer"
+      :refundInfo="refundAmountData"
+      typeShow="refund"
+    ></refund-amount>
   </view>
 </template>
 
@@ -191,7 +199,7 @@ export default {
   components: {
     refundTop,
     RefundAmount,
-    flightHeader
+    flightHeader,
   },
   data() {
     return {
@@ -200,14 +208,14 @@ export default {
       checkedPassengerlist: [], // 选中乘客列表
 
       refundList: {
-        data: []
+        data: [],
       }, // 退票详情列表
 
-      remark:'', // 备注
+      remark: "", // 备注
 
       radioValue: 1, //单选选择
 
-      group:'', //退票理由
+      group: "", //退票理由
 
       message_true: false, // 提交状态
       message_msg: "", // 错误信息
@@ -218,20 +226,22 @@ export default {
 
       roundTripType: false, // 是否往返
 
+      refundAmountData: {}, // 退票金额明细列表
+
+      refundPriceAmount: 0, // 退票金额参考
     };
   },
   methods: {
-    
     // 单选框
     volRadio(val) {
-      this.radioValue = val
-      console.log('退票是否自愿',this.radioValue)
+      this.radioValue = val;
+      console.log("退票是否自愿", this.radioValue);
     },
 
     // 退票理由
     reasonSel(val) {
-      this.group = val
-      console.log('理由',this.group)
+      this.group = val;
+      console.log("理由", this.group);
     },
 
     // 打开退票成功弹窗
@@ -243,43 +253,44 @@ export default {
     },
 
     backPage() {
-      console.log(this.message_true)
+      console.log(this.message_true);
       this.$refs.refundMessage.close();
-      if(this.message_true){
-        console.log('返回上一页')
+      if (this.message_true) {
+        console.log("返回上一页");
         uni.navigateBack();
       }
     },
 
     // 提交申请
     submitRefund() {
-      
-      if(this.checkedPassengerlist.length < 1){
+      if (this.checkedPassengerlist.length < 1) {
         return uni.showToast({
           title: "请选择退票人员信息",
           icon: "none",
         });
-      } 
-      console.log(this.radioValue)
- 
-      if((String(this.radioValue) === '2' && !this.group) || !this.remark) {
+      }
+      console.log(this.radioValue);
 
+      if ((String(this.radioValue) === "2" && !this.group) || !this.remark) {
         return uni.showToast({
-          title: (String(this.radioValue) === '2' && !this.group)?"请选择退票理由":!this.remark?"请输入备注信息":"请完善退票信息",
+          title:
+            String(this.radioValue) === "2" && !this.group
+              ? "请选择退票理由"
+              : !this.remark
+              ? "请输入备注信息"
+              : "请完善退票信息",
           icon: "none",
         });
       }
- 
+
       let params = {
-        is_abandon:1,                //类型：Number  必有字段  备注：1：退票 2：废票
-        contact:this.refundList.contact,                //类型：String  必有字段  备注：联系人
-        is_voluntary:this.radioValue,                //类型：Number  必有字段  备注：是否自愿 1：是 2：否
-        keep_seat:1,                //类型：Number  必有字段  备注：委托平台取消座位 1：是 0：否
-        reason:this.group,                //类型：String  必有字段  备注：退票理由
-        remark:this.remark,                //类型：String  必有字段  备注：备注
-        phone:this.refundList.phone                //类型：Number  必有字段  备注：联系手机
-
-
+        is_abandon: 1, //类型：Number  必有字段  备注：1：退票 2：废票
+        contact: this.refundList.contact, //类型：String  必有字段  备注：联系人
+        is_voluntary: this.radioValue, //类型：Number  必有字段  备注：是否自愿 1：是 2：否
+        keep_seat: 1, //类型：Number  必有字段  备注：委托平台取消座位 1：是 0：否
+        reason: this.group, //类型：String  必有字段  备注：退票理由
+        remark: this.remark, //类型：String  必有字段  备注：备注
+        phone: this.refundList.phone, //类型：Number  必有字段  备注：联系手机
       };
 
       let passenger_ids = this.checkedPassengerlist;
@@ -288,105 +299,168 @@ export default {
       let data = {
         params: params,
         passenger_ids: passenger_ids,
-        segment_ids: segment_ids
+        segment_ids: segment_ids,
+      };
+
+      console.log(data);
+      orderApi.refundSubmit(data).then((res) => {
+        this.message_true = res.status === "1";
+        this.message_msg = res.msg;
+        this.open();
+        console.log(res);
+      });
+    },
+
+    // 打开退票金额弹窗
+    async openExp() {
+      if (this.checkedPassengerlist.length < 1) {
+        return uni.showToast({
+          title: "请至少选择一位需要退票的乘客",
+          icon: "none",
+        });
       }
-      
-      console.log(data)
-      orderApi.refundSubmit(data).then((res) =>{
-          
-          this.message_true = res.status === '1';
-          this.message_msg = res.msg;
-          this.open();
-          console.log(res)
-      })
+      let refundPriceList = []; // 退票金额明细选中乘客列表
+      let refundRate =
+        parseInt(this.refundList.ticket_segments[0].refund_rate) || 100;
+      let refundPriceTotal = 0; // 退票金额选中乘客总价
+      let refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
+      await this.refundList.ticket_passenger.forEach((item) => {
+        this.checkedPassengerlist.forEach((oitem) => {
+          if (item.id === oitem) {
+            refundPriceList.push(item);
+            refundPriceTotal += item.total_price;
+            refundPriceAmount +=
+              item.build_total +
+              item.insurance_total +
+              item.service_price -
+              item.reward_price;
+          }
+        });
+      });
+
+      this.refundAmountData = {
+        checkedTotal: refundPriceTotal, // 选中乘客总价
+        refundRate: this.refundList.ticket_segments[0].refund_rate, // 退票费率
+        passengerList: refundPriceList, // 乘客列表
+        refundPriceCost: this.$NumberMul(refundPriceTotal, refundRate / 100), // 参考退票费
+        refundPriceAmount: refundPriceAmount, // 参考退票金额
+      };
+      console.log(this.refundAmountData);
+      await this.$refs.refundAmountRefer.openExp();
     },
 
-    // 打开退改签说明弹窗
-    openExp() {
-
-      this.$refs.refundAmountRefer.openExp();
-    },
-
-    // 关闭产品说明弹窗
+    // 关闭退票金额弹窗
     closeExp() {
       this.$refs.refundAmountRefer.closeExp();
     },
 
     // 跳转备注页面
     openRemark() {
-        uni.navigateTo({
-            url:'/order/addRemark?remark='+this.remark,
-        })
+      uni.navigateTo({
+        url: "/order/addRemark?remark=" + this.remark,
+      });
     },
 
     // 选择联系人
     checkedPassenger(val, index) {
-
-      console.log(val, index)
+      console.log(val, index);
       // 判断当前数据是否有active属性，如果有，就赋值为相反状态
-        this.$set(this.refundList.ticket_passenger[index],"active",!val.active);
-    
+      this.$set(this.refundList.ticket_passenger[index], "active", !val.active);
+
       // 判断当前数据active状态
-        if (this.refundList.ticket_passenger[index].active) {
-      //   如果为true就push进选中列表
-          this.checkedPassengerlist.push(val.id);
-        } else {
-      //   如果为false就从选中列表删除
-          this.checkedPassengerlist.splice(this.checkedPassengerlist.findIndex(item => item === val.id),1)
-        }
-        this.checkedAllStatus = this.checkedPassengerlist.length === this.refundList.ticket_passenger.length
+      if (this.refundList.ticket_passenger[index].active) {
+        //   如果为true就push进选中列表
+        this.checkedPassengerlist.push(val.id);
+      } else {
+        //   如果为false就从选中列表删除
+        this.checkedPassengerlist.splice(
+          this.checkedPassengerlist.findIndex((item) => item === val.id),
+          1
+        );
+      }
+      this.checkedAllStatus =
+        this.checkedPassengerlist.length ===
+        this.refundList.ticket_passenger.length;
 
-        this.$forceUpdate()
+      this.refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
+      this.refundList.ticket_passenger.forEach((item) => {
+        this.checkedPassengerlist.forEach((oitem) => {
+          if (item.id === oitem) {
+            this.refundPriceAmount +=
+              item.build_total +
+              item.insurance_total +
+              item.service_price -
+              item.reward_price;
+          }
+        });
+      });
 
-        console.log(this.checkedPassengerlist);
-        // this.checkedPassengerList
+      this.$forceUpdate();
+
+      console.log(this.checkedPassengerlist);
+      // this.checkedPassengerList
     },
 
     // 全选联系人
     checkedAll() {
-      
-		// 判断选中的乘客人数是否和数据携带全部人数相同
-      if (this.refundList.ticket_passenger.length === this.checkedPassengerlist.length) {
+      // 判断选中的乘客人数是否和数据携带全部人数相同
+      if (
+        this.refundList.ticket_passenger.length ===
+        this.checkedPassengerlist.length
+      ) {
         //   如果相同 清空选中列表 并且遍历乘客数组 将状态全部赋值为false
-            this.checkedAllStatus = false
-            this.checkedPassengerlist = [];
-            this.refundList.ticket_passenger.forEach((item) => {
-              item.active = false;
-            });
+        this.checkedAllStatus = false;
+        this.checkedPassengerlist = [];
+        this.refundList.ticket_passenger.forEach((item) => {
+          item.active = false;
+        });
       } else {
         //   如果不相同 遍历乘客列表 全部赋值为 true ，并将乘客列表数组赋值给选中乘客列表
-            this.checkedPassengerlist = [];
-            this.refundList.ticket_passenger.forEach((item, index) => {
-              item.active = true;
-              this.checkedPassengerlist.push(item.id)
-            }); 
-            this.checkedAllStatus = true
+        this.checkedPassengerlist = [];
+        this.refundList.ticket_passenger.forEach((item, index) => {
+          item.active = true;
+          this.checkedPassengerlist.push(item.id);
+        });
+        this.checkedAllStatus = true;
       }
-        this.$forceUpdate();
-	    console.log(this.refundList.ticket_passenger,this.checkedPassengerlist);
+
+      this.refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
+      this.refundList.ticket_passenger.forEach((item) => {
+        this.checkedPassengerlist.forEach((oitem) => {
+          if (item.id === oitem) {
+            this.refundPriceAmount +=
+              item.build_total +
+              item.insurance_total +
+              item.service_price -
+              item.reward_price;
+          }
+        });
+      });
+
+      this.$forceUpdate();
+      console.log(this.refundList.ticket_passenger, this.checkedPassengerlist);
     },
   },
-  onShow(){
-
+  onShow() {
     // 退票信息   退费票备注内容
-    if(uni.getStorageSync('remark_key')){
-      this.remark = uni.getStorageSync('remark_key')
-      uni.removeStorageSync('remark_key')
+    if (uni.getStorageSync("remark_key")) {
+      this.remark = uni.getStorageSync("remark_key");
+      uni.removeStorageSync("remark_key");
     }
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    console.log('退票信息',data)
-    this.refundList = JSON.parse(data.refundData)
-    console.log(this.refundList)
+    console.log("退票信息", data);
+    this.refundList = JSON.parse(data.refundData);
+    console.log(this.refundList);
 
     // 组装航程信息
     this.flightData = {
       flightType: this.refundList.ticket_segments.segment_type
-      ?Number(this.refundList.ticket_segments.segment_type) === 2
-      ?"去程"
-      :"返程"
-      :"单程",
+        ? Number(this.refundList.ticket_segments.segment_type) === 2
+          ? "去程"
+          : "返程"
+        : "单程",
       data: this.refundList.ticket_segments || [], // 单程信息
       cabinInfo: this.refundList.ticket_segments || [], //退票规则
     };
@@ -463,9 +537,9 @@ export default {
       &.active {
         .main_content {
           .list_click {
-          background: url(@/static/selected_active.png) no-repeat;
-          background-size: contain;
-        }
+            background: url(@/static/selected_active.png) no-repeat;
+            background-size: contain;
+          }
         }
       }
 
@@ -474,19 +548,17 @@ export default {
         font-weight: bold;
         color: rgba(42, 42, 42, 1);
         margin-bottom: 24rpx;
-        padding-top: 24rpx;
         flex: 1;
         justify-content: flex-end;
       }
       .checked_all_btn {
         display: flex;
-        &.active{
+        &.active {
           .list_click {
-                background: url(@/static/selected_active.png) no-repeat;
-                background-size: contain;
-              }
+            background: url(@/static/selected_active.png) no-repeat;
+            background-size: contain;
+          }
         }
-          
       }
       .main_content {
         font-size: 14px;
@@ -631,7 +703,9 @@ export default {
     }
     &.passenger {
       .passenger_list {
-        margin-top: 46upx;
+        margin-top: 20upx;
+        border-bottom: 2upx solid rgba(241, 243, 245, 1);
+        margin-bottom: 30upx;
         .list_item {
           &.active {
             .list_info {
@@ -645,8 +719,6 @@ export default {
             margin-bottom: 60upx;
           }
           &:last-child {
-            padding-bottom: 32upx;
-            border-bottom: 2upx solid rgba(241, 243, 245, 1);
             margin-bottom: 30upx;
           }
           .list_info {
@@ -654,42 +726,49 @@ export default {
             align-items: center;
             margin-bottom: 34upx;
             justify-content: space-between;
-            .info_type {
-              width: 100upx;
-              height: 30upx;
-              border: 2upx solid rgba(127, 183, 240, 1);
-              border-radius: 20upx;
-              font-size: 20upx;
-              font-weight: 400;
-              color: rgba(127, 183, 240, 1);
-              display: inline-flex;
+            .info_message {
+              display: flex;
               align-items: center;
-              justify-content: center;
+              .info_type {
+                width: 100upx;
+                height: 30upx;
+                border: 2upx solid rgba(127, 183, 240, 1);
+                border-radius: 20upx;
+                font-size: 20upx;
+                font-weight: 400;
+                color: rgba(127, 183, 240, 1);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 16upx;
+              }
+              .info_name {
+                font-size: 28upx;
+                font-weight: bold;
+                color: rgba(42, 42, 42, 1);
+              }
+              .is_insurance {
+                background: url(@/static/insurance_icon.png) no-repeat center
+                  center;
+                background-size: contain;
+                width: 25upx;
+                height: 30upx;
+                margin-left: 8upx;
+              }
+              .group_type {
+                font-size: 28upx;
+                font-weight: 400;
+                color: #333333;
+                margin-left: 28upx;
+                margin-right: 16upx;
+              }
+              .group_number {
+                font-weight: bold;
+                font-size: 14px;
+                color: #2a2a2a;
+              }
             }
-            .info_name {
-              font-size: 28upx;
-              font-weight: bold;
-              color: rgba(42, 42, 42, 1);
-            }
-            .is_insurance {
-              background: url(@/static/insurance_icon.png) no-repeat center
-                center;
-              background-size: contain;
-              width: 25upx;
-              height: 30upx;
-            }
-            .group_type {
-              margin-left: 28upx;
-              font-size: 28upx;
-              font-weight: 400;
-              color: #333333;
-              margin-right: -12px;
-            }
-            .group_number {
-              font-weight: bold;
-              font-size: 14px;
-              color: #2a2a2a;
-            }
+
             .list_click {
               background: url(@/static/selected.png) no-repeat;
               background-size: contain;
@@ -783,63 +862,61 @@ export default {
   }
 
   .not_flight_data {
-        border-radius: 20rpx;
-        background: #ffffff;
-        box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
-        padding: 30rpx 20rpx 22rpx;
-        margin: 0 20rpx 20rpx;
-        height: 144upx;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: hidden;
-        &::before {
-          content: "";
-          display: block;
-          width: 44upx;
-          height: 200%;
-          position: absolute;
-          top: -30%;
-          transform: rotate(30deg);
-          background: #fff;
-          left: -30%;
-          animation: skeleton 3s infinite;
-          -webkit-animation: skeleton 3s infinite;
-        }
-        @keyframes skeleton {
-          from {
-            left: -30%;
-          }
-          to {
-            left: 120%;
-          }
-        }
-        text {
-          display: block;
-          width: 80%;
-          height: 28upx;
-          background: #e5e9f2;
-          margin-bottom: 10upx;
-        }
-        view {
-          width: 80%;
-          height: 40upx;
-          margin: auto auto 0;
-          background: #e5e9f2;
-        }
+    border-radius: 20rpx;
+    background: #ffffff;
+    box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+    padding: 30rpx 20rpx 22rpx;
+    margin: 0 20rpx 20rpx;
+    height: 144upx;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    &::before {
+      content: "";
+      display: block;
+      width: 44upx;
+      height: 200%;
+      position: absolute;
+      top: -30%;
+      transform: rotate(30deg);
+      background: #fff;
+      left: -30%;
+      animation: skeleton 3s infinite;
+      -webkit-animation: skeleton 3s infinite;
+    }
+    @keyframes skeleton {
+      from {
+        left: -30%;
+      }
+      to {
+        left: 120%;
+      }
+    }
+    text {
+      display: block;
+      width: 80%;
+      height: 28upx;
+      background: #e5e9f2;
+      margin-bottom: 10upx;
+    }
+    view {
+      width: 80%;
+      height: 40upx;
+      margin: auto auto 0;
+      background: #e5e9f2;
+    }
   }
 
   .refund_top {
     border-radius: 20upx;
     background: rgba(255, 255, 255, 1);
     margin: 20upx 20upx 20upx;
-    padding: 24upx 20upx 20upx;
+    padding: 24upx 20upx 0;
 
     .top_message {
       display: flex;
       align-items: center;
-      margin-bottom: 24upx;
-      padding-top: 24upx;
       color: rgba(42, 42, 42, 1);
       font-size: 32upx;
       font-weight: Bold;
@@ -850,7 +927,7 @@ export default {
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      height: 100upx;
+      padding: 32upx 0;
       &:not(:last-child) {
         border-bottom: 2upx solid #f1f3f5;
       }
@@ -878,9 +955,8 @@ export default {
             margin-right: 100upx;
           }
         }
-	  }
+      }
       .logo {
-        
         margin-top: 15rpx;
         margin-right: 4rpx;
         color: rgba(255, 0, 0, 1);
@@ -899,12 +975,12 @@ export default {
           text-overflow: ellipsis;
           text-align: right;
           max-width: 40vw;
-		}
-		.total_price {
-			color: rgba(255, 0, 0, 1);
-			font-size: 21px;
-			font-weight: bold;
-		}
+        }
+        .total_price {
+          color: rgba(255, 0, 0, 1);
+          font-size: 21px;
+          font-weight: bold;
+        }
       }
     }
   }
