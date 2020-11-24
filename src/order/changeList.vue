@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-11-24 13:56:40
+ * @LastEditTime: 2020-11-24 18:13:25
  * @LastEditors: Please set LastEditors
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -19,7 +19,7 @@
         @click="checkedHeaderActive(index)"
         >{{ item }}</view>
     </view>
-
+    
     <!-- 筛选条件 -->
     <view class="order_filter">
       <view class="filter_list" >
@@ -29,9 +29,19 @@
         <view class="list_title">申请(早-晚)</view>
       </view>
 
-      <view class="filter_list" >
+      <view 
+      :class="[
+          'filter_list',
+          { active: JSON.stringify(changeListFilter) !== '{}' },
+      ]"  
+      @click="goFilter('2')">
         <view class="list_icon">
-          <image src="@/static/filter_btn_active.png" mode="contain" />
+          <image
+            v-if="JSON.stringify(changeListFilter) !== '{}'"
+            src="@/static/filter_btn_active.png"
+            mode="contain"
+          />
+          <image v-else src="@/static/filter_btn.png" mode="contain" />
         </view>
         <view class="list_title">筛选</view>
       </view>
@@ -147,6 +157,10 @@ export default {
             changeOrderList:[], //改签列表
             changeListFilter:{}, //筛选条件
 
+            changeStatus:false,
+
+            scrollTop: 0, // 列表滚动值
+            oldScrollTop: 0,
 
         }
 
@@ -161,6 +175,19 @@ export default {
             this.changeOrderList = []; 
             this.getChangeList();
     
+        },
+
+        // 航班信息滚动
+        scroll(e) {
+          this.oldScrollTop = e.detail.scrollTop;
+        },
+
+        // 航班信息返回顶部
+        backScroll() {
+          this.scrollTop = this.oldScrollTop;
+          this.$nextTick(() => {
+            this.scrollTop = 0;
+          });
         },
 
         // 获取改签列表
@@ -190,10 +217,15 @@ export default {
 
 
           orderApi.changeList(data).then((res) => { 
-
             if(res.result ===  10000){
               this.changeOrderList = res.data.data;
               console.log('改签列表',this.changeOrderList)
+              if (this.changeStatus) {
+                this.changeOrderList.push.apply(this.changeOrderList, res.data.data);
+              } else {
+                this.changeOrderList = res.data.data;
+                this.changeStatus = true;
+              }
             } else {
               uni.showToast({
                 title: res.msg,
@@ -206,6 +238,7 @@ export default {
 
 
         },
+
         // 跳转到详情页
         jumpChangeDetails() {
 
@@ -217,6 +250,18 @@ export default {
 
         },
 
+        // 跳转到筛选页面
+        goFilter(type) {
+
+          uni.navigateTo({
+            url:'/order/filter?type=' +
+            type +
+            "&changeData=" +
+            JSON.stringify(this.changeListFilter),
+          })
+
+        },
+
         // 下一页数据
         nextPageData() {
           if (this.orderPageStatus) {
@@ -224,12 +269,38 @@ export default {
             this.getChangeList();
           }
         },
+    },
 
-        onLoad(data) {
+    onLoad(data) {
             this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
             this.getChangeList();
-        },
+    },
 
+    onHide() {
+      this.changeOrderList = [];
+      this.changeStatus = false;
+    },
+
+    onShow() {
+      
+
+      if (uni.getStorageSync("changeListFilter")) {
+        this.changeListFilter = JSON.parse(uni.getStorageSync("changeListFilter"));
+        uni.removeStorageSync("changeListFilter");
+        if (
+          this.changeListFilter.change_status &&
+          this.changeListFilter.change_status !== null
+        ) {
+          this.checkedHeaderActive(this.changeListFilter.change_status);
+        } else {
+          this.checkedHeaderActive(0);
+        }
+        console.log("退票筛选条件", this.changeListFilter);
+      } else {
+        this.headerActive = 0;
+        this.getChangeList();
+        this.backScroll();
+      }
     },
     
 }
