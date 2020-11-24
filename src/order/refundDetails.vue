@@ -2,8 +2,8 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-16 14:02:56
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-24 09:45:53
+ * @LastEditors: wish.WuJunLong
 -->
 
 <template>
@@ -125,8 +125,8 @@
             <view class="message_icon">
               <image
                 class="message_icon"
-                :src="'https://fxxcx.ystrip.cn/' + refundDetail.image"
-                mode="aspectFill"
+                :src="refundDetail.image"
+                mode="aspectFit"
               />
             </view>
             <view class="message_list">{{ item.flight_no }}</view>
@@ -158,7 +158,7 @@
                   oitem.ticket_passenger.PassengerName
                 }}</view>
                 <view class="is_insurance" v-if="oitem.insure_count !== 0">
-                  <image src="@/static/insurance_icon.png" mode="aspectFill" />
+                  <image src="@/static/insurance_icon.png" mode="aspectFit" />
                 </view>
                 <view class="group_type">票号</view>
                 <view class="group_number">{{ oitem.ticket_no }}</view>
@@ -245,6 +245,7 @@ export default {
       orderApi.orderInterRefund(data).then((res) => {
         if (res.result === 10000) {
           this.refundDetail = res.data;
+          this.refundDetail.image = 'https://fxxcx.ystrip.cn'+ this.refundDetail.image
           console.log("this.refundDetail", this.refundDetail);
         } else {
           uni.showToast({
@@ -305,7 +306,6 @@ export default {
           font-size: 24upx;
           font-weight: 400;
           margin-right: 6upx;
-          margin-top: 10upx;
         }
       }
     }
