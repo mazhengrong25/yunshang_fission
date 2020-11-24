@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-24 09:45:53
+ * @LastEditTime: 2020-11-24 14:28:52
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -27,8 +27,9 @@
           }}
         </view>
 
-        <view class="order_price">
-          <view class="price_text" v-if="flightData.order_status === 2">退票金额&nbsp;&yen;</view>
+        <view class="order_price" @click="openExp">
+          <view class="price_text" v-if="flightData.order_status === 2" 
+          >退票金额&nbsp;&yen;</view>
           <view class="price_text"
             v-if="flightData.order_status === 1 || flightData.order_status === 3"
           >退票金额参考</view>
@@ -209,6 +210,10 @@
             </view>
           </view>
         </view>
+
+        <!-- 退改信息弹窗 -->
+        <refund-amount ref="refundAmountRefer" :refundInfo="flightData" typeShow="change"></refund-amount>
+
       </scroll-view>
     </view>
   </view>
@@ -218,10 +223,12 @@
 import orderApi from "@/api/order.js";
 import moment from "moment";
 import flightExplanation from "@/components/flight_explanation.vue"; // 航班退改信息
+import RefundAmount from "@/components/refund_amount_refer.vue"; //退票金额参考
 moment.locale("zh-cn");
 export default {
   components: {
     flightExplanation,
+    RefundAmount
   },
 
   data() {
@@ -254,6 +261,17 @@ export default {
           });
         }
       });
+    },
+
+    // 打开退票金额明细弹窗
+    openExp() {
+
+      this.$refs.refundAmountRefer.openExp();
+    },
+
+    // 关闭退票金额明细弹窗
+    closeExp() {
+      this.$refs.refundAmountRefer.closeExp();
     },
 
     onLoad(data) {

@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-11-19 11:49:02
+ * @LastEditTime: 2020-11-24 13:56:40
  * @LastEditors: Please set LastEditors
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -44,7 +44,77 @@
       @scrolltolower="nextPageData()"
     >
 
-  
+        <view class="content_list"
+        v-for="(item, index) in changeOrderList"
+        :key="index">
+      
+          <view class="list_item" @click="jumpChangeDetails()">
+            <view class="item_header">
+              <view class="item_title">
+                <view class="title">
+                  {{ item.change_segments[0].departure_CN.city_name }} -
+                  {{ item.change_segments[0].arrive_CN.city_name }}</view>
+              </view>
+              <view class="item_price">
+                <text>&yen;</text>
+                {{ item.ticket_price || "金额错误" }}
+              </view>
+            </view>
+            <view class="item_info">
+              <view class="info_left">
+                <text>{{ item.change_segments[0].flight_no }}</text>
+                <text>{{
+                  $dateTool(item.change_segments[0].departure_time, "MM月DD日")
+                }}</text>
+                <!-- HH:mm 24制   hh:mm 12制 -->
+                <text
+                  >{{
+                    $dateTool(item.change_segments[0].departure_time, "HH:mm")
+                  }}起飞</text
+                >
+              </view>
+              <view class="info_right">
+                {{
+                    
+                    item.change_status === 1 
+                    ? "申请中"
+                    : item.change_status === 2
+                    ? "待支付"
+                    : item.change_status === 3
+                    ? "待出票"
+                    : item.change_status === 4
+                    ? "已完成"
+                    : ""
+                }}
+              </view>
+            </view>
+
+            <view class="item_time" v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0">
+              <view class="time_icon">
+                <image src="@/static/remaining_time.png" mode="aspectFit" />
+              </view>
+              <view class="time_text">剩余支付时间：</view>
+              <view class="time_number">
+                {{
+                  item.left_min
+                }}分钟
+              </view>
+            </view>
+            <view
+              class="item_btn_box"
+              v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0"
+            >
+              <view class="item_btn close_btn" @click.stop="removeOrder(item, 0)"
+                >取消订单</view
+              >
+              <view
+                class="item_btn submit_btn"
+                @click.stop="jumpPayOrder(item, 0)"
+                >去支付</view
+              >
+            </view>
+          </view>
+        </view>
 
 
 
@@ -56,6 +126,9 @@
 </template>
 
 <script>
+import orderApi from "@/api/order.js";
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
 
     data() {
@@ -69,8 +142,10 @@ export default {
 
             headerActive: 0, // 订单类别默认值 全部
             orderPageNumber: 1, // 当前订单页数
+            orderPageStatus: true, // 是否允许加载下一页数据
 
             changeOrderList:[], //改签列表
+            changeListFilter:{}, //筛选条件
 
 
         }
@@ -84,11 +159,75 @@ export default {
             this.headerActive = index;
             this.orderPageNumber = 1;
             this.changeOrderList = []; 
+            this.getChangeList();
     
+        },
+
+        // 获取改签列表
+        getChangeList() {
+
+          this.orderPageStatus = true;
+
+          let data = {
+            pnr_code:this.changeListFilter.pnrNumber, //pnr
+            change_status:this.headerActive === 0
+                            ?""
+                            : this.headerActive === 1
+                            ?1
+                            : this.headerActive === 2
+                            ?2
+                            : this.headerActive === 3
+                            ?3
+                            : this.headerActive, // 订单状态
+            created_at:this.changeListFilter.Timestart || moment().subtract(3, "years").format("YYYY-MM-DD"), // 申请开始
+            created_at_end:this.changeListFilter.Timend || moment().format("YYYY-MM-DD"), // 申请结束
+            page:this.orderPageNumber, //   页数 
+            order_no:this.changeListFilter.orderNumber	, //订单号
+            ticket_no:this.changeListFilter.ticketNumber, // 乘机人
+            passenger_name:this.changeListFilter.passengerName, // 乘机人
+            passenger_type:this.changeListFilter.passengerType,	// 乘客类型
+          }
+
+
+          orderApi.changeList(data).then((res) => { 
+
+            if(res.result ===  10000){
+              this.changeOrderList = res.data.data;
+              console.log('改签列表',this.changeOrderList)
+            } else {
+              uni.showToast({
+                title: res.msg,
+                icon: "none",
+              });
+            }
+            
+          
+          });
+
+
+        },
+        // 跳转到详情页
+        jumpChangeDetails() {
+
+          uni.navigateTo({
+
+            url: '/order/changeDetails',
+          
+          })
+
+        },
+
+        // 下一页数据
+        nextPageData() {
+          if (this.orderPageStatus) {
+            this.orderPageNumber = this.orderPageNumber + 1;
+            this.getChangeList();
+          }
         },
 
         onLoad(data) {
             this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+            this.getChangeList();
         },
 
     },
@@ -297,27 +436,25 @@ export default {
           display: flex;
           align-items: center;
           justify-content: space-between;
+      
           .info_left {
             font-size: 24upx;
             font-weight: 400;
             color: rgba(42, 42, 42, 1);
-            display: flex;
-            align-items: center;
-            .left_title {
-              margin-right: 20upx;
-              flex-shrink: 0;
-            }
-            .left_message {
-              color: rgba(175, 185, 196, 1);
-              width: 50%;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              .message_passenger {
-                &:not(:last-child) {
-                  &::after {
-                    content: "/";
-                  }
+            text {
+              display: inline-flex;
+              align-items: center;
+              &:first-child {
+                padding-left: 0;
+              }
+              &:not(:last-child) {
+                &::after {
+                  content: "";
+                  display: block;
+                  width: 2upx;
+                  height: 20upx;
+                  background: rgba(211, 223, 236, 1);
+                  margin: 0 8upx;
                 }
               }
             }

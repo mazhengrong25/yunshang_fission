@@ -2,8 +2,8 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-23 18:22:13
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-24 14:01:57
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="refund">
@@ -183,6 +183,7 @@
     <refund-amount
       ref="refundAmountRefer"
       :refundInfo="refundAmountData"
+      typeShow="refund"
     ></refund-amount>
   </view>
 </template>

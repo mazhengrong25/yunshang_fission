@@ -105,6 +105,12 @@
           }
         },
         {
+          "path": "changeDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "refundList",
           "style": {
             "navigationStyle": "custom"

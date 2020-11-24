@@ -2,7 +2,7 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-11-19 10:12:46
+ * @LastEditTime: 2020-11-23 11:42:42
  * @LastEditors: Please set LastEditors
  */
 import request from '@/api/request';
@@ -90,6 +90,15 @@ function changeSubmit(data) {
 	})
 }
 
+// 改签列表
+function changeList(data) {
+	return request({
+		method:'POST',
+		url:'/api/change/list',
+		data: data
+	})
+}
+
 // 取消订单
 function cancleInterRefund(data) {
 	return request({
@@ -128,6 +137,7 @@ export default{
   getFilghtData,
   sendMessage,
   sendMessageSelect,
-  changeSubmit
+  changeSubmit,
+  changeList
 
 }
