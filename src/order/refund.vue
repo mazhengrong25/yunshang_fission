@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-20 13:38:13
+ * @LastEditTime: 2020-11-23 10:48:47
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -154,7 +154,7 @@
 
       
       <!-- 退改信息弹窗 -->
-      <refund-amount ref="refundAmountRefer" :refundInfo="refundList"></refund-amount>
+      <refund-amount ref="refundAmountRefer" :refundInfo="refundList" typeShow="refund"></refund-amount>
 
       <!-- 退票申请发送成功 -->
       <uni-popup ref="refundMessage" type="dialog" :maskClick="false">

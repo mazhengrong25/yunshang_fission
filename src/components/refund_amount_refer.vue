@@ -2,7 +2,7 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-11-19 15:44:11
+ * @LastEditTime: 2020-11-23 11:08:15
  * @LastEditors: Please set LastEditors
 -->
 
@@ -13,13 +13,14 @@
         <view class="title">
           <view class="close_btn" @click="closeExp"></view>
           <view class="explanation_header">
-            <view>退票金额参考</view>
+            <view v-if="typeShow === 'refund'">退票金额参考</view>
+            <view v-else>退票金额明细</view>
           </view>
         </view>
 
         <view class="flight_scroll">
           <!-- 黄色警示 -->
-          <view class="top_yellow">
+          <view class="top_yellow" v-if="typeShow === 'refund'">
             *以下退票金额仅供参考，请以实际退票金额为准
           </view>
 
@@ -30,7 +31,7 @@
                   <view class="header_left">
                     <view class="total_price_title">订单总价</view>
                     <view class="total_price_message">
-                      <text>&yen;</text>{{ refundInfo.total_price }}
+                      <text>&yen;</text>{{ refundInfo.total_price || refundInfo.ticket_refund_passenger[0].ticket_price }}
                     </view>
                   </view>
                 </view>
@@ -80,13 +81,13 @@
                         >
                       </view>
 
-                      <!-- <view class="list_item">
+                      <view class="list_item" v-if=" !typeShow">
                         <view class="item_title">服务费</view>
                         <view class="item_message"
                           >&yen; {{ item.service_price }}</view
                         >
                       </view>
-                      <view class="list_item">
+                      <!-- <view class="list_item">
                         <view class="item_title">奖励金</view>
                         <view class="item_message"
                           >&yen; {{ item.reward_price }}</view
@@ -95,7 +96,7 @@
                     </view>
                   </view>
 
-                  <view class="price_info_list active">
+                  <view class="price_info_list active" v-if=" typeShow === 'refund'">
                     <view class="list_title">
                       <view class="title_name">退票费率明细</view>
                     </view>
@@ -121,6 +122,44 @@
                     </view>
                   </view>
 
+                  <view class="price_info_list active" v-if=" typeShow === 'change' ">
+                    <view class="list_title">
+                      <view class="title_name">退票费率明细</view>
+                    </view>
+                    <view class="list_main">
+                      <view class="list_item">
+                        <view class="item_title">退票费率</view>
+                        <view class="item_message"
+                          >{{''}}%</view
+                        >
+                      </view>
+                      <view class="list_item">
+                        <view class="item_title">退票费</view>
+                        <view class="item_message"
+                          >&yen; {{''}}</view
+                        >
+                      </view>
+                      <view class="list_item">
+                        <view class="item_title">误机费</view>
+                        <view class="item_message"
+                          >&yen; {{''}}</view
+                        >
+                      </view>
+                       <view class="list_item">
+                        <view class="item_title">其他费用</view>
+                        <view class="item_message"
+                          >&yen; {{''}}</view
+                        >
+                      </view>
+                       <view class="list_item">
+                        <view class="item_title">应退金额</view>
+                        <view class="item_message"
+                          >&yen; {{''}}</view
+                        >
+                      </view>
+                    </view>
+                  </view>
+
                   
                 </scroll-view>
               </view>
@@ -138,6 +177,12 @@ export default {
       refundInfo: {
         type: Object,
         default:() => ({})
+      },
+
+      // 区别退票改签有无警告条
+      typeShow: {
+        type:String,
+        default:() => ''
       },
 
 
