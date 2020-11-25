@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-11-24 11:24:31
+ * @LastEditTime: 2020-11-24 17:30:55
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -229,12 +229,14 @@ export default {
     },
     methods:{
 
-        onLoad(data) {
+        
+    },
+    onLoad(data) {
             
-            this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+      this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       
-        },
-    }
+    },
+
     
 }
 </script>

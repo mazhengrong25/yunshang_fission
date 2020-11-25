@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-18 14:55:42
+ * @LastEditTime: 2020-11-24 18:17:42
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -33,6 +33,19 @@
           >{{item.name}}</view>
         </view>
       </view>
+
+      <view class="list_item" v-if="filterType === '2'">
+        <view class="item_title">订单状态</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in changeFilter"
+            :key="item"
+            @click="activeChangeFilter(item)"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
       <view class="list_item" v-if="filterType === '0'">
         <view class="item_title">订单状态</view>
         <view class="item_content item_checkbox">
@@ -56,12 +69,20 @@
             :class="['dialog_view',{input_placeholder: !refundTime.start}]"
             @click="openlimitdaySelector('start')"
           >{{refundTime.start?refundTime.start:'申请日始'}}</view>
+           <view v-if="filterType === '2'"
+            :class="['dialog_view',{input_placeholder: !refundTime.start}]"
+            @click="openlimitdaySelector('start')"
+          >{{refundTime.start?refundTime.start:'申请日始'}}</view>
           <view class="dialog_line">—</view>
           <view v-if="filterType === '0'"
             :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
             @click="openlimitdaySelector('end')"
           >{{timeLimit.end?timeLimit.end:'预定日止'}}</view>
           <view v-if="filterType === '1'"
+            :class="['dialog_view',{input_placeholder: !refundTime.end}]"
+            @click="openlimitdaySelector('end')"
+          >{{refundTime.end?refundTime.end:'申请日止'}}</view>
+          <view v-if="filterType === '2'"
             :class="['dialog_view',{input_placeholder: !refundTime.end}]"
             @click="openlimitdaySelector('end')"
           >{{refundTime.end?refundTime.end:'申请日止'}}</view>
@@ -80,12 +101,36 @@
         </view>
       </view>
 
+      <view class="list_item" v-if="filterType === '2'">
+        <view class="item_title">乘客类型</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in passengerChangeFilter"
+            :key="item"
+            @click="activeDate(item,'passenger')"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
       <view class="list_item" v-if="filterType === '1'">
         <view class="item_title">订单类型</view>
         <view class="item_content item_checkbox">
           <view
             :class="['checkbox_item',{'active': item.active}]"
             v-for="item in orderFilter"
+            :key="item"
+            @click="activeDate(item,'orderType')"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="list_item" v-if="filterType === '2'">
+        <view class="item_title">订单类型</view>
+        <view class="item_content item_checkbox">
+          <view
+            :class="['checkbox_item',{'active': item.active}]"
+            v-for="item in orderChangeFilter"
             :key="item"
             @click="activeDate(item,'orderType')"
           >{{item.name}}</view>
@@ -119,7 +164,20 @@
         </view>
       </view>
 
-      <view class="list_item list_input" v-if="filterType === '1'">
+      <view class="list_item list_input" 
+      v-if="filterType === '0' || filterType === '2'">
+        <view class="item_title">订单号</view>
+        <input
+          type="text"
+          class="item_input"
+          v-model="orderNumber"
+          placeholder="请填写订单号"
+          placeholder-class="input_placeholder"
+        />
+      </view>
+
+      <view class="list_item list_input" 
+      >
         <view class="item_title">票号</view>
         <input
           type="text"
@@ -141,16 +199,6 @@
         />
       </view>
       <view class="list_item list_input" v-if="filterType === '0'">
-        <view class="item_title">订单号</view>
-        <input
-          type="text"
-          class="item_input"
-          v-model="orderNumber"
-          placeholder="请填写订单号"
-          placeholder-class="input_placeholder"
-        />
-      </view>
-      <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">航班号</view>
         <input
           type="text"
@@ -161,7 +209,8 @@
         />
       </view>
 
-      <view class="list_item list_input" v-if="filterType === '1'">
+      <view class="list_item list_input" 
+      v-if="filterType === '1' || filterType === '2'">
         <view class="item_title">乘机人</view>
         <input
           type="text"
@@ -212,7 +261,7 @@ export default {
     return {
       iStatusBarHeight: 0,
 
-      filterType:"", //筛选类型  国内外  和  国内退票
+      filterType:"", //筛选类型  国内外  国内退票 国内改签  依次为0 1  2
 
       submitBtnStatus: false, // 确认按钮状态
 
@@ -247,6 +296,31 @@ export default {
         }
       ],
 
+      changeFilter: [
+
+        //改签状态筛选列表
+        {
+          name: "申请中",
+          id:1,
+          active:false,
+        },
+        {
+          name: "待支付",
+          id:2,
+          active:false,
+        },
+        {
+          name: "待出票",
+          id:3,
+          active:false,
+        },
+        {
+          name:"已完成",
+          id:4,
+          active:false,
+        }
+      ],
+
       passengerFilter: [
         //乘客类型筛选列表
         {
@@ -266,6 +340,27 @@ export default {
         }
       ],
 
+      passengerChangeFilter: [
+
+        // 改签列表
+        {
+          name: "成人",
+          value: 'ADT',
+          active:false,
+        },
+        {
+          name: "儿童",
+          value: 'CNN',
+          active:false,
+        },
+        {
+          name: "婴儿",
+          value: 'INF',
+          active:false,
+        }
+
+      ],
+
       orderFilter: [
         // 订单类型筛选列表
         {
@@ -278,6 +373,22 @@ export default {
           id:1,
           active:false,
         },
+      ],
+
+      orderChangeFilter: [
+
+        // 改签列表
+        {
+          name: "客户单",
+          id:0,
+          active:false,
+        },
+        {
+          name: "手工单",
+          id:1,
+          active:false,
+        },
+
       ],
       orderStatus: [
         // 订单状态筛选列表  id对应导航栏位置
@@ -328,7 +439,7 @@ export default {
           "欧阳娜娜",
           "Lisa",
           "GD",
-    ],
+      ],
 
   
     pnr: "", // pnr
@@ -348,8 +459,12 @@ export default {
     flightApplicant:"", // 申请人
     refundStatus: null, // 退票订单状态
     ticket_Number:"", // 票号
-
     passengerType: "",
+
+    //改签筛选
+    changeStatus: null, //改签订单状态
+
+    
     };
   },
   methods: {
@@ -419,6 +534,21 @@ export default {
       })
     },
 
+    // 订单状态  改签列表
+    activeChangeFilter(val) {
+      this.changeFilter.forEach((item) => {
+        if(item.name === val.name) {
+          item.active = !val.active;
+          this.changeStatus = item.active?val.id:null
+        }else {
+          item.active = false;
+        }
+      })
+
+    },
+
+
+
     // 重置筛选
     resetBtn() {
       this.dateFilter.forEach((item) => (item.active = false));
@@ -446,6 +576,13 @@ export default {
       let data = {}
       uni.setStorageSync('orderListFilter',JSON.stringify(data));
       uni.navigateBack();
+
+      // 改签筛选
+      this.changeStatus=null;
+      let change_data = {}
+      uni.setStorageSync('changeListFilter',JSON.stringify(change_data));
+      uni.navigateBack();
+
     },
 
     // 确定筛选
@@ -480,10 +617,19 @@ export default {
           passenger_type: this.passengerStatus, // 旅客类型
           order_type: this.orderType, // 客户单  手工单
         }
+      }else if(this.filterType == '2'){
+        //改签筛选
+        change_data = {
+          change_status: this.changeStatus, //订单状态
+        }
       }
       
-    uni.setStorageSync('orderListFilter',JSON.stringify(data));
-    uni.navigateBack();
+      uni.setStorageSync('orderListFilter',JSON.stringify(data));
+      uni.navigateBack();
+
+      uni.setStorageSync('changeListFilter',JSON.stringify(change_data));
+      uni.navigateBack();
+
     },
 
     // 打开时间范围日期选择框
@@ -605,6 +751,13 @@ export default {
       this.refundFilter.forEach(item => item.active = item.id === refundList.order_status)
       this.passengerFilter.forEach(item => item.active = item.value === refundList.passenger_type)
       this.orderFilter.forEach(item => item.active = item.id === refundList.order_type)
+    }
+
+    //改签列表
+    if(this.filterType === '2' && data.changeData !== '{}'){
+      let changeList = JSON.parse(data.changeData)
+      this.changeStatus = changeList.change_status // 订单状态
+      
     }
     
   },
