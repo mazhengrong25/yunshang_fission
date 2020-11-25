@@ -2,7 +2,7 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-24 18:17:42
+ * @LastEditTime: 2020-11-25 14:56:51
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -70,9 +70,9 @@
             @click="openlimitdaySelector('start')"
           >{{refundTime.start?refundTime.start:'申请日始'}}</view>
            <view v-if="filterType === '2'"
-            :class="['dialog_view',{input_placeholder: !refundTime.start}]"
+            :class="['dialog_view',{input_placeholder: !changeTime.start}]"
             @click="openlimitdaySelector('start')"
-          >{{refundTime.start?refundTime.start:'申请日始'}}</view>
+          >{{changeTime.start?changeTime.start:'申请日始'}}</view>
           <view class="dialog_line">—</view>
           <view v-if="filterType === '0'"
             :class="['dialog_view',{input_placeholder: !timeLimit.end}]"
@@ -83,9 +83,9 @@
             @click="openlimitdaySelector('end')"
           >{{refundTime.end?refundTime.end:'申请日止'}}</view>
           <view v-if="filterType === '2'"
-            :class="['dialog_view',{input_placeholder: !refundTime.end}]"
+            :class="['dialog_view',{input_placeholder: !changeTime.end}]"
             @click="openlimitdaySelector('end')"
-          >{{refundTime.end?refundTime.end:'申请日止'}}</view>
+          >{{changeTime.end?changeTime.end:'申请日止'}}</view>
         </view>
       </view>
 
@@ -108,7 +108,7 @@
             :class="['checkbox_item',{'active': item.active}]"
             v-for="item in passengerChangeFilter"
             :key="item"
-            @click="activeDate(item,'passenger')"
+            @click="activeDate(item,'change_passenger')"
           >{{item.name}}</view>
         </view>
       </view>
@@ -119,18 +119,6 @@
           <view
             :class="['checkbox_item',{'active': item.active}]"
             v-for="item in orderFilter"
-            :key="item"
-            @click="activeDate(item,'orderType')"
-          >{{item.name}}</view>
-        </view>
-      </view>
-
-      <view class="list_item" v-if="filterType === '2'">
-        <view class="item_title">订单类型</view>
-        <view class="item_content item_checkbox">
-          <view
-            :class="['checkbox_item',{'active': item.active}]"
-            v-for="item in orderChangeFilter"
             :key="item"
             @click="activeDate(item,'orderType')"
           >{{item.name}}</view>
@@ -253,6 +241,7 @@
 
 <script>
 import flightFilterDialog from "@/components/flight_filter_dialog.vue"; // 航班筛选弹窗
+import refundListVue from './refundList.vue';
 export default {
    components: {
     flightFilterDialog,
@@ -350,7 +339,7 @@ export default {
         },
         {
           name: "儿童",
-          value: 'CNN',
+          value: 'CHD',
           active:false,
         },
         {
@@ -375,21 +364,6 @@ export default {
         },
       ],
 
-      orderChangeFilter: [
-
-        // 改签列表
-        {
-          name: "客户单",
-          id:0,
-          active:false,
-        },
-        {
-          name: "手工单",
-          id:1,
-          active:false,
-        },
-
-      ],
       orderStatus: [
         // 订单状态筛选列表  id对应导航栏位置
         {
@@ -420,6 +394,11 @@ export default {
       },
       // 退票申请时间开始结束
       refundTime: {
+        start:"",
+        end:"",
+      },
+      // 改签申请时间开始结束
+      changeTime: {
         start:"",
         end:"",
       },
@@ -463,6 +442,7 @@ export default {
 
     //改签筛选
     changeStatus: null, //改签订单状态
+    changePassengerStatus:null, //乘客类型
 
     
     };
@@ -507,6 +487,21 @@ export default {
 
         }
             
+      }else if(this.filterType === "2") {
+
+
+          if(type === "change_passenger"){
+
+            // 乘客状态
+            this.passengerChangeFilter.forEach((item) => {
+              if (item.name === val.name) {
+                item.active = !val.active;
+                this.changePassengerStatus = item.active?val.value: null
+              } else {
+                item.active = false;
+              }
+            }); 
+          }
       }
     
     },
@@ -574,14 +569,20 @@ export default {
       this.orderType = ""; // 客户单  手工单
       this.passengerStatus = ""; // 旅客类型
       let data = {}
-      uni.setStorageSync('orderListFilter',JSON.stringify(data));
-      uni.navigateBack();
 
       // 改签筛选
+      this.changeFilter.forEach((item) => (item.active = false));
       this.changeStatus=null;
-      let change_data = {}
-      uni.setStorageSync('changeListFilter',JSON.stringify(change_data));
+      this.changePassengerStatus = ""; //乘客类型
+      this.changeTime.start = ""; //时间范围
+      this.changeTime.end = "";
+      this.ticket_Number = "";  // 票号
+      this.flightPassenger = "";  // 乘机人
+    
+
+      uni.setStorageSync('orderListFilter',JSON.stringify(data));
       uni.navigateBack();
+    
 
     },
 
@@ -589,6 +590,7 @@ export default {
     yesBtn() {
        
       let data 
+      // let change_data
       // 国内列表筛选
       if(this.filterType === '0'){
         data = {
@@ -619,16 +621,21 @@ export default {
         }
       }else if(this.filterType == '2'){
         //改签筛选
-        change_data = {
+        data = {
           change_status: this.changeStatus, //订单状态
+          passengerType: this.changePassengerStatus, //乘客类型
+          ticketNumber: this.ticket_Number, //票号
+          pnrNumber: this.pnr, //pnr
+          orderNumber: this.orderNumber, // 订单号
+          passengerName: this.flightPassenger, //乘机人
+          Timestart: this.changeTime.start, //申请日始
+          Timend: this.changeTime.end, //申请日止
+         
         }
       }
       
       uni.setStorageSync('orderListFilter',JSON.stringify(data));
-      uni.navigateBack();
-
-      uni.setStorageSync('changeListFilter',JSON.stringify(change_data));
-      uni.navigateBack();
+      uni.navigateBack(); 
 
     },
 
@@ -671,10 +678,25 @@ export default {
             icon:'none'
           })
         }
+      }else if(this.dateType === 'end' && this.changeTime.start) {
+        if(new Date(start).getTime() < new Date(this.changeTime.start).getTime()){
+          return uni.showToast({
+            title:'请选择大于起始时间',
+            icon:'none'
+          })
+        }
+      }else if(this.dateType === 'start' && this.changeTime.end) {
+        if(new Date(start).getTime() > new Date(this.changeTime.end).getTime()){
+          return uni.showToast({
+            title:'请选择小于结束时间',
+            icon:'none'
+          })
+        }
       }
 
       this.$set(this.timeLimit,this.dateType,start)
       this.$set(this.refundTime,this.dateType,start)
+      this.$set(this.changeTime,this.dateType,start)
     },
 
     //城市选择  出发城市
@@ -757,6 +779,17 @@ export default {
     if(this.filterType === '2' && data.changeData !== '{}'){
       let changeList = JSON.parse(data.changeData)
       this.changeStatus = changeList.change_status // 订单状态
+      this.changePassengerStatus = changeList.passengerType //乘客类型
+      this.ticket_Number = changeList.ticketNumber //票号
+      this.pnr = changeList.pnrNumber //pnr
+      this.orderNumber = changeList.orderNumber //订单号
+      this.flightPassenger = changeList.passengerName //乘机人
+      this.changeTime.start = changeList.Timestart, //申请日始
+      this.changeTime.end = changeList.Timend, //申请日止
+
+
+      this.changeFilter.forEach(item => item.active = item.id === changeList.change_status)
+      this.passengerChangeFilter.forEach(item => item.active = item.value === changeList.passengerType)
       
     }
     

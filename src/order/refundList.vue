@@ -2,8 +2,8 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-23 17:25:33
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-25 13:45:03
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_list">
@@ -42,7 +42,7 @@
       <view
         :class="[
           'filter_list',
-          { active: JSON.stringify(refundListFilter) !== '{}' },
+          { active: JSON.stringify(refundListFilter) !== '{}' }
         ]"
         @click="goFilter('1')"
       >

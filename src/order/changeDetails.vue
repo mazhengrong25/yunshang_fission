@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-11-24 17:30:55
+ * @LastEditTime: 2020-11-25 18:05:28
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -18,12 +18,23 @@
     <view class="details_header">
       <view class="header_top">
         <view class="order_type">
-         申请中
+         {{
+
+            changeDetailsData.change_status === 1 
+            ? "申请中"
+            : changeDetailsData.change_status === 2
+            ? "待支付"
+            : changeDetailsData.change_status === 3
+            ? "待出票"
+            : changeDetailsData.change_status === 4
+            ? "已完成"
+            : ""
+         }}
         </view>
 
         <view
           class="order_price"
-          v-if="JSON.stringify(orderDetails) !== '{}'"
+          v-if="JSON.stringify(changeDetailsData) !== '{}'"
 
         >
           <text class="price_text">改签费&yen;</text>
@@ -32,24 +43,35 @@
 
         <view class="price_other" v-else> 数据获取中 </view>
       </view>
-      <!-- 剩余时间  已预订 -->
-      <view
+      <!-- 剩余时间 待支付 -->
+      <!-- <view
         class="remaining_time"
-        v-if="
-          orderDetails.status !== 0 &&
-          orderDetails.status !== 5 &&
-          orderDetails.pay_status === 1 &&
-          orderDetails.left_min > 0
-        "
+        v-if="changeDetailsData.change_status === 2"
       >
         <image
           class="time_icon"
           src="@/static/order_remaining_time.png"
           mode="aspectFit"
         />
-        <text class="time_text"
-          >剩余支付时间：{{ orderDetails.left_min }}分钟</text
+        <text class="time_text">剩余支付时间：{{ '' }}分钟</text
         >
+      </view> -->
+      
+      <!-- 订单状态 -->
+      <view class="remaining_time">
+        <text class="time_text">
+            {{
+              changeDetailsData.change_status === 1
+                ? "您的申请已提交，等待后台审核"
+                : changeDetailsData.change_status === 2
+                ? "剩余支付时间"
+                : changeDetailsData.change_status === 3
+                ? "订单支付成功，出票中..."
+                : changeDetailsData.change_status === 4
+                ? "订单改签完成，已出票"
+                : ""
+            }}
+        </text>
       </view>
 
       <view class="order_option">
@@ -189,23 +211,35 @@
           <view class="message_list">
             <view class="list_item">
               <view class="item_title">订单编号</view>
-              <view class="item_message">{{ '' }}</view>
+              <view class="item_message">{{ changeDetailsData.order_no }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">PNR</view>
-              <view class="item_message">{{ '' }}</view>
+              <view class="item_message">{{ changeDetailsData.pnr_code }}</view>
+            </view>
+            <view class="list_item" v-if="changeDetailsData.change_status === 4">
+              <view class="item_title">YATP订单号</view>
+              <view class="item_message">{{ changeDetailsData.yatp_id }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">订票员</view>
-              <view class="item_message">{{ '' }}</view>
+              <view class="item_message">{{ changeDetailsData.login_name }}</view>
             </view>
             <view class="list_item">
-              <view class="item_title">预定时间</view>
-              <view class="item_message">{{ '' }}</view>
+              <view class="item_title">分销商</view>
+              <view class="item_message">{{ changeDetailsData.admin_name }}</view>
+            </view>
+            <view class="list_item"  v-if="changeDetailsData.change_status === 4">
+              <view class="item_title">出票员</view>
+              <view class="item_message">{{ changeDetailsData.change_passengers[0].ticket_passenger.out_ticket_name }}</view>
+            </view>
+            <view class="list_item">
+              <view class="item_title">申请时间</view>
+              <view class="item_message">{{ changeDetailsData.created_at }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">备注</view>
-              <view class="item_message input-right-arrow">{{''}}</view>
+              <view class="item_message input-right-arrow">{{remark || '无'}}</view>
             </view>
           </view>
         </view>
@@ -225,6 +259,8 @@ export default {
         return {
 
             iStatusBarHeight: 0,
+
+            changeDetailsData:{}, //列表传入
         }
     },
     methods:{
@@ -234,7 +270,8 @@ export default {
     onLoad(data) {
             
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-      
+      this.changeDetailsData = JSON.parse(data.changeData)
+      console.log("改签列表",this.changeDetailsData)
     },
 
     
@@ -299,9 +336,11 @@ export default {
             margin-right: 10upx;
             }
             .time_text {
-            font-size: 24upx;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 1);
+
+              font-size: 24upx;
+              font-weight: 400;
+              color: #ffffff;
+              opacity: 0.8;
             }
         }
         .order_option {
@@ -644,7 +683,7 @@ export default {
                     font-size: 24upx;
                     font-weight: 400;
                     color: rgba(153, 153, 153, 1);
-                    width: 100upx;
+                    width: 132upx;
                     text {
                         font-size: 20upx;
                     }
