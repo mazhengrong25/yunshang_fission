@@ -2,8 +2,8 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-11-06 17:51:59
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-25 16:25:30
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_pay">
@@ -277,7 +277,14 @@ export default {
     // 立即支付按钮
     jumpPay(type) {
       if (this.payBtnStatus) {
-        let data = {
+
+        uni.showModal({
+          title: '提示',
+          content: '请确定是否支付当前订单',
+          success: (res) => {
+              if (res.confirm) {
+                  
+let data = {
           pay_type: this.payType === "钱包" ? 1 : "",
         };
         let payType = type === "儿童" ? 1 : 0;
@@ -343,6 +350,16 @@ export default {
               });
             }
           });
+
+              } 
+          }
+      });
+
+
+        
+
+
+
       }
     },
   },
