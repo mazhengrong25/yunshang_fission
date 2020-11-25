@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-25 16:21:35
+ * @LastEditTime: 2020-11-25 16:39:30
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -17,12 +17,14 @@
       <view class="header_top">
         <view class="order_type">
           {{
-            refundDetail.ticket_refund_passenger[0].refund_status === 1
+            refundDetail.order_status === 1
               ? "申请中"
-              : refundDetail.ticket_refund_passenger[0].refund_status === 2
+              : refundDetail.order_status === 2
               ? "成功"
-              : refundDetail.ticket_refund_passenger[0].refund_status === 3
+              : refundDetail.order_status === 3
               ? "已取消"
+              : refundDetail.order_status === 4
+              ? "已审核"
               : ""
           }}
         </view>
@@ -30,20 +32,21 @@
         <view class="order_price" @click="openExp">
           <view
             class="price_text"
-            v-if="refundDetail.ticket_refund_passenger[0].refund_status === 2"
+            v-if="refundDetail.order_status === 2"
             >退票金额&nbsp;&yen;</view
           >
           <view
             class="price_text"
             v-if="
-              refundDetail.ticket_refund_passenger[0].refund_status === 1 ||
-                refundDetail.ticket_refund_passenger[0].refund_status === 3
+              refundDetail.order_status === 1 ||
+                refundDetail.order_status === 3 || 
+                refundDetail.order_status === 4
             "
             >退票金额参考</view
           >
           <view
             class="price_total"
-            v-if="refundDetail.ticket_refund_passenger[0].refund_status === 2"
+            v-if="refundDetail.order_status === 2"
           >
             {{ refundTotalNmber }}
           </view>
@@ -58,6 +61,8 @@
             ? "您的订单已成功退款"
             : refundDetail.order_status === 3
             ? "您的申请已取消"
+            : refundDetail.order_status === 4
+            ? "您的申请已审核，等待系统操作"
             : ""
         }}</text>
       </view>
@@ -615,7 +620,7 @@ export default {
                 align-items: center;
                 margin-bottom: 34upx;
                 .info_type {
-                  width: 100upx;
+                  width: 90upx;
                   height: 30upx;
                   border: 2upx solid rgba(127, 183, 240, 1);
                   border-radius: 20upx;
