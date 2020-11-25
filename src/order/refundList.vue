@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-25 16:14:20
+ * @LastEditTime: 2020-11-25 16:28:57
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -93,6 +93,8 @@
                     ? "成功"
                     : item.ticket_refund_passenger[0].refund_status === 3
                     ? "已取消"
+                    : item.ticket_refund_passenger[0].refund_status === 4
+                    ? "已审核"
                     : ""
                 }}
               </text>
