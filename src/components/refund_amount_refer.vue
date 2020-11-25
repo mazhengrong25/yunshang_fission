@@ -2,8 +2,8 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-11-24 14:03:51
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-25 16:16:24
+ * @LastEditors: wish.WuJunLong
 -->
 
 <template>
@@ -96,6 +96,7 @@
                     </view>
                   </view> 
 
+                  <!-- 退票页明细 -->
                   <view class="price_info_list active" v-if="typeShow === 'refund'">
                     <view class="list_title">
                       <view class="title_name">退票费率明细</view>
@@ -121,7 +122,46 @@
                       </view>
                     </view>
                   </view>
+                  <!-- 退票页详情页明细 -->
+                  <view class="price_info_list active" v-if="typeShow === 'refundDetail'">
+                    <view class="list_title">
+                      <view class="title_name">退票费率明细</view>
+                    </view>
+                    <view class="list_main">
+                      <view class="list_item">
+                        <view class="item_title">退票费率</view>
+                        <view class="item_message red_message"
+                          >{{refundInfo.refundRate}}%</view
+                        >
+                      </view>
+                      <view class="list_item">
+                        <view class="item_title">退票费</view>
+                        <view class="item_message red_message" 
+                          >&yen; {{refundInfo.refundPriceCost}}</view
+                        >
+                      </view>
+                      <view class="list_item">
+                        <view class="item_title">误机费</view>
+                        <view class="item_message red_message"
+                          >&yen; {{refundInfo.delay_price}}</view
+                        >
+                      </view>
+                       <view class="list_item">
+                        <view class="item_title">其他费用</view>
+                        <view class="item_message red_message"
+                          >&yen; {{refundInfo.sale_other_fee}}</view
+                        >
+                      </view>
+                      <view class="list_item">
+                        <view class="item_title">应退金额</view>
+                        <view class="item_message red_message"
+                          >&yen; {{refundInfo.refundPriceAmount}}</view
+                        >
+                      </view>
+                    </view>
+                  </view>
 
+                  <!-- 改签详情 -->
                   <view class="price_info_list active" v-if="typeShow === 'change' ">
                     <view class="list_title">
                       <view class="title_name">退票费率明细</view>

@@ -2,8 +2,13 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
+<<<<<<< HEAD
  * @LastEditTime: 2020-11-25 13:45:03
  * @LastEditors: Please set LastEditors
+=======
+ * @LastEditTime: 2020-11-25 16:35:30
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 5efb27536f639dcbca64d6d4f5d67b2264a1793d
 -->
 <template>
   <view class="order_list">
@@ -93,6 +98,8 @@
                     ? "成功"
                     : item.order_status === 3
                     ? "已取消"
+                    : item.order_status === 4
+                    ? "已审核"
                     : ""
                 }}
               </text>
@@ -506,13 +513,14 @@ export default {
             color: rgba(42, 42, 42, 1);
             display: flex;
             align-items: center;
+            flex: 1;
             .left_title {
               margin-right: 20upx;
               flex-shrink: 0;
             }
             .left_message {
               color: rgba(175, 185, 196, 1);
-              width: 50%;
+              width: 40%;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -529,6 +537,7 @@ export default {
             font-size: 24upx;
             font-weight: 400;
             color: rgba(42, 42, 42, 1);
+            flex-shrink: 0;
           }
         }
         .item_time {

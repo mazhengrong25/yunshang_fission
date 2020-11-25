@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-24 14:28:52
+ * @LastEditTime: 2020-11-25 16:39:30
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -17,38 +17,52 @@
       <view class="header_top">
         <view class="order_type">
           {{
-            flightData.order_status === 1
+            refundDetail.order_status === 1
               ? "申请中"
-              : flightData.order_status === 2
+              : refundDetail.order_status === 2
               ? "成功"
-              : flightData.order_status === 3
+              : refundDetail.order_status === 3
               ? "已取消"
+              : refundDetail.order_status === 4
+              ? "已审核"
               : ""
           }}
         </view>
 
         <view class="order_price" @click="openExp">
-          <view class="price_text" v-if="flightData.order_status === 2" 
-          >退票金额&nbsp;&yen;</view>
-          <view class="price_text"
-            v-if="flightData.order_status === 1 || flightData.order_status === 3"
-          >退票金额参考</view>
-          <view class="price_total" v-if="flightData.order_status === 2">
-            {{
-              Number(flightData.ticket_refund_passenger[0].refund_total).toFixed(0) || ''
-            }}
+          <view
+            class="price_text"
+            v-if="refundDetail.order_status === 2"
+            >退票金额&nbsp;&yen;</view
+          >
+          <view
+            class="price_text"
+            v-if="
+              refundDetail.order_status === 1 ||
+                refundDetail.order_status === 3 || 
+                refundDetail.order_status === 4
+            "
+            >退票金额参考</view
+          >
+          <view
+            class="price_total"
+            v-if="refundDetail.order_status === 2"
+          >
+            {{ refundTotalNmber }}
           </view>
         </view>
       </view>
       <!-- 状态提示 -->
       <view class="remaining_time">
         <text class="time_text">{{
-          flightData.order_status === 1
+          refundDetail.order_status === 1
             ? "您的申请已提交，等待后台审核"
-            : flightData.order_status === 2
+            : refundDetail.order_status === 2
             ? "您的订单已成功退款"
-            : flightData.order_status === 3
+            : refundDetail.order_status === 3
             ? "您的申请已取消"
+            : refundDetail.order_status === 4
+            ? "您的申请已审核，等待系统操作"
             : ""
         }}</text>
       </view>
@@ -114,9 +128,7 @@
                   item.arrive_CN.air_port_name
                     ? item.arrive_CN.air_port_name
                     : ""
-                }}{{
-                  item.arrive_terminal ? item.arrive_terminal : ""
-                }}</view
+                }}{{ item.arrive_terminal ? item.arrive_terminal : "" }}</view
               >
             </view>
           </view>
@@ -140,7 +152,7 @@
           <view class="passenger_list">
             <view
               class="list_item"
-              v-for="(oitem, oindex) in flightData.ticket_refund_passenger"
+              v-for="(oitem, oindex) in refundDetail.ticket_refund_passenger"
               :key="oindex"
             >
               <view class="list_info">
@@ -188,7 +200,9 @@
             </view>
             <view class="list_item">
               <view class="item_title">PNR</view>
-              <view class="item_message">{{ refundDetail.pnr_code || ''}}</view>
+              <view class="item_message">{{
+                refundDetail.pnr_code || ""
+              }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">分销商</view>
@@ -198,22 +212,30 @@
               <view class="item_title">申请时间</view>
               <view class="item_message">{{ refundDetail.created_at }}</view>
             </view>
-            <view class="list_item" v-if="flightData.order_status === 2">
+            <view
+              class="list_item"
+              v-if="refundDetail.ticket_refund_passenger[0].refund_status === 2"
+            >
               <view class="item_title">退款时间</view>
-              <view class="item_message">{{ refundDetail.ticket_refund_passenger[0].refund_time }}</view>
+              <view class="item_message">{{
+                refundDetail.ticket_refund_passenger[0].refund_time
+              }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">退废票备注</view>
               <view class="item_message">{{
-                refundDetail.remark || '无'
+                refundDetail.remark || "无"
               }}</view>
             </view>
           </view>
         </view>
 
         <!-- 退改信息弹窗 -->
-        <refund-amount ref="refundAmountRefer" :refundInfo="flightData" typeShow="change"></refund-amount>
-
+        <refund-amount
+          ref="refundAmountRefer"
+          :refundInfo="refundAmountData"
+          typeShow="refundDetail"
+        ></refund-amount>
       </scroll-view>
     </view>
   </view>
@@ -228,7 +250,7 @@ moment.locale("zh-cn");
 export default {
   components: {
     flightExplanation,
-    RefundAmount
+    RefundAmount,
   },
 
   data() {
@@ -240,6 +262,10 @@ export default {
       orderId: "", // 订单号
 
       refundDetail: {}, // 退票单详情
+
+      refundAmountData: {}, // 退票金额明细
+
+      refundTotalNmber: 0, // 退票金额
     };
   },
   methods: {
@@ -252,8 +278,13 @@ export default {
       orderApi.orderInterRefund(data).then((res) => {
         if (res.result === 10000) {
           this.refundDetail = res.data;
-          this.refundDetail.image = 'https://fxxcx.ystrip.cn'+ this.refundDetail.image
-          console.log("this.refundDetail", this.refundDetail);
+          this.refundDetail.image =
+            "https://fxxcx.ystrip.cn" + this.refundDetail.image;
+          let refundTotalNmber = 0;
+          this.refundDetail.ticket_refund_passenger.forEach((item) => {
+            refundTotalNmber += Number(item.refund_total);
+          });
+          this.refundTotalNmber = refundTotalNmber;
         } else {
           uni.showToast({
             title: res.msg,
@@ -265,6 +296,35 @@ export default {
 
     // 打开退票金额明细弹窗
     openExp() {
+      let refundPriceList = []; // 退票金额明细乘客列表
+      let refundRate;
+      let refundPriceTotal = 0; // 金额总价
+      let refundPriceCost = 0; // 退票费
+      let refundPriceAmount = 0; // 退票金额
+      let delay_price = 0; // 误机费
+      let sale_other_fee = 0; // 其他费用
+      this.refundDetail.ticket_refund_passenger.forEach((item) => {
+        item["PassengerName"] = item.ticket_passenger.PassengerName;
+        refundPriceList.push(item);
+        refundPriceTotal += item.total_price;
+        refundPriceCost += Number(item.refund_money);
+        refundPriceAmount += Number(item.refund_total);
+        refundRate = parseInt(item.refund_rate) || 100;
+        sale_other_fee += Number(item.sale_other_fee);
+        delay_price += Number(item.delay_price);
+      });
+
+      this.refundAmountData = {
+        checkedTotal: refundPriceTotal, // 选中乘客总价
+        refundRate: refundRate, // 退票费率
+        passengerList: refundPriceList, // 乘客列表
+        refundPriceCost: refundPriceCost, // 退票费
+        refundPriceAmount: refundPriceAmount, // 退票金额
+        delay_price: delay_price, // 误机费
+        sale_other_fee: sale_other_fee, // 其他费用
+      };
+
+      console.log(this.refundAmountData);
 
       this.$refs.refundAmountRefer.openExp();
     },
@@ -552,7 +612,6 @@ export default {
                 margin-bottom: 60upx;
               }
               &:last-child {
-                padding-bottom: 32upx;
                 border-bottom: 2upx solid rgba(241, 243, 245, 1);
                 margin-bottom: 30upx;
               }
@@ -561,7 +620,7 @@ export default {
                 align-items: center;
                 margin-bottom: 34upx;
                 .info_type {
-                  width: 100upx;
+                  width: 90upx;
                   height: 30upx;
                   border: 2upx solid rgba(127, 183, 240, 1);
                   border-radius: 20upx;
