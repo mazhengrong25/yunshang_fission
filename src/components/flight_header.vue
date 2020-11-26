@@ -9,6 +9,7 @@
   <view class="fight_header">
     <view class="main_list_title" v-if="flightTitle === 'refund'">航班信息</view>
     <view class="main_list_title" v-if="flightTitle === 'change'">原航班</view>
+    <view class="main_list_title" v-if="flightTitle === 'new'">新航班</view>
     <view class="fight_list">
       <view class="header_message">
         <view :class="['header_type', {'round_trip_type': flightData.flightType === '返程'}]">{{flightData.flightType}}</view>

@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-11-25 18:05:28
+ * @LastEditTime: 2020-11-26 18:22:18
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -38,33 +38,35 @@
 
         >
           <text class="price_text">改签费&yen;</text>
-          <text>1920</text>
+          <text>{{changeDetailsData.change_fee}}</text>
         </view>
 
         <view class="price_other" v-else> 数据获取中 </view>
       </view>
       <!-- 剩余时间 待支付 -->
-      <!-- <view
+      <view
         class="remaining_time"
         v-if="changeDetailsData.change_status === 2"
       >
-        <image
+        <view class="time_info">
+          <image
           class="time_icon"
           src="@/static/order_remaining_time.png"
           mode="aspectFit"
         />
-        <text class="time_text">剩余支付时间：{{ '' }}分钟</text
+        <text class="time_text">剩余支付时间：{{ changeDetailsData.overdue_time }}分钟</text
         >
-      </view> -->
+        </view>
+      </view>
       
       <!-- 订单状态 -->
-      <view class="remaining_time">
+      <view class="remaining_time"
+        v-else
+      >
         <text class="time_text">
             {{
               changeDetailsData.change_status === 1
                 ? "您的申请已提交，等待后台审核"
-                : changeDetailsData.change_status === 2
-                ? "剩余支付时间"
                 : changeDetailsData.change_status === 3
                 ? "订单支付成功，出票中..."
                 : changeDetailsData.change_status === 4
@@ -72,71 +74,23 @@
                 : ""
             }}
         </text>
+
+        <view 
+          class="option_btn"
+          v-if="changeDetailsData.change_status === 1"
+          >取消订单</view>
+
       </view>
 
       <view class="order_option">
-        <view
-          class="option_btn"
-          v-if="orderDetails.status !== 5 && orderDetails.status !== 3"
-          @click="sendMessage" 
-          >发送短信</view
-        >
         <view 
           class="option_btn"
-          v-if="
-            orderDetails.status !== 0 &&
-            orderDetails.status !== 5 &&
-            orderDetails.pay_status === 1 &&
-            orderDetails.left_min > 0
-          "
-          @click="getCancel(item)"
-          >取消订单</view
-        >
+          v-if="changeDetailsData.change_status === 2"
+          >取消订单</view>
         <view
           class="option_btn important_btn"
-          v-if="
-            orderDetails.status !== 0 &&
-            orderDetails.status !== 5 &&
-            orderDetails.pay_status === 1 &&
-            orderDetails.left_min > 0
-          "
-          @click="jumpOrderPay()"
+          v-if="changeDetailsData.change_status === 2"
           >去支付</view
-        >
-        <view
-          @click="notMessage"
-          class="option_btn"
-          v-if="orderDetails.status === 3"
-          >报销凭证</view
-        >
-        <view
-          @click="sendMessage"
-          class="option_btn"
-          v-if="orderDetails.status === 3"
-          >发送短信</view
-        >
-        <view
-          class="option_btn"
-          v-if="orderDetails.status === 3"
-          @click="getRefund()"
-          >退票</view
-        >
-        <view
-          class="option_btn"
-          @click="getChange()"
-          v-if="orderDetails.status === 3"
-          >改签</view
-        >
-        <view
-          class="option_btn"
-          v-if="
-            orderDetails.status === 5 ||
-            (orderDetails.pay_status === 1 &&
-              orderDetails.status === 1 &&
-              orderDetails.left_min <= 0)
-          "
-          @click="reOrder()"
-          >再次预定</view
         >
       </view>
     </view>
@@ -147,31 +101,88 @@
       class="details_main"
     >
       <view class="content">
-
+      
         <!-- 乘机人 -->
         <view class="main_list passenger">
           <view class="main_list_title">乘机人</view>
-          <view class="passenger_list">
+          <view
+          :class="['passenger_list',{active:passInfoChecket === index}]"
+          v-for="(item, index) in changeDetailsData.change_passengers"
+          :key="index" 
+          >
             <view class="list_item">
-              <view class="list_info">
-                <view class="info_type">成人票</view>
-                <view class="info_name">{{ "" }}</view>
+              <view class="list_info" @click="openPassInfo(index)">
+                <view class="info_type">
+                  {{item.ticket_passenger.PassengerType === "ADT"
+                      ? "成人"
+                      : item.ticket_passenger.PassengerType === "CNN" 
+                      ? "儿童"
+                      : item.ticket_passenger.PassengerType === "INF"
+                      ? "婴儿"
+                      : ""}}票
+                </view>
+                <view class="info_name">{{ item.ticket_passenger.PassengerName }}</view>
                 <view
                   class="is_insurance"
                 >
                   <image src="@/static/insurance_icon.png" mode="aspectFit" />
                 </view>
-                <view class="group_type">员工</view>
+                <view class="group_info" 
+                v-if="changeDetailsData.change_status !== 4 ">
+                  <view class="group_type">旧票号</view>
+                  <view class="group_number">
+                    {{ changeDetailsData.ticket_order.ticket_passenger[0].ticket_no || ''}}
+                  </view>
+                </view>
+                <!-- 已完成状态 -->
+                <view class="group_info" v-else>  
+                    <view class="group_type" >新票号</view>
+                    <view class="group_number">
+                      {{ changeDetailsData.change_passengers[0].ticket_no || ''}}
+                    </view>
+                </view>
+                <view class="price_arrow">
+                  <image src="@/static/unfold.png" mode="aspectFit" />
+                </view>
               </view>
+              <!-- 展开内容 -->
+              <view class="list_main">
 
-              <view class="list_message">
-                <view class="message_title">身份证</view>
-                <view class="message_number">{{ "" }}</view>
-              </view>
+                <view class="list_item" v-if="changeDetailsData.change_status === 4">
+                  <view class="item_title_old">旧票号</view>
+                  <view class="item_message_old">{{ changeDetailsData.ticket_order.ticket_passenger[0].ticket_no || '' }}</view>
+                </view>
+      
+                <view class="list_item">
+                  <view class="item_title">{{
+                    item.ticket_passenger.Credential === "0"
+                    ?'身份证'
+                    :item.ticket_passenger.Credential === "1"
+                    ?'护照'
+                    :item.ticket_passenger.Credential === "2"
+                    ?'港澳通行证'
+                    :item.ticket_passenger.Credential === "3"
+                    ?'台胞证'
+                    :item.ticket_passenger.Credential === "4"
+                    ?'回乡证'
+                    :item.ticket_passenger.Credential === "5"
+                    ?'台湾通行证'
+                    :item.ticket_passenger.Credential === "6"
+                    ?'入台证'
+                    :item.ticket_passenger.Credential === "7"
+                    ?'国际海员证'
+                    :item.ticket_passenger.Credential === "8"
+                    ?'其它证件'
+                    :''
+                  }}</view>
+                  <view class="item_message">{{ item.ticket_passenger.CredentialNo }}</view>
+                </view>
 
-              <view class="ticket_no">
-                <view class="ticket_no_title">票号</view>
-                <view>{{ "" }}</view>
+                <view class="list_item">
+                  <view class="item_title">手机号</view>
+                  <view class="item_message">{{ item.ticket_passenger.phone }}</view>
+                </view>
+
               </view>
             </view>
           </view>
@@ -179,29 +190,47 @@
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{ '' }}</view>
+              <view class="list_message">{{ changeDetailsData.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
-              <view class="list_message">{{ '' }}</view>
+              <view class="list_message">{{ changeDetailsData.phone }}</view>
             </view>
           </view>
         </view>
         
-        <!-- <flight-header
-          v-if="JSON.stringify(orderDetails) !== '{}'"
+        <!-- 新航班 -->
+        <flight-header
+          v-if="flightData.data.length > 0"
           :flightData="flightData"
           :roundTripFlightData="roundTripFlightData"
           :roundTripType="roundTripType"
           :interType="false"
-          @openHeadExpPopup="openHeadExpPopup"
+          flightTitle="new"
         ></flight-header>
 
         <view v-else class="not_flight_data">
           <text></text>
           <text></text>
           <view></view>
-        </view> -->
+        </view>
+
+        <!-- 原航班 -->
+        <flight-header
+          v-if="flightOldData.data.length > 0"
+          :flightData="flightOldData"
+          :roundTripFlightData="roundTripFlightData"
+          :roundTripType="roundTripType"
+          :interType="false"
+          flightTitle="change"
+        ></flight-header>
+
+        <view v-else class="not_flight_data">
+          <text></text>
+          <text></text>
+          <view></view>
+        </view>
+
 
         <!-- 订单信息 -->
         <view class="main_list order_message">
@@ -227,7 +256,7 @@
             </view>
             <view class="list_item">
               <view class="item_title">分销商</view>
-              <view class="item_message">{{ changeDetailsData.admin_name }}</view>
+              <view class="item_message">{{ changeDetailsData.disinfo.company_name }}</view>
             </view>
             <view class="list_item"  v-if="changeDetailsData.change_status === 4">
               <view class="item_title">出票员</view>
@@ -252,7 +281,13 @@
 </template>
 
 <script>
+import flightHeader from "@/components/flight_header.vue"; // 航程信息
 export default {
+
+    components: {
+      
+        flightHeader
+    },
 
     data() {
 
@@ -261,9 +296,21 @@ export default {
             iStatusBarHeight: 0,
 
             changeDetailsData:{}, //列表传入
+
+            flightData:{}, //新航班
+            flightOldData:{}, //原航班
+
+            passInfoChecket:null, //乘客信息展开值
         }
     },
     methods:{
+
+      // 展开乘客信息详情
+      openPassInfo(i) {
+    
+          this.passInfoChecket = this.passInfoChecket === i ? null : i;
+          this.$forceUpdate();
+      }
 
         
     },
@@ -271,7 +318,33 @@ export default {
             
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.changeDetailsData = JSON.parse(data.changeData)
-      console.log("改签列表",this.changeDetailsData)
+
+      // 组装航程信息   新航班
+      this.flightData = {
+
+          flightType: this.changeDetailsData.change_segments.segment_num
+              ?Number(this.changeDetailsData.change_segments.segment_num) === 2
+              ?"去程"
+              :"返程"
+              :"单程",
+          data: this.changeDetailsData.change_segments || [], // 单程信息
+          cabinInfo: this.changeDetailsData.change_segments || [], //退票规则
+      };
+
+      // 组装航程信息  原航班
+      this.flightOldData = {
+
+          flightType: this.changeDetailsData.ticket_order.ticket_segments.segment_num
+              ?Number(this.changeDetailsData.ticket_order.ticket_segments.segment_num) === 2
+              ?"去程"
+              :"返程"
+              :"单程",
+          data: this.changeDetailsData.ticket_order.ticket_segments || [], // 单程信息
+          cabinInfo: this.changeDetailsData.ticket_order.ticket_segments || [], //退票规则
+      };
+
+
+     
     },
 
     
@@ -329,6 +402,7 @@ export default {
             display: flex;
             align-items: center;
             margin-bottom: 32upx;
+            justify-content: space-between;
             .time_icon {
             width: 24upx;
             height: 24upx;
@@ -341,6 +415,28 @@ export default {
               font-weight: 400;
               color: #ffffff;
               opacity: 0.8;
+            }
+             .option_btn {
+                width: 150upx;
+                height: 56upx;
+                border: 2upx solid rgba(255, 255, 255, 0.3);
+                border-radius: 50upx;
+                font-size: 24upx;
+                font-weight: 400;
+                color: rgba(255, 255, 255, 1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 32upx;
+                &.important_btn {
+                    border-color: #fff;
+                    background: #fff;
+                    color: rgba(0, 112, 226, 1);
+                }
+            }
+            .time_info {
+              display: inline-flex;
+              align-items: center;
             }
         }
         .order_option {
@@ -550,84 +646,158 @@ export default {
             &.passenger {
                 .passenger_list {
                 margin-top: 46upx;
-                .list_item {
-                    &:not(:last-child) {
-                    margin-bottom: 50upx;
-                    }
-                    &:last-child {
-                    padding-bottom: 32upx;
-                    border-bottom: 2upx solid rgba(241, 243, 245, 1);
-                    margin-bottom: 30upx;
-                    }
+                  &.active {
                     .list_info {
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 20upx;
-                    .info_type {
-                        width: 100upx;
-                        height: 30upx;
-                        border: 2upx solid rgba(127, 183, 240, 1);
-                        border-radius: 20upx;
-                        margin-right: 12upx;
-                        font-size: 20upx;
-                        font-weight: 400;
-                        color: rgba(127, 183, 240, 1);
+                      .price_arrow {
+                        transform: rotate(180deg);
+                      }
+                    }
+                    .list_item{
+                      .list_main {
+                      animation: openMain .4s forwards;
+                      height: auto;
+                      padding-bottom: 24rpx;
+                        border-bottom: 2rpx solid #F1F3F5;
+                        margin-bottom: 32rpx;
+                    }
+                    }
+                    
+                  }
+                  .list_item {
+                      &:not(:last-child) {
+                      margin-bottom: 24upx;
+                      }
+                      
+                      .list_info {
+                      display: flex;
+                      align-items: center;
+                      margin-bottom: 20upx;
+                      .info_type {
+                          width: 100upx;
+                          height: 30upx;
+                          border: 2upx solid rgba(127, 183, 240, 1);
+                          border-radius: 20upx;
+                          margin-right: 12upx;
+                          font-size: 20upx;
+                          font-weight: 400;
+                          color: rgba(127, 183, 240, 1);
+                          display: inline-flex;
+                          align-items: center;
+                          justify-content: center;
+                      }
+                      .info_name {
+                          font-size: 28upx;
+                          font-weight: bold;
+                          color: rgba(42, 42, 42, 1);
+                          margin-right: 8upx;
+                      }
+                      .is_insurance {
+                          width: 30upx;
+                          height: 30upx;
+                          margin-right: 8upx;
+                          display: flex;
+                          image {
+                          width: 100%;
+                          height: 100%;
+                          object-fit: contain;
+                          }
+                      }
+                      .group_info{
+
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                            .group_type {
+                              margin-left: 28upx;
+                              font-size: 28upx;
+                              font-weight: 400;
+                              color: #333333;
+                              margin-right: 10px;
+                            }
+                            .group_number {
+                              font-weight: bold;
+                              font-size: 14px;
+                              color: #2a2a2a;
+                            }
+
+                      }
+                      .price_arrow {
+                        transition: all 0.3s;
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
-                    }
-                    .info_name {
-                        font-size: 28upx;
-                        font-weight: bold;
-                        color: rgba(42, 42, 42, 1);
-                        margin-right: 8upx;
-                    }
-                    .is_insurance {
-                        width: 30upx;
-                        height: 30upx;
-                        margin-right: 8upx;
-                        display: flex;
+                        width: 22upx;
+                        height: 12upx;
+                        margin-left: auto;
                         image {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
+                          width: 100%;
+                          height: 100%;
+                          object-fit: contain;
                         }
-                    }
-                    .group_type {
-                        margin-left: 28upx;
-                        font-size: 22upx;
-                        font-weight: 400;
-                        color: rgba(153, 153, 153, 1);
-                    }
-                    }
-                    .list_message {
-                    display: flex;
-                    align-items: center;
-                    .message_title {
-                        font-size: 28upx;
-                        font-weight: 400;
-                        color: rgba(42, 42, 42, 1);
-                        width: 114upx;
-                    }
-                    .message_number {
-                        font-size: 28upx;
-                        font-weight: bold;
-                        color: rgba(42, 42, 42, 1);
-                    }
-                    }
-                    .ticket_no {
-                    margin-top: 20upx;
-                    display: flex;
-                    align-items: center;
-                    font-size: 28upx;
-                    color: rgba(42, 42, 42, 1);
-                    font-weight: bold;
-                    .ticket_no_title {
-                        width: 114upx;
-                        font-weight: 400;
-                    }
-                    }
-                }
+                      }
+                      }
+                      .list_main {
+                        overflow: hidden;
+                        height:0;
+                        animation: closeMain .4s forwards;
+                        margin-left: 37%;
+                        .list_item {
+                          display: flex;
+                          align-items: center;
+                          justify-content: space-between;
+                          .item_title {
+                            font-size: 28upx;
+                            font-weight: 400;  
+                            color: #666666;
+                          }
+                          .item_message {
+                            font-size: 28upx;
+                            font-weight: 400;
+                            color: #666666;
+                            margin-right: 25%;
+                          }
+                          .item_title_old {
+                            font-size: 28upx;
+                            font-weight: 400;  
+                            color: #AFB9C4;
+                          }
+                          .item_message_old {
+                            font-size: 28upx;
+                            font-weight: 400;  
+                            color: #AFB9C4;
+                            margin-right: 25%;
+                          }
+                        }
+                      }
+                      .list_message {
+                      display: flex;
+                      align-items: center;
+                      .message_title {
+                          font-size: 28upx;
+                          font-weight: 400;
+                          color: rgba(42, 42, 42, 1);
+                          width: 114upx;
+                      }
+                      .message_number {
+                          font-size: 28upx;
+                          font-weight: bold;
+                          color: rgba(42, 42, 42, 1);
+                      }
+                      }
+                      .ticket_no {
+                      margin-top: 20upx;
+                      display: flex;
+                      align-items: center;
+                      font-size: 28upx;
+                      color: rgba(42, 42, 42, 1);
+                      font-weight: bold;
+                      .ticket_no_title {
+                          width: 114upx;
+                          font-weight: 400;
+                      }
+                      }
+                  }
                 }
                 .contact {
                 .contact_list {

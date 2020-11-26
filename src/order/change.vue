@@ -290,7 +290,7 @@ export default {
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
         this.changeDetail = JSON.parse(data.changeData)
 
-         // 组装航程信息
+        // 组装航程信息
         this.flightData = {
 
             flightType: this.changeDetail.ticket_segments.segment_type
@@ -300,8 +300,8 @@ export default {
                 :"单程",
             data: this.changeDetail.ticket_segments || [], // 单程信息
             cabinInfo: this.changeDetail.ticket_segments || [], //退票规则
-            };
-        }
+        };
+    }
     
 }
 </script>

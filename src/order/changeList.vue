@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-11-25 17:29:41
+ * @LastEditTime: 2020-11-26 16:50:07
  * @LastEditors: Please set LastEditors
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -106,29 +106,21 @@
               </view>
             </view>
 
-            <view class="item_time" v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0">
+            <view class="item_time" v-if="item.change_status === 2">
               <view class="time_icon">
                 <image src="@/static/remaining_time.png" mode="aspectFit" />
               </view>
               <view class="time_text">剩余支付时间：</view>
               <view class="time_number">
                 {{
-                  item.left_min
+                  item.overdue_time
                 }}分钟
               </view>
             </view>
             <view
               class="item_btn_box"
-              v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0"
-            >
-              <view class="item_btn close_btn" @click.stop="removeOrder(item, 0)"
-                >取消订单</view
-              >
-              <view
-                class="item_btn submit_btn"
-                @click.stop="jumpPayOrder(item, 0)"
-                >去支付</view
-              >
+              v-if="item.change_status === 2">
+              <view class="item_btn submit_btn">去支付</view>
             </view>
           </view>
         </view>
