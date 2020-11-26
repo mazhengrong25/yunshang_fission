@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-11-24 18:13:25
+ * @LastEditTime: 2020-11-25 17:29:41
  * @LastEditors: Please set LastEditors
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -22,9 +22,16 @@
     
     <!-- 筛选条件 -->
     <view class="order_filter">
-      <view class="filter_list" >
+      <view 
+      :class="['filter_list',{ active: orderFilterStatus },]" 
+      @click="sorTime()">
         <view class="list_icon">
-          <image src="@/static/filter_apply_btn.png" mode="contain" />
+          <image
+            v-if="orderFilterStatus"
+            src="@/static/filter_apply_btn_active.png"
+            mode="contain"
+          />
+          <image v-else src="@/static/filter_apply_btn.png" mode="contain" />
         </view>
         <view class="list_title">申请(早-晚)</view>
       </view>
@@ -58,7 +65,7 @@
         v-for="(item, index) in changeOrderList"
         :key="index">
       
-          <view class="list_item" @click="jumpChangeDetails()">
+          <view class="list_item" @click="jumpChangeDetails(item)">
             <view class="item_header">
               <view class="item_title">
                 <view class="title">
@@ -157,11 +164,10 @@ export default {
             changeOrderList:[], //改签列表
             changeListFilter:{}, //筛选条件
 
-            changeStatus:false,
-
             scrollTop: 0, // 列表滚动值
             oldScrollTop: 0,
 
+            orderFilterStatus: false,
         }
 
     },
@@ -196,7 +202,7 @@ export default {
           this.orderPageStatus = true;
 
           let data = {
-            pnr_code:this.changeListFilter.pnrNumber, //pnr
+            pnr_code:this.changeListFilter.pnrNumber || "", //pnr
             change_status:this.headerActive === 0
                             ?""
                             : this.headerActive === 1
@@ -209,22 +215,29 @@ export default {
             created_at:this.changeListFilter.Timestart || moment().subtract(3, "years").format("YYYY-MM-DD"), // 申请开始
             created_at_end:this.changeListFilter.Timend || moment().format("YYYY-MM-DD"), // 申请结束
             page:this.orderPageNumber, //   页数 
-            order_no:this.changeListFilter.orderNumber	, //订单号
-            ticket_no:this.changeListFilter.ticketNumber, // 乘机人
-            passenger_name:this.changeListFilter.passengerName, // 乘机人
-            passenger_type:this.changeListFilter.passengerType,	// 乘客类型
+            order_no:this.changeListFilter.orderNumber || "", //订单号
+            ticket_no:this.changeListFilter.ticketNumber || "", // 票号
+            passenger_name:this.changeListFilter.passengerName || "", // 乘机人
+            passenger_type:this.changeListFilter.passengerType || "",	// 乘客类型
+
+            order_by: this.orderFilterStatus?'asc':'desc', // desc倒叙，asc升序
+            order_by_field: "created_at",
           }
 
 
           orderApi.changeList(data).then((res) => { 
             if(res.result ===  10000){
-              this.changeOrderList = res.data.data;
-              console.log('改签列表',this.changeOrderList)
-              if (this.changeStatus) {
+              // this.changeOrderList = res.data.data;
+              // console.log('改签列表',this.changeOrderList)
+              if (this.orderPageStatus) {
                 this.changeOrderList.push.apply(this.changeOrderList, res.data.data);
               } else {
                 this.changeOrderList = res.data.data;
-                this.changeStatus = true;
+                this.orderPageStatus = true;
+              }
+
+              if (this.orderPageNumber >= res.data.last_page) {
+                this.orderPageStatus = false;
               }
             } else {
               uni.showToast({
@@ -239,12 +252,22 @@ export default {
 
         },
 
+        //时间排序
+        sorTime() {
+          this.orderFilterStatus = !this.orderFilterStatus;
+          this.changeOrderList = []; //退票列表
+          this.getChangeList();
+          this.backScroll();
+
+          console.log(this.orderFilterStatus);
+        },
+
         // 跳转到详情页
-        jumpChangeDetails() {
+        jumpChangeDetails(data) {
 
           uni.navigateTo({
 
-            url: '/order/changeDetails',
+            url: '/order/changeDetails?changeData=' + JSON.stringify(data),
           
           })
 
@@ -273,20 +296,19 @@ export default {
 
     onLoad(data) {
             this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-            this.getChangeList();
     },
 
     onHide() {
       this.changeOrderList = [];
-      this.changeStatus = false;
+      this.orderPageStatus = false;
     },
 
     onShow() {
       
 
-      if (uni.getStorageSync("changeListFilter")) {
-        this.changeListFilter = JSON.parse(uni.getStorageSync("changeListFilter"));
-        uni.removeStorageSync("changeListFilter");
+      if (uni.getStorageSync("orderListFilter")) {
+        this.changeListFilter = JSON.parse(uni.getStorageSync("orderListFilter"));
+        uni.removeStorageSync("orderListFilter");
         if (
           this.changeListFilter.change_status &&
           this.changeListFilter.change_status !== null
@@ -295,7 +317,7 @@ export default {
         } else {
           this.checkedHeaderActive(0);
         }
-        console.log("退票筛选条件", this.changeListFilter);
+        console.log("改签筛选条件", this.changeListFilter);
       } else {
         this.headerActive = 0;
         this.getChangeList();
@@ -361,6 +383,11 @@ export default {
       justify-content: center;
       flex: 1;
       padding: 10upx 40upx;
+      &.active {
+        .list_title {
+          color: #0070e2;
+        }
+      }
       &:not(:last-child) {
         border-right: 2upx solid #eaeaea;
       }
@@ -378,7 +405,7 @@ export default {
       .list_title {
         font-size: 22upx;
         font-weight: 400;
-        color: rgba(51, 51, 51, 1);
+        color: #959da7;
       }
     }
   }

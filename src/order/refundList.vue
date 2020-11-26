@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-25 17:34:30
+ * @LastEditTime: 2020-11-26 09:22:50
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -42,7 +42,7 @@
       <view
         :class="[
           'filter_list',
-          { active: JSON.stringify(refundListFilter) !== '{}' },
+          { active: JSON.stringify(refundListFilter) !== '{}' }
         ]"
         @click="goFilter('1')"
       >
