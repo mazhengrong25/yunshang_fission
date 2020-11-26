@@ -2,7 +2,7 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-25 16:35:30
+ * @LastEditTime: 2020-11-25 17:34:30
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -117,7 +117,10 @@
         </view>
       </view>
 
-      <view class="no_data" v-if="!orderPageStatus">
+      <!-- 缺省页 -->
+      <default-page v-if="showDefault" defaultType="not_order"></default-page>
+
+      <view class="no_data" v-if="!orderPageStatus && !showDefault">
         <text>到底啦</text>
       </view>
     </scroll-view>
@@ -134,10 +137,9 @@ export default {
       iStatusBarHeight: 0,
       refundList: ["全部", "申请中", "成功", "已取消"], // 退票列表类别
       headerActive: 0, // 订单类别默认值 全部
-      orderPageNumber: 1, // 当前订单页数
       orderPageStatus: true, // 是否允许加载下一页数据
 
-      orderListPage: 1,
+      orderListPage: 1, // 当前订单页数
 
       orderHeaderTitle: "国内退票单", // 订单列表页头部标题
       refundOrderList: [], //国内退票列表
@@ -147,12 +149,14 @@ export default {
       oldScrollTop: 0,
 
       orderFilterStatus: false,
+
+      showDefault: false, // 缺省页
     };
   },
   methods: {
     checkedHeaderActive(index) {
       this.headerActive = index;
-      this.orderPageNumber = 1;
+      this.orderListPage = 1;
       this.refundOrderList = []; //退票列表
       this.getOrderList();
     },
@@ -175,7 +179,7 @@ export default {
         start_date:
           this.refundListFilter.start_date ||
           moment()
-            .subtract(3, "years")
+            .subtract(3, "days")
             .format("YYYY-MM-DD"),
         end_date:
           this.refundListFilter.end_date || moment().format("YYYY-MM-DD"),
@@ -203,6 +207,7 @@ export default {
       orderApi.orderRefundList(data).then((res) => {
         console.log(res);
         if (res.result === 10000) {
+          this.showDefault = false;
           if (this.orderPageStatus) {
             this.refundOrderList.push.apply(
               this.refundOrderList,
@@ -213,10 +218,15 @@ export default {
             this.orderLishStuats = true;
           }
 
+          if (this.refundOrderList.length < 1) {
+              this.showDefault = true;
+            }
+
           if (this.orderListPage >= res.data.last_page) {
             this.orderPageStatus = false;
           }
         } else {
+          this.showDefault = true;
           uni.showToast({
             title: res.msg,
             icon: "none",
@@ -515,7 +525,7 @@ export default {
             }
             .left_message {
               color: rgba(175, 185, 196, 1);
-              width: 40%;
+              width: 300upx;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;

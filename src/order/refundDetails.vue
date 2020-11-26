@@ -2,7 +2,7 @@
  * @Description: 退票单详情
  * @Author: mazhengrong
  * @Date: 2020-09-18 10:14:28
- * @LastEditTime: 2020-11-25 16:39:30
+ * @LastEditTime: 2020-11-25 17:44:49
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -448,7 +448,7 @@ export default {
       height: 100%;
       overflow-y: auto;
       position: relative;
-      z-index: 1;
+      z-index: 2;
       .main_list {
         background: rgba(255, 255, 255, 1);
         box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);

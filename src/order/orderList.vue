@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-11-18 11:31:06
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-25 17:11:13
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_list">
@@ -621,7 +621,7 @@ export default {
             this.headerActive === 1 ? 1 : this.headerActive === 2 ? 2 : "",
           created_at:
             this.orderListFilter.Timestart ||
-            moment().subtract(3, "years").format("YYYY-MM-DD"), // 预定日期开始
+            moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
           created_at_end:
             this.orderListFilter.Timend || moment().format("YYYY-MM-DD"), // 预定日期结束
           pnr_code: this.orderListFilter.pnr || "", // pnr

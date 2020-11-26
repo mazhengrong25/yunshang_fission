@@ -2,8 +2,8 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-24 14:42:07
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-11-25 17:45:04
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
@@ -50,9 +50,9 @@
         class="remaining_time"
         v-if="
           orderDetails.status !== 0 &&
-          orderDetails.status !== 5 &&
-          orderDetails.pay_status === 1 &&
-          orderDetails.left_min > 0
+            orderDetails.status !== 5 &&
+            orderDetails.pay_status === 1 &&
+            orderDetails.left_min > 0
         "
       >
         <image
@@ -69,16 +69,16 @@
         <view
           class="option_btn"
           v-if="orderDetails.status !== 5 && orderDetails.status !== 3"
-          @click="sendMessage" 
+          @click="sendMessage"
           >发送短信</view
         >
-        <view 
+        <view
           class="option_btn"
           v-if="
             orderDetails.status !== 0 &&
-            orderDetails.status !== 5 &&
-            orderDetails.pay_status === 1 &&
-            orderDetails.left_min > 0
+              orderDetails.status !== 5 &&
+              orderDetails.pay_status === 1 &&
+              orderDetails.left_min > 0
           "
           @click="getCancel(item)"
           >取消订单</view
@@ -87,9 +87,9 @@
           class="option_btn important_btn"
           v-if="
             orderDetails.status !== 0 &&
-            orderDetails.status !== 5 &&
-            orderDetails.pay_status === 1 &&
-            orderDetails.left_min > 0
+              orderDetails.status !== 5 &&
+              orderDetails.pay_status === 1 &&
+              orderDetails.left_min > 0
           "
           @click="jumpOrderPay()"
           >去支付</view
@@ -122,9 +122,9 @@
           class="option_btn"
           v-if="
             orderDetails.status === 5 ||
-            (orderDetails.pay_status === 1 &&
-              orderDetails.status === 1 &&
-              orderDetails.left_min <= 0)
+              (orderDetails.pay_status === 1 &&
+                orderDetails.status === 1 &&
+                orderDetails.left_min <= 0)
           "
           @click="reOrder()"
           >再次预定</view
@@ -132,12 +132,8 @@
       </view>
     </view>
 
-    <scroll-view
-      :enable-back-to-top="true"
-      :scroll-y="true"
-      class="details_main"
-    >
-      <view class="content">
+    <view class="details_main">
+      <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
         <flight-header
           v-if="JSON.stringify(orderDetails) !== '{}'"
           :flightData="flightData"
@@ -273,8 +269,8 @@
           ref="flightExplanation"
           :ruleInfos="ruleInfos"
         ></flight-explanation>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
 
     <!-- 取消订单弹窗 -->
     <yun-config
@@ -373,7 +369,7 @@
               <view class="list_title">
                 <view class="title_name">所有乘客票面总价</view>
               </view>
-               <view class="list_main">
+              <view class="list_main">
                 <view class="list_item">
                   <view class="item_title">总票面价</view>
                   <view class="item_message"
@@ -383,25 +379,26 @@
                 <view class="list_item">
                   <view class="item_title">总机建/燃油</view>
                   <view class="item_message"
-                    >&yen; {{ totalPrice.build_total + '/' +  totalPrice.fuel_total}}</view
+                    >&yen;
+                    {{
+                      totalPrice.build_total + "/" + totalPrice.fuel_total
+                    }}</view
                   >
                 </view>
-                 <view class="list_item">
+                <view class="list_item">
                   <view class="item_title">总保险</view>
                   <view class="item_message"
-                    >&yen; {{ totalPrice.insurance_total}}</view
+                    >&yen; {{ totalPrice.insurance_total }}</view
                   >
                 </view>
                 <view class="list_item">
                   <view class="item_title">总服务费</view>
                   <view class="item_message"
-                    >&yen; {{ totalPrice.service_price}}</view
+                    >&yen; {{ totalPrice.service_price }}</view
                   >
                 </view>
               </view>
             </view>
-
-            
           </scroll-view>
         </view>
       </view>
@@ -489,13 +486,14 @@ export default {
 
       listCancelType: "", // 列表页传递取消订单值
 
-      totalPrice: { // 订单总价计算
+      totalPrice: {
+        // 订单总价计算
         ticket_price: 0,
         build_total: 0,
         fuel_total: 0,
         insurance_total: 0,
         service_price: 0,
-      }, 
+      },
     };
   },
   methods: {
@@ -672,12 +670,12 @@ export default {
           if (this.orderDetails.ticket_passenger.length < 3) {
             this.priceInfoChecket = 0;
           }
-          this.orderDetails.ticket_passenger.forEach(item => {
-            this.totalPrice.ticket_price += item.ticket_price
-            this.totalPrice.build_total += item.build_total
-            this.totalPrice.fuel_total += item.fuel_total
-            this.totalPrice.insurance_total += item.insurance_total
-            this.totalPrice.service_price += item.service_price
+          this.orderDetails.ticket_passenger.forEach((item) => {
+            this.totalPrice.ticket_price += item.ticket_price;
+            this.totalPrice.build_total += item.build_total;
+            this.totalPrice.fuel_total += item.fuel_total;
+            this.totalPrice.insurance_total += item.insurance_total;
+            this.totalPrice.service_price += item.service_price;
           });
 
           if (this.listCancelType) {
@@ -719,10 +717,10 @@ export default {
 
     // 跳转改签
     getChange() {
-      // return this.notMessage()
+      return this.notMessage();
       uni.navigateTo({
-        url:"/order/change?changeData=" + JSON.stringify(this.orderDetails),
-      })
+        url: "/order/change?changeData=" + JSON.stringify(this.orderDetails),
+      });
     },
 
     // 再次预定
@@ -784,7 +782,7 @@ export default {
       this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.orderId = data.orderNo; //订单编号
       console.log(this.orderId);
-      console.log('详情data',data)
+      console.log("详情data", data);
 
       this.type = data.roundType; //去程  返程
 
@@ -816,7 +814,6 @@ export default {
   display: flex;
   flex-direction: column;
   background: rgba(243, 245, 247, 1);
-  overflow: hidden;
   .details_header {
     background: rgba(0, 112, 226, 1);
     padding: 40upx 20upx 30upx;
@@ -900,24 +897,25 @@ export default {
     //兼容问题
     position: relative;
     flex: 1;
-    height: 100%;
-    overflow-y: auto;
+    display: flex;
+    &::after {
+      content: "";
+      display: block;
+      background: #0070e2;
+      width: 100%;
+      height: 90upx;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
     .content {
+      flex: 1;
       height: 100%;
       position: relative;
+      overflow-y: auto;
       z-index: 2;
       padding-top: 20rpx;
-      // &::after {
-      //   content: "";
-      //   display: block;
-      //   background: #0070e2;
-      //   width: 100%;
-      //   height: 90upx;
-      //   position: absolute;
-      //   top: 0;
-      //   left: 0;
-      //   z-index: 0;
-      // }
 
       /deep/.fight_header {
         position: relative;
@@ -1398,7 +1396,7 @@ export default {
             }
           }
           .list_main {
-            animation: openMain .4s forwards;
+            animation: openMain 0.4s forwards;
             padding: 40upx 0 46upx;
             border-top: 2upx solid #eaeaea;
           }
@@ -1455,7 +1453,7 @@ export default {
         .list_main {
           overflow: hidden;
           margin-top: -100%;
-          animation: closeMain .4s forwards;
+          animation: closeMain 0.4s forwards;
           border-top: 2upx solid transparent;
           .list_item {
             display: flex;
