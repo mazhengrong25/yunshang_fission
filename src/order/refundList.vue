@@ -2,8 +2,8 @@
  * @Description: 国内退票列表
  * @Author: mazhengrong
  * @Date: 2020-09-17 11:57:29
- * @LastEditTime: 2020-11-26 09:22:50
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-11-27 17:16:27
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <view class="order_list">
@@ -131,6 +131,7 @@
 import orderApi from "@/api/order.js";
 import moment from "moment";
 moment.locale("zh-cn");
+
 export default {
   data() {
     return {
