@@ -111,6 +111,12 @@
           }
         },
         {
+          "path": "changeHistory",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "refundList",
           "style": {
             "navigationStyle": "custom"

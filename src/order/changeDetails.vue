@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-11-26 18:22:18
+ * @LastEditTime: 2020-11-27 13:38:11
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -231,6 +231,13 @@
           <view></view>
         </view>
 
+        <!-- 多次改签 -->
+        <view class="main_list" 
+        v-if="changeDetailsData.ticket_order.ticket_segments.length > 1"
+        @click="openHistoryChange">
+            <text class="flight_list_title">更多历史航班信息</text>
+        </view>
+
 
         <!-- 订单信息 -->
         <view class="main_list order_message">
@@ -310,7 +317,15 @@ export default {
     
           this.passInfoChecket = this.passInfoChecket === i ? null : i;
           this.$forceUpdate();
-      }
+      },
+
+      // 跳转到多次改签页面
+      openHistoryChange() {
+
+        uni.navigateTo({
+          url: '/order/changeHistory',
+        })
+      },
 
         
     },
@@ -500,6 +515,14 @@ export default {
             padding: 24upx 20upx 20upx;
             position: relative;
             z-index: 2;
+            .flight_list_title {
+             
+              font-size: 28upx; 
+              font-weight: 400;    
+              color: #333333;
+              text-align: center;
+              
+            }
             .main_list_title {
                 font-size: 32upx;
                 font-weight: bold;
