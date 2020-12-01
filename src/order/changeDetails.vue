@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-11-30 15:21:20
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-12-01 17:17:08
+ * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
 -->
@@ -216,7 +216,7 @@
         <!-- 多次改签 -->
         <view
           class="main_list"
-          v-if="changeDetailsData.ticket_order.ticket_segments.length > 1"
+          v-if="mulChangeList !== ''"
           @click="openHistoryChange"
         >
           <text class="flight_list_title">更多历史航班信息</text>
@@ -272,6 +272,7 @@
 </template>
 
 <script>
+import orderApi from "@/api/order.js";
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
 export default {
   components: {
@@ -288,6 +289,8 @@ export default {
       flightOldData: {}, //原航班
 
       passInfoChecket: null, //乘客信息展开值
+
+      mulChangeList:[], //多次改签列表
     };
   },
   methods: {
@@ -299,15 +302,37 @@ export default {
 
     // 跳转到多次改签页面
     openHistoryChange() {
+      let data = {
+        oldDetails: this.changeDetailsData,
+        newDetails: this.mulChangeList
+      }
       uni.navigateTo({
-        url: "/order/changeHistory",
+        url: "/order/changeHistory?changeData="+ JSON.stringify(data),
       });
     },
+
+    // 获取多次改签
+    getMulChangeList(){
+      let data = {
+        pid: this.changeDetailsData.id
+      }
+
+      orderApi.mulChangeList(data).then((res) => {
+        if(res.result === 10000){
+          this.mulChangeList = res.data
+        }
+          
+      })
+    },
+  },
+  onShow() {
+    this.getMulChangeList();
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.changeDetailsData = JSON.parse(data.changeData);
-
+    
+    console.log(this.changeDetailsData.id)
     // 组装航程信息   新航班
     this.flightData = {
       flightType: this.changeDetailsData.change_segments.segment_num
@@ -487,7 +512,7 @@ export default {
           font-size: 28upx;
           font-weight: 400;
           color: #333333;
-          text-align: center;
+          margin-left: 34%;
         }
         .main_list_title {
           font-size: 32upx;
