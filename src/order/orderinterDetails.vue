@@ -2,15 +2,12 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-11-25 17:45:04
+ * @LastEditTime: 2020-11-30 15:19:47
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_details">
-    <yun-header
-      :statusHeight="iStatusBarHeight"
-      centerTitle="订单详情"
-    ></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="订单详情"></yun-header>
 
     <!-- 国内详情 -->
     <view class="details_header">
@@ -60,9 +57,7 @@
           src="@/static/order_remaining_time.png"
           mode="aspectFit"
         />
-        <text class="time_text"
-          >剩余支付时间：{{ orderDetails.left_min }}分钟</text
-        >
+        <text class="time_text">剩余支付时间：{{ orderDetails.left_min }}分钟</text>
       </view>
 
       <view class="order_option">
@@ -94,28 +89,16 @@
           @click="jumpOrderPay()"
           >去支付</view
         >
-        <view
-          @click="notMessage"
-          class="option_btn"
-          v-if="orderDetails.status === 3"
+        <view @click="notMessage" class="option_btn" v-if="orderDetails.status === 3"
           >报销凭证</view
         >
-        <view
-          @click="sendMessage"
-          class="option_btn"
-          v-if="orderDetails.status === 3"
+        <view @click="sendMessage" class="option_btn" v-if="orderDetails.status === 3"
           >发送短信</view
         >
-        <view
-          class="option_btn"
-          v-if="orderDetails.status === 3"
-          @click="getRefund()"
+        <view class="option_btn" v-if="orderDetails.status === 3" @click="getRefund()"
           >退票</view
         >
-        <view
-          class="option_btn"
-          @click="getChange()"
-          v-if="orderDetails.status === 3"
+        <view class="option_btn" @click="getChange()" v-if="orderDetails.status === 3"
           >改签</view
         >
         <view
@@ -171,10 +154,7 @@
                   }}票</view
                 >
                 <view class="info_name">{{ item.PassengerName || "" }}</view>
-                <view
-                  class="is_insurance"
-                  v-if="Number(item.insurance_total) > 0"
-                >
+                <view class="is_insurance" v-if="Number(item.insurance_total) > 0">
                   <image src="@/static/insurance_icon.png" mode="aspectFit" />
                 </view>
                 <view class="group_type">员工</view>
@@ -213,9 +193,7 @@
             <view class="contact_list">
               <view class="list_title">已购保险</view>
               <view class="list_message">{{
-                orderDetails.insurance_total
-                  ? orderDetails.insurance_total + "元"
-                  : ""
+                orderDetails.insurance_total ? orderDetails.insurance_total + "元" : ""
               }}</view>
             </view>
             <view class="contact_list">
@@ -232,9 +210,7 @@
         <view class="main_list order_message">
           <view class="main_list_title">
             <text>订单信息</text>
-            <view
-              class="showPriceInfo input-right-arrow"
-              @click="openTotalOrder()"
+            <view class="showPriceInfo input-right-arrow" @click="openTotalOrder()"
               >查看订单金额明细</view
             >
           </view>
@@ -307,10 +283,7 @@
 
           <scroll-view :scroll-y="true" class="price_info_main">
             <view
-              :class="[
-                'price_info_list',
-                { active: priceInfoChecket === index },
-              ]"
+              :class="['price_info_list', { active: priceInfoChecket === index }]"
               v-for="(item, index) in orderDetails.ticket_passenger"
               :key="index"
             >
@@ -331,9 +304,7 @@
               <view class="list_main">
                 <view class="list_item">
                   <view class="item_title">票面价</view>
-                  <view class="item_message"
-                    >&yen; {{ item.ticket_price }}</view
-                  >
+                  <view class="item_message">&yen; {{ item.ticket_price }}</view>
                 </view>
 
                 <view class="list_item">
@@ -345,22 +316,16 @@
 
                 <view class="list_item">
                   <view class="item_title">保险</view>
-                  <view class="item_message"
-                    >&yen; {{ item.insurance_total }}</view
-                  >
+                  <view class="item_message">&yen; {{ item.insurance_total }}</view>
                 </view>
 
                 <view class="list_item">
                   <view class="item_title">服务费</view>
-                  <view class="item_message"
-                    >&yen; {{ item.service_price }}</view
-                  >
+                  <view class="item_message">&yen; {{ item.service_price }}</view>
                 </view>
                 <view class="list_item">
                   <view class="item_title">奖励金</view>
-                  <view class="item_message"
-                    >&yen; {{ item.reward_price }}</view
-                  >
+                  <view class="item_message">&yen; {{ item.reward_price }}</view>
                 </view>
               </view>
             </view>
@@ -372,30 +337,22 @@
               <view class="list_main">
                 <view class="list_item">
                   <view class="item_title">总票面价</view>
-                  <view class="item_message"
-                    >&yen; {{ totalPrice.ticket_price }}</view
-                  >
+                  <view class="item_message">&yen; {{ totalPrice.ticket_price }}</view>
                 </view>
                 <view class="list_item">
                   <view class="item_title">总机建/燃油</view>
                   <view class="item_message"
                     >&yen;
-                    {{
-                      totalPrice.build_total + "/" + totalPrice.fuel_total
-                    }}</view
+                    {{ totalPrice.build_total + "/" + totalPrice.fuel_total }}</view
                   >
                 </view>
                 <view class="list_item">
                   <view class="item_title">总保险</view>
-                  <view class="item_message"
-                    >&yen; {{ totalPrice.insurance_total }}</view
-                  >
+                  <view class="item_message">&yen; {{ totalPrice.insurance_total }}</view>
                 </view>
                 <view class="list_item">
                   <view class="item_title">总服务费</view>
-                  <view class="item_message"
-                    >&yen; {{ totalPrice.service_price }}</view
-                  >
+                  <view class="item_message">&yen; {{ totalPrice.service_price }}</view>
                 </view>
               </view>
             </view>
@@ -580,9 +537,9 @@ export default {
       console.log(this.orderDetails.ticket_segments[0].cabin_level);
       // 组装航班数据
       let filghtMessage = {
-        time: moment(
-          this.orderDetails.ticket_segments[0].departure_time
-        ).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
+        time: moment(this.orderDetails.ticket_segments[0].departure_time).format(
+          "YYYY-MM-DD HH:mm:ss"
+        ), // 起飞时间
         code: this.orderDetails.ticket_segments[0].flight_no, // 航班号
         address:
           this.orderDetails.ticket_segments[0].departure_CN.city_name +
@@ -606,8 +563,7 @@ export default {
       };
 
       // 组装退改信息
-      let gaugeMessage = this.orderDetails.ticket_segments[0].gaugeType
-        .gauge_type_value;
+      let gaugeMessage = this.orderDetails.ticket_segments[0].gaugeType.gauge_type_value;
 
       this.ruleInfos = {
         filght: filghtMessage,
@@ -658,11 +614,7 @@ export default {
 
           // 组装航程信息
           this.flightData = {
-            flightType: this.type
-              ? this.type === "0"
-                ? "去程"
-                : "返程"
-              : "单程",
+            flightType: this.type ? (this.type === "0" ? "去程" : "返程") : "单程",
             data: this.orderDetails.ticket_segments || [], // 单程信息
             cabinInfo: this.orderDetails.ticket_segments || [], //退票规则
           };
@@ -728,10 +680,8 @@ export default {
       this.ticketOrder = {
         to: {
           city_code: this.orderDetails.ticket_segments[0].departure,
-          city_name: this.orderDetails.ticket_segments[0].departure_CN
-            .city_name,
-          country_code: this.orderDetails.ticket_segments[0].departure_CN
-            .country_code,
+          city_name: this.orderDetails.ticket_segments[0].departure_CN.city_name,
+          country_code: this.orderDetails.ticket_segments[0].departure_CN.country_code,
           province: this.orderDetails.ticket_segments[0].departure_CN.province,
         },
         from: {
@@ -749,17 +699,15 @@ export default {
           ].arrive_CN.province,
         },
         toTime: {
-          date: moment(
-            this.orderDetails.ticket_segments[0].departure_time
-          ).format("YYYY-MM-DD"),
-          month: moment(
-            this.orderDetails.ticket_segments[0].departure_time
-          ).format("M月DD日"),
+          date: moment(this.orderDetails.ticket_segments[0].departure_time).format(
+            "YYYY-MM-DD"
+          ),
+          month: moment(this.orderDetails.ticket_segments[0].departure_time).format(
+            "M月DD日"
+          ),
           status: "start",
           type: "time",
-          week: moment(
-            this.orderDetails.ticket_segments[0].departure_time
-          ).format("ddd"),
+          week: moment(this.orderDetails.ticket_segments[0].departure_time).format("ddd"),
         },
         fromTime: {},
         to_type: "",
@@ -768,9 +716,7 @@ export default {
 
       this.ticketOrder["type"] = 0;
       uni.navigateTo({
-        url:
-          "/ticketInquiry/ticketInquiry?data=" +
-          JSON.stringify(this.ticketOrder),
+        url: "/ticketInquiry/ticketInquiry?data=" + JSON.stringify(this.ticketOrder),
       });
     },
 
@@ -1006,8 +952,7 @@ export default {
               .center_icon {
                 width: 112upx;
                 height: 20upx;
-                background: url(@/static/ticket_path.png) no-repeat center
-                  center;
+                background: url(@/static/ticket_path.png) no-repeat center center;
                 background-size: contain;
                 display: block;
               }
@@ -1197,6 +1142,7 @@ export default {
           }
         }
         &.order_message {
+          margin-bottom: var(--status-bar-height);
           .message_list {
             margin-top: 40upx;
             .list_item {
