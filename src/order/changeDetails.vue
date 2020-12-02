@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-01 17:17:08
+ * @LastEditTime: 2020-12-02 18:16:34
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -27,7 +27,10 @@
           }}
         </view>
 
-        <view class="order_price" v-if="JSON.stringify(changeDetailsData) !== '{}'">
+        <view class="order_price" 
+        v-if="JSON.stringify(changeDetailsData) !== '{}'"
+        @click="openTotalChange()"
+        >
           <text class="price_text">改签费&yen;</text>
           <text>{{ changeDetailsData.change_fee }}</text>
         </view>
@@ -103,14 +106,14 @@
                   }}票
                 </view>
                 <view class="info_name">{{ item.ticket_passenger.PassengerName }}</view>
-                <view class="is_insurance">
+                <view class="is_insurance"  v-if="Number(item.insurance_total) > 0">
                   <image src="@/static/insurance_icon.png" mode="aspectFit" />
                 </view>
                 <view class="group_info" v-if="changeDetailsData.change_status !== 4">
                   <view class="group_type">旧票号</view>
                   <view class="group_number">
                     {{
-                      changeDetailsData.ticket_order.ticket_passenger[0].ticket_no || ""
+                      item.ticket_passenger.ticket_no || ""
                     }}
                   </view>
                 </view>
@@ -118,7 +121,7 @@
                 <view class="group_info" v-else>
                   <view class="group_type">新票号</view>
                   <view class="group_number">
-                    {{ changeDetailsData.change_passengers[0].ticket_no || "" }}
+                    {{ item.ticket_no || "" }}
                   </view>
                 </view>
                 <view class="price_arrow">
@@ -130,7 +133,7 @@
                 <view class="list_item" v-if="changeDetailsData.change_status === 4">
                   <view class="item_title_old">旧票号</view>
                   <view class="item_message_old">{{
-                    changeDetailsData.ticket_order.ticket_passenger[0].ticket_no || ""
+                    item.ticket_passenger.ticket_no || ""
                   }}</view>
                 </view>
 
@@ -216,7 +219,7 @@
         <!-- 多次改签 -->
         <view
           class="main_list"
-          v-if="mulChangeList !== ''"
+          v-if="JSON.stringify(mulChangeList) !== '{}'"
           @click="openHistoryChange"
         >
           <text class="flight_list_title">更多历史航班信息</text>
@@ -268,6 +271,109 @@
         </view>
       </scroll-view>
     </view>
+
+    <!-- 改签费弹窗 -->
+    <uni-popup ref="totalChange" type="bottom">
+      <view class="price_info">
+        <view class="title">
+          改签费用
+          <view class="close_btn" @click="closeTotalChange()"></view>
+        </view>
+        <view class="price_info_box">
+          <view class="total_price_header">
+            <view class="header_left">
+              <view class="total_price_title">订单总价</view>
+              <view class="total_price_message">
+                <text>&yen;</text>{{ changeDetailsData.change_fee }}
+              </view>
+            </view>
+          </view>
+
+          <scroll-view :scroll-y="true" class="price_info_main">
+            <view
+              :class="['price_info_list', { active: priceInfoChecket === index }]"
+              v-for="(item, index) in changeDetailsData.change_passengers"
+              :key="index"
+            >
+              <view class="list_title" @click="openPriceInfo(index)">
+                <view class="title_name">{{ item.ticket_passenger.PassengerName }}</view>
+
+                <view class="title_price">
+                  <view class="title_text">总金额</view>
+                  <view class="peice_style">
+                    <text>&yen; {{ item.ticket_passenger.total_price }}</text>
+                    <view class="price_arrow">
+                      <image src="@/static/unfold.png" mode="aspectFit" />
+                    </view>
+                  </view>
+                </view>
+              </view>
+
+              <view class="list_main">
+                <view class="list_item">
+                  <view class="item_title">票面价</view>
+                  <view class="item_message">&yen; {{ item.ticket_passenger.ticket_price }}</view>
+                </view>
+
+                <view class="list_item">
+                  <view class="item_title">机建/燃油</view>
+                  <view class="item_message">{{
+                    "&yen; " + item.build_price + " / &yen; " + item.fuel_price
+                  }}</view>
+                </view>
+
+                <view class="list_item">
+                  <view class="item_title">保险</view>
+                  <view class="item_message">&yen; {{ item.insurance_price }}</view>
+                </view>
+
+                <view class="list_item">
+                  <view class="item_title">服务费</view>
+                  <view class="item_message">&yen; {{ item.ticket_passenger.service_price }}</view>
+                </view>
+
+                 <view class="list_item">
+                  <view class="item_title">误机费</view>
+                  <view class="item_message">&yen; {{ item.delay_price }}</view>
+                </view>
+              </view>
+            </view>
+
+            <view class="price_info_list active">
+              <view class="list_title">
+                <view class="title_name">所有乘客票面总价</view>
+              </view>
+              <view class="list_main">
+                <view class="list_item">
+                  <view class="item_title">总票面价</view>
+                  <view class="item_message">&yen; {{ totalPrice.ticket_price }}</view>
+                </view>
+                <view class="list_item">
+                  <view class="item_title">总机建/燃油</view>
+                  <view class="item_message"
+                    >&yen;
+                    {{ totalPrice.build_price + "/" + totalPrice.fuel_price }}</view
+                  >
+                </view>
+                <view class="list_item">
+                  <view class="item_title">总保险</view>
+                  <view class="item_message">&yen; {{ totalPrice.insurance_price }}</view>
+                </view>
+                <view class="list_item">
+                  <view class="item_title">总服务费</view>
+                  <view class="item_message">&yen; {{ totalPrice.service_price }}</view>
+                </view>
+                <view class="list_item">
+                  <view class="item_title">总误机费</view>
+                  <view class="item_message">&yen; {{ totalPrice.delay_price }}</view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </uni-popup>
+
   </view>
 </template>
 
@@ -291,12 +397,40 @@ export default {
       passInfoChecket: null, //乘客信息展开值
 
       mulChangeList:[], //多次改签列表
+
+      priceInfoChecket: null, // 改签金额明细展开值
+
+      totalPrice: {
+        // 改签所有乘客计算
+        ticket_price: 0,
+        build_price: 0,
+        fuel_price: 0,
+        insurance_price: 0,
+        service_price: 0,
+        delay_price:0,
+      },
     };
   },
   methods: {
     // 展开乘客信息详情
     openPassInfo(i) {
       this.passInfoChecket = this.passInfoChecket === i ? null : i;
+      this.$forceUpdate();
+    },
+
+    // 订单总价 弹窗
+    openTotalChange() {
+      this.$refs.totalChange.open();
+    },
+
+    // 订单总价  关闭弹窗
+    closeTotalChange() {
+      this.$refs.totalChange.close();
+    },
+
+     // 展开改签金额详情信息
+    openPriceInfo(i) {
+      this.priceInfoChecket = this.priceInfoChecket === i ? null : i;
       this.$forceUpdate();
     },
 
@@ -332,7 +466,7 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.changeDetailsData = JSON.parse(data.changeData);
     
-    console.log(this.changeDetailsData.id)
+    console.log('改签详情',this.changeDetailsData)
     // 组装航程信息   新航班
     this.flightData = {
       flightType: this.changeDetailsData.change_segments.segment_num
@@ -354,6 +488,15 @@ export default {
       data: this.changeDetailsData.ticket_order.ticket_segments || [], // 单程信息
       cabinInfo: this.changeDetailsData.ticket_order.ticket_segments || [], //退票规则
     };
+
+    this.changeDetailsData.change_passengers.forEach((item) => {
+            this.totalPrice.ticket_price += item.ticket_price;
+            this.totalPrice.build_price += item.build_price;
+            this.totalPrice.fuel_price += item.fuel_price;
+            this.totalPrice.insurance_price += item.insurance_price;
+            this.totalPrice.service_price += item.service_price;
+            this.totalPrice.delay_price += item.delay_price;
+    });
   },
 };
 </script>
@@ -927,5 +1070,209 @@ export default {
       }
     }
   }
+
+  .price_info {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: -120upx;
+    width: 100%;
+    height: 120upx;
+    background-color: #fff;
+  }
+  .title {
+    height: 140upx;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 80upx 80upx 0 0;
+    position: relative;
+    border-bottom: 2upx solid rgba(217, 225, 234, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #333333;
+    font-size: 36upx;
+    .close_btn {
+      position: absolute;
+      background: url(@/static/popup_close.png) no-repeat;
+      background-size: contain;
+      width: 30upx;
+      height: 30upx;
+      top: 54upx;
+      right: 44upx;
+    }
+  }
+
+  .price_info_box {
+    background-color: #fff;
+    .total_price_header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28upx;
+      padding: 56upx 24upx 0;
+      .header_left {
+        display: inline-flex;
+        align-items: center;
+        .total_price_title {
+          font-size: 32upx;
+          font-weight: bold;
+          color: #333333;
+          margin-right: 20upx;
+        }
+        .total_price_message {
+          font-size: 36upx;
+          font-weight: bold;
+          color: #ff0000;
+          text {
+            font-size: 28upx;
+          }
+        }
+      }
+      .header_right {
+        display: inline-flex;
+        align-items: center;
+        .total_price_title {
+          font-size: 26upx;
+          color: #333333;
+          margin-right: 20upx;
+        }
+        .total_price_message {
+          font-size: 30upx;
+          font-weight: bold;
+          color: #333;
+          text {
+            font-size: 28upx;
+          }
+        }
+      }
+    }
+
+    @keyframes openMain {
+      from {
+        margin-top: -100%;
+      }
+      to {
+        margin-top: 0;
+      }
+    }
+
+    @keyframes closeMain {
+      from {
+        margin-top: 0;
+      }
+      to {
+        margin-top: -100%;
+      }
+    }
+
+    .price_info_main {
+      max-height: 60vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+
+      .price_info_list {
+        background: #f9f9f9;
+        padding: 0 16upx 0 24upx;
+        margin: 0 24upx 20upx;
+        min-height: 96rpx;
+        overflow: hidden;
+        &:last-child {
+          margin-bottom: var(--status-bar-height);
+        }
+        &.active {
+          .list_title {
+            .title_price {
+              .peice_style {
+                .price_arrow {
+                  transform: rotate(180deg);
+                }
+              }
+            }
+          }
+          .list_main {
+            animation: openMain 0.4s forwards;
+            padding: 40upx 0 46upx;
+            border-top: 2upx solid #eaeaea;
+          }
+        }
+        .list_title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 96upx;
+          position: relative;
+          z-index: 5;
+          background: #f9f9f9;
+
+          .title_name {
+            font-size: 28upx;
+            font-weight: bold;
+            color: #333333;
+          }
+
+          .title_price {
+            display: flex;
+            align-items: center;
+            .title_text {
+              font-size: 28upx;
+              font-weight: 400;
+              color: #666666;
+              margin-right: 16upx;
+            }
+            .peice_style {
+              display: inline-flex;
+              align-items: center;
+              text {
+                font-size: 28upx;
+                font-weight: bold;
+                color: #ff0000;
+              }
+              .price_arrow {
+                transition: all 0.3s;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 22upx;
+                height: 12upx;
+                margin-left: 16upx;
+                image {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: contain;
+                }
+              }
+            }
+          }
+        }
+        .list_main {
+          overflow: hidden;
+          margin-top: -100%;
+          animation: closeMain 0.4s forwards;
+          border-top: 2upx solid transparent;
+          .list_item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            &:not(:last-child) {
+              margin-bottom: 30upx;
+            }
+            .item_title {
+              font-size: 28upx;
+              font-weight: 400;
+              color: #333333;
+            }
+            .item_message {
+              font-size: 28upx;
+              font-weight: 500;
+              color: #333333;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 }
 </style>

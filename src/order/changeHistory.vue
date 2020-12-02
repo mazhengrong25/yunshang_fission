@@ -1,34 +1,28 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-27 10:39:07
- * @LastEditTime: 2020-12-01 18:23:06
+ * @LastEditTime: 2020-12-02 16:18:41
  * @LastEditors: Please set LastEditors
  * @Description: 历史改签航班
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeHistory.vue
 -->
 <template>
     <view class="change_history">
-
         <yun-header :statusHeight="iStatusBarHeight" centerTitle="历史改签航班"></yun-header>
-
         <scroll-view
             :scroll-y="true"
             :enable-back-to-top="true"
             :scroll-top="scrollTop"
             class="content"
         >
-
             <!-- 第一次改签 -->
             <view class="content_list">
-
                 <!--改签类别 -->
                 <view class="list_item_header">
                     <view class="list_tyle gray">第一次改签</view>
                 </view>
-
                 <!-- 航班信息 -->
-                <view class="filght_message">
-                    
+                <view class="filght_message">   
                     <view class="header_message">
                         <view class="header_type">单程</view>
                         <view class="header_time">
@@ -36,7 +30,6 @@
                             {{$dateTool(historyFirst.change_segments[0].departure_time,'dddd')}}
                         </view>
                     </view>
-
                     <view class="content_message" >
                         <view class="left_message address_message">
                             <view class="time">
@@ -49,7 +42,10 @@
                             </view>
                         </view>
                         <view class="center_message">
-                            <view class="duration">2h30m</view>
+                            <view class="duration">
+                                 {{Math.floor($timeDiff(historyFirst.change_segments[0].arrive_time,historyFirst.change_segments[0].departure_time, 'minutes') / 60)}}h{{
+                                Math.floor($timeDiff(historyFirst.change_segments[0].arrive_time,historyFirst.change_segments[0].departure_time, 'minutes') % 60)}}m
+                            </view>
                             <view class="arrow_icon"></view>
                         </view>
                         <view class="right_message address_message">
@@ -63,40 +59,60 @@
                             </view>
                         </view>
                     </view>
+                    <view class="change_filght_message">
+                        <!-- 航班图标 -->
+                        <view class="message_icon">
+                        <image
+                            class="message_icon"
+                            :src="'https://fxxcx.ystrip.cn' + historyFirst.change_segments[0].image"
+                            mode="aspectFit"
+                        />
+                        </view>
+                        <view class="message_list">
+                            {{historyFirst.change_segments[0].airline_CN}}
+                        </view>
+                        <view class="message_list">{{ historyFirst.change_segments[0].flight_no }}</view?>
+                        <view class="message_list">{{ historyFirst.change_segments[0].model }}</view>
+                    </view>
                 </view>
-
                 <!-- 图片 -->
                 <view class="middle_image">
                     <image class="middle_icon" src="@/static/change_connect.png" mode="aspectFill" />
                 </view>
-
                 <!-- 乘客信息 -->
                 <view class="passenger_message">
-
                     <view
-                        :class="['passenger_list', { active: passInfoChecket === index }]"
-                        :key="index"
+                    :class="['passenger_list', { active: passInfoChecket === index }]"
+                    v-for="(item, index) in historyFirst.change_passengers" 
+                    :key="index"
                     >
                         <view class="list_item">
-                            <view class="list_info">
+                            <view class="list_info" @click="openPassInfo(index)">
                                 <view class="info_type">
-                                    成人票
+                                    {{
+                                        item.ticket_passenger.PassengerType === "ADT"
+                                            ? "成人"
+                                            : item.ticket_passenger.PassengerType === "CNN"
+                                            ? "儿童"
+                                            : item.ticket_passenger.PassengerType === "INF"
+                                            ? "婴儿"
+                                            : ""
+                                    }}票
                                 </view>
-                                <view class="info_name">白小飞</view>
+                                <view class="info_name">{{item.ticket_passenger.PassengerName}}</view>
                                 <view class="is_insurance">
                                     <image src="@/static/insurance_icon.png" mode="aspectFit" />
                                 </view>
                                 <view class="group_info">
                                     <view class="group_type">票号</view>
-                                    <view class="group_number">5214523698547</view>
+                                    <view class="group_number">{{item.ticket_passenger.ticket_no || ''}}</view>
                                 </view>
                                 <view class="price_arrow">
                                     <image src="@/static/unfold.png" mode="aspectFit" />
                                 </view>
                             </view>
                             <!-- 展开内容 -->
-                            <view class="list_main">
-                            
+                            <view class="list_main">                           
                                 <view class="list_item">
                                     <view class="item_title">{{
                                         item.ticket_passenger.Credential === "0"
@@ -119,80 +135,109 @@
                                         ? "其它证件"
                                         : ""
                                     }}</view>
-                                    <view class="item_message">E10214441</view>
+                                    <view class="item_message">{{item.ticket_passenger.CredentialNo}}</view>
                                 </view>
-
                                 <view class="list_item">
                                     <view class="item_title">手机号</view>
-                                    <view class="item_message">18523987773</view>
+                                    <view class="item_message">{{item.ticket_passenger.phone}}</view>
                                 </view>
                             </view>
                         </view>
-                    </view>
-                    
-                    
+                    </view>     
                 </view>
-
-                
-
-
-
             </view>
-
             <!-- 原航班改签 -->
             <view class="content_list">
-
                 <!--改签类别 -->
                 <view class="list_item_header">
                     <view class="gray list_tyle">原航班</view>
                 </view>
-
-                <!-- 航班信息 -->
+                <!-- 航班信息 单程固定-->
                 <view class="filght_message">
-                    
                     <view class="header_message">
                         <view class="header_type">单程</view>
-                        <view class="header_time">2020-04-18</view>
+                        <view class="header_time">
+                            {{$dateTool(historyFromer.change_segments[0].departure_time,'YYYY-MM-DD')}}
+                            {{$dateTool(historyFromer.change_segments[0].departure_time,'dddd')}}
+                        </view>
                     </view>
 
                     <view class="content_message" >
                         <view class="left_message address_message">
-                            <view class="time">08:00</view>
-                            <view class="address">重庆江北机场T3</view>
+                            <view class="time">
+                                {{$dateTool(historyFromer.change_segments[0].departure_time,'HH:mm')}}
+                            </view>
+                            <view class="address">
+                                {{historyFromer.change_segments[0].departure_CN.city_name}}{{
+                                historyFromer.change_segments[0].departure_CN.air_port_name}}{{
+                                historyFromer.change_segments[0].departure_terminal}}机场
+                            </view>
                         </view>
                         <view class="center_message">
-                            <view class="duration">2h30m</view>
+                            <view class="duration">
+                                {{Math.floor($timeDiff(historyFromer.change_segments[0].arrive_time,historyFromer.change_segments[0].departure_time, 'minutes') / 60)}}h{{
+                                Math.floor($timeDiff(historyFromer.change_segments[0].arrive_time,historyFromer.change_segments[0].departure_time, 'minutes') % 60)}}m
+                            </view>
                             <view class="arrow_icon"></view>
                         </view>
                         <view class="right_message address_message">
-                            <view class="time">08:00</view>
-                            <view class="address">重庆江北机场T3</view>
+                            <view class="time">
+                                {{$dateTool(historyFromer.change_segments[0].arrive_time,'HH:mm')}}
+                            </view>
+                            <view class="address">
+                                {{historyFromer.change_segments[0].arrive_CN.city_name}}{{
+                                historyFromer.change_segments[0].arrive_CN.air_port_name}}{{
+                                historyFromer.change_segments[0].arrive_terminal}}机场
+                            </view>
                         </view>
                     </view>
+                    <view class="change_filght_message">
+                        <!-- 航班图标 -->
+                        <view class="message_icon">
+                        <image
+                            class="message_icon"
+                            :src="'https://fxxcx.ystrip.cn' + historyFromer.change_segments[0].image"
+                            mode="aspectFit"
+                        />
+                        </view>
+                         <view class="message_list">
+                            {{historyFromer.change_segments[0].airline_CN}}
+                        </view>
+                        <view class="message_list">{{ historyFromer.change_segments[0].flight_no }}</view>
+                        <view class="message_list">{{ historyFromer.change_segments[0].model }}</view>
+                    </view>
                 </view>
-
                 <!-- 图片 -->
                 <view class="middle_image">
                     <image class="middle_icon" src="@/static/change_connect.png" mode="aspectFill" />
                 </view>
-
                 <!-- 乘客信息 -->
                 <view class="passenger_message">
-
                     <view
                         :class="['passenger_list', { active: passInfoChecket === index }]"
+                        v-for="(item, index) in historyFromer.change_passengers" 
                         :key="index"
                     >
                         <view class="list_item">
-                            <view class="list_info">
-                                <view class="info_type">成人票 </view>
-                                <view class="info_name">白小飞</view>
-                                <view class="is_insurance">
+                            <view class="list_info" @click="openPassInfo(index)">
+                                <view class="info_type">
+                                    {{
+                                        item.ticket_passenger.PassengerType === "ADT"
+                                            ? "成人"
+                                            : item.ticket_passenger.PassengerType === "CNN"
+                                            ? "儿童"
+                                            : item.ticket_passenger.PassengerType === "INF"
+                                            ? "婴儿"
+                                            : ""
+                                    }}票
+                                </view>
+                                <view class="info_name">{{item.ticket_passenger.PassengerName}}</view>
+                                <view class="is_insurance"  v-if="Number(item.ticket_passenger.insurance_total) > 0">
                                     <image src="@/static/insurance_icon.png" mode="aspectFit" />
                                 </view>
                                 <view class="group_info">
                                     <view class="group_type">票号</view>
-                                    <view class="group_number">5214523698547</view>
+                                    <view class="group_number">{{item.ticket_no || ''}}</view>
                                 </view>
                                 <view class="price_arrow">
                                     <image src="@/static/unfold.png" mode="aspectFit" />
@@ -223,31 +268,20 @@
                                         ? "其它证件"
                                         : ""
                                     }}</view>
-                                    <view class="item_message">E10214441</view>
+                                    <view class="item_message">{{item.ticket_passenger.CredentialNo}}</view>
                                 </view>
 
                                 <view class="list_item">
                                     <view class="item_title">手机号</view>
-                                    <view class="item_message">18523987773</view>
+                                    <view class="item_message">{{item.ticket_passenger.phone}}</view>
                                 </view>
                             </view>
                         </view>
-                    </view>
-                    
-                    
+                    </view>  
                 </view>
-
-                
-
-
-
             </view>
-
-
         </scroll-view>
-
-    </view>
-    
+    </view>   
 </template>
 
 <script>
@@ -258,25 +292,39 @@ export default {
         return{
 
             iStatusBarHeight: 0,
+            scrollTop: 0, // 列表滚动值
 
             changeHistoryList:{}, //列表数据 原航班和第一次改签
             historyFirst:{}, // 第一次改签
+            historyFromer:{}, //原航班
+
+            passInfoChecket: null, //乘客信息展开值
         }
 
     },
 
     methods: {
 
+        // 展开乘客信息详情
+        openPassInfo(i) {
+            this.passInfoChecket = this.passInfoChecket === i ? null : i;
+            this.$forceUpdate();
+        },
+
     },
 
     onLoad(data){
 
-         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-         this.changeHistoryList = JSON.parse(data.changeData);
-         this.historyFirst = this.changeHistoryList.newDetails
+        this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+        this.changeHistoryList = JSON.parse(data.changeData);
+        this.historyFirst = this.changeHistoryList.newDetails
+        this.historyFromer =  this.changeHistoryList.oldDetails
 
-         console.log('多次改签',this.changeHistoryList)
-         console.log('第一次改签',this.historyFirst)
+
+        console.log('多次改签',this.changeHistoryList)
+        console.log('第一次改签',this.historyFirst)
+        console.log('原航班',this.historyFromer)
+         
 
     }
     
@@ -341,9 +389,8 @@ export default {
 
                 background: rgba(255, 255, 255, 1);
                 box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
-                border-radius: 20upx 20upx 0upx 0upx;
-                // padding: 24upx 20upx 20upx;
-                padding: 20upx 20upx 40upx;
+                border-radius: 20upx 20upx 0upx 0upx;  
+                padding: 46upx 20upx 14upx;
 
                 .header_message {
                     display: flex;
@@ -560,6 +607,36 @@ export default {
                         position: absolute;
                         top: 22upx;
                         left: -6upx;
+                    }
+                    }
+                }
+
+                .change_filght_message {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .message_icon {
+                    width: 24upx;
+                    height: 24upx;
+                    object-fit: contain;
+                    margin-right: 6upx;
+                    display: flex;
+                    }
+                    .message_list {
+                    font-size: 22upx;
+                    font-weight: 400;
+                    color: rgba(175, 185, 196, 1);
+                    display: inline-flex;
+                    align-items: center;
+                    &:not(:last-child) {
+                        &::after {
+                        content: "";
+                        display: block;
+                        width: 2upx;
+                        height: 20upx;
+                        background: rgba(217, 225, 234, 1);
+                        margin: 0 8upx;
+                        }
                     }
                     }
                 }
