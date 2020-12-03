@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-03 09:31:09
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-12-03 14:59:16
+ * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
 -->
@@ -67,17 +67,18 @@
         </text>
 
         <view class="option_btn" v-if="changeDetailsData.change_status === 1"
-          >取消订单</view
-        >
+        @click="getCancel()"
+        >取消订单</view>
       </view>
 
       <view class="order_option">
         <view class="option_btn" v-if="changeDetailsData.change_status === 2"
-          >取消订单</view
-        >
+        @click="getCancel()"
+        >取消订单</view>
         <view
           class="option_btn important_btn"
           v-if="changeDetailsData.change_status === 2"
+          @click="jumpOrderPay()"
           >去支付</view
         >
       </view>
@@ -271,6 +272,15 @@
       </scroll-view>
     </view>
 
+    <!-- 取消订单弹窗 -->
+    <yun-config
+      ref="yunConfig"
+      @submitConfig="getSubmit"
+      title="温馨提示"
+      content="您是否要取消此订单"
+      submitIndex="right"
+    ></yun-config>
+
     <!-- 改签费弹窗 -->
     <uni-popup ref="totalChange" type="bottom">
       <view class="price_info">
@@ -436,6 +446,57 @@ export default {
       this.$forceUpdate();
     },
 
+    // 取消订单弹窗
+    getCancel() {
+      this.$refs.yunConfig.openConfigPopup();
+    },
+
+     //取消订单弹窗 确认取消
+    getSubmit(type) {
+      console.log(type);
+      let data = {
+        order_no: this.changeDetailsData.order_no,
+      };
+      console.log(data);
+      orderApi.cancleInterRefund(data).then((res) => {
+        if (res.result === 10000) {
+      
+        } else {
+          uni.showToast({
+            title: res.data,
+            icon: "none",
+          });
+        }
+      });
+    },
+    
+    // 去支付
+    jumpOrderPay() {
+
+      let orderId = [this.changeDetailsData.order_no];
+      let priceList = [this.changeDetailsData.need_pay_amount];
+      let priceNumber = this.changeDetailsData.need_pay_amount;
+      let passengerList = []
+      this.changeDetailsData.change_passengers.forEach(item =>{
+        passengerList.push(item.ticket_passenger)
+      })
+
+      uni.navigateTo({
+        url:
+          "/flightReservation/orderPay?orderId=" +
+          JSON.stringify(orderId) +
+          "&flightData=" +
+          JSON.stringify(this.flightData) +
+          "&priceList=" +
+          JSON.stringify(priceList) +
+          "&price=" +
+          priceNumber +
+          "&passMessage=" +
+          JSON.stringify(passengerList) +
+          "&headerType=false" +
+          "&type=false",        
+      });
+    },
     // 跳转到多次改签页面
     openHistoryChange() {
       let data = {

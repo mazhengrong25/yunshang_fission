@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-11-26 16:50:07
+ * @LastEditTime: 2020-12-03 11:55:01
  * @LastEditors: Please set LastEditors
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -63,9 +63,10 @@
 
         <view class="content_list"
         v-for="(item, index) in changeOrderList"
-        :key="index">
+        :key="index"
+        >
       
-          <view class="list_item" @click="jumpChangeDetails(item)">
+          <view class="list_item" @click.stop="jumpChangeDetails(item)">
             <view class="item_header">
               <view class="item_title">
                 <view class="title">
@@ -120,7 +121,9 @@
             <view
               class="item_btn_box"
               v-if="item.change_status === 2">
-              <view class="item_btn submit_btn">去支付</view>
+              <view class="item_btn submit_btn"
+              @click.stop="jumpOrderPay(item)"
+              >去支付</view>
             </view>
           </view>
         </view>
@@ -188,6 +191,39 @@ export default {
           });
         },
 
+        // 待支付状态 去支付
+        jumpOrderPay(val) {
+
+          console.log(this.changeOrderList)
+          let orderId = [val.order_no];
+          let priceList = [val.need_pay_amount];
+          let priceNumber = val.need_pay_amount;
+          let flightData = {
+            flightType: '单程',
+            data: val.change_segments,
+            cabinInfo: {},
+          };
+          let passengerList = []
+          val.change_passengers.forEach(item =>{
+            passengerList.push(item.ticket_passenger)
+          })
+          uni.navigateTo({
+            url:
+              "/flightReservation/orderPay?orderId=" +
+              JSON.stringify(orderId) +
+              "&flightData=" +
+              JSON.stringify(flightData) +
+              "&priceList=" +
+              JSON.stringify(priceList) +
+              "&price=" +
+              priceNumber +
+              "&passMessage=" +
+              JSON.stringify(passengerList) +
+              "&headerType=false" +
+              "&type=false",        
+          });
+        },
+
         // 获取改签列表
         getChangeList() {
 
@@ -227,7 +263,7 @@ export default {
                 this.changeOrderList = res.data.data;
                 this.orderPageStatus = true;
               }
-
+              console.log('改签列表数据',this.changeOrderList)
               if (this.orderPageNumber >= res.data.last_page) {
                 this.orderPageStatus = false;
               }

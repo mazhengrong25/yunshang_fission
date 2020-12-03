@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-11-20 11:59:36
+ * @LastEditTime: 2020-12-03 17:47:31
  * @LastEditors: Please set LastEditors
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -69,6 +69,30 @@
                 <text></text>
                 <text></text>
                 <view></view>
+            </view>
+
+            <!-- 新航班 -->
+            <view class="main_list newflight">
+                <view class=main_list_first>
+                    <view class="main_list_title">新航班</view>   
+                </view>
+
+                <view class="flight_list">
+                    <view class="list_item">
+                        <view class="list_info">
+                            <view class="list_connect"
+                            @click="openDataSelect()">
+                                <view class="info_type">
+                                    <image class="info_img" src="@/static/from_time.png" mode="aspectFill" />
+                                </view>
+                                <view v-if="changeDate" class="info_name_not">{{ changeDate }}</view>
+                                <view v-else class="info_name">改签日期</view>
+                            </view>
+                            <view class="info_query">搜索航班</view>
+                        </view>
+                    </view>
+                </view>
+
             </view>
 
             <!-- 订单信息 -->
@@ -164,7 +188,9 @@ export default {
 
             cause:"", //改签原因
 
-            flightData:{}
+            flightData:{},
+
+            changeDate:'', //改签日期
         }
     },
 
@@ -194,6 +220,13 @@ export default {
         openRemark() {
             uni.navigateTo({
                 url:'/order/addRemark?changeRemark='+this.changeRemark,
+            })
+        },
+
+        // 跳转到选择日期页面
+        openDataSelect() {
+            uni.navigateTo({
+                url:'/pages/dateSelect/dateSelect'
             })
         },
 
@@ -282,6 +315,16 @@ export default {
         if(uni.getStorageSync('remark_key')){
         this.changeRemark = uni.getStorageSync('remark_key')
         uni.removeStorageSync('remark_key')
+        }
+        
+        // 新航班 时间处理
+        if (uni.getStorageSync("time")) {
+            let timeData = JSON.parse(uni.getStorageSync("time"));
+            console.log("时间", timeData);
+            this.changeDate = timeData.date
+            this.$forceUpdate();
+            console.log("时间返回", this.changeDate);
+            uni.removeStorageSync("time");
         }
     },
 
@@ -650,6 +693,60 @@ export default {
             }
             }
         }
+        }
+        &.newflight {
+
+            .flight_list {
+                .list_item {
+                    .list_info {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 10upx;
+                        justify-content: space-between;
+                        .list_connect {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+    
+                            .info_type {
+                                display: inline-flex;
+                                width: 30upx;
+                                height: 30upx;
+                                margin-right: 12rpx;
+                                .info_img {
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: contain;
+                                }
+                            }
+                            .info_name {
+                                font-size: 32upx;
+                                font-weight: 400;
+                                color: rgba(175, 185, 196, 1);
+                            }
+                            .info_name_not {
+                                font-size: 32upx;
+                                font-weight: 400;
+                                color:rgba(51, 51, 51, 1);
+                            }
+                        }
+                        .info_query {
+                            width: 170upx;
+                            height: 64upx; 
+                            border: 1px solid #0070E2;
+                            border-radius: 90upx;
+                            font-size: 28upx;
+                            font-weight: 400;
+                            color:rgba(0, 112, 226, 1);
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-top: -55rpx;
+                        }
+                    }
+                }
+            }
+
         }
     }
 

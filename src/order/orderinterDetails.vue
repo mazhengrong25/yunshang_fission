@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-02 17:47:49
+ * @LastEditTime: 2020-12-03 15:24:07
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -608,6 +608,7 @@ export default {
       orderApi.orderDetails(data).then((res) => {
         if (res.result === 10000) {
           this.orderDetails = res.data;
+          console.log('订单详情',this.orderDetails)
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;
           }
@@ -669,7 +670,7 @@ export default {
 
     // 跳转改签
     getChange() {
-      return this.notMessage();
+      // return this.notMessage();
       uni.navigateTo({
         url: "/order/change?changeData=" + JSON.stringify(this.orderDetails),
       });
