@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-02 18:16:34
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-03 09:31:09
+ * @LastEditors: wish.WuJunLong
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
 -->
@@ -27,9 +27,10 @@
           }}
         </view>
 
-        <view class="order_price" 
-        v-if="JSON.stringify(changeDetailsData) !== '{}'"
-        @click="openTotalChange()"
+        <view
+          class="order_price"
+          v-if="JSON.stringify(changeDetailsData) !== '{}'"
+          @click="openTotalChange()"
         >
           <text class="price_text">改签费&yen;</text>
           <text>{{ changeDetailsData.change_fee }}</text>
@@ -87,12 +88,12 @@
         <!-- 乘机人 -->
         <view class="main_list passenger">
           <view class="main_list_title">乘机人</view>
-          <view
-            :class="['passenger_list', { active: passInfoChecket === index }]"
-            v-for="(item, index) in changeDetailsData.change_passengers"
-            :key="index"
-          >
-            <view class="list_item">
+          <view class="passenger_list">
+            <view
+              :class="['list_item', { active: passInfoChecket === index }]"
+              v-for="(item, index) in changeDetailsData.change_passengers"
+              :key="index"
+            >
               <view class="list_info" @click="openPassInfo(index)">
                 <view class="info_type">
                   {{
@@ -106,15 +107,13 @@
                   }}票
                 </view>
                 <view class="info_name">{{ item.ticket_passenger.PassengerName }}</view>
-                <view class="is_insurance"  v-if="Number(item.insurance_total) > 0">
+                <view class="is_insurance" v-if="Number(item.insurance_total) > 0">
                   <image src="@/static/insurance_icon.png" mode="aspectFit" />
                 </view>
                 <view class="group_info" v-if="changeDetailsData.change_status !== 4">
                   <view class="group_type">旧票号</view>
                   <view class="group_number">
-                    {{
-                      item.ticket_passenger.ticket_no || ""
-                    }}
+                    {{ item.ticket_passenger.ticket_no || "" }}
                   </view>
                 </view>
                 <!-- 已完成状态 -->
@@ -312,7 +311,9 @@
               <view class="list_main">
                 <view class="list_item">
                   <view class="item_title">票面价</view>
-                  <view class="item_message">&yen; {{ item.ticket_passenger.ticket_price }}</view>
+                  <view class="item_message"
+                    >&yen; {{ item.ticket_passenger.ticket_price }}</view
+                  >
                 </view>
 
                 <view class="list_item">
@@ -329,10 +330,12 @@
 
                 <view class="list_item">
                   <view class="item_title">服务费</view>
-                  <view class="item_message">&yen; {{ item.ticket_passenger.service_price }}</view>
+                  <view class="item_message"
+                    >&yen; {{ item.ticket_passenger.service_price }}</view
+                  >
                 </view>
 
-                 <view class="list_item">
+                <view class="list_item">
                   <view class="item_title">误机费</view>
                   <view class="item_message">&yen; {{ item.delay_price }}</view>
                 </view>
@@ -373,7 +376,6 @@
         </view>
       </view>
     </uni-popup>
-
   </view>
 </template>
 
@@ -396,7 +398,7 @@ export default {
 
       passInfoChecket: null, //乘客信息展开值
 
-      mulChangeList:[], //多次改签列表
+      mulChangeList: [], //多次改签列表
 
       priceInfoChecket: null, // 改签金额明细展开值
 
@@ -407,7 +409,7 @@ export default {
         fuel_price: 0,
         insurance_price: 0,
         service_price: 0,
-        delay_price:0,
+        delay_price: 0,
       },
     };
   },
@@ -428,7 +430,7 @@ export default {
       this.$refs.totalChange.close();
     },
 
-     // 展开改签金额详情信息
+    // 展开改签金额详情信息
     openPriceInfo(i) {
       this.priceInfoChecket = this.priceInfoChecket === i ? null : i;
       this.$forceUpdate();
@@ -438,25 +440,24 @@ export default {
     openHistoryChange() {
       let data = {
         oldDetails: this.changeDetailsData,
-        newDetails: this.mulChangeList
-      }
+        newDetails: this.mulChangeList,
+      };
       uni.navigateTo({
-        url: "/order/changeHistory?changeData="+ JSON.stringify(data),
+        url: "/order/changeHistory?changeData=" + JSON.stringify(data),
       });
     },
 
     // 获取多次改签
-    getMulChangeList(){
+    getMulChangeList() {
       let data = {
-        pid: this.changeDetailsData.id
-      }
+        pid: this.changeDetailsData.id,
+      };
 
       orderApi.mulChangeList(data).then((res) => {
-        if(res.result === 10000){
-          this.mulChangeList = res.data
+        if (res.result === 10000) {
+          this.mulChangeList = res.data;
         }
-          
-      })
+      });
     },
   },
   onShow() {
@@ -465,8 +466,8 @@ export default {
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.changeDetailsData = JSON.parse(data.changeData);
-    
-    console.log('改签详情',this.changeDetailsData)
+
+    console.log("改签详情", this.changeDetailsData);
     // 组装航程信息   新航班
     this.flightData = {
       flightType: this.changeDetailsData.change_segments.segment_num
@@ -490,12 +491,12 @@ export default {
     };
 
     this.changeDetailsData.change_passengers.forEach((item) => {
-            this.totalPrice.ticket_price += item.ticket_price;
-            this.totalPrice.build_price += item.build_price;
-            this.totalPrice.fuel_price += item.fuel_price;
-            this.totalPrice.insurance_price += item.insurance_price;
-            this.totalPrice.service_price += item.service_price;
-            this.totalPrice.delay_price += item.delay_price;
+      this.totalPrice.ticket_price += item.ticket_price;
+      this.totalPrice.build_price += item.build_price;
+      this.totalPrice.fuel_price += item.fuel_price;
+      this.totalPrice.insurance_price += item.insurance_price;
+      this.totalPrice.service_price += item.service_price;
+      this.totalPrice.delay_price += item.delay_price;
     });
   },
 };
@@ -648,7 +649,7 @@ export default {
         padding: 24upx 20upx 20upx;
         position: relative;
         z-index: 2;
-        &:last-child{
+        &:last-child {
           margin-bottom: var(--status-bar-height);
         }
         .flight_list_title {
@@ -799,29 +800,46 @@ export default {
             }
           }
         }
+        @keyframes openPassenger {
+          from {
+            margin-top: -100%;
+          }
+          to {
+            margin-top: 0;
+          }
+        }
+
+        @keyframes closePassenger {
+          from {
+            margin-top: 0;
+          }
+          to {
+            margin-top: -100%;
+          }
+        }
         &.passenger {
           .passenger_list {
+            min-height: 40upx;
             margin-top: 32upx;
-            &.active {
-              .list_info {
-                .price_arrow {
-                  transform: rotate(180deg);
-                }
+            .list_item {
+              min-height: 40rpx;
+              overflow: hidden;
+              &:not(:last-child){
+                margin-bottom: 40upx;
               }
-              .list_item {
+              &.active {
+                .list_info {
+                  .price_arrow {
+                    transform: rotate(180deg);
+                  }
+                }
                 .list_main {
-                  animation: openMain 0.4s forwards;
-                  height: auto;
+                  animation: openPassenger 0.4s forwards;
                   padding-bottom: 24rpx;
                   border-bottom: 2rpx solid #f1f3f5;
                   margin-bottom: 32rpx;
-                  margin-top: 28upx;
+                  padding-top: 28upx;
                 }
-              }
-            }
-            .list_item {
-              &:not(:last-child) {
-                margin-bottom: 24upx;
               }
 
               .list_info {
@@ -892,12 +910,14 @@ export default {
               }
               .list_main {
                 overflow: hidden;
-                height: 0;
-                animation: closeMain 0.4s forwards;
+                animation: closePassenger 0.4s forwards;
                 padding-left: 37%;
                 .list_item {
                   display: flex;
                   align-items: center;
+                  &:not(:last-child) {
+                    margin-bottom: 24upx;
+                  }
                   .item_title {
                     font-size: 28upx;
                     font-weight: 400;
@@ -1072,207 +1092,207 @@ export default {
   }
 
   .price_info {
-  position: relative;
-  &::before {
-    content: "";
-    position: absolute;
-    bottom: -120upx;
-    width: 100%;
-    height: 120upx;
-    background-color: #fff;
-  }
-  .title {
-    height: 140upx;
-    background: rgba(255, 255, 255, 1);
-    border-radius: 80upx 80upx 0 0;
     position: relative;
-    border-bottom: 2upx solid rgba(217, 225, 234, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #333333;
-    font-size: 36upx;
-    .close_btn {
+    &::before {
+      content: "";
       position: absolute;
-      background: url(@/static/popup_close.png) no-repeat;
-      background-size: contain;
-      width: 30upx;
-      height: 30upx;
-      top: 54upx;
-      right: 44upx;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
     }
-  }
-
-  .price_info_box {
-    background-color: #fff;
-    .total_price_header {
+    .title {
+      height: 140upx;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 80upx 80upx 0 0;
+      position: relative;
+      border-bottom: 2upx solid rgba(217, 225, 234, 1);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28upx;
-      padding: 56upx 24upx 0;
-      .header_left {
-        display: inline-flex;
+      justify-content: center;
+      font-weight: bold;
+      color: #333333;
+      font-size: 36upx;
+      .close_btn {
+        position: absolute;
+        background: url(@/static/popup_close.png) no-repeat;
+        background-size: contain;
+        width: 30upx;
+        height: 30upx;
+        top: 54upx;
+        right: 44upx;
+      }
+    }
+
+    .price_info_box {
+      background-color: #fff;
+      .total_price_header {
+        display: flex;
         align-items: center;
-        .total_price_title {
-          font-size: 32upx;
-          font-weight: bold;
-          color: #333333;
-          margin-right: 20upx;
+        justify-content: space-between;
+        margin-bottom: 28upx;
+        padding: 56upx 24upx 0;
+        .header_left {
+          display: inline-flex;
+          align-items: center;
+          .total_price_title {
+            font-size: 32upx;
+            font-weight: bold;
+            color: #333333;
+            margin-right: 20upx;
+          }
+          .total_price_message {
+            font-size: 36upx;
+            font-weight: bold;
+            color: #ff0000;
+            text {
+              font-size: 28upx;
+            }
+          }
         }
-        .total_price_message {
-          font-size: 36upx;
-          font-weight: bold;
-          color: #ff0000;
-          text {
-            font-size: 28upx;
+        .header_right {
+          display: inline-flex;
+          align-items: center;
+          .total_price_title {
+            font-size: 26upx;
+            color: #333333;
+            margin-right: 20upx;
+          }
+          .total_price_message {
+            font-size: 30upx;
+            font-weight: bold;
+            color: #333;
+            text {
+              font-size: 28upx;
+            }
           }
         }
       }
-      .header_right {
-        display: inline-flex;
-        align-items: center;
-        .total_price_title {
-          font-size: 26upx;
-          color: #333333;
-          margin-right: 20upx;
+
+      @keyframes openMain {
+        from {
+          margin-top: -100%;
         }
-        .total_price_message {
-          font-size: 30upx;
-          font-weight: bold;
-          color: #333;
-          text {
-            font-size: 28upx;
+        to {
+          margin-top: 0;
+        }
+      }
+
+      @keyframes closeMain {
+        from {
+          margin-top: 0;
+        }
+        to {
+          margin-top: -100%;
+        }
+      }
+
+      .price_info_main {
+        max-height: 60vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+
+        .price_info_list {
+          background: #f9f9f9;
+          padding: 0 16upx 0 24upx;
+          margin: 0 24upx 20upx;
+          min-height: 96rpx;
+          overflow: hidden;
+          &:last-child {
+            margin-bottom: var(--status-bar-height);
           }
-        }
-      }
-    }
-
-    @keyframes openMain {
-      from {
-        margin-top: -100%;
-      }
-      to {
-        margin-top: 0;
-      }
-    }
-
-    @keyframes closeMain {
-      from {
-        margin-top: 0;
-      }
-      to {
-        margin-top: -100%;
-      }
-    }
-
-    .price_info_main {
-      max-height: 60vh;
-      overflow-y: auto;
-      box-sizing: border-box;
-
-      .price_info_list {
-        background: #f9f9f9;
-        padding: 0 16upx 0 24upx;
-        margin: 0 24upx 20upx;
-        min-height: 96rpx;
-        overflow: hidden;
-        &:last-child {
-          margin-bottom: var(--status-bar-height);
-        }
-        &.active {
+          &.active {
+            .list_title {
+              .title_price {
+                .peice_style {
+                  .price_arrow {
+                    transform: rotate(180deg);
+                  }
+                }
+              }
+            }
+            .list_main {
+              animation: openMain 0.4s forwards;
+              padding: 40upx 0 46upx;
+              border-top: 2upx solid #eaeaea;
+            }
+          }
           .list_title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 96upx;
+            position: relative;
+            z-index: 5;
+            background: #f9f9f9;
+
+            .title_name {
+              font-size: 28upx;
+              font-weight: bold;
+              color: #333333;
+            }
+
             .title_price {
+              display: flex;
+              align-items: center;
+              .title_text {
+                font-size: 28upx;
+                font-weight: 400;
+                color: #666666;
+                margin-right: 16upx;
+              }
               .peice_style {
+                display: inline-flex;
+                align-items: center;
+                text {
+                  font-size: 28upx;
+                  font-weight: bold;
+                  color: #ff0000;
+                }
                 .price_arrow {
-                  transform: rotate(180deg);
+                  transition: all 0.3s;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 22upx;
+                  height: 12upx;
+                  margin-left: 16upx;
+                  image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                  }
                 }
               }
             }
           }
           .list_main {
-            animation: openMain 0.4s forwards;
-            padding: 40upx 0 46upx;
-            border-top: 2upx solid #eaeaea;
-          }
-        }
-        .list_title {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          height: 96upx;
-          position: relative;
-          z-index: 5;
-          background: #f9f9f9;
-
-          .title_name {
-            font-size: 28upx;
-            font-weight: bold;
-            color: #333333;
-          }
-
-          .title_price {
-            display: flex;
-            align-items: center;
-            .title_text {
-              font-size: 28upx;
-              font-weight: 400;
-              color: #666666;
-              margin-right: 16upx;
-            }
-            .peice_style {
-              display: inline-flex;
+            overflow: hidden;
+            margin-top: -100%;
+            animation: closeMain 0.4s forwards;
+            border-top: 2upx solid transparent;
+            .list_item {
+              display: flex;
               align-items: center;
-              text {
+              justify-content: space-between;
+              &:not(:last-child) {
+                margin-bottom: 30upx;
+              }
+              .item_title {
                 font-size: 28upx;
-                font-weight: bold;
-                color: #ff0000;
+                font-weight: 400;
+                color: #333333;
               }
-              .price_arrow {
-                transition: all 0.3s;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 22upx;
-                height: 12upx;
-                margin-left: 16upx;
-                image {
-                  width: 100%;
-                  height: 100%;
-                  object-fit: contain;
-                }
+              .item_message {
+                font-size: 28upx;
+                font-weight: 500;
+                color: #333333;
               }
-            }
-          }
-        }
-        .list_main {
-          overflow: hidden;
-          margin-top: -100%;
-          animation: closeMain 0.4s forwards;
-          border-top: 2upx solid transparent;
-          .list_item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            &:not(:last-child) {
-              margin-bottom: 30upx;
-            }
-            .item_title {
-              font-size: 28upx;
-              font-weight: 400;
-              color: #333333;
-            }
-            .item_message {
-              font-size: 28upx;
-              font-weight: 500;
-              color: #333333;
             }
           }
         }
       }
     }
   }
-}
 }
 </style>
