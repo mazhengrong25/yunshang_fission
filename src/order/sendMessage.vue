@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-04 11:42:48
- * @LastEditTime: 2020-11-06 11:21:57
+ * @LastEditTime: 2020-12-04 15:12:22
  * @LastEditors: Please set LastEditors
  * @Description: 发送短信
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\pages\order\sendMessage.vue
@@ -158,7 +158,7 @@ export default {
       orderApi.sendMessageSelect(this.order_no).then((res) => {
         console.log(res);
         this.radioValue = res.user_type;
-        this.phone = res.passenger_phone;
+        this.phone = res.passenger_phone[0].phone;
         this.isTimer = res.is_timer;
         this.typeGroup = res.modelList;
       });
@@ -209,6 +209,7 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     console.log("发送短信", data);
     this.order_no = data.orderId;
+    console.log('订单号',this.order_no)
     console.log(this.order_no);
 
     this.getTemplateList();

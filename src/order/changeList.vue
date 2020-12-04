@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-12-03 11:55:01
+ * @LastEditTime: 2020-12-04 09:26:07
  * @LastEditors: Please set LastEditors
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -128,11 +128,13 @@
           </view>
         </view>
 
+        <!-- 缺省页 -->
+        <default-page v-if="showDefault" defaultType="not_order"></default-page>
 
-
-        <view class="no_data" v-if="!orderPageStatus">
+        <view class="no_data" v-if="!orderPageStatus && !showDefault ">
             <text>到底啦</text>
         </view>
+
     </scroll-view>
   </view>
 </template>
@@ -163,6 +165,7 @@ export default {
             oldScrollTop: 0,
 
             orderFilterStatus: false,
+            showDefault: false, // 缺省页
         }
 
     },
@@ -255,8 +258,7 @@ export default {
 
           orderApi.changeList(data).then((res) => { 
             if(res.result ===  10000){
-              // this.changeOrderList = res.data.data;
-              // console.log('改签列表',this.changeOrderList)
+              this.showDefault = false;
               if (this.orderPageStatus) {
                 this.changeOrderList.push.apply(this.changeOrderList, res.data.data);
               } else {
@@ -264,10 +266,14 @@ export default {
                 this.orderPageStatus = true;
               }
               console.log('改签列表数据',this.changeOrderList)
+              if (this.changeOrderList.length < 1) {
+                this.showDefault = true;
+              }
               if (this.orderPageNumber >= res.data.last_page) {
                 this.orderPageStatus = false;
               }
             } else {
+              this.showDefault = true;
               uni.showToast({
                 title: res.msg,
                 icon: "none",
