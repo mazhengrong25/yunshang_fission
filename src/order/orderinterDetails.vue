@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-07 14:19:50
+ * @LastEditTime: 2020-12-07 14:25:27
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -670,7 +670,7 @@ export default {
 
     // 跳转改签
     getChange() {
-      return this.notMessage();
+      // return this.notMessage();
       uni.navigateTo({
         url: "/order/change?changeData=" + JSON.stringify(this.orderDetails),
       });
