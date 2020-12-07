@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-10-20 10:24:44
+ * @LastEditTime: 2020-12-07 14:18:35
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -67,7 +67,7 @@
 
     <view class="item_box_bottom">
       <view class="bottom_message" @click="openFlightPopop">
-        {{ flightData.cabin }} | 退改签规则
+        {{ flightData.cabin}} {{flightData.data.discount? flightData.data.discount: ''}} | 退改签规则
         {{ flightData.baggage ? " | " + flightData.baggage : "" }}
         <view class="message_more_btn"></view>
       </view>

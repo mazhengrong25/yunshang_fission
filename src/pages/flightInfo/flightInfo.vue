@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-10-20 10:23:27
+ * @LastEditTime: 2020-12-07 14:17:01
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -430,6 +430,8 @@ export default {
                     data: oitem,
                   });
                 });
+
+                console.log(this.cabinList)
               }
             }
           });
