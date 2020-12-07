@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-12-03 17:47:31
+ * @LastEditTime: 2020-12-07 18:26:02
  * @LastEditors: Please set LastEditors
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -191,6 +191,14 @@ export default {
             flightData:{},
 
             changeDate:'', //改签日期
+
+            ticketAddress: {
+                // 导航栏地址
+                to: "",
+                from: "",
+                departure: "", // 起飞机场三字码
+                arrival: "",
+            },
         }
     },
 
@@ -332,15 +340,39 @@ export default {
 
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
         this.changeDetail = JSON.parse(data.changeData)
+        console.log('改签',this.changeDetail)
+
+        // 组装 搜索航班信息
+        this.ticketAddress = {
+
+            //  to: this.ticketData.to_type ==='air'?this.ticketData.to.air_port_name:this.ticketData.to.city_name,
+            // from: this.ticketData.from_type ==='air'?this.ticketData.from.air_port_name:this.ticketData.from.city_name,
+            // departure:
+            //     this.ticketData.to_type === "air"
+            //     ? this.ticketData.to.air_port
+            //     : this.ticketData.to.city_code, // 起飞机场三字码
+            // arrival:
+            //     this.ticketData.from_type === "air"
+            //     ? this.ticketData.from.air_port
+            //     : this.ticketData.from.city_code, // 到达机场三字码
+        }
 
         // 组装航程信息
         this.flightData = {
 
-            flightType: this.changeDetail.ticket_segments.segment_type
-                ?Number(this.changeDetail.ticket_segments.segment_type) === 2
-                ?"去程"
-                :"返程"
-                :"单程",
+            flightType: (this.changeDetail.ticket_segments.length) === 2
+                ? Number(this.changeDetail.ticket_segments[1].segment_num) === 2
+                    ? "往返"
+                    : "单程"
+                : "单程",
+
+            // flightType: this.changeDetail.ticket_segments.segment_type
+            //     ?Number(this.changeDetail.ticket_segments.segment_type) === 2
+            //     ?"去程"
+            //     :"返程"
+            //     :"单程",
+
+                
             data: this.changeDetail.ticket_segments || [], // 单程信息
             cabinInfo: this.changeDetail.ticket_segments || [], //退票规则
         };

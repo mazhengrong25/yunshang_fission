@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-07 11:39:18
+ * @LastEditTime: 2020-12-07 17:03:15
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -352,7 +352,7 @@
               </view>
             </view>
 
-            <view class="price_info_list active">
+            <!-- <view class="price_info_list active">
               <view class="list_title">
                 <view class="title_name">所有乘客票面总价</view>
               </view>
@@ -381,7 +381,7 @@
                   <view class="item_message">&yen; {{ totalPrice.delay_price }}</view>
                 </view>
               </view>
-            </view>
+            </view> -->
           </scroll-view>
         </view>
       </view>
@@ -542,11 +542,18 @@ export default {
 
     // 组装航程信息  原航班
     this.flightOldData = {
-      flightType: this.changeDetailsData.ticket_order.ticket_segments[1].segment_num
-        ? Number(this.changeDetailsData.ticket_order.ticket_segments[1].segment_num) === 2
-          ? "往返"
-          : "单程"
-        : "",
+
+      flightType: (this.changeDetailsData.ticket_order.ticket_segments.length) === 2
+      ? Number(this.changeDetailsData.ticket_order.ticket_segments[1].segment_num) === 2
+        ? "往返"
+        : "单程"
+      : "单程",
+      
+      // flightType: this.changeDetailsData.ticket_order.ticket_segments[0].segment_num
+      //   ? Number(this.changeDetailsData.ticket_order.ticket_segments[0].segment_num) === 2
+      //     ? "往返"
+      //     : "单程"
+      //   : "",
       data: this.changeDetailsData.ticket_order.ticket_segments || [], // 单程信息
       cabinInfo: this.changeDetailsData.ticket_order.ticket_segments || [], //退票规则
     };
@@ -678,6 +685,7 @@ export default {
     position: relative;
     flex: 1;
     display: flex;
+    overflow: hidden;
     &::after {
       content: "";
       display: block;

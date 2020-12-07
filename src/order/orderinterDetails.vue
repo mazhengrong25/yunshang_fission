@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-03 15:24:07
+ * @LastEditTime: 2020-12-07 15:23:12
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -261,7 +261,7 @@
     <uni-popup ref="totalOrder" type="bottom">
       <view class="price_info">
         <view class="title">
-            改签费用
+            订单总价
           <view class="close_btn" @click="closeTotalOrder()"></view>
         </view>
         <view class="price_info_box">
