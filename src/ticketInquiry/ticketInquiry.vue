@@ -2,8 +2,8 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-10-20 10:24:20
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-12-07 11:57:26
+ * @LastEditors: Please set LastEditors
 --> 
 
 <template>
@@ -12,7 +12,7 @@
 
     <view class="ticket_header" v-if="!showDefaultType">
       <scroll-view scroll-x="true" class="ticket_time_list" :scroll-into-view="timeIndex">
-        <block v-for="(item, index) in ticketTimeList" :key="index">
+        <blticket_priceock v-for="(item, index) in ticketTimeList" :key="index">
           <view
             :id="item.id"
             :class="['ticket_time_btn',{'active': item.date === activeTimeNumber},{'is_before': !item.status}]"
@@ -21,7 +21,7 @@
             <view class="time_day">{{item.day}}</view>
             <view class="time_number">{{item.number}}</view>
           </view>
-        </block>
+        </blticket_priceock>
       </scroll-view>
       <view class="calendar_btn" @click="backCalendar">
         <image class="calendar_btn_icon" src="@/static/flight_time.png" mode="contain" />日历
@@ -88,7 +88,8 @@
             <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
-          <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view>
+          <!-- <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view> -->
+          <view class="ticket_cabin">{{item.first_cabin.cabinInfo.cabinDesc}}{{item.first_cabin.discount}}</view>
           <view class="ticket_low_price" v-if="item.lowPrice">最低价</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>

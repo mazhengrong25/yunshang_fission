@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-03 14:59:16
+ * @LastEditTime: 2020-12-07 11:39:18
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -166,7 +166,7 @@
 
                 <view class="list_item">
                   <view class="item_title">手机号</view>
-                  <view class="item_message">{{ item.ticket_passenger.phone }}</view>
+                  <view class="item_message">{{ item.ticket_passenger.phone || ''}}</view>
                 </view>
               </view>
             </view>
@@ -542,11 +542,11 @@ export default {
 
     // 组装航程信息  原航班
     this.flightOldData = {
-      flightType: this.changeDetailsData.ticket_order.ticket_segments.segment_num
-        ? Number(this.changeDetailsData.ticket_order.ticket_segments.segment_num) === 2
-          ? "去程"
-          : "返程"
-        : "单程",
+      flightType: this.changeDetailsData.ticket_order.ticket_segments[1].segment_num
+        ? Number(this.changeDetailsData.ticket_order.ticket_segments[1].segment_num) === 2
+          ? "往返"
+          : "单程"
+        : "",
       data: this.changeDetailsData.ticket_order.ticket_segments || [], // 单程信息
       cabinInfo: this.changeDetailsData.ticket_order.ticket_segments || [], //退票规则
     };

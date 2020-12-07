@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-27 10:39:07
- * @LastEditTime: 2020-12-02 16:18:41
+ * @LastEditTime: 2020-12-07 10:35:10
  * @LastEditors: Please set LastEditors
  * @Description: 历史改签航班
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeHistory.vue
@@ -135,11 +135,11 @@
                                         ? "其它证件"
                                         : ""
                                     }}</view>
-                                    <view class="item_message">{{item.ticket_passenger.CredentialNo}}</view>
+                                    <view class="item_message">{{item.ticket_passenger.CredentialNo || ''}}</view>
                                 </view>
                                 <view class="list_item">
                                     <view class="item_title">手机号</view>
-                                    <view class="item_message">{{item.ticket_passenger.phone}}</view>
+                                    <view class="item_message">{{item.ticket_passenger.phone || ''}}</view>
                                 </view>
                             </view>
                         </view>
@@ -268,12 +268,12 @@
                                         ? "其它证件"
                                         : ""
                                     }}</view>
-                                    <view class="item_message">{{item.ticket_passenger.CredentialNo}}</view>
+                                    <view class="item_message">{{item.ticket_passenger.CredentialNo || ''}}</view>
                                 </view>
 
                                 <view class="list_item">
                                     <view class="item_title">手机号</view>
-                                    <view class="item_message">{{item.ticket_passenger.phone}}</view>
+                                    <view class="item_message">{{item.ticket_passenger.phone || ''}}</view>
                                 </view>
                             </view>
                         </view>
