@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-04 11:42:48
- * @LastEditTime: 2020-12-04 15:12:22
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-07 11:38:37
+ * @LastEditors: wish.WuJunLong
  * @Description: 发送短信
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\pages\order\sendMessage.vue
 -->
@@ -25,6 +25,10 @@
                         </label>
                     </radio-group>
                 </view>
+            </view>
+            <view class="message_item" @click="openPasssengerDialog" v-if="radioValue === '2'">
+                <view class="message_title">乘机人</view>
+                <view class="message_action input-right-arrow">{{passenger}}</view>
             </view>
             <view class="message_item">
                 <view class="message_title">手机号</view>
@@ -52,6 +56,14 @@
             
             <button class="message_btn" @click="getSend()">立即发送</button>
 
+            <!-- 选择乘机人 -->
+            <flight-filter-dialog ref="passengerDialog" 
+            @ticketFilterData="submitpasseengerBtn"
+            :flightType="false" 
+            :checkboxGroup="messageData.passenger_phone"
+            keyTitle="PassengerName"
+            ></flight-filter-dialog>
+
             <!-- 选择模板 -->
             <flight-filter-dialog ref="filterDialog" 
             @ticketFilterData="submitTemplateBtn"
@@ -64,10 +76,10 @@
             <uni-popup ref="sendMessage" type="dialog">
                 <view class="message_box">
                     <view class="message_icon" v-if="message_true">
-                        <img src="@/static/message_right.png"></img>
+                        <img src="@/static/message_right.png" />
                     </view>
                     <view class="message_icon" v-if="!message_true">
-                        <img src="@/static/message_error.png"></img>
+                        <img src="@/static/message_error.png" />
                     </view>
                     <view class="message_send">{{message_msg}}</view>
                     <view class="message_bottom" @click="backPage">知道了</view>
@@ -104,6 +116,10 @@ export default {
         },
       ],
 
+      messageData : {}, // 发送短信数据
+
+      passenger: '', // 乘机人名称
+
       radioValue: "", //单选选择值
 
       //  选择模块选择
@@ -131,8 +147,13 @@ export default {
     },
     // 单选点击
     radioChange(e) {
-      console.log(e);
+      console.log(e.detail.value);
       this.radioValue = e.detail.value;
+      if(e.detail.value === '2'){
+          this.phone = ''
+      }else {
+        this.phone = this.messageData.ticketOrder.phone
+      }
     },
 
     //  打开弹窗
@@ -143,6 +164,18 @@ export default {
     // 关闭弹出框
     closeTemplateDialog() {
       this.$refs.filterDialog.closeFilterDialog();
+    },
+
+
+    // 打开乘机人选择框
+    openPasssengerDialog(){
+      this.$refs.passengerDialog.openFilterDialog();
+    },
+    // 选中乘机人
+    submitpasseengerBtn(val){
+      console.log(val)
+      this.passenger = val.PassengerName
+      this.phone = val.phone;
     },
 
     // 确认选择模块
@@ -157,8 +190,9 @@ export default {
     getTemplateList() {
       orderApi.sendMessageSelect(this.order_no).then((res) => {
         console.log(res);
+        this.messageData = res
         this.radioValue = res.user_type;
-        this.phone = res.passenger_phone[0].phone;
+        this.phone = res.ticketOrder.phone;
         this.isTimer = res.is_timer;
         this.typeGroup = res.modelList;
       });
@@ -226,7 +260,6 @@ export default {
   .message_content {
     height: 100%;
     background-color: rgba(255, 255, 255, 1);
-    padding-top: 40px;
     .message_item {
       display: flex;
       margin: 30px 10px;
