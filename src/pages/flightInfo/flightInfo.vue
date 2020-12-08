@@ -2,8 +2,8 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-12-07 14:17:01
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2020-12-08 10:59:38
+ * @LastEditors: Please set LastEditors
 --> 
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
@@ -812,6 +812,19 @@ export default {
                     "key",
                     res.data.keys
                   );
+                }
+
+                if(uni.getStorageSync('changeTicket')){
+                  uni.navigateTo({
+                  url:
+                    "/order/change?key=" +
+                    res.data.keys +
+                    "&price=" +
+                    res.data.price +
+                    "&changeData=" + uni.getStorageSync('changeTicket'),
+                });
+
+                 return 
                 }
 
                 // 单程验价

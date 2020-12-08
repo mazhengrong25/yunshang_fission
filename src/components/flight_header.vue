@@ -2,14 +2,19 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-11-20 11:56:23
+ * @LastEditTime: 2020-12-08 18:00:08
  * @LastEditors: Please set LastEditors
 --> 
 <template>
   <view class="fight_header">
     <view class="main_list_title" v-if="flightTitle === 'refund'">航班信息</view>
     <view class="main_list_title" v-if="flightTitle === 'change'">原航班</view>
-    <view class="main_list_title" v-if="flightTitle === 'new'">新航班</view>
+    <view class="main_list_title" v-if="flightTitle === 'detail_new'">新航班</view>
+    <!-- 改签后的新航班 -->
+    <view class="main_list_title change_new_ticket" v-if="flightTitle === 'new'">
+      <view>新航班</view>
+      <view class="ticket_btn" @click="newTicket">重选航班</view>
+    </view>
     <view class="fight_list">
       <view class="header_message">
         <view :class="['header_type', {'round_trip_type': flightData.flightType === '返程'}]">{{flightData.flightType}}</view>
@@ -254,7 +259,7 @@ export default {
       default: () => true,
     },
     interType: {
-      // type false 国内订单详情
+      // true false 国内订单详情
       type: Boolean,
       default: () => true,
     },
@@ -287,9 +292,7 @@ export default {
     this.$forceUpdate()
     console.log('航班信息头部',this.flightData,this.roundTripFlightData)
   },
-  onLoad(){
-    this.console.log(this.flightTitle)
-  },
+  
   methods: {
     openHeadExp(val) {
       // 打开航班详情弹窗
@@ -300,6 +303,11 @@ export default {
     flodBtn() {
       // 往返中转折叠航班详情
       this.filghtFold = !this.filghtFold;
+    },
+
+    // 改签页面 - 重选航班
+    newTicket(){
+      this.$emit('changeNewTicket')
     },
   },
 };
@@ -322,6 +330,16 @@ export default {
         // padding-top: 24rpx;
         flex: 1;
         justify-content: flex-end;
+        &.change_new_ticket{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .ticket_btn{
+            font-size: 28upx;
+            font-weight: 400;
+            color: #0070E2;
+          }
+        }
   }
   .fight_list {
     // &:nth-child(2) {

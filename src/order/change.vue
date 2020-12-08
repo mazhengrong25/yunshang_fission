@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-12-07 18:26:02
+ * @LastEditTime: 2020-12-08 18:19:45
  * @LastEditors: Please set LastEditors
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -17,6 +17,9 @@
             @voluntary="volRadio" 
             @cause="causeSel"
             @change="typeRadio" 
+            :valueType="valueType"
+            :volunType='radioValue'
+            :changeReason='cause'
             topStatus="change"
             
             ></refundTop>
@@ -71,29 +74,36 @@
                 <view></view>
             </view>
 
+            <flight-header
+                v-if="flightNewData.data.length > 0"
+                :flightData="flightNewData"
+                :interType="true"
+                flightTitle="new"
+                @changeNewTicket="queryFlightData"
+            ></flight-header>
             <!-- 新航班 -->
-            <view class="main_list newflight">
+            <view class="main_list newflight" v-else>
                 <view class=main_list_first>
                     <view class="main_list_title">新航班</view>   
                 </view>
-
                 <view class="flight_list">
                     <view class="list_item">
                         <view class="list_info">
                             <view class="list_connect"
-                            @click="openDataSelect()">
+                            @click.stop="openDataSelect()">
                                 <view class="info_type">
                                     <image class="info_img" src="@/static/from_time.png" mode="aspectFill" />
                                 </view>
-                                <view v-if="changeDate" class="info_name_not">{{ changeDate }}</view>
+                                <view v-if="changeDate" class="info_name_not">{{ changeDate.date }}</view>
                                 <view v-else class="info_name">改签日期</view>
                             </view>
-                            <view class="info_query">搜索航班</view>
+                            <view class="info_query" @click.stop="queryFlightData()">搜索航班</view>
                         </view>
                     </view>
                 </view>
-
             </view>
+
+            
 
             <!-- 订单信息 -->
             <view class="main_list order_message">
@@ -157,9 +167,12 @@
 
 <script>
 import orderApi from "@/api/order.js";
+import ticket from "@/api/ticketInquiry.js";
 import { parse } from 'querystring';
 import refundTop from "@/components/refund_top.vue"; //改签信息
 import flightHeader from "@/components/flight_header.vue"; // 航程信息
+import moment from "moment";
+moment.locale("zh-cn");
 export default {
 
     components: {
@@ -188,17 +201,26 @@ export default {
 
             cause:"", //改签原因
 
-            flightData:{},
+            flightData:{}, //原航班
+            flightNewData:{}, //新航班
 
             changeDate:'', //改签日期
 
-            ticketAddress: {
-                // 导航栏地址
-                to: "",
-                from: "",
-                departure: "", // 起飞机场三字码
-                arrival: "",
+            // 航班信息
+            flightMessage: {
+                to: {
+                    city_code: "CKG",
+                    city_name: "重庆",
+                    province: "重庆",
+                },
+                from: {
+                    city_code: "CKG",
+                    city_name: "重庆",
+                    province: "重庆",
+                }
             },
+
+            changeTicketAddress: [], // 改签航班信息
         }
     },
 
@@ -207,8 +229,8 @@ export default {
         // 单选框 是否自愿
         volRadio(val) {
 
-            this.radioValue = val
-            console.log('改签是否自愿',this.radioValue)
+            this.radioValue = val 
+            console.log('改签是否自愿',typeof(this.radioValue))
         },
 
         // 单选框  改签类型
@@ -267,30 +289,48 @@ export default {
                 });
             } 
 
-            if((String(this.radioValue) === '2' && !this.cause) || !this.changeRemark) {
+            // if(!this.cause || !this.changeRemark) {
 
-                return uni.showToast({
-                title: (String(this.radioValue) === '2' && !this.cause)?"请选择改签理由":!this.changeRemark?"请输入备注信息":"请完善改签信息",
-                icon: "none",
-                });
+            //     return uni.showToast({
+            //     title: (this.radioValue === '2' && !this.cause)?"请选择改签理由":!this.changeRemark?"请输入备注信息":"请完善改签信息",
+            //     icon: "none",
+            //     });
+            // }
+            let params  = {
+                "change_type":this.valueType,      
+                "reason": this.cause,               
+                "contact": this.changeDetail.contact,             
+                "phone":this.changeDetail.phone,          
+                "order_no":this.changeDetail.order_no
             }
-
-            let data = {
+            let segments = {
+                "flight_data":this.checkedPassengerlist[0].depTime,                //类型：String  必有字段  备注：起飞日期
+                "departure":this.checkedPassengerlist[0].depAirport,                //类型：String  必有字段  备注：起飞机场
+                "arrival":this.checkedPassengerlist[0].arrAirport,                //类型：String  必有字段  备注：到达机场
+                "flight_no":this.checkedPassengerlist[0].flightNumber,                //类型：String  必有字段  备注：航班号
+                "time":this.checkedPassengerlist[0].departureTime,                //类型：String  必有字段  备注：起飞时间
+                "model":Number(this.checkedPassengerlist[0].aircraftCode),                //类型：String  必有字段  备注：机型
+                "cabin":this.checkedPassengerlist[0].cabin,                //类型：String  必有字段  备注：舱位
+                "price":2000,                //类型：Number  必有字段  备注：票价
+                "arr_time":this.checkedPassengerlist[0].arrTime,                //类型：String  必有字段  备注：到达时间
+                "policy_id":"293",                //类型：String  必有字段  备注：政策ID
+                "flight_time":this.checkedPassengerlist[0].duration,                //类型：String  必有字段  备注：飞行时间
+                "departure_term":this.checkedPassengerlist[0].depTerminal,                //类型：String  必有字段  备注：出发航站楼
+                "arrival_term":this.checkedPassengerlist[0].arrTerminal,                //类型：String  必有字段  备注：到达航站楼
+                "cabin_level_key":"超级经济舱",                //类型：String  必有字段  备注：舱位等级
+                "keys":"",                //类型：String  必有字段  备注：无
+                "old_segment_id":this.changeDetail.ticket_segments[0].id               //类型：Number  必有字段  备注：旧航段ID
+            }
+            let data = {    
                 params: params,
-                passenger_ids: passenger_ids,
-                segments: segments
+                passenger_ids: this.checkedPassengerlist,
+                segments: [segments]
             }
-
-
             orderApi.changeSubmit(data).then((res => {
-
-                
                 this.message_true = res.status === '1';
                 this.message_msg = res.msg;
                 this.open();
                 console.log(res)
-
-                
             }))
 
 
@@ -315,6 +355,62 @@ export default {
                 uni.navigateBack();
             }
         },
+
+        // 搜索航班点击
+        queryFlightData() {
+            if(this.changeDate) {
+
+                console.log('搜索提交',JSON.stringify(this.flightMessage))
+                let newData = {
+                    time: this.changeDate, // 改签日期
+                    changeType: this.valueType,  // 改签类型
+                    changeStatus: this.radioValue,  // 是否自愿
+                    changeCause: this.cause, // 改签原因
+                    passengerList: this.checkedPassengerlist
+                }
+                this.flightMessage['toTime'] = this.changeDate
+                uni.setStorageSync('changeMessage', JSON.stringify(newData))
+                uni.setStorageSync('changeTicket', JSON.stringify(this.changeDetail))
+                uni.navigateTo({
+                    url: '/ticketInquiry/ticketInquiry?data=' + JSON.stringify(this.flightMessage),
+                });
+
+
+            }else if(!this.changeDate) {
+                uni.showToast({
+    
+                    title: "请先选择改签日期",
+                    icon: "none",
+                    duration: 3000,
+                })
+            }
+           
+        },
+
+        // 获取新航班信息
+        getNewAddress(key,price){
+            let newData = {
+                price: price,
+            };
+            ticket.getTicketInfo(key, newData)
+            .then((res) => {
+                console.log(res)
+                if(res.errorcode === 10000){
+                    
+                    this.changeTicketAddress =res.data.segments
+                    // 组装新航班信息
+                    this.flightNewData = {
+                        
+                        flightType:'单程',
+                        data: res.data.segments, //单程信息
+                    }
+
+                } 
+
+                console.log('新航班',this.changeTicketAddress)
+            })
+        },
+
     },
 
     onShow(){
@@ -329,32 +425,53 @@ export default {
         if (uni.getStorageSync("time")) {
             let timeData = JSON.parse(uni.getStorageSync("time"));
             console.log("时间", timeData);
-            this.changeDate = timeData.date
+            this.changeDate = timeData
             this.$forceUpdate();
             console.log("时间返回", this.changeDate);
-            uni.removeStorageSync("time");
+            uni.removeStorageSync("time")
         }
+    
     },
 
     onLoad(data){
-
+        console.log(data)
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
         this.changeDetail = JSON.parse(data.changeData)
+        if(data.key){
+            let changeMessage = JSON.parse(uni.getStorageSync('changeMessage'))
+            
+            // 组装改签页面原始信息
+            this.changeDate = changeMessage.time
+                this.valueType = changeMessage.changeType
+                this.radioValue  = changeMessage.changeStatus
+                this.cause  = changeMessage.changeCause
+            
+            this.checkedPassengerlist = changeMessage.passengerList
+            // 组装选中乘机人列表状态
+            this.changeDetail.ticket_passenger.forEach(item =>{
+                changeMessage.passengerList.forEach(oitem =>{
+                    item.active = item.id === oitem
+                })
+            })
+
+            this.getNewAddress(data.key,data.price)
+            
+        }
         console.log('改签',this.changeDetail)
 
         // 组装 搜索航班信息
-        this.ticketAddress = {
+        this.flightMessage = {
 
-            //  to: this.ticketData.to_type ==='air'?this.ticketData.to.air_port_name:this.ticketData.to.city_name,
-            // from: this.ticketData.from_type ==='air'?this.ticketData.from.air_port_name:this.ticketData.from.city_name,
-            // departure:
-            //     this.ticketData.to_type === "air"
-            //     ? this.ticketData.to.air_port
-            //     : this.ticketData.to.city_code, // 起飞机场三字码
-            // arrival:
-            //     this.ticketData.from_type === "air"
-            //     ? this.ticketData.from.air_port
-            //     : this.ticketData.from.city_code, // 到达机场三字码
+            from: {
+                city_code: this.changeDetail.ticket_segments[0].arrive_CN.city_code,
+                city_name:  this.changeDetail.ticket_segments[0].arrive_CN.city_name,
+                province: this.changeDetail.ticket_segments[0].arrive_CN.province,
+            },
+            to: {
+                city_code: this.changeDetail.ticket_segments[0].departure_CN.city_code,
+                city_name: this.changeDetail.ticket_segments[0].departure_CN.city_name,
+                province: this.changeDetail.ticket_segments[0].departure_CN.province,
+            },
         }
 
         // 组装航程信息
@@ -376,6 +493,7 @@ export default {
             data: this.changeDetail.ticket_segments || [], // 单程信息
             cabinInfo: this.changeDetail.ticket_segments || [], //退票规则
         };
+
     }
     
 }
@@ -866,6 +984,44 @@ export default {
             }
         }
     }
+}
+
+.refund_message_box {
+  width: 540upx;
+  background: #ffffff;
+  border-radius: 20upx;
+  display: flex;
+  flex-direction: column;
+  padding-top: 40upx;
+  .refund_message_icon {
+    width: 90upx;
+    height: 90upx;
+    margin: 0 auto;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+  .refund_message_send {
+    margin-top: 22upx;
+    text-align: center;
+    font-size: 24upx;
+    font-weight: 400;
+    color: #0070e2;
+    padding: 0 60rpx;
+  }
+  .refund_message_bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90upx;
+    border-top: 2upx solid #eaeaea;
+    margin-top: 40upx;
+    font-size: 28upx;
+    font-weight: 400;
+    color: #333333;
+  }
 }
 
 </style>

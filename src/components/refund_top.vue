@@ -110,6 +110,19 @@ export default {
     topStatus: {  //区别退票和改签
       type: String,
       default: () => ''
+    },
+    valueType: {  // 改签类型默认值
+      type: String,
+      default:() => ''
+    },
+    volunType: { // 改签是否自愿默认值
+      type: String,
+      default:() => ''
+    },
+    changeReason:{ // 改签原因
+      type: String,
+      default:() => ''
+
     }
   },
   data() {
@@ -148,7 +161,7 @@ export default {
       radioValue: '1', //单选选择值
       radio_value:'', // 改签选择值
 
-      // 理由   之前是{} 出现bug
+      // 理由 
       group: "",
       changeGroup: "", // 原因
 
@@ -224,6 +237,26 @@ export default {
       console.log('原因',e)
       this.changeGroup = e;
       this.$emit('cause',this.changeGroup)
+    }
+  },
+  mounted(){
+    console.log('组件状态',this.valueType,this.volunType,this.changeReason)
+    // 改签类型
+    if(this.valueType){
+      this.changeType.forEach(item =>{
+        item.checked = this.valueType === String(item.key)
+      })
+    }
+    // 是否自愿
+    if(this.volunType){
+      this.radioItems.forEach(item =>{
+        item.checked = this.volunType === String(item.key)
+      })
+      this.radioValue = this.volunType;
+    }
+    // 改签原因
+    if(this.changeReason){
+      this.changeGroup = this.changeReason
     }
   },
 };

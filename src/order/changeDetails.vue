@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-07 17:03:15
+ * @LastEditTime: 2020-12-08 17:59:58
  * @LastEditors: Please set LastEditors
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -191,7 +191,7 @@
           :roundTripFlightData="roundTripFlightData"
           :roundTripType="roundTripType"
           :interType="false"
-          flightTitle="new"
+          flightTitle="detail_new"
         ></flight-header>
 
         <view v-else class="not_flight_data">
