@@ -2,15 +2,12 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-11-25 16:25:30
+ * @LastEditTime: 2020-12-07 16:20:55
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_pay">
-    <yun-header
-      :statusHeight="iStatusBarHeight"
-      centerTitle="确认支付"
-    ></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="确认支付"></yun-header>
     <view class="order_price">
       <text>订单总价</text>
       <view>
@@ -19,11 +16,7 @@
       </view>
     </view>
 
-    <scroll-view
-      :enable-back-to-top="true"
-      :scroll-y="true"
-      class="order_pay_main"
-    >
+    <scroll-view :enable-back-to-top="true" :scroll-y="true" class="order_pay_main">
       <flight-header
         v-if="JSON.stringify(payData) !== '{}'"
         :flightData="flightData"
@@ -33,31 +26,27 @@
       ></flight-header>
 
       <view v-else class="not_flight_data">
-          <text></text>
-          <text></text>
-          <view></view>
+        <text></text>
+        <text></text>
+        <view></view>
       </view>
 
       <view class="order_message box-shadow-style" style="margin-bottom: 20rpx">
         <view class="message_list" v-for="(item, index) in passengerList" :key="index">
           <view>
             <text class="list_title">乘客：</text>
-            <text class="list_text">{{item.PassengerName}}</text>
+            <text class="list_text">{{ item.PassengerName }}</text>
           </view>
           <view>
             <text class="list_title">证件号：</text>
-            <text class="list_text">{{item.CredentialNo}}</text>
+            <text class="list_text">{{ item.CredentialNo }}</text>
           </view>
           <!-- <view class="list_text">{{item.CredentialNo}}</view> -->
         </view>
       </view>
 
       <view class="order_message box-shadow-style">
-        <view
-          class="message_list"
-          v-for="(item, index) in payOrder"
-          :key="index"
-        >
+        <view class="message_list" v-for="(item, index) in payOrder" :key="index">
           <view class="list_title"
             >{{
               payOrder.length > 1 && index === 0
@@ -105,9 +94,7 @@
           :disabled="!payPayStatus"
           @click="jumpPay()"
         >
-          {{
-            payOrder.length > 1 ? "成人支付 &yen;" + priceList[0] : "立即支付"
-          }}
+          {{ payOrder.length > 1 ? "成人支付 &yen;" + priceList[0] : "立即支付" }}
         </button>
         <button
           v-if="payOrder.length > 1"
@@ -185,7 +172,7 @@ export default {
       payPayStatus: true,
       childPayStatus: false, // 儿童票支付状态
 
-      headerType: true,  // 航班信息状态
+      headerType: true, // 航班信息状态
 
       passengerList: [], //乘客信息
     };
@@ -215,13 +202,13 @@ export default {
               this.orderCountdown();
             }, 1000);
           } else {
-             this.payBtnStatus = false;
-              this.payPayStatus = false;
+            this.payBtnStatus = false;
+            this.payPayStatus = false;
             uni.showToast({
               title: res.data,
               icon: "none",
               mask: true,
-              duration: 4000
+              duration: 4000,
             });
             setTimeout(() => {
               uni.navigateBack();
@@ -277,108 +264,106 @@ export default {
     // 立即支付按钮
     jumpPay(type) {
       if (this.payBtnStatus) {
-
         uni.showModal({
-          title: '提示',
-          content: '请确定是否支付当前订单',
+          title: "提示",
+          content: "请确定是否支付当前订单",
           success: (res) => {
-              if (res.confirm) {
-                  
-let data = {
-          pay_type: this.payType === "钱包" ? 1 : "",
-        };
-        let payType = type === "儿童" ? 1 : 0;
-        ticket
-          .payOrder(
-            uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])),
-            data
-          )
-          .then((res) => {
-            if (res.errorcode === 10000) {
-              if (this.payOrder.length > 1) {
-                // 携带儿童订单
-                if (payType === 1) {
-                  this.childPayStatus = true;
-                } else {
-                  this.payPayStatus = false;
-                }
-                if (this.childPayStatus && !this.payPayStatus) {
-                  console.log("成人儿童支付成功");
-                  let orderInfo = {
-                    payId: this.payOrder,
-                    payType: this.payType,
-                    price: this.price,
-                    payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-                  };
-                  uni.reLaunch({
-                    url:
-                      "/flightReservation/payResult?orderData=" +
-                      JSON.stringify(orderInfo),
-                  });
-                }
-                uni.showToast({
-                  title: "支付成功",
-                  icon: "none",
-                  mask: true,
+            if (res.confirm) {
+              let data = {
+                pay_type: this.payType === "钱包" ? 1 : "",
+              };
+              let payType = type === "儿童" ? 1 : 0;
+              ticket
+                .payOrder(
+                  uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])),
+                  data
+                )
+                .then((res) => {
+                  if (res.errorcode === 10000) {
+                    if (this.payOrder.length > 1) {
+                      // 携带儿童订单
+                      if (payType === 1) {
+                        this.childPayStatus = true;
+                      } else {
+                        this.payPayStatus = false;
+                      }
+                      if (this.childPayStatus && !this.payPayStatus) {
+                        console.log("成人儿童支付成功");
+                        let orderInfo = {
+                          payId: this.payOrder,
+                          payType: this.payType,
+                          price: this.price,
+                          payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                        };
+                        uni.reLaunch({
+                          url:
+                            "/flightReservation/payResult?orderData=" +
+                            JSON.stringify(orderInfo),
+                        });
+                      }
+                      uni.showToast({
+                        title: "支付成功",
+                        icon: "none",
+                        mask: true,
+                      });
+                    } else {
+                      // 单个成人订单
+                      this.payPayStatus = false;
+                      let orderInfo = {
+                        payId: this.payOrder,
+                        payType: this.payType,
+                        price: this.price,
+                        payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                      };
+                      uni.reLaunch({
+                        url:
+                          "/flightReservation/payResult?orderData=" +
+                          JSON.stringify(orderInfo),
+                      });
+                    }
+                  } else {
+                    if (payType === 1) {
+                      this.childPayStatus = false;
+                    } else {
+                      this.payPayStatus = false;
+                      this.payBtnStatus = false;
+                    }
+                    uni.showToast({
+                      title: res.data,
+                      icon: "none",
+                      duration: 4000,
+                    });
+                  }
                 });
-              } else {
-                // 单个成人订单
-                this.payPayStatus = false;
-                let orderInfo = {
-                  payId: this.payOrder,
-                  payType: this.payType,
-                  price: this.price,
-                  payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-                };
-                uni.reLaunch({
-                  url:
-                    "/flightReservation/payResult?orderData=" +
-                    JSON.stringify(orderInfo),
-                });
-              }
-            } else {
-              if (payType === 1) {
-                this.childPayStatus = false;
-              } else {
-                this.payPayStatus = false;
-                this.payBtnStatus = false;
-              }
-              uni.showToast({
-                title: res.data,
-                icon: "none",
-                duration: 4000
-              });
             }
-          });
-
-              } 
-          }
-      });
-
-
-        
-
-
-
+          },
+        });
       }
     },
   },
   onLoad(data) {
     console.log(data);
-    console.log('确认支付',data)
+    console.log("确认支付", data);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.payOrder = JSON.parse(data.orderId);
     this.flightData = JSON.parse(data.flightData);
     this.price = data.price;
     this.priceList = JSON.parse(data.priceList);
-    
+
     this.orderType = JSON.parse(data.type);
-    this.passengerList = data.passMessage?JSON.parse(data.passMessage):[];
-    if(data.headerType){
-      this.headerType = false
+    this.passengerList = data.passMessage ? JSON.parse(data.passMessage) : [];
+    if (data.headerType) {
+      this.headerType = false;
     }
 
-    console.log('航班信息',this.flightData,'航班头部状态',this.headerType,'乘客信息',this.passengerList);
+    console.log(
+      "航班信息",
+      this.flightData,
+      "航班头部状态",
+      this.headerType,
+      "乘客信息",
+      this.passengerList
+    );
 
     if (this.orderType) {
       this.flightRoundData = JSON.parse(data.flightRoundData);
@@ -418,7 +403,7 @@ let data = {
     }
   }
   .price_other {
-        color: rgba(255, 255, 255, 1)
+    color: rgba(255, 255, 255, 1);
   }
   .order_pay_main {
     position: relative;
@@ -439,52 +424,52 @@ let data = {
     }
   }
 
-    .not_flight_data {
-      border-radius: 20rpx;
-      background: #ffffff;
-      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
-      padding: 30rpx 20rpx 22rpx;
-      margin: 0 20rpx 20rpx;
-      height: 144upx;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      &::before {
-        content: "";
-        display: block;
-        width: 44upx;
-        height: 200%;
-        position: absolute;
-        top: -30%;
-        transform: rotate(30deg);
-        background: #fff;
+  .not_flight_data {
+    border-radius: 20rpx;
+    background: #ffffff;
+    box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+    padding: 30rpx 20rpx 22rpx;
+    margin: 0 20rpx 20rpx;
+    height: 144upx;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    &::before {
+      content: "";
+      display: block;
+      width: 44upx;
+      height: 200%;
+      position: absolute;
+      top: -30%;
+      transform: rotate(30deg);
+      background: #fff;
+      left: -30%;
+      animation: skeleton 3s infinite;
+      -webkit-animation: skeleton 3s infinite;
+    }
+    @keyframes skeleton {
+      from {
         left: -30%;
-        animation: skeleton 3s infinite;
-        -webkit-animation: skeleton 3s infinite;
       }
-      @keyframes skeleton {
-        from {
-          left: -30%;
-        }
-        to {
-          left: 120%;
-        }
-      }
-      text {
-        display: block;
-        width: 80%;
-        height: 28upx;
-        background: #e5e9f2;
-        margin-bottom: 10upx;
-      }
-      view {
-        width: 80%;
-        height: 40upx;
-        margin: auto auto 0;
-        background: #e5e9f2;
+      to {
+        left: 120%;
       }
     }
+    text {
+      display: block;
+      width: 80%;
+      height: 28upx;
+      background: #e5e9f2;
+      margin-bottom: 10upx;
+    }
+    view {
+      width: 80%;
+      height: 40upx;
+      margin: auto auto 0;
+      background: #e5e9f2;
+    }
+  }
   .order_message {
     .message_list {
       display: flex;

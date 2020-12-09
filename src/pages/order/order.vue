@@ -71,11 +71,11 @@ export default {
 
     //跳转到国内改签订单
     goChangeList() {
-      // return uni.showToast({
-      //   title: "当前功能开发中，请等待后续版本更新",
-      //   duration: 3000,
-      //   icon: "none",
-      // });
+      return uni.showToast({
+        title: "当前功能开发中，请等待后续版本更新",
+        duration: 3000,
+        icon: "none",
+      });
       uni.navigateTo({
         url: "/order/changeList",
       });

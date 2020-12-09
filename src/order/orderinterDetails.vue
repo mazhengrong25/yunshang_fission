@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-07 14:25:27
+ * @LastEditTime: 2020-12-09 17:06:02
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -845,6 +845,7 @@ export default {
     position: relative;
     flex: 1;
     display: flex;
+    overflow: hidden;
     &::after {
       content: "";
       display: block;
