@@ -2,7 +2,7 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-24 14:01:57
+ * @LastEditTime: 2020-12-09 10:48:03
  * @LastEditors: Please set LastEditors
 -->
 <template>
@@ -165,10 +165,10 @@
       <uni-popup ref="refundMessage" type="dialog" :maskClick="false">
         <view class="refund_message_box">
           <view class="refund_message_icon" v-if="message_true">
-            <img src="@/static/message_error.png" />
+            <img src="@/static/message_right.png" />
           </view>
           <view class="refund_message_icon" v-else>
-            <img src="@/static/message_right.png" />
+            <img src="@/static/message_error.png" />
           </view>
           <view class="refund_message_send">{{ message_msg }}</view>
           <view class="refund_message_bottom" @click="backPage">知道了</view>

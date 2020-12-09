@@ -1,7 +1,5 @@
 <template>
-  <view class="refund_top">
-      
-     
+  <view class="refund_top"> 
     <!-- 改签 -->
     <view v-if="topStatus === 'change'">
       <view class="top_message">改签信息</view>
@@ -122,7 +120,6 @@ export default {
     changeReason:{ // 改签原因
       type: String,
       default:() => ''
-
     }
   },
   data() {
@@ -155,9 +152,6 @@ export default {
           
         }
       ],
-
-      
-
       radioValue: '1', //单选选择值
       radio_value:'', // 改签选择值
 

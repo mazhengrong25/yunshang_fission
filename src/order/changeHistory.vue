@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-27 10:39:07
- * @LastEditTime: 2020-12-07 15:58:30
+ * @LastEditTime: 2020-12-09 12:10:15
  * @LastEditors: Please set LastEditors
  * @Description: 历史改签航班
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeHistory.vue
@@ -691,8 +691,7 @@ export default {
 
                     .list_info {
                         display: flex;
-                        align-items: flex-start;
-
+                        align-items: baseline;
                         .group_message{
                             margin-left: 28upx;
                             .message_show{
@@ -701,11 +700,6 @@ export default {
                                 width: 100%;
                             }
                         }
-
-
-
-
-
                         .info_type {
                         width: 100upx;
                         height: 30upx;
@@ -733,11 +727,11 @@ export default {
                         margin-right: 8upx;
                         display: flex;
                         flex-shrink: 0;
-                        image {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                        }
+                            image {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
                         }
                         .group_info {
                         display: inline-flex;
