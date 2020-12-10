@@ -2,7 +2,7 @@
  * @Description: 流水详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 13:48:46
- * @LastEditTime: 2020-09-21 17:15:43
+ * @LastEditTime: 2020-12-10 11:48:25
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -101,7 +101,7 @@
               ? "+"
               : walletData.before_balance >
                 walletData.after_balance
-              ? "-"
+              ? ""
               : ""
           }}
           {{ Number(walletData.amount).toFixed(2) }}

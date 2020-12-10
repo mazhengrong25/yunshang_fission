@@ -2,12 +2,12 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-12-07 16:20:55
+ * @LastEditTime: 2020-12-10 14:57:58
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_pay">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="确认支付"></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="确认支付" :showHome="true"></yun-header>
     <view class="order_price">
       <text>订单总价</text>
       <view>

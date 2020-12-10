@@ -2,7 +2,7 @@
  * @Description: 钱包流水
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 17:22:34
- * @LastEditTime: 2020-10-30 14:51:02
+ * @LastEditTime: 2020-12-10 11:48:04
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -151,7 +151,7 @@
                     ? "+"
                     : item.before_balance >
                       item.after_balance
-                    ? "-"
+                    ? ""
                     : ""
                 }}
                 {{ Number(item.amount).toFixed(2) }}

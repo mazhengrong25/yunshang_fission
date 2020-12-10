@@ -2,9 +2,9 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-11-04 14:35:44
- * @LastEditors: Please set LastEditors
---> 
+ * @LastEditTime: 2020-12-10 14:57:20
+ * @LastEditors: wish.WuJunLong
+-->
 <template>
   <view
     :class="['yun_header', { white: headerColor }]"
@@ -13,18 +13,19 @@
       marginBottom: headerBottom + 'px',
     }"
   >
-    <view v-if="showReturn" class="go_back" @click="goBack"></view>
+    <view v-if="showReturn" class="back_box">
+      <view class="go_back" @click="goBack"></view>
+      <view v-if="showHome" class="go_home" @click="goHome"></view>
+    </view>
     <view class="center_title" v-if="centerTitle">{{ centerTitle }}</view>
     <view class="title" v-else>
       <view class="title_left">
         {{
           headerAddress.to_type === "air"
             ? headerAddress.to.air_port_name
-            : headerAddress.to_type === "hot" &&
-              headerAddress.to.city_name === "上海"
+            : headerAddress.to_type === "hot" && headerAddress.to.city_name === "上海"
             ? headerAddress.to.city_name + headerAddress.to.air_port_name
-            : headerAddress.to_type === "hot" &&
-              headerAddress.to.city_name === "北京"
+            : headerAddress.to_type === "hot" && headerAddress.to.city_name === "北京"
             ? headerAddress.to.city_name + "首都"
             : headerAddress.to.city_name
         }}
@@ -35,11 +36,9 @@
         {{
           headerAddress.from_type === "air"
             ? headerAddress.from.air_port_name
-            : headerAddress.from_type === "hot" &&
-              headerAddress.from.city_name === "上海"
+            : headerAddress.from_type === "hot" && headerAddress.from.city_name === "上海"
             ? headerAddress.from.city_name + headerAddress.from.air_port_name
-            : headerAddress.from_type === "hot" &&
-              headerAddress.from.city_name === "北京"
+            : headerAddress.from_type === "hot" && headerAddress.from.city_name === "北京"
             ? headerAddress.from.city_name + "首都"
             : headerAddress.from.city_name
         }}
@@ -84,6 +83,11 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    showHome: {
+      // 返回主页按钮
+      type: Boolean,
+      default: () => false,
+    },
   },
   data() {
     return {
@@ -102,6 +106,20 @@ export default {
         uni.navigateBack();
       }
     },
+    // 返回主页
+    goHome() {
+      uni.showModal({
+        title: "提示",
+        content: "是否离开当前页面返回主页？",
+        success: function(res) {
+          if (res.confirm) {
+            uni.switchTab({
+              url: "/pages/index/index",
+            });
+          }
+        },
+      });
+    },
   },
   mounted() {},
 };
@@ -118,24 +136,37 @@ export default {
   z-index: 999;
   &.white {
     background: #fff;
-    .go_back {
-      background: url(@/static/go_back_white.png) no-repeat center center;
-      background-size: 23upx 31upx;
+    .back_box {
+      .go_back {
+        background: url(@/static/go_back_white.png) no-repeat center center;
+        background-size: 23upx 31upx;
+      }
     }
     .title,
     .center_title {
       color: #000;
     }
   }
-
-  .go_back {
-    background: url(@/static/go_back.png) no-repeat center center;
-    background-size: 23upx 31upx;
-    width: 50upx;
-    height: 50upx;
+  .back_box {
+    display: inline-flex;
+    align-items: center;
     position: absolute;
     left: 20upx;
+    .go_back {
+      background: url(@/static/go_back.png) no-repeat center center;
+      background-size: 23upx 31upx;
+      width: 50upx;
+      height: 50upx;
+    }
+    .go_home {
+      background: url(@/static/back_home.png) no-repeat center center;
+      background-size: 35rpx 35rpx;
+      width: 50rpx;
+      height: 50rpx;
+      margin-left: 30rpx;
+    }
   }
+
   .center_title {
     display: flex;
     align-items: center;
@@ -162,8 +193,7 @@ export default {
       height: 20upx;
       margin: 0 25upx;
       &.roundTripIcon {
-        background: url(@/static/ticket_header_roundTripIcon.png) no-repeat
-          center center;
+        background: url(@/static/ticket_header_roundTripIcon.png) no-repeat center center;
         background-size: contain;
       }
     }

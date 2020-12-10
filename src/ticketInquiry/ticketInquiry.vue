@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-12-08 18:31:47
+ * @LastEditTime: 2020-12-10 10:50:11
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -89,7 +89,7 @@
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
           <!-- <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view> -->
-          <!-- <view class="ticket_cabin">{{item.first_cabin.cabinInfo.cabinDesc}}{{item.first_cabin.discount}}</view> -->
+          <view class="ticket_cabin">{{item.first_cabin.cabinInfo.cabinDesc}}{{item.first_cabin.discount}}</view>
           <view class="ticket_low_price" v-if="item.lowPrice">最低价</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>

@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-09 17:59:25
+ * @LastEditTime: 2020-12-10 14:57:42
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -140,6 +140,7 @@
               class="list_item"
               v-for="(item, index) in orderDetails.ticket_passenger"
               :key="index"
+              @click="clipboardBtn(item)"
             >
               <view class="list_info">
                 <view class="info_type"
@@ -261,7 +262,7 @@
     <uni-popup ref="totalOrder" type="bottom">
       <view class="price_info">
         <view class="title">
-            订单总价
+          订单总价
           <view class="close_btn" @click="closeTotalOrder()"></view>
         </view>
         <view class="price_info_box">
@@ -492,7 +493,7 @@ export default {
 
     //取消订单弹窗 确认取消
     getSubmit(type) {
-      this.listCancelType = ""
+      this.listCancelType = "";
       console.log(type);
       let data = {
         order_no: this.orderId,
@@ -507,6 +508,26 @@ export default {
             icon: "none",
           });
         }
+      });
+    },
+
+    // 复制乘客信息至剪贴板
+    clipboardBtn(val) {
+      let clipboardMessage =
+        val.PassengerName + " 证件号：" + val.CredentialNo + " 票号：" + val.ticket_no;
+
+      console.log(clipboardMessage);
+      uni.setClipboardData({
+        data: clipboardMessage,
+        success: function() {
+          uni.getClipboardData({
+            success: function(res) {
+              uni.showToast({
+                title: "已复制到剪贴板",
+              });
+            },
+          });
+        },
       });
     },
 
@@ -609,7 +630,7 @@ export default {
       orderApi.orderDetails(data).then((res) => {
         if (res.result === 10000) {
           this.orderDetails = res.data;
-          console.log('订单详情',this.orderDetails)
+          console.log("订单详情", this.orderDetails);
           if (JSON.stringify(this.orderDetails) === "{}") {
             this.skeletonNumber = 0;
           }
@@ -671,7 +692,7 @@ export default {
 
     // 跳转改签
     getChange() {
-      // return this.notMessage();
+      return this.notMessage();
       uni.navigateTo({
         url: "/order/change?changeData=" + JSON.stringify(this.orderDetails),
       });
