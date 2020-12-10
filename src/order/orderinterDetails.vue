@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-09 17:06:02
+ * @LastEditTime: 2020-12-09 17:59:25
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -261,7 +261,7 @@
     <uni-popup ref="totalOrder" type="bottom">
       <view class="price_info">
         <view class="title">
-            改签费用
+            订单总价
           <view class="close_btn" @click="closeTotalOrder()"></view>
         </view>
         <view class="price_info_box">
@@ -492,6 +492,7 @@ export default {
 
     //取消订单弹窗 确认取消
     getSubmit(type) {
+      this.listCancelType = ""
       console.log(type);
       let data = {
         order_no: this.orderId,

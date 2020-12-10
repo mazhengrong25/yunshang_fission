@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-11-25 17:11:13
+ * @LastEditTime: 2020-12-09 17:54:34
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -285,6 +285,18 @@
                   : ""
               }}
             </view>
+          </view>
+
+          <!-- 乘客姓名 -->
+          <view class="passenger_item">
+            <view
+              class="item_title"
+              v-for="(oitem, oindex) in item.ticket_passenger"
+              :key="oindex"
+            >
+              <text>{{ oitem.PassengerName }}</text>
+            </view>
+            <view class="" v-if="item.ticket_passenger.length > 4">...</view>
           </view>
 
           <view

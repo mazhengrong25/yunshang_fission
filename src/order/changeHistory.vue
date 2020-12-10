@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-27 10:39:07
- * @LastEditTime: 2020-12-07 10:35:10
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-10 09:09:20
+ * @LastEditors: wish.WuJunLong
  * @Description: 历史改签航班
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeHistory.vue
 -->
@@ -22,7 +22,7 @@
                     <view class="list_tyle gray">第一次改签</view>
                 </view>
                 <!-- 航班信息 -->
-                <view class="filght_message">   
+                <view class="filght_message" v-if="historyFirst.change_segments">   
                     <view class="header_message">
                         <view class="header_type">单程</view>
                         <view class="header_time">
@@ -62,90 +62,94 @@
                     <view class="change_filght_message">
                         <!-- 航班图标 -->
                         <view class="message_icon">
-                        <image
-                            class="message_icon"
-                            :src="'https://fxxcx.ystrip.cn' + historyFirst.change_segments[0].image"
-                            mode="aspectFit"
-                        />
+                            <image
+                                class="message_icon"
+                                :src="'https://fxxcx.ystrip.cn' + historyFirst.change_segments[0].image"
+                                mode="aspectFit"
+                            />
                         </view>
                         <view class="message_list">
                             {{historyFirst.change_segments[0].airline_CN}}
                         </view>
-                        <view class="message_list">{{ historyFirst.change_segments[0].flight_no }}</view?>
-                        <view class="message_list">{{ historyFirst.change_segments[0].model }}</view>
+                        <view class="message_list">{{ historyFirst.change_segments[0].flight_no }}</view>
+                            <view class="message_list">{{ historyFirst.change_segments[0].model }}</view>
+                        </view>
+                    </view>
+                    <!-- 图片 -->
+                    <view class="middle_image">
+                        <image class="middle_icon" src="@/static/change_connect.png" mode="aspectFill" />
+                    </view>
+                    <!-- 乘客信息 -->
+                    <view class="passenger_message">
+                        <view
+                        :class="['passenger_list', { active: passInfoChecket === index }]"
+                        v-for="(item, index) in historyFirst.change_passengers" 
+                        :key="index"
+                        >
+                            <view class="list_item">
+                                <view class="list_info" @click="openPassInfo(index)">
+                                    <view class="info_type">
+                                        {{
+                                            item.ticket_passenger.PassengerType === "ADT"
+                                                ? "成人"
+                                                : item.ticket_passenger.PassengerType === "CNN"
+                                                ? "儿童"
+                                                : item.ticket_passenger.PassengerType === "INF"
+                                                ? "婴儿"
+                                                : ""
+                                        }}票
+                                    </view>
+                                    <view class="info_name">{{item.ticket_passenger.PassengerName}}</view>
+                                    <view class="is_insurance">
+                                        <image src="@/static/insurance_icon.png" mode="aspectFit" />
+                                    </view>
+                                    <view class="group_message">
+                                        <view class="message_show">
+                                            <view class="group_info">
+                                                <view class="group_type">票号</view>
+                                                <view class="group_number">{{item.ticket_passenger.ticket_no || ''}}</view>
+                                            </view>
+                                            <view class="price_arrow">
+                                                <image src="@/static/unfold.png" mode="aspectFit" />
+                                            </view>
+                                        </view>
+                                        <!-- 展开内容 -->
+                                        <view class="list_main">                           
+                                            <view class="list_item">
+                                                <view class="item_title">{{
+                                                    item.ticket_passenger.Credential === "0"
+                                                    ? "身份证"
+                                                    : item.ticket_passenger.Credential === "1"
+                                                    ? "护照"
+                                                    : item.ticket_passenger.Credential === "2"
+                                                    ? "港澳通行证"
+                                                    : item.ticket_passenger.Credential === "3"
+                                                    ? "台胞证"
+                                                    : item.ticket_passenger.Credential === "4"
+                                                    ? "回乡证"
+                                                    : item.ticket_passenger.Credential === "5"
+                                                    ? "台湾通行证"
+                                                    : item.ticket_passenger.Credential === "6"
+                                                    ? "入台证"
+                                                    : item.ticket_passenger.Credential === "7"
+                                                    ? "国际海员证"
+                                                    : item.ticket_passenger.Credential === "8"
+                                                    ? "其它证件"
+                                                    : ""
+                                                }}</view>
+                                                <view class="item_message">{{item.ticket_passenger.CredentialNo || ''}}</view>
+                                            </view>
+                                            <view class="list_item">
+                                                <view class="item_title">手机号</view>
+                                                <view class="item_message">{{item.ticket_passenger.phone || ''}}</view>
+                                            </view>
+                                        </view>
+                                    </view>    
+                                </view>    
+                            </view>
+                        </view>     
                     </view>
                 </view>
-                <!-- 图片 -->
-                <view class="middle_image">
-                    <image class="middle_icon" src="@/static/change_connect.png" mode="aspectFill" />
-                </view>
-                <!-- 乘客信息 -->
-                <view class="passenger_message">
-                    <view
-                    :class="['passenger_list', { active: passInfoChecket === index }]"
-                    v-for="(item, index) in historyFirst.change_passengers" 
-                    :key="index"
-                    >
-                        <view class="list_item">
-                            <view class="list_info" @click="openPassInfo(index)">
-                                <view class="info_type">
-                                    {{
-                                        item.ticket_passenger.PassengerType === "ADT"
-                                            ? "成人"
-                                            : item.ticket_passenger.PassengerType === "CNN"
-                                            ? "儿童"
-                                            : item.ticket_passenger.PassengerType === "INF"
-                                            ? "婴儿"
-                                            : ""
-                                    }}票
-                                </view>
-                                <view class="info_name">{{item.ticket_passenger.PassengerName}}</view>
-                                <view class="is_insurance">
-                                    <image src="@/static/insurance_icon.png" mode="aspectFit" />
-                                </view>
-                                <view class="group_info">
-                                    <view class="group_type">票号</view>
-                                    <view class="group_number">{{item.ticket_passenger.ticket_no || ''}}</view>
-                                </view>
-                                <view class="price_arrow">
-                                    <image src="@/static/unfold.png" mode="aspectFit" />
-                                </view>
-                            </view>
-                            <!-- 展开内容 -->
-                            <view class="list_main">                           
-                                <view class="list_item">
-                                    <view class="item_title">{{
-                                        item.ticket_passenger.Credential === "0"
-                                        ? "身份证"
-                                        : item.ticket_passenger.Credential === "1"
-                                        ? "护照"
-                                        : item.ticket_passenger.Credential === "2"
-                                        ? "港澳通行证"
-                                        : item.ticket_passenger.Credential === "3"
-                                        ? "台胞证"
-                                        : item.ticket_passenger.Credential === "4"
-                                        ? "回乡证"
-                                        : item.ticket_passenger.Credential === "5"
-                                        ? "台湾通行证"
-                                        : item.ticket_passenger.Credential === "6"
-                                        ? "入台证"
-                                        : item.ticket_passenger.Credential === "7"
-                                        ? "国际海员证"
-                                        : item.ticket_passenger.Credential === "8"
-                                        ? "其它证件"
-                                        : ""
-                                    }}</view>
-                                    <view class="item_message">{{item.ticket_passenger.CredentialNo || ''}}</view>
-                                </view>
-                                <view class="list_item">
-                                    <view class="item_title">手机号</view>
-                                    <view class="item_message">{{item.ticket_passenger.phone || ''}}</view>
-                                </view>
-                            </view>
-                        </view>
-                    </view>     
-                </view>
-            </view>
             <!-- 原航班改签 -->
             <view class="content_list">
                 <!--改签类别 -->
@@ -153,7 +157,7 @@
                     <view class="gray list_tyle">原航班</view>
                 </view>
                 <!-- 航班信息 单程固定-->
-                <view class="filght_message">
+                <view class="filght_message" v-if="historyFirst.change_segments">
                     <view class="header_message">
                         <view class="header_type">单程</view>
                         <view class="header_time">
@@ -235,47 +239,49 @@
                                 <view class="is_insurance"  v-if="Number(item.ticket_passenger.insurance_total) > 0">
                                     <image src="@/static/insurance_icon.png" mode="aspectFit" />
                                 </view>
-                                <view class="group_info">
-                                    <view class="group_type">票号</view>
-                                    <view class="group_number">{{item.ticket_no || ''}}</view>
-                                </view>
-                                <view class="price_arrow">
-                                    <image src="@/static/unfold.png" mode="aspectFit" />
-                                </view>
-                            </view>
-                            <!-- 展开内容 -->
-                            <view class="list_main">
-                            
-                                <view class="list_item">
-                                    <view class="item_title">{{
-                                        item.ticket_passenger.Credential === "0"
-                                        ? "身份证"
-                                        : item.ticket_passenger.Credential === "1"
-                                        ? "护照"
-                                        : item.ticket_passenger.Credential === "2"
-                                        ? "港澳通行证"
-                                        : item.ticket_passenger.Credential === "3"
-                                        ? "台胞证"
-                                        : item.ticket_passenger.Credential === "4"
-                                        ? "回乡证"
-                                        : item.ticket_passenger.Credential === "5"
-                                        ? "台湾通行证"
-                                        : item.ticket_passenger.Credential === "6"
-                                        ? "入台证"
-                                        : item.ticket_passenger.Credential === "7"
-                                        ? "国际海员证"
-                                        : item.ticket_passenger.Credential === "8"
-                                        ? "其它证件"
-                                        : ""
-                                    }}</view>
-                                    <view class="item_message">{{item.ticket_passenger.CredentialNo || ''}}</view>
-                                </view>
-
-                                <view class="list_item">
-                                    <view class="item_title">手机号</view>
-                                    <view class="item_message">{{item.ticket_passenger.phone || ''}}</view>
-                                </view>
-                            </view>
+                                <view class="group_message">
+                                    <view class="message_show">
+                                        <view class="group_info">
+                                            <view class="group_type">票号</view>
+                                            <view class="group_number">{{item.ticket_no || ''}}</view>
+                                        </view>
+                                        <view class="price_arrow">
+                                            <image src="@/static/unfold.png" mode="aspectFit" />
+                                        </view>
+                                    </view>
+                                     <!-- 展开内容 -->
+                                    <view class="list_main">
+                                        <view class="list_item">
+                                            <view class="item_title">{{
+                                                item.ticket_passenger.Credential === "0"
+                                                ? "身份证"
+                                                : item.ticket_passenger.Credential === "1"
+                                                ? "护照"
+                                                : item.ticket_passenger.Credential === "2"
+                                                ? "港澳通行证"
+                                                : item.ticket_passenger.Credential === "3"
+                                                ? "台胞证"
+                                                : item.ticket_passenger.Credential === "4"
+                                                ? "回乡证"
+                                                : item.ticket_passenger.Credential === "5"
+                                                ? "台湾通行证"
+                                                : item.ticket_passenger.Credential === "6"
+                                                ? "入台证"
+                                                : item.ticket_passenger.Credential === "7"
+                                                ? "国际海员证"
+                                                : item.ticket_passenger.Credential === "8"
+                                                ? "其它证件"
+                                                : ""
+                                            }}</view>
+                                            <view class="item_message">{{item.ticket_passenger.CredentialNo || ''}}</view>
+                                        </view>
+                                        <view class="list_item">
+                                            <view class="item_title">手机号</view>
+                                            <view class="item_message">{{item.ticket_passenger.phone || ''}}</view>
+                                        </view>
+                                    </view>
+                                </view>   
+                            </view>   
                         </view>
                     </view>  
                 </view>
@@ -685,7 +691,15 @@ export default {
 
                     .list_info {
                         display: flex;
-                        align-items: center;
+                        align-items: baseline;
+                        .group_message{
+                            margin-left: 28upx;
+                            .message_show{
+                                display: inline-flex;
+                                align-items: center;
+                                width: 100%;
+                            }
+                        }
                         .info_type {
                         width: 100upx;
                         height: 30upx;
@@ -698,31 +712,33 @@ export default {
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
+                        flex-shrink: 0;
                         }
                         .info_name {
                         font-size: 28upx;
                         font-weight: bold;
                         color: rgba(42, 42, 42, 1);
                         margin-right: 8upx;
+                        flex-shrink: 0;
                         }
                         .is_insurance {
                         width: 30upx;
                         height: 30upx;
                         margin-right: 8upx;
                         display: flex;
-                        image {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                        }
+                        flex-shrink: 0;
+                            image {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
                         }
                         .group_info {
-                        display: flex;
+                        display: inline-flex;
                         justify-content: center;
                         align-items: center;
 
                         .group_type {
-                            margin-left: 28upx;
                             font-size: 28upx;
                             font-weight: 400;
                             color: #333333;
@@ -753,7 +769,6 @@ export default {
                         overflow: hidden;
                         height: 0;
                         animation: closeMain 0.4s forwards;
-                        padding-left: 37%;
                         .list_item {
                         display: flex;
                         align-items: center;

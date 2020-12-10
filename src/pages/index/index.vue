@@ -2,8 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-11-13 16:07:20
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-09 17:12:32
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="index">
@@ -469,6 +469,9 @@ export default {
     submitTicket() {
       console.log("提交", JSON.stringify(this.airMessage));
       this.airMessage["type"] = this.currentTab;
+
+      uni.removeStorageSync('changeMessage');
+      uni.removeStorageSync('changeTicket');
 
       let jumpUrl;
       if (

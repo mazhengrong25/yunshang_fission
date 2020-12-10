@@ -2,9 +2,9 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-12-07 14:17:01
+ * @LastEditTime: 2020-12-09 17:10:26
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <scroll-view :enable-back-to-top="true" class="flight_info">
     <yun-header
@@ -49,7 +49,13 @@
                 <text class="info_title">票面价</text>
                 <text class="info_text"
                   >&yen;{{
-                    index === 0 ? checkMultiRate?checkMultiRate:checkPrice : roundCheckMultiRate?roundCheckMultiRate:checkRoundPrice
+                    index === 0
+                      ? checkMultiRate
+                        ? checkMultiRate
+                        : checkPrice
+                      : roundCheckMultiRate
+                      ? roundCheckMultiRate
+                      : checkRoundPrice
                   }}</text
                 >
               </view>
@@ -93,10 +99,7 @@
         </view>
 
         <swiper class="cabin_content" @change="change" :current="current">
-          <swiper-item
-            v-for="(header, headerIndex) in cabinHeader"
-            :key="headerIndex"
-          >
+          <swiper-item v-for="(header, headerIndex) in cabinHeader" :key="headerIndex">
             <view class="cabin_content_item">
               <flight-item
                 v-for="(item, index) in cabinList[header]"
@@ -132,10 +135,7 @@
         </view>
 
         <swiper class="cabin_content" @change="change" :current="current">
-          <swiper-item
-            v-for="(header, headerIndex) in depCabinHeader"
-            :key="headerIndex"
-          >
+          <swiper-item v-for="(header, headerIndex) in depCabinHeader" :key="headerIndex">
             <view class="cabin_content_item">
               <flight-item
                 v-for="(item, index) in depCabinList[header]"
@@ -150,9 +150,7 @@
                 @jumpReservation="jumpReservationBtn"
                 @getPriceData="getPriceData"
               ></flight-item>
-              <view
-                class="not_content_item"
-                v-if="depCabinList[header].length < 1"
+              <view class="not_content_item" v-if="depCabinList[header].length < 1"
                 >暂无舱位</view
               >
             </view>
@@ -206,14 +204,21 @@
                   <view
                     :class="[
                       'price_list',
-                      { active: roundTripBtnActive === 1?roundCheckMultiRate === item.price: checkMultiRate === item.price },
+                      {
+                        active:
+                          roundTripBtnActive === 1
+                            ? roundCheckMultiRate === item.price
+                            : checkMultiRate === item.price,
+                      },
                     ]"
                     @click="checkedMultiRate(item)"
                     v-for="(item, index) in multiRateList"
                     :key="index"
                   >
                     <view class="price_text"
-                      >{{ item.price }}/{{ item.tax }}/{{item.reward}}/{{item.settle_price}}</view
+                      >{{ item.price }}/{{ item.tax }}/{{ item.reward }}/{{
+                        item.settle_price
+                      }}</view
                     >
                     <view class="price_checked"></view>
                   </view>
@@ -345,8 +350,8 @@ export default {
       roundCheckMultiRate: "", // 返程多运价选择
       multiRateList: [], // 多运价列表
 
-      checkBuild: '',  // 多运价机建费
-      roundCheckBuild: '', // 返程机建费
+      checkBuild: "", // 多运价机建费
+      roundCheckBuild: "", // 返程机建费
     };
   },
   methods: {
@@ -399,8 +404,7 @@ export default {
                     reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
                     voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
                     cabinCode: oitem.cabinInfo.cabinCode,
-                    cabin:
-                      oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
+                    cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
                     baggage: oitem.cabinInfo.baggage, // 行李额
                     ruleInfos: oitem.ruleInfos, // 退改信息
                     data: oitem,
@@ -423,15 +427,14 @@ export default {
                     reward: oitem.cabinPrices.ADT.rulePrice.reward, // 奖励金
                     voteNumber: oitem.cabinInfo.cabinNum, // 剩余票数
                     cabinCode: oitem.cabinInfo.cabinCode,
-                    cabin:
-                      oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
+                    cabin: oitem.cabinInfo.cabinCode + oitem.cabinInfo.cabinDesc, // 舱位
                     baggage: oitem.cabinInfo.baggage, // 行李额
                     ruleInfos: oitem.ruleInfos, // 退改信息
                     data: oitem,
                   });
                 });
 
-                console.log(this.cabinList)
+                console.log(this.cabinList);
               }
             }
           });
@@ -477,20 +480,18 @@ export default {
       console.log("组装", data);
       // 组装航班数据
       let filghtMessage = {
-        time: moment(data.data.routing.segments[0].depTime).format(
-          "YYYY-MM-DD HH:mm:ss"
-        ), // 起飞时间
+        time: moment(data.data.routing.segments[0].depTime).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
         code: data.data.routing.segments[0].flightNumber, // 航班号
         address:
           data.data.routing.segments[0].depAirport_CN.city_name +
           " " +
           data.data.routing.segments[0].depAirport_CN.city_code +
           " - " +
-          data.data.routing.segments[data.data.routing.segments.length - 1]
-            .arrAirport_CN.city_name +
+          data.data.routing.segments[data.data.routing.segments.length - 1].arrAirport_CN
+            .city_name +
           " " +
-          data.data.routing.segments[data.data.routing.segments.length - 1]
-            .arrAirport_CN.city_code, // 行程
+          data.data.routing.segments[data.data.routing.segments.length - 1].arrAirport_CN
+            .city_code, // 行程
         cabin: data.cabin, // 舱位
         price: data.data.cabinPrices.ADT.rulePrice.price, // 票面价
         baggage: data.baggage,
@@ -522,12 +523,7 @@ export default {
             item.cabin === this.airActiveInfo.cabin &&
             item.data.cabinPrices.ADT.price === this.airActiveInfo.price
           ) {
-            console.log(
-              "获取价格完成后选中",
-              this.airActiveInfo,
-              item,
-              this.cabinList
-            );
+            console.log("获取价格完成后选中", this.airActiveInfo, item, this.cabinList);
             this.roundTripCheckList[this.roundTripBtnActive] = item;
           }
         });
@@ -748,109 +744,120 @@ export default {
       //     this.getRoundTrip();
       //   }
       // } else {
-        ticket.checkPrice(params).then((res) => {
-          if (res.errorcode === 10000) {
-            this.getGaugeInfo(data);
-            if (!res.data.check_price_status && res.data.is_sd_list) {
-              // 价格有修改 弹出提示框
-              this.newPrice = res.data.price;
-              this.relatedKey = res.data.keys;
-              this.checkPriceData = {
-                header: header,
-                index: index,
-                // type: type,
-                price: res.data.price,
-                keys: res.data.keys,
-              };
+      ticket.checkPrice(params).then((res) => {
+        if (res.errorcode === 10000) {
+          this.getGaugeInfo(data);
+          if (!res.data.check_price_status && res.data.is_sd_list) {
+            // 价格有修改 弹出提示框
+            this.newPrice = res.data.price;
+            this.relatedKey = res.data.keys;
+            this.checkPriceData = {
+              header: header,
+              index: index,
+              // type: type,
+              price: res.data.price,
+              keys: res.data.keys,
+            };
 
-              let newSdList = res.data.sd_list;
-              this.multiRateList = res.data.sd_list;
+            let newSdList = res.data.sd_list;
+            this.multiRateList = res.data.sd_list;
 
-              let hash = {};
-              this.multiRateList = newSdList.reduce((item, next) => {
-                hash[next.price]
-                  ? ""
-                  : (hash[next.price] = true && item.push(next));
-                return item;
-              }, []);
+            let hash = {};
+            this.multiRateList = newSdList.reduce((item, next) => {
+              hash[next.price] ? "" : (hash[next.price] = true && item.push(next));
+              return item;
+            }, []);
 
-              this.checkMultiRate = data.data.cabinPrices.ADT.price;
+            this.checkMultiRate = data.data.cabinPrices.ADT.price;
 
-              this.openMultiRate();
+            this.openMultiRate();
 
-              this.$forceUpdate();
+            this.$forceUpdate();
 
-              // this.$refs.checkPricePopup.open();
-            } else {
-              // 价格没有修改 直接进行操作
-              if (!this.roundTripType) {
-                this.checkPrice = res.data.price; // 获取验价价格
-                this.checkPriceKey = res.data.keys; // 获取验价key
-                if (type) {
-                  this.$set(
-                    this.depCabinList[header][index].data.cabinPrices.ADT
-                      .rulePrice,
-                    "price",
-                    res.data.price
-                  );
-                  this.$set(
-                    this.depCabinList[header][index].data.cabinPrices.ADT
-                      .rulePrice,
-                    "key",
-                    res.data.keys
-                  );
-                } else {
-                  this.$set(
-                    this.cabinList[header][index].data.cabinPrices.ADT
-                      .rulePrice,
-                    "price",
-                    res.data.price
-                  );
-                  this.$set(
-                    this.cabinList[header][index].data.cabinPrices.ADT
-                      .rulePrice,
-                    "key",
-                    res.data.keys
-                  );
-                }
+            // this.$refs.checkPricePopup.open();
+          } else {
+            // 价格没有修改 直接进行操作
+            if (!this.roundTripType) {
+              this.checkPrice = res.data.price; // 获取验价价格
+              this.checkPriceKey = res.data.keys; // 获取验价key
+              if (type) {
+                this.$set(
+                  this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                  "price",
+                  res.data.price
+                );
+                this.$set(
+                  this.depCabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                  "key",
+                  res.data.keys
+                );
+              } else {
+                this.$set(
+                  this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                  "price",
+                  res.data.price
+                );
+                this.$set(
+                  this.cabinList[header][index].data.cabinPrices.ADT.rulePrice,
+                  "key",
+                  res.data.keys
+                );
+              }
 
-                // 单程验价
+              // 判断是否改签页面跳入
+              if (uni.getStorageSync("changeTicket")) {
                 uni.navigateTo({
                   url:
-                    "/flightReservation/flightReservation?key=" +
+                    "/order/change?key=" +
                     res.data.keys +
-                    "&airMessage=" +
-                    JSON.stringify(this.airMessage) +
                     "&price=" +
                     res.data.price +
-                    "&data=" +
-                    JSON.stringify(this.ticketAddress),
+                    "&roundKey=" +
+                    this.checkRoundPriceKey +
+                    "&roundPrice=" +
+                    this.checkRoundPrice +
+                    "&changeData=" +
+                    uni.getStorageSync("changeTicket"),
                 });
-              } else {
-                // 往返验价
-                if (this.roundTripBtnActive === 0) {
-                  this.checkPrice = res.data.price; // 获取验价价格
-                  this.checkPriceKey = res.data.keys; // 获取验价key
-                } else {
-                  this.checkRoundPrice = res.data.price; // 获取验价价格
-                  this.checkRoundPriceKey = res.data.keys; // 获取验价key
-                }
-                console.log("往返验价");
-                this.getRoundTrip();
-                if (this.roundTripBtnActive === 0) {
-                  this.roundTripBtn(1);
-                }
+                return;
               }
-              
+
+              // 单程验价
+              uni.navigateTo({
+                url:
+                  "/flightReservation/flightReservation?key=" +
+                  res.data.keys +
+                  "&airMessage=" +
+                  JSON.stringify(this.airMessage) +
+                  "&price=" +
+                  res.data.price +
+                  "&data=" +
+                  JSON.stringify(this.ticketAddress),
+              });
+            } else {
+              // 往返验价
+              if (this.roundTripBtnActive === 0) {
+                this.checkPrice = res.data.price; // 获取验价价格
+                this.checkPriceKey = res.data.keys; // 获取验价key
+              } else {
+                this.checkRoundPrice = res.data.price; // 获取验价价格
+                this.checkRoundPriceKey = res.data.keys; // 获取验价key
+              }
+              console.log("往返验价");
+              this.getRoundTrip();
+              if (this.roundTripBtnActive === 0) {
+                this.roundTripBtn(1);
+              }
             }
-          } else {
-            uni.showToast({
-              title: res.msg + res.data.Message,
-              icon: "none",
-              duration: 3000,
-            });
           }
-        });
+        } else {
+          uni.showToast({
+            title: res.msg + res.data.Message,
+            icon: "none",
+            duration: 3000,
+          });
+        }
+      });
       // }
     },
 
@@ -870,13 +877,13 @@ export default {
       if (this.roundTripBtnActive !== 0) {
         this.$nextTick(() => {
           this.roundCheckMultiRate = val.price;
-          this.roundCheckBuild = val.tax
+          this.roundCheckBuild = val.tax;
         });
-      }else {
-        this.$nextTick(() =>{
-        this.checkMultiRate = val.price
-        this.checkBuild = val.tax
-      })
+      } else {
+        this.$nextTick(() => {
+          this.checkMultiRate = val.price;
+          this.checkBuild = val.tax;
+        });
       }
       this.$forceUpdate();
     },
@@ -900,42 +907,39 @@ export default {
 
       if (this.checkPriceData.type) {
         this.$set(
-          this.depCabinList[this.checkPriceData.header][
-            this.checkPriceData.index
-          ].data.cabinPrices.ADT.rulePrice,
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "price",
           this.checkPriceData.price
         );
         this.$set(
-          this.depCabinList[this.checkPriceData.header][
-            this.checkPriceData.index
-          ].data.cabinPrices.ADT.rulePrice,
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "type",
           true
         );
         this.$set(
-          this.depCabinList[this.checkPriceData.header][
-            this.checkPriceData.index
-          ].data.cabinPrices.ADT.rulePrice,
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "key",
           this.checkPriceData.keys
         );
       } else {
         this.$set(
-          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT.rulePrice,
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "price",
           this.checkPriceData.price
         );
         this.$set(
-          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT.rulePrice,
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "type",
           true
         );
         this.$set(
-          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT.rulePrice,
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "key",
           this.checkPriceData.keys
         );
@@ -954,11 +958,15 @@ export default {
 
       if (this.roundTripType) {
         if (this.roundTripBtnActive === 0) {
-          this.checkPrice = this.checkMultiRate?this.checkMultiRate:this.checkPriceData.price; // 获取验价价格
+          this.checkPrice = this.checkMultiRate
+            ? this.checkMultiRate
+            : this.checkPriceData.price; // 获取验价价格
           this.checkPriceKey = this.checkPriceData.keys; // 获取验价key
-          this.checkPriceData.price = this.checkMultiRate
+          this.checkPriceData.price = this.checkMultiRate;
         } else {
-          this.checkRoundPrice = this.roundCheckMultiRate?this.roundCheckMultiRate:this.checkPriceData.price; // 获取验价价格
+          this.checkRoundPrice = this.roundCheckMultiRate
+            ? this.roundCheckMultiRate
+            : this.checkPriceData.price; // 获取验价价格
           this.checkRoundPriceKey = this.checkPriceData.keys; // 获取验价key
         }
         this.$forceUpdate();
@@ -967,11 +975,10 @@ export default {
 
       if (this.checkPriceData.type) {
         this.$set(
-          this.depCabinList[this.checkPriceData.header][
-            this.checkPriceData.index
-          ].data.cabinPrices.ADT.rulePrice,
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "price",
-          this.roundCheckMultiRate?this.roundCheckMultiRate:this.checkPriceData.price
+          this.roundCheckMultiRate ? this.roundCheckMultiRate : this.checkPriceData.price
         );
         // this.$set(
         //   this.depCabinList[this.checkPriceData.header][
@@ -981,28 +988,27 @@ export default {
         //   true
         // );
         this.$set(
-          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT,
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT,
           "build",
           this.roundCheckBuild
         );
         this.$set(
-          this.depCabinList[this.checkPriceData.header][
-            this.checkPriceData.index
-          ].data.cabinPrices.ADT.rulePrice,
+          this.depCabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "key",
           this.checkPriceData.keys
         );
       } else {
         this.$set(
-          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT.rulePrice,
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "price",
-          this.checkMultiRate?this.checkMultiRate:this.checkPriceData.price
+          this.checkMultiRate ? this.checkMultiRate : this.checkPriceData.price
         );
         this.$set(
-          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT,
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT,
           "build",
           this.checkBuild
         );
@@ -1013,18 +1019,37 @@ export default {
         //   true
         // );
         this.$set(
-          this.cabinList[this.checkPriceData.header][this.checkPriceData.index]
-            .data.cabinPrices.ADT.rulePrice,
+          this.cabinList[this.checkPriceData.header][this.checkPriceData.index].data
+            .cabinPrices.ADT.rulePrice,
           "key",
           this.checkPriceData.keys
         );
       }
 
-      this.$forceUpdate(); 
+      this.$forceUpdate();
 
       if (!this.roundTripType) {
         // 单程验价
         // this.closeCheckPrice();
+
+        // 判断是否改签页面跳入
+        if (uni.getStorageSync("changeTicket")) {
+          uni.navigateTo({
+            url:
+              "/order/change?key=" +
+              res.data.keys +
+              "&price=" +
+              res.data.price +
+              "&roundKey=" +
+              this.checkRoundPriceKey +
+              "&roundPrice=" +
+              this.checkRoundPrice +
+              "&changeData=" +
+              uni.getStorageSync("changeTicket"),
+          });
+          return;
+        }
+
         uni.navigateTo({
           url:
             "/flightReservation/flightReservation?key=" +
@@ -1051,6 +1076,24 @@ export default {
 
     // 往返预定跳转
     roundTripCheckedBtn() {
+      // 判断是否改签页面跳入
+      if (uni.getStorageSync("changeTicket")) {
+        uni.navigateTo({
+          url:
+            "/order/change?key=" +
+            res.data.keys +
+            "&price=" +
+            res.data.price +
+            "&roundKey=" +
+            this.checkRoundPriceKey +
+            "&roundPrice=" +
+            this.checkRoundPrice +
+            "&changeData=" +
+            uni.getStorageSync("changeTicket"),
+        });
+        return;
+      }
+
       uni.navigateTo({
         url:
           "/flightReservation/flightReservation?type=" +
@@ -1120,11 +1163,7 @@ export default {
         flightType: "返程", // 航程类型
         data: JSON.parse(data.roundTripData).end.segments, // 原始数据
       };
-      console.log(
-        "舱位信息航班详情",
-        this.flightData,
-        this.roundTripFlightData
-      );
+      console.log("舱位信息航班详情", this.flightData, this.roundTripFlightData);
       console.log(
         "航班数据",
         this.airMessage,
@@ -1576,8 +1615,8 @@ export default {
                     color: #0070e2;
                   }
                   .price_checked {
-                    background: url("@/static/selected_active.png") no-repeat
-                      center center;
+                    background: url("@/static/selected_active.png") no-repeat center
+                      center;
                     background-size: contain;
                   }
                 }
@@ -1587,8 +1626,7 @@ export default {
                   color: #333333;
                 }
                 .price_checked {
-                  background: url("@/static/selected.png") no-repeat center
-                    center;
+                  background: url("@/static/selected.png") no-repeat center center;
                   background-size: contain;
                   width: 40upx;
                   height: 40upx;

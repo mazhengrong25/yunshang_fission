@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-07 11:39:18
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-10 09:09:04
+ * @LastEditors: wish.WuJunLong
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
 -->
@@ -66,15 +66,21 @@
           }}
         </text>
 
-        <view class="option_btn" v-if="changeDetailsData.change_status === 1"
-        @click="getCancel()"
-        >取消订单</view>
+        <view
+          class="option_btn"
+          v-if="changeDetailsData.change_status === 1"
+          @click="getCancel()"
+          >取消订单</view
+        >
       </view>
 
       <view class="order_option">
-        <view class="option_btn" v-if="changeDetailsData.change_status === 2"
-        @click="getCancel()"
-        >取消订单</view>
+        <view
+          class="option_btn"
+          v-if="changeDetailsData.change_status === 2"
+          @click="getCancel()"
+          >取消订单</view
+        >
         <view
           class="option_btn important_btn"
           v-if="changeDetailsData.change_status === 2"
@@ -166,7 +172,9 @@
 
                 <view class="list_item">
                   <view class="item_title">手机号</view>
-                  <view class="item_message">{{ item.ticket_passenger.phone || ''}}</view>
+                  <view class="item_message">{{
+                    item.ticket_passenger.phone || ""
+                  }}</view>
                 </view>
               </view>
             </view>
@@ -191,7 +199,7 @@
           :roundTripFlightData="roundTripFlightData"
           :roundTripType="roundTripType"
           :interType="false"
-          flightTitle="new"
+          flightTitle="detail_new"
         ></flight-header>
 
         <view v-else class="not_flight_data">
@@ -352,7 +360,7 @@
               </view>
             </view>
 
-            <view class="price_info_list active">
+            <!-- <view class="price_info_list active">
               <view class="list_title">
                 <view class="title_name">所有乘客票面总价</view>
               </view>
@@ -381,7 +389,7 @@
                   <view class="item_message">&yen; {{ totalPrice.delay_price }}</view>
                 </view>
               </view>
-            </view>
+            </view> -->
           </scroll-view>
         </view>
       </view>
@@ -451,7 +459,7 @@ export default {
       this.$refs.yunConfig.openConfigPopup();
     },
 
-     //取消订单弹窗 确认取消
+    //取消订单弹窗 确认取消
     getSubmit(type) {
       console.log(type);
       let data = {
@@ -460,7 +468,6 @@ export default {
       console.log(data);
       orderApi.cancleInterRefund(data).then((res) => {
         if (res.result === 10000) {
-      
         } else {
           uni.showToast({
             title: res.data,
@@ -469,17 +476,16 @@ export default {
         }
       });
     },
-    
+
     // 去支付
     jumpOrderPay() {
-
       let orderId = [this.changeDetailsData.order_no];
       let priceList = [this.changeDetailsData.need_pay_amount];
       let priceNumber = this.changeDetailsData.need_pay_amount;
-      let passengerList = []
-      this.changeDetailsData.change_passengers.forEach(item =>{
-        passengerList.push(item.ticket_passenger)
-      })
+      let passengerList = [];
+      this.changeDetailsData.change_passengers.forEach((item) => {
+        passengerList.push(item.ticket_passenger);
+      });
 
       uni.navigateTo({
         url:
@@ -494,7 +500,7 @@ export default {
           "&passMessage=" +
           JSON.stringify(passengerList) +
           "&headerType=false" +
-          "&type=false",        
+          "&type=false",
       });
     },
     // 跳转到多次改签页面
@@ -542,11 +548,19 @@ export default {
 
     // 组装航程信息  原航班
     this.flightOldData = {
-      flightType: this.changeDetailsData.ticket_order.ticket_segments[1].segment_num
-        ? Number(this.changeDetailsData.ticket_order.ticket_segments[1].segment_num) === 2
-          ? "往返"
-          : "单程"
-        : "",
+      flightType:
+        this.changeDetailsData.ticket_order.ticket_segments.length === 2
+          ? Number(this.changeDetailsData.ticket_order.ticket_segments[1].segment_num) ===
+            2
+            ? "往返"
+            : "单程"
+          : "单程",
+
+      // flightType: this.changeDetailsData.ticket_order.ticket_segments[0].segment_num
+      //   ? Number(this.changeDetailsData.ticket_order.ticket_segments[0].segment_num) === 2
+      //     ? "往返"
+      //     : "单程"
+      //   : "",
       data: this.changeDetailsData.ticket_order.ticket_segments || [], // 单程信息
       cabinInfo: this.changeDetailsData.ticket_order.ticket_segments || [], //退票规则
     };
@@ -678,6 +692,7 @@ export default {
     position: relative;
     flex: 1;
     display: flex;
+    overflow: hidden;
     &::after {
       content: "";
       display: block;
@@ -885,7 +900,7 @@ export default {
             .list_item {
               min-height: 40rpx;
               overflow: hidden;
-              &:not(:last-child){
+              &:not(:last-child) {
                 margin-bottom: 40upx;
               }
               &.active {

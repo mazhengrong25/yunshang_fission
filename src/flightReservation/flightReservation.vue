@@ -2,8 +2,8 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-11-06 17:49:38
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-09 17:48:27
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="flight_reservation">
@@ -1123,7 +1123,7 @@ export default {
         passengerData.forEach((item) => {
           passengerName.push(item.PassengerName);
           passengerType.push(item.PassengerType);
-          credential.push(item.Credential);
+          credential.push(String(item.Credential));
           credentialNo.push(item.CredentialNo);
           birthday.push(item.Birthday);
           phone.push(item.Phone);
@@ -1215,7 +1215,7 @@ export default {
         passengerData.forEach((item) => {
           passengerName.push(item.PassengerName);
           passengerType.push(item.PassengerType);
-          credential.push(item.Credential);
+          credential.push(String(item.Credential));
           credentialNo.push(item.CredentialNo);
           birthday.push(item.Birthday);
           phone.push(item.Phone);
