@@ -2,9 +2,9 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-10-20 12:11:12
+ * @LastEditTime: 2020-12-10 15:55:06
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="ticketRoundTrip">
     <!-- 导航栏 -->
@@ -71,18 +71,16 @@
                 <view class="ticket_type" v-if="item.segments.length > 1"
                   >{{ item.segments.length - 1 }}转</view
                 >
+                <view class="ticket_stop" v-if="item.segments[0].stopCount > 0"
+                  >经停</view
+                >
               </view>
               <view class="top_time end_time">
                 <view class="time">{{
-                  $dateTool(
-                    item.segments[item.segments.length - 1].arrTime,
-                    "HH:mm"
-                  )
+                  $dateTool(item.segments[item.segments.length - 1].arrTime, "HH:mm")
                 }}</view>
                 <view class="address"
-                  >{{
-                    item.segments[item.segments.length - 1].arrAirport_CN
-                      .air_port_name
+                  >{{ item.segments[item.segments.length - 1].arrAirport_CN.air_port_name
                   }}{{
                     item.segments[item.segments.length - 1].arrTerminal !== "--"
                       ? item.segments[item.segments.length - 1].arrTerminal
@@ -98,11 +96,14 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/assets/airline/'+ item.segments[0].airline +'.png'"
+                  :src="
+                    'https://fxxcx.ystrip.cn/assets/airline/' +
+                      item.segments[0].airline +
+                      '.png'
+                  "
                   mode="contain"
                 />
-                {{ item.segments[0].airline_CN
-                }}{{ item.segments[0].flightNumber }}
+                {{ item.segments[0].airline_CN }}{{ item.segments[0].flightNumber }}
               </view>
               <view class="price" v-if="item.available_cabin > 0">
                 <view class="price_mini">&yen;</view>
@@ -163,18 +164,16 @@
                 <view class="ticket_type" v-if="item.segments.length > 1"
                   >{{ item.segments.length - 1 }}转</view
                 >
+                <view class="ticket_stop" v-if="item.segments[0].stopCount > 0"
+                  >经停</view
+                >
               </view>
               <view class="top_time end_time">
                 <view class="time">{{
-                  $dateTool(
-                    item.segments[item.segments.length - 1].arrTime,
-                    "HH:mm"
-                  )
+                  $dateTool(item.segments[item.segments.length - 1].arrTime, "HH:mm")
                 }}</view>
                 <view class="address"
-                  >{{
-                    item.segments[item.segments.length - 1].arrAirport_CN
-                      .air_port_name
+                  >{{ item.segments[item.segments.length - 1].arrAirport_CN.air_port_name
                   }}{{
                     item.segments[item.segments.length - 1].arrTerminal !== "--"
                       ? item.segments[item.segments.length - 1].arrTerminal
@@ -190,7 +189,11 @@
               <view class="airlines">
                 <image
                   class="airlines_icon"
-                  :src="'https://fxxcx.ystrip.cn/assets/airline/'+ item.segments[item.segments.length - 1].airline +'.png'"
+                  :src="
+                    'https://fxxcx.ystrip.cn/assets/airline/' +
+                      item.segments[item.segments.length - 1].airline +
+                      '.png'
+                  "
                   mode="contain"
                 />
                 {{ item.segments[item.segments.length - 1].airline_CN
@@ -234,7 +237,11 @@
     ></default-page>
 
     <view
-      :class="['filter', { show: showFilterStatus === 'show' },{ hien: showFilterStatus === 'hien' }]"
+      :class="[
+        'filter',
+        { show: showFilterStatus === 'show' },
+        { hien: showFilterStatus === 'hien' },
+      ]"
       v-if="!showDefaultType"
     >
       <view class="filter_btn" @click="showFilterBtn"></view>
@@ -331,7 +338,7 @@ export default {
 
       airlineList: ["不限"], // 航班列表
 
-      showFilterStatus: '', // 显示筛选框
+      showFilterStatus: "", // 显示筛选框
     };
   },
   methods: {
@@ -343,7 +350,7 @@ export default {
 
     // 显示筛选框
     showFilterBtn() {
-      this.showFilterStatus = this.showFilterStatus === 'show'?'hien':'show';
+      this.showFilterStatus = this.showFilterStatus === "show" ? "hien" : "show";
     },
 
     // 获取往返提示头部信息
@@ -352,24 +359,19 @@ export default {
       if (this.flightList.length > 0 && this.roundFlightList.length > 0) {
         this.showRoundTripData = {
           toCode: this.flightList[this.toActive].segments[0].flightNumber,
-          fromCode: this.roundFlightList[this.fromActive].segments[0]
-            .flightNumber,
+          fromCode: this.roundFlightList[this.fromActive].segments[0].flightNumber,
           toTime:
-            moment(this.flightList[this.toActive].segments[0].depTime).format(
+            moment(this.flightList[this.toActive].segments[0].depTime).format("HH:mm") +
+            "-" +
+            moment(this.flightList[this.toActive].segments[0].arrTime).format("HH:mm"),
+          fromTime:
+            moment(this.roundFlightList[this.fromActive].segments[0].depTime).format(
               "HH:mm"
             ) +
             "-" +
-            moment(this.flightList[this.toActive].segments[0].arrTime).format(
+            moment(this.roundFlightList[this.fromActive].segments[0].arrTime).format(
               "HH:mm"
             ),
-          fromTime:
-            moment(
-              this.roundFlightList[this.fromActive].segments[0].depTime
-            ).format("HH:mm") +
-            "-" +
-            moment(
-              this.roundFlightList[this.fromActive].segments[0].arrTime
-            ).format("HH:mm"),
         };
       }
     },
@@ -429,9 +431,7 @@ export default {
           this.roundFlightKey = res.data.IBE.file_key;
           this.roundFlightList = res.data.IBE.list;
           // this.roundFlightList = uni.getStorageSync("roundFlightList");
-          this.oldRoundFlightList = JSON.parse(
-            JSON.stringify(this.roundFlightList)
-          );
+          this.oldRoundFlightList = JSON.parse(JSON.stringify(this.roundFlightList));
 
           this.price += this.roundFlightList[this.fromActive].min_price;
           this.dataRoundListApplyType = true;
@@ -502,9 +502,7 @@ export default {
         this.roundFlightList.sort(this.priceSort("min_price"));
 
         let priceList = this.flightList.filter((item) => item.available_cabin !== 0);
-        let notPriceList = this.flightList.filter(
-          (item) => item.available_cabin === 0
-        );
+        let notPriceList = this.flightList.filter((item) => item.available_cabin === 0);
         this.flightList = [...priceList, ...notPriceList];
 
         let roundPriceList = this.roundFlightList.filter(
@@ -552,9 +550,7 @@ export default {
         return false;
       }
       if (status) {
-        this.flightList = this.flightList.filter(
-          (item) => item.segments.length < 2
-        );
+        this.flightList = this.flightList.filter((item) => item.segments.length < 2);
         this.roundFlightList = this.roundFlightList.filter(
           (item) => item.segments.length < 2
         );
@@ -627,8 +623,7 @@ export default {
             (item) => item.segments[0].airline_CN === val[1]
           );
           this.roundFlightList = this.roundFlightList.filter(
-            (item) =>
-              item.segments[item.segments.length - 1].airline_CN === val[1]
+            (item) => item.segments[item.segments.length - 1].airline_CN === val[1]
           );
         }
       }
@@ -705,8 +700,7 @@ export default {
         this.getTicketData();
       }
       if (JSON.parse(endTime).date !== this.timeData.fromTime.date) {
-        this.price =
-          this.price - this.roundFlightList[this.fromActive].min_price;
+        this.price = this.price - this.roundFlightList[this.fromActive].min_price;
         this.timeData.fromTime = JSON.parse(endTime);
         this.roundFlightKey = "";
         this.roundFlightList = [];
@@ -932,6 +926,13 @@ export default {
             width: 100%;
             text-align: center;
           }
+          .ticket_stop {
+            font-size: 20upx;
+            text-align: center;
+            width: 100%;
+            color: #afb9c4;
+            margin-top: 4upx;
+          }
         }
       }
       .total_price_message {
@@ -1075,7 +1076,7 @@ export default {
         opacity: 0;
         transform: rotate(0deg);
       }
-      .filter_btn_close{
+      .filter_btn_close {
         transform: rotate(180deg);
       }
     }
@@ -1087,7 +1088,7 @@ export default {
         opacity: 1;
         transform: rotate(180deg);
       }
-      .filter_btn_close{
+      .filter_btn_close {
         transform: rotate(0deg);
       }
     }

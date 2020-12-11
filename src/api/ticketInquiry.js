@@ -2,7 +2,7 @@
  * @Description: AV查询 获取航班信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-09-24 17:10:02
+ * @LastEditTime: 2020-12-10 17:11:33
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';
@@ -97,6 +97,15 @@ function payOrder(id, data) {
   });
 }
 
+// 获取经停信息
+function stopMessage(data) {
+  return request({
+    method: 'POST',
+    url: '/api/stopCityV2',
+    data: data,
+  });
+}
+
 export default {
   getTicket,
   getNfd,
@@ -108,4 +117,5 @@ export default {
   createRoundOrder,
   getPayInfo,
   payOrder,
+  stopMessage
 };

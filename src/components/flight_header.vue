@@ -2,9 +2,9 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-12-08 18:00:08
- * @LastEditors: Please set LastEditors
---> 
+ * @LastEditTime: 2020-12-10 18:10:48
+ * @LastEditors: wish.WuJunLong
+-->
 <template>
   <view class="fight_header">
     <view class="main_list_title" v-if="flightTitle === 'refund'">航班信息</view>
@@ -17,68 +17,146 @@
     </view>
     <view class="fight_list">
       <view class="header_message">
-        <view :class="['header_type', {'round_trip_type': flightData.flightType === '返程'}]">{{flightData.flightType}}</view>
         <view
-          class="header_time"
-        >{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'YYYY-MM-DD')}}
-         {{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'dddd')}}</view>
+          :class="['header_type', { round_trip_type: flightData.flightType === '返程' }]"
+          >{{ flightData.flightType }}</view
+        >
+        <view class="header_time"
+          >{{
+            $dateTool(
+              flightData.data[0][interType ? "depTime" : "departure_time"],
+              "YYYY-MM-DD"
+            )
+          }}
+          {{
+            $dateTool(
+              flightData.data[0][interType ? "depTime" : "departure_time"],
+              "dddd"
+            )
+          }}</view
+        >
       </view>
 
       <!-- 单程直飞 -->
       <view class="content_message" v-if="flightData.data.length <= 1">
         <view class="left_message address_message">
-          <view class="time">{{$dateTool(flightData.data[0][interType?'depTime':'departure_time'],'HH:mm')}}</view>
-          <view
-            class="address"
-          >
-          {{flightData.data[0][interType?'depAirport_CN':'departure_CN'].province + flightData.data[0][interType?'depAirport_CN':'departure_CN'].air_port_name}}
-          {{flightData.data[0][interType?'depTerminal':'departure_terminal'] || ''}}
+          <view class="time">{{
+            $dateTool(
+              flightData.data[0][interType ? "depTime" : "departure_time"],
+              "HH:mm"
+            )
+          }}</view>
+          <view class="address">
+            {{
+              flightData.data[0][interType ? "depAirport_CN" : "departure_CN"].province +
+                flightData.data[0][interType ? "depAirport_CN" : "departure_CN"]
+                  .air_port_name
+            }}
+            {{
+              flightData.data[0][interType ? "depTerminal" : "departure_terminal"] || ""
+            }}
           </view>
         </view>
         <view class="center_message">
           <view class="duration" v-if="interType">
             {{ Math.floor(flightData.data[0].duration / 60) }}h{{
-            Math.floor(flightData.data[0].duration % 60)
+              Math.floor(flightData.data[0].duration % 60)
             }}m
           </view>
           <view v-else class="duration">
-            {{ Math.floor($timeDiff(flightData.data[0].arrive_time,flightData.data[0].departure_time, 'minutes') / 60) }}h{{
-            Math.floor($timeDiff(flightData.data[0].arrive_time,flightData.data[0].departure_time, 'minutes') % 60)
+            {{
+              Math.floor(
+                $timeDiff(
+                  flightData.data[0].arrive_time,
+                  flightData.data[0].departure_time,
+                  "minutes"
+                ) / 60
+              )
+            }}h{{
+              Math.floor(
+                $timeDiff(
+                  flightData.data[0].arrive_time,
+                  flightData.data[0].departure_time,
+                  "minutes"
+                ) % 60
+              )
             }}m
           </view>
           <view class="arrow_icon"></view>
+          <view
+            class="arrow_stop"
+            v-if="flightData.data[0].stopCount > 0"
+            @click="openTicketStopMessage(true)"
+            >经停</view
+          >
         </view>
         <view class="right_message address_message">
-          <view class="time">{{$dateTool(flightData.data[0][interType?'arrTime':'arrive_time'],'HH:mm')}}</view>
-          <view
-            class="address"
-          >{{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].province + flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].air_port_name}}
-          {{flightData.data[0][interType?'arrTerminal':'arrive_terminal'] || ''}}
+          <view class="time">{{
+            $dateTool(flightData.data[0][interType ? "arrTime" : "arrive_time"], "HH:mm")
+          }}</view>
+          <view class="address"
+            >{{
+              flightData.data[0][interType ? "arrAirport_CN" : "arrive_CN"].province +
+                flightData.data[0][interType ? "arrAirport_CN" : "arrive_CN"]
+                  .air_port_name
+            }}
+            {{ flightData.data[0][interType ? "arrTerminal" : "arrive_terminal"] || "" }}
           </view>
-          
         </view>
       </view>
 
       <!-- 单程 中转 -->
-      <view :class="['content_message transit',{fold: !filghtFold}]" v-else>
-        <view class="flight_message" v-for="(item, index) in flightData.data" :key="index">
+      <view :class="['content_message transit', { fold: !filghtFold }]" v-else>
+        <view
+          class="flight_message"
+          v-for="(item, index) in flightData.data"
+          :key="index"
+        >
           <view class="fly_message">
             <view class="fly_left">
-              <view class="fly_time">{{$dateTool(item[interType?'depTime':'departure_time'],'HH:mm')}}</view>
+              <view class="fly_time">{{
+                $dateTool(item[interType ? "depTime" : "departure_time"], "HH:mm")
+              }}</view>
               <view class="fly_date">
-                <image class="fly_date_icon" src="@/static/filter_time.png" mode="aspectFill" />
-                {{Math.floor($timeDiff(item[interType?'arrTime':'arrive_time'],item[interType?'depTime':'departure_time'], 'minutes') / 60)}}h{{Math.floor($timeDiff(item[interType?'arrTime':'arrive_time'],item[interType?'depTime':'departure_time'], 'minutes') % 60)}}m
+                <image
+                  class="fly_date_icon"
+                  src="@/static/filter_time.png"
+                  mode="aspectFill"
+                />
+                {{
+                  Math.floor(
+                    $timeDiff(
+                      item[interType ? "arrTime" : "arrive_time"],
+                      item[interType ? "depTime" : "departure_time"],
+                      "minutes"
+                    ) / 60
+                  )
+                }}h{{
+                  Math.floor(
+                    $timeDiff(
+                      item[interType ? "arrTime" : "arrive_time"],
+                      item[interType ? "depTime" : "departure_time"],
+                      "minutes"
+                    ) % 60
+                  )
+                }}m
               </view>
-              <view class="fly_time">{{$dateTool(item[interType?'arrTime':'arrive_time'],'HH:mm')}}</view>
+              <view class="fly_time">{{
+                $dateTool(item[interType ? "arrTime" : "arrive_time"], "HH:mm")
+              }}</view>
             </view>
             <view class="fly_line"></view>
             <view class="fly_right">
               <view class="fly_air">
-                {{item[interType?'depAirport_CN':'departure_CN'].air_port + ' ' +
-                item[interType?'depAirport_CN':'departure_CN'].city_name +
-                item[interType?'depAirport_CN':'departure_CN'].air_port_name + 
-                (item[interType?'depTerminal':'departure_terminal']?' / '+ item[interType?'depTerminal':'departure_terminal']: '')}}
-                
+                {{
+                  item[interType ? "depAirport_CN" : "departure_CN"].air_port +
+                    " " +
+                    item[interType ? "depAirport_CN" : "departure_CN"].city_name +
+                    item[interType ? "depAirport_CN" : "departure_CN"].air_port_name +
+                    (item[interType ? "depTerminal" : "departure_terminal"]
+                      ? " / " + item[interType ? "depTerminal" : "departure_terminal"]
+                      : "")
+                }}
               </view>
 
               <view class="fly_info">
@@ -88,23 +166,54 @@
                   :src="'https://fxxcx.ystrip.cn' + item.image"
                   mode="aspectFill"
                 />
-                {{item.airline_CN + item[interType?'flightNumber':'flight_no'] + ' | ' + item[interType?'aircraftCode':'model']}}
+                {{
+                  item.airline_CN +
+                    item[interType ? "flightNumber" : "flight_no"] +
+                    " | " +
+                    item[interType ? "aircraftCode" : "model"]
+                }}
               </view>
 
               <view class="fly_air bottom_fly_ait">
-                {{item[interType?'arrAirport_CN':'arrive_CN'].air_port + ' ' +
-                item[interType?'arrAirport_CN':'arrive_CN'].city_name +
-                item[interType?'arrAirport_CN':'arrive_CN'].air_port_name + 
-                (item[interType?'arrTerminal':'arrive_terminal']?' / '+ item[interType?'arrTerminal':'arrive_terminal']: '')}}
-                
+                {{
+                  item[interType ? "arrAirport_CN" : "arrive_CN"].air_port +
+                    " " +
+                    item[interType ? "arrAirport_CN" : "arrive_CN"].city_name +
+                    item[interType ? "arrAirport_CN" : "arrive_CN"].air_port_name +
+                    (item[interType ? "arrTerminal" : "arrive_terminal"]
+                      ? " / " + item[interType ? "arrTerminal" : "arrive_terminal"]
+                      : "")
+                }}
               </view>
             </view>
           </view>
-          <view class="transit_message" v-if="index === 0">  
+          <view class="transit_message" v-if="index === 0">
             转
-            {{flightData.data[0][interType?'arrAirport_CN':'arrive_CN'].city_name +
-            ' 停留 '}}
-            {{Math.floor($timeDiff(flightData.data[flightData.data.length - 1][interType?'depTime':'departure_time'],flightData.data[0][interType?'arrTime':'arrive_time'], 'minutes') / 60)}}h{{Math.floor($timeDiff(flightData.data[flightData.data.length - 1][interType?'depTime':'departure_time'],flightData.data[0][interType?'arrTime':'arrive_time'], 'minutes') % 60)}}m
+            {{
+              flightData.data[0][interType ? "arrAirport_CN" : "arrive_CN"].city_name +
+                " 停留 "
+            }}
+            {{
+              Math.floor(
+                $timeDiff(
+                  flightData.data[flightData.data.length - 1][
+                    interType ? "depTime" : "departure_time"
+                  ],
+                  flightData.data[0][interType ? "arrTime" : "arrive_time"],
+                  "minutes"
+                ) / 60
+              )
+            }}h{{
+              Math.floor(
+                $timeDiff(
+                  flightData.data[flightData.data.length - 1][
+                    interType ? "depTime" : "departure_time"
+                  ],
+                  flightData.data[0][interType ? "arrTime" : "arrive_time"],
+                  "minutes"
+                ) % 60
+              )
+            }}m
           </view>
         </view>
       </view>
@@ -115,72 +224,124 @@
           :src="'https://fxxcx.ystrip.cn' + flightData.data[0].image"
           mode="aspectFill"
         />
-        {{flightData.data[0].airline_CN + flightData.data[0][interType?'flightNumber':'flight_no']}}{{flightData.data[0][interType?'aircraftCode':'model']?' | '+ flightData.data[0][interType?'aircraftCode':'model']: ''}} {{flightData.data[0].MealCode? ' | 有餐食': ''}}
+        {{
+          flightData.data[0].airline_CN +
+            flightData.data[0][interType ? "flightNumber" : "flight_no"]
+        }}{{
+          flightData.data[0][interType ? "aircraftCode" : "model"]
+            ? " | " + flightData.data[0][interType ? "aircraftCode" : "model"]
+            : ""
+        }}
+        {{ flightData.data[0].MealCode ? " | 有餐食" : "" }}
       </view>
 
       <view
         class="flight_reservation_box"
         v-if="!flightInfo && !roundTripType"
-        @click="openHeadExp">
-            {{flightData.cabinInfo[interType?'cabinDesc':'cabin']? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
-            flightData.cabinInfo[interType?'cabinDesc':'cabin']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
+        @click="openHeadExp"
+      >
+        {{
+          flightData.cabinInfo[interType ? "cabinDesc" : "cabin"]
+            ? flightData.cabinInfo[interType ? "cabinCode" : "cabin"] +
+              flightData.cabinInfo[interType ? "cabinDesc" : "cabin"] +
+              " | "
+            : ""
+        }}退改签规则
+        {{ flightData.cabinInfo.baggage ? " | " + flightData.cabinInfo.baggage : "" }}
         <view class="message_more_btn"></view>
       </view>
     </view>
     <view class="fight_list found_fight_list" v-if="roundTripType">
       <view class="header_message">
-        <view class="header_type round_trip_type">{{roundTripFlightData.flightType}}</view>
-        <view
-          class="header_time"
-        >{{$dateTool(roundTripFlightData.data[0].depTime,'YYYY-MM-DD')}} {{$dateTool(roundTripFlightData.data[0].depTime,'dddd')}}</view>
+        <view class="header_type round_trip_type">{{
+          roundTripFlightData.flightType
+        }}</view>
+        <view class="header_time"
+          >{{ $dateTool(roundTripFlightData.data[0].depTime, "YYYY-MM-DD") }}
+          {{ $dateTool(roundTripFlightData.data[0].depTime, "dddd") }}</view
+        >
       </view>
       <view class="content_message" v-if="roundTripFlightData.data.length <= 1">
         <view class="left_message address_message">
-          <view class="time">{{$dateTool(roundTripFlightData.data[0].depTime,'HH:mm')}}</view>
-          <view
-            class="address"
-          >{{roundTripFlightData.data[0].depAirport_CN.province + roundTripFlightData.data[0].depAirport_CN.air_port_name}}
-          {{roundTripFlightData.data[0][interType?'depTerminal':'departure_terminal']}}
+          <view class="time">{{
+            $dateTool(roundTripFlightData.data[0].depTime, "HH:mm")
+          }}</view>
+          <view class="address"
+            >{{
+              roundTripFlightData.data[0].depAirport_CN.province +
+                roundTripFlightData.data[0].depAirport_CN.air_port_name
+            }}
+            {{
+              roundTripFlightData.data[0][
+                interType ? "depTerminal" : "departure_terminal"
+              ]
+            }}
           </view>
         </view>
         <view class="center_message">
           <view class="duration">
             {{ Math.floor(roundTripFlightData.data[0].duration / 60) }}h{{
-            Math.floor(roundTripFlightData.data[0].duration % 60)
+              Math.floor(roundTripFlightData.data[0].duration % 60)
             }}m
           </view>
           <view class="arrow_icon"></view>
+          <view
+            class="arrow_stop"
+            v-if="roundTripFlightData.data[0].stopCount > 0"
+            @click="openTicketStopMessage(false)"
+            >经停</view
+          >
         </view>
         <view class="right_message address_message">
-          <view class="time">{{$dateTool(roundTripFlightData.data[0].arrTime,'HH:mm')}}</view>
-          <view
-            class="address"
-          >{{roundTripFlightData.data[0].arrAirport_CN.province + roundTripFlightData.data[0].arrAirport_CN.air_port_name}}
-          {{roundTripFlightData.data[0][interType?'arrTerminal':'arrive_terminal']}}
+          <view class="time">{{
+            $dateTool(roundTripFlightData.data[0].arrTime, "HH:mm")
+          }}</view>
+          <view class="address"
+            >{{
+              roundTripFlightData.data[0].arrAirport_CN.province +
+                roundTripFlightData.data[0].arrAirport_CN.air_port_name
+            }}
+            {{
+              roundTripFlightData.data[0][interType ? "arrTerminal" : "arrive_terminal"]
+            }}
           </view>
         </view>
       </view>
 
       <!-- 往返 中转 -->
-      <view :class="['content_message transit',{fold: !filghtFold}]" v-else>
-        <view class="flight_message" v-for="(item, index) in roundTripFlightData.data" :key="index">
-          <view :class="['fly_message',{fold: !filghtFold}]">
+      <view :class="['content_message transit', { fold: !filghtFold }]" v-else>
+        <view
+          class="flight_message"
+          v-for="(item, index) in roundTripFlightData.data"
+          :key="index"
+        >
+          <view :class="['fly_message', { fold: !filghtFold }]">
             <view class="fly_left">
-              <view class="fly_time">{{$dateTool(item.depTime,'HH:mm')}}</view>
+              <view class="fly_time">{{ $dateTool(item.depTime, "HH:mm") }}</view>
               <view class="fly_date">
-                <image class="fly_date_icon" src="@/static/filter_time.png" mode="aspectFill" />
-                {{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') / 60)}}h{{Math.floor($timeDiff(item.arrTime,item.depTime, 'minutes') % 60)}}m
+                <image
+                  class="fly_date_icon"
+                  src="@/static/filter_time.png"
+                  mode="aspectFill"
+                />
+                {{ Math.floor($timeDiff(item.arrTime, item.depTime, "minutes") / 60) }}h{{
+                  Math.floor($timeDiff(item.arrTime, item.depTime, "minutes") % 60)
+                }}m
               </view>
-              <view class="fly_time">{{$dateTool(item.arrTime,'HH:mm')}}</view>
+              <view class="fly_time">{{ $dateTool(item.arrTime, "HH:mm") }}</view>
             </view>
             <view class="fly_line"></view>
             <view class="fly_right">
-               <view class="fly_air">
-                {{item[interType?'depAirport_CN':'departure_CN'].air_port + ' ' +
-                item[interType?'depAirport_CN':'departure_CN'].city_name +
-                item[interType?'depAirport_CN':'departure_CN'].air_port_name + 
-                (item[interType?'depTerminal':'departure_terminal']?' / '+ item[interType?'depTerminal':'departure_terminal']: '')}}
-                
+              <view class="fly_air">
+                {{
+                  item[interType ? "depAirport_CN" : "departure_CN"].air_port +
+                    " " +
+                    item[interType ? "depAirport_CN" : "departure_CN"].city_name +
+                    item[interType ? "depAirport_CN" : "departure_CN"].air_port_name +
+                    (item[interType ? "depTerminal" : "departure_terminal"]
+                      ? " / " + item[interType ? "depTerminal" : "departure_terminal"]
+                      : "")
+                }}
               </view>
 
               <view class="fly_info">
@@ -190,23 +351,55 @@
                   :src="'https://fxxcx.ystrip.cn' + item.image"
                   mode="aspectFill"
                 />
-                {{item.airline_CN + item[interType?'flightNumber':'flight_no'] + ' | ' + item[interType?'aircraftCode':'model']}}
+                {{
+                  item.airline_CN +
+                    item[interType ? "flightNumber" : "flight_no"] +
+                    " | " +
+                    item[interType ? "aircraftCode" : "model"]
+                }}
               </view>
 
               <view class="fly_air bottom_fly_ait">
-                {{item[interType?'arrAirport_CN':'arrive_CN'].air_port + ' ' +
-                item[interType?'arrAirport_CN':'arrive_CN'].city_name +
-                item[interType?'arrAirport_CN':'arrive_CN'].air_port_name + 
-                (item[interType?'arrTerminal':'arrive_terminal']?' / '+ item[interType?'arrTerminal':'arrive_terminal']: '')}}
-                
+                {{
+                  item[interType ? "arrAirport_CN" : "arrive_CN"].air_port +
+                    " " +
+                    item[interType ? "arrAirport_CN" : "arrive_CN"].city_name +
+                    item[interType ? "arrAirport_CN" : "arrive_CN"].air_port_name +
+                    (item[interType ? "arrTerminal" : "arrive_terminal"]
+                      ? " / " + item[interType ? "arrTerminal" : "arrive_terminal"]
+                      : "")
+                }}
               </view>
             </view>
           </view>
-          <view class="transit_message" v-if="index === 0">  
+          <view class="transit_message" v-if="index === 0">
             转
-            {{roundTripFlightData.data[flightData.data.length - 1][interType?'arrAirport_CN':'arrive_CN'].city_name +
-            ' 停留 '}}
-            {{Math.floor($timeDiff(roundTripFlightData.data[roundTripFlightData.data.length - 1][interType?'depTime':'departure_time'],roundTripFlightData.data[0][interType?'arrTime':'arrive_time'], 'minutes') / 60)}}h{{Math.floor($timeDiff(roundTripFlightData.data[roundTripFlightData.data.length - 1][interType?'depTime':'departure_time'],roundTripFlightData.data[0][interType?'arrTime':'arrive_time'], 'minutes') % 60)}}m
+            {{
+              roundTripFlightData.data[flightData.data.length - 1][
+                interType ? "arrAirport_CN" : "arrive_CN"
+              ].city_name + " 停留 "
+            }}
+            {{
+              Math.floor(
+                $timeDiff(
+                  roundTripFlightData.data[roundTripFlightData.data.length - 1][
+                    interType ? "depTime" : "departure_time"
+                  ],
+                  roundTripFlightData.data[0][interType ? "arrTime" : "arrive_time"],
+                  "minutes"
+                ) / 60
+              )
+            }}h{{
+              Math.floor(
+                $timeDiff(
+                  roundTripFlightData.data[roundTripFlightData.data.length - 1][
+                    interType ? "depTime" : "departure_time"
+                  ],
+                  roundTripFlightData.data[0][interType ? "arrTime" : "arrive_time"],
+                  "minutes"
+                ) % 60
+              )
+            }}m
           </view>
         </view>
       </view>
@@ -219,15 +412,40 @@
           mode="aspectFill"
         />
 
-        {{roundTripFlightData.data[0].airline_CN + roundTripFlightData.data[0][interType?'flightNumber':'flight_no']}}{{roundTripFlightData.data[0][interType?'aircraftCode':'model']?' | '+ roundTripFlightData.data[0][interType?'aircraftCode':'model']: ''}} {{roundTripFlightData.data[0].MealCode? ' | 有餐食': ''}}
+        {{
+          roundTripFlightData.data[0].airline_CN +
+            roundTripFlightData.data[0][interType ? "flightNumber" : "flight_no"]
+        }}{{
+          roundTripFlightData.data[0][interType ? "aircraftCode" : "model"]
+            ? " | " + roundTripFlightData.data[0][interType ? "aircraftCode" : "model"]
+            : ""
+        }}
+        {{ roundTripFlightData.data[0].MealCode ? " | 有餐食" : "" }}
       </view>
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp()">
-        {{flightData.cabinInfo[interType?'cabinDesc':'cabin']? flightData.cabinInfo[interType?'cabinCode':'cabin'] + 
-        flightData.cabinInfo[interType?'cabinDesc':'cabin_level']+' | ': ''}}退改签规则 {{flightData.cabinInfo.baggage?' | '+ flightData.cabinInfo.baggage: ''}}
+        {{
+          flightData.cabinInfo[interType ? "cabinDesc" : "cabin"]
+            ? flightData.cabinInfo[interType ? "cabinCode" : "cabin"] +
+              flightData.cabinInfo[interType ? "cabinDesc" : "cabin_level"] +
+              " | "
+            : ""
+        }}退改签规则
+        {{ flightData.cabinInfo.baggage ? " | " + flightData.cabinInfo.baggage : "" }}
         <view class="message_more_btn"></view>
       </view>
       <view class="flight_reservation_box" v-if="!flightInfo" @click="openHeadExp('arr')">
-        {{roundTripFlightData.cabinInfo.cabinDesc? roundTripFlightData.cabinInfo.cabinCode + roundTripFlightData.cabinInfo.cabinDesc+' | ': ''}}退改签规则 {{roundTripFlightData.cabinInfo.baggage?' | '+ roundTripFlightData.cabinInfo.baggage: ''}}
+        {{
+          roundTripFlightData.cabinInfo.cabinDesc
+            ? roundTripFlightData.cabinInfo.cabinCode +
+              roundTripFlightData.cabinInfo.cabinDesc +
+              " | "
+            : ""
+        }}退改签规则
+        {{
+          roundTripFlightData.cabinInfo.baggage
+            ? " | " + roundTripFlightData.cabinInfo.baggage
+            : ""
+        }}
         <view class="message_more_btn"></view>
       </view>
 
@@ -244,13 +462,48 @@
 
     <view
       @click="flodBtn"
-      :class="['filght_fold',{'unfold': filghtFold}]"
+      :class="['filght_fold', { unfold: filghtFold }]"
       v-if="flightData.data.length > 1 || roundTripFlightData.data.length > 1"
-    >{{filghtFold?'收起详情':'展开详情'}}</view>
+      >{{ filghtFold ? "收起详情" : "展开详情" }}</view
+    >
+
+    <uni-popup ref="stopMessagePopup" type="bottom">
+      <view class="stop_message_popup">
+        <view class="title">
+          <text>经停信息</text>
+          <view class="close_btn" @click="closeStopMessage"></view>
+        </view>
+        <view class="stop_message_main" v-if="stopMessageType">
+          <view
+            class="stop_message_list"
+            v-for="(item, index) in stopMessage"
+            :key="index"
+          >
+            <view class="list_message">经停机场：{{ item.air_port_name }}</view>
+            <view class="list_message">到达时间：{{ item.departure_time }}</view>
+            <view class="list_message">离开时间：{{ item.arrive_time }}</view>
+            <view class="list_message">经停{{ item.stop_time }}分钟</view>
+          </view>
+        </view>
+        <view class="stop_message_main" v-else>
+          <view
+            class="stop_message_list"
+            v-for="(item, index) in roundStopMessage"
+            :key="index"
+          >
+            <view class="list_message">经停机场：{{ item.air_port_name }}</view>
+            <view class="list_message">到达时间：{{ item.departure_time }}</view>
+            <view class="list_message">离开时间：{{ item.arrive_time }}</view>
+            <view class="list_message">经停{{ item.stop_time }}分钟</view>
+          </view>
+        </view>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script>
+import ticket from "@/api/ticketInquiry.js";
 export default {
   props: {
     flightInfo: {
@@ -278,26 +531,74 @@ export default {
       type: Boolean,
       default: () => false,
     },
-    flightTitle: {  //区别国内  退票   改签
+    flightTitle: {
+      //区别国内  退票   改签
       type: String,
-      default: () => ''
-    }
+      default: () => "",
+    },
   },
   data() {
     return {
       filghtFold: false, // 往返中转航班折叠状态
+
+      stopMessage: [], // 经停信息
+      roundStopMessage: [], // 返程经停信息
+
+      stopMessageType: null,
     };
   },
-  mounted(){
-    this.$forceUpdate()
-    console.log('航班信息头部',this.flightData,this.roundTripFlightData)
+  mounted() {
+    this.$forceUpdate();
+
+    console.log("航班信息头部", this.flightData, this.roundTripFlightData);
+
+    if (this.flightData.data[0].stopCount > 0) {
+      let data = {
+        start_time:
+          this.flightData.data[0].depTime || this.flightData.data[0].departure_time,
+        flight_no:
+          this.flightData.data[0].flightNumber || this.flightData.data[0].flight_no,
+      };
+      this.getStopMessage(data);
+    }
+
+    if (this.roundTripFlightData && JSON.stringify(this.roundTripFlightData) !== "{}") {
+      if (this.roundTripFlightData.data[0].stopCount > 0) {
+        let roundData = {
+          start_time:
+            this.roundTripFlightData.data[0].depTime ||
+            this.roundTripFlightData.data[0].departure_time,
+          flight_no:
+            this.roundTripFlightData.data[0].flightNumber ||
+            this.roundTripFlightData.data[0].flight_no,
+        };
+        this.getStopMessage(roundData, true);
+      }
+    }
   },
-  
+
   methods: {
+    // 关闭经停信息弹窗
+    closeStopMessage() {
+      this.$refs.stopMessagePopup.close();
+    },
+    // 获取经停信息
+    getStopMessage(data, type) {
+      ticket.stopMessage(data).then((res) => {
+        if (res.code === 1) {
+          if (type) {
+            this.roundStopMessage = res.msg;
+          } else {
+            this.stopMessage = res.msg;
+          }
+        }
+      });
+    },
+
     openHeadExp(val) {
       // 打开航班详情弹窗
       console.log("打开弹窗");
-      this.$emit("openHeadExpPopup",val);
+      this.$emit("openHeadExpPopup", val);
     },
 
     flodBtn() {
@@ -306,8 +607,14 @@ export default {
     },
 
     // 改签页面 - 重选航班
-    newTicket(){
-      this.$emit('changeNewTicket')
+    newTicket() {
+      this.$emit("changeNewTicket");
+    },
+
+    // 打开经停弹窗
+    openTicketStopMessage(type) {
+      this.stopMessageType = type;
+      this.$refs.stopMessagePopup.open();
     },
   },
 };
@@ -323,23 +630,23 @@ export default {
   position: relative;
   z-index: 9;
   .main_list_title {
-        font-size: 32upx;
-        font-weight: bold;
-        color: rgba(42, 42, 42, 1);
-        margin-bottom: 24rpx;
-        // padding-top: 24rpx;
-        flex: 1;
-        justify-content: flex-end;
-        &.change_new_ticket{
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          .ticket_btn{
-            font-size: 28upx;
-            font-weight: 400;
-            color: #0070E2;
-          }
-        }
+    font-size: 32upx;
+    font-weight: bold;
+    color: rgba(42, 42, 42, 1);
+    margin-bottom: 24rpx;
+    // padding-top: 24rpx;
+    flex: 1;
+    justify-content: flex-end;
+    &.change_new_ticket {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .ticket_btn {
+        font-size: 28upx;
+        font-weight: 400;
+        color: #0070e2;
+      }
+    }
   }
   .fight_list {
     // &:nth-child(2) {
@@ -606,6 +913,24 @@ export default {
         top: 22upx;
         left: -6upx;
       }
+      .arrow_stop {
+        font-size: 20upx;
+        font-weight: 400;
+        color: orange;
+        padding: 2upx 9upx 2upx 15upx;
+        display: inline-flex;
+        border: 2upx solid #ffa500;
+        margin-top: 20upx;
+        align-items: center;
+        &::after {
+          content: "";
+          background: url("@/static/ticket_stop_arrow.png") no-repeat center center;
+          width: 20upx;
+          height: 20upx;
+          background-size: contain;
+          margin-left: 8upx;
+        }
+      }
     }
   }
 
@@ -632,7 +957,7 @@ export default {
     padding-top: 22upx;
     font-size: 24upx;
     font-weight: 400;
-    color:#666;
+    color: #666;
     text-align: center;
     display: flex;
     align-items: center;
@@ -669,6 +994,59 @@ export default {
       width: 20upx;
       height: 12upx;
       margin-left: 10upx;
+    }
+  }
+  .stop_message_popup {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
+    .title {
+      height: 110upx;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 80upx 80upx 0 0;
+      position: relative;
+      border-bottom: 2upx solid rgba(217, 225, 234, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30upx;
+      font-weight: bold;
+      color: #333333;
+      .close_btn {
+        position: absolute;
+        background: url(@/static/popup_close.png) no-repeat;
+        background-size: contain;
+        width: 30upx;
+        height: 30upx;
+        top: 45upx;
+        right: 55upx;
+      }
+    }
+    .stop_message_main {
+      padding: 46upx 40upx var(--status-bar-height);
+      height: 100%;
+      box-sizing: border-box;
+      width: 100%;
+      background: rgba(255, 255, 255, 1);
+      .stop_message_list {
+        &:not(:last-child) {
+          margin-bottom: 10upx;
+          padding-bottom: 10upx;
+          border-bottom: 2upx solid rgba(217, 225, 234, 1);
+        }
+        .list_message {
+          font-size: 30upx;
+          &:not(:last-child) {
+            margin-bottom: 15upx;
+          }
+        }
+      }
     }
   }
 }

@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-12-09 17:10:26
+ * @LastEditTime: 2020-12-10 17:41:06
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -19,6 +19,7 @@
         :flightData="flightData"
         :roundTripFlightData="roundTripFlightData"
         :roundTripType="roundTripType"
+        @openStopMessage="openStopMessage"
       ></flight-header>
 
       <view v-else class="not_flight_data">
@@ -234,6 +235,7 @@
         </view>
       </view>
     </uni-popup>
+
   </scroll-view>
 </template>
 
@@ -1271,11 +1273,11 @@ export default {
     }
 
     .not_flight_data {
-      border-radius: 20rpx;
+      border-radius: 20upx;
       background: #ffffff;
-      box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
-      padding: 30rpx 20rpx 22rpx;
-      margin: 0 20rpx 20rpx;
+      box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
+      padding: 30upx 20upx 22upx;
+      margin: 0 20upx 20upx;
       height: 144upx;
       display: flex;
       flex-direction: column;
@@ -1662,5 +1664,7 @@ export default {
       }
     }
   }
+
+
 }
 </style>

@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2020-12-10 10:50:11
+ * @LastEditTime: 2020-12-10 15:53:12
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -57,6 +57,7 @@
                 }}m
               </view>
               <view class="ticket_type" v-if="item.segments.length > 1">转 {{item.segments[0].arrAirport_CN.city_name}}</view>
+              <view class="ticket_stop" v-if="item.segments[0].stopCount > 0">经停</view>
             </view>
             <view class="ticket_end ticket_time">
               <view class="ticket_date">
@@ -89,7 +90,7 @@
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
           <!-- <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view> -->
-          <view class="ticket_cabin">{{item.first_cabin.cabinInfo.cabinDesc}}{{item.first_cabin.discount}}</view>
+          <view class="ticket_cabin" v-if="item.first_cabin.discount">{{item.first_cabin.cabinInfo.cabinDesc}}{{item.first_cabin.discount}}</view>
           <view class="ticket_low_price" v-if="item.lowPrice">最低价</view>
           <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
         </view>
@@ -785,6 +786,11 @@ export default {
             .ticket_type {
               margin-top: 14upx;
             }
+            .ticket_stop{
+              font-size: 20upx;
+              text-align: center;
+              margin-top: 14upx;
+            }
 
             &::before {
               content: "";
@@ -820,6 +826,7 @@ export default {
           margin-bottom: 2upx;
           display: flex;
           align-items: baseline;
+          justify-content: flex-end;
           .currency {
             font-size: 24upx;
             margin-right: 6upx;
@@ -876,6 +883,7 @@ export default {
           background: rgba(251, 152, 38, .11);
           padding: 2upx 12upx;
           border: 2upx solid rgba(251, 152, 38, .24);
+          display: inline-flex;
         }
         .ticket_reward {
           background: rgba(255, 0, 0, 0.1);
