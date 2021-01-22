@@ -2,7 +2,7 @@
  * @Description: 订单详情页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-05 14:29:00
- * @LastEditTime: 2020-12-10 14:57:42
+ * @LastEditTime: 2021-01-22 11:50:06
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -131,6 +131,14 @@
           <text></text>
           <view></view>
         </view>
+
+        <div
+          v-if="orderDetails.ticket_segments[0].airline === 'g5' && orderDetails.status === 3"
+          class="hx_check"
+          @click="openHxCheckMessage()"
+        >
+          华夏航空 选座值机
+        </div>
 
         <!-- 出行信息 -->
         <view class="main_list passenger">
@@ -361,6 +369,21 @@
         </view>
       </view>
     </uni-popup>
+
+    <!-- 华夏值机链接弹窗 -->
+    <yun-config
+      ref="hxCheck"
+      @submitConfig="openHxCheckMessage(true)"
+      title="温馨提示"
+      content="请点击按钮复制链接，使用手机浏览器访问值机选座网页进行操作"
+      submitIndex="right"
+      :submitText="{right:'复制到剪切板'}"
+      :closeBtn="false"
+      :contentLeft="30"
+    ></yun-config>
+
+    
+
   </view>
 </template>
 
@@ -452,6 +475,8 @@ export default {
         insurance_total: 0,
         service_price: 0,
       },
+
+      hxCheckModal: false, // 华夏航空值机弹窗
     };
   },
   methods: {
@@ -509,6 +534,26 @@ export default {
           });
         }
       });
+    },
+
+    // 打开华夏航空值机选座弹窗
+    openHxCheckMessage(val) {
+      if (val) {
+        uni.setClipboardData({
+          data: "https://www.chinaexpressair.com/yss/PreCheckerH5/YSHK",
+          success: function() {
+            uni.getClipboardData({
+              success: function(res) {
+                uni.showToast({
+                  title: "已复制到剪贴板",
+                });
+              },
+            });
+          },
+        });
+      } else {
+        this.$refs.hxCheck.openConfigPopup();
+      }
     },
 
     // 复制乘客信息至剪贴板
@@ -1240,6 +1285,22 @@ export default {
           margin: auto auto 0;
           background: #e5e9f2;
         }
+      }
+
+      .hx_check {
+        border-radius: 20rpx;
+        background: #ffffff;
+        box-shadow: 0 12rpx 18rpx rgba(0, 0, 0, 0.04);
+        margin: 0 20rpx 20rpx;
+        position: relative;
+        z-index: 9;
+        height: 90upx;
+        font-size: 28upx;
+        font-weight: 400;
+        color: #333333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

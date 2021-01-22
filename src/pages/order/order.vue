@@ -2,8 +2,8 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2020-11-27 09:08:02
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-01-22 10:53:42
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order">

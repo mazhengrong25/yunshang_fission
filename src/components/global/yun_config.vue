@@ -2,20 +2,29 @@
  * @Description: 信息弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-09-07 15:24:39
- * @LastEditTime: 2020-09-21 15:27:32
+ * @LastEditTime: 2021-01-22 10:50:38
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <uni-popup ref="configPopup" type="dialog">
     <view class="config_box">
-      <view class="box_title">{{title}}</view>  
-      <view class="box_content" v-if="content">{{content}}</view>
+      <view class="box_title">{{ title }}</view>
+      <view class="box_content" :style="{marginLeft: contentLeft + 'rpx'}" v-if="content">{{ content }}</view>
       <view class="input_value" v-if="showInput">
-        <input type="text" v-model="inputValue" placeholder="请输入姓名" placeholder-class="input_placeholder">
+        <input
+          type="text"
+          v-model="inputValue"
+          placeholder="请输入姓名"
+          placeholder-class="input_placeholder"
+        />
       </view>
       <view class="box_bottom">
-        <view class="submit_btn active" @click="submitConfig('left')">{{submitText.left}}</view>
-        <view class="submit_btn" @click="submitConfig('right')">{{submitText.right}}</view>
+        <view class="submit_btn active" v-if="closeBtn" @click="submitConfig('left')">{{
+          submitText.left
+        }}</view>
+        <view class="submit_btn" @click="submitConfig('right')">{{
+          submitText.right
+        }}</view>
       </view>
     </view>
   </uni-popup>
@@ -28,12 +37,12 @@ export default {
     //   default: () => {}
     // },
 
-      title: {
+    title: {
       // 居中文字标题
       type: String,
       default: () => "",
     },
-     content: {
+    content: {
       // 内容摘要
       type: String,
       default: () => "",
@@ -41,27 +50,37 @@ export default {
     submitIndex: {
       // 确认按钮位置
       type: String,
-      default: () => 'left'
+      default: () => "left",
     },
 
     showInput: {
       type: Boolean,
-      default: () => false
+      default: () => false,
     },
 
-    submitText:{
+    submitText: {
       type: Object,
       default: () => ({
-        left: '点 错 了',
-        right: '确 认 取 消'
-      })
-    }
+        left: "点 错 了",
+        right: "确 认 取 消",
+      }),
+    },
 
+    // 隐藏关闭按钮
+    closeBtn: {
+      type: Boolean,
+      default: () => true
+    },
+
+    contentLeft: {
+      type: Number,
+      default:() => 122
+    }
   },
   data() {
     return {
-      inputValue: ''
-    }
+      inputValue: "",
+    };
   },
   methods: {
     // 打开弹窗
@@ -75,10 +94,10 @@ export default {
 
     // 确认按钮
     submitConfig(type) {
-      if(this.submitIndex === type){
-         this.$emit("submitConfig",this.inputValue);
+      if (this.submitIndex === type) {
+        this.$emit("submitConfig", this.inputValue);
       }
-      this.closeConfig()
+      this.closeConfig();
     },
   },
 };
@@ -104,18 +123,18 @@ export default {
     font-size: 26upx;
     height: 80upx;
     letter-spacing: 2px;
-    margin-left: 122upx;
     padding: 30upx 50upx 30upx 20upx;
     color: rgba(42, 42, 42, 1);
+    text-align: justify;
   }
-  .input_value{
+  .input_value {
     height: 80upx;
     padding: 0 40upx;
     display: flex;
     align-items: center;
     justify-content: center;
-    input{
-      border: 2upx solid #F1F3F5;
+    input {
+      border: 2upx solid #f1f3f5;
       width: 100%;
       padding: 10upx 20upx;
     }

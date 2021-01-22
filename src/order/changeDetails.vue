@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2020-12-10 09:09:04
+ * @LastEditTime: 2021-01-06 11:40:29
  * @LastEditors: wish.WuJunLong
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
@@ -273,7 +273,7 @@
             </view>
             <view class="list_item">
               <view class="item_title">备注</view>
-              <view class="item_message input-right-arrow">{{ remark || "无" }}</view>
+              <view class="item_message input-right-arrow">{{ changeDetailsData.reason || "无" }}</view>
             </view>
           </view>
         </view>
@@ -299,7 +299,7 @@
         <view class="price_info_box">
           <view class="total_price_header">
             <view class="header_left">
-              <view class="total_price_title">订单总价</view>
+              <view class="total_price_title">改签费总价</view>
               <view class="total_price_message">
                 <text>&yen;</text>{{ changeDetailsData.change_fee }}
               </view>

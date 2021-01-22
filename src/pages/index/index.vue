@@ -2,9 +2,9 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-12-09 17:12:32
+ * @LastEditTime: 2021-01-15 18:22:49
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="index">
     <yun-header
@@ -198,11 +198,7 @@
         </view>
       </view>
       <view class="flight_explanation_main">
-        <swiper
-          class="explanation_content"
-          @change="popupChange"
-          :current="popupCurrent"
-        >
+        <swiper class="explanation_content" @change="popupChange" :current="popupCurrent">
           <swiper-item>
             <view class="popup_content_item">儿童票</view>
           </swiper-item>
@@ -264,7 +260,7 @@ export default {
           path: require("@/static/header_swiper.jpg"),
           title: "云上航空，心之所愿",
           url: "#",
-          swiper_type: true
+          swiper_type: true,
         },
       ],
 
@@ -309,11 +305,17 @@ export default {
           province: "北京",
         },
         toTime: {
-          date: moment().add(1, "d").format("YYYY-MM-DD"),
-          month: moment().add(1, "d").format("M月DD日"),
+          date: moment()
+            .add(1, "d")
+            .format("YYYY-MM-DD"),
+          month: moment()
+            .add(1, "d")
+            .format("M月DD日"),
           status: "start",
           type: "time",
-          week: moment().add(1, "d").format("ddd"),
+          week: moment()
+            .add(1, "d")
+            .format("ddd"),
         },
         fromTime: {},
         to_type: "",
@@ -470,14 +472,11 @@ export default {
       console.log("提交", JSON.stringify(this.airMessage));
       this.airMessage["type"] = this.currentTab;
 
-      uni.removeStorageSync('changeMessage');
-      uni.removeStorageSync('changeTicket');
+      uni.removeStorageSync("changeMessage");
+      uni.removeStorageSync("changeTicket");
 
       let jumpUrl;
-      if (
-        this.currentTab === 0 &&
-        JSON.stringify(this.airMessage.fromTime) === "{}"
-      ) {
+      if (this.currentTab === 0 && JSON.stringify(this.airMessage.fromTime) === "{}") {
         jumpUrl = "/ticketInquiry/ticketInquiry";
       } else if (this.currentTab === 2 && this.airMessage.fromTime) {
         jumpUrl = "/ticketInquiry/ticketRoundTrip";
@@ -574,6 +573,16 @@ export default {
       console.log("时间返回", timeData);
       uni.removeStorageSync("time");
     }
+    wx.login({
+      success(res) {
+        if (res.code) {
+          console.log(res.code)
+          uni.setStorageSync("userCode", res.code);
+        } else {
+          console.log("登录失败！" + res.errMsg);
+        }
+      },
+    });
   },
 };
 </script>
@@ -873,8 +882,7 @@ export default {
                 background: url(@/static/number_remove_btn.png) no-repeat;
                 background-size: contain;
                 &.active {
-                  background: url(@/static/number_remove_btn_active.png)
-                    no-repeat;
+                  background: url(@/static/number_remove_btn_active.png) no-repeat;
                   background-size: contain;
                 }
               }

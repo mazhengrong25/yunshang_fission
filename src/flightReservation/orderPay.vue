@@ -2,12 +2,16 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2020-12-10 14:57:58
+ * @LastEditTime: 2021-01-22 10:52:50
  * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_pay">
-    <yun-header :statusHeight="iStatusBarHeight" centerTitle="确认支付" :showHome="true"></yun-header>
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      centerTitle="确认支付"
+      :showHome="true"
+    ></yun-header>
     <view class="order_price">
       <text>订单总价</text>
       <view>
@@ -74,10 +78,10 @@
             <radio value="钱包" color="#0070E2" checked="true" />
           </label>
           <label class="type_group" @click="notPayStatus">
-            <view class="group_title">
-              <image src="@/static/pay_yibao.png" mode="contain" />易宝支付
+            <view class="group_title" >
+              <image src="@/static/pay_wx.png" mode="contain" />微信支付
             </view>
-            <radio value="易宝" disabled color="#0070E2" />
+            <radio value="微信" disabled color="#0070E2" />
           </label>
         </radio-group>
       </view>
@@ -114,6 +118,21 @@ import flightHeader from "@/components/flight_header.vue"; // 航程信息
 import ticket from "@/api/ticketInquiry.js";
 import moment from "moment";
 moment.locale("zh-cn");
+
+let Base64 = {
+  decode(str) {
+    // Going backwards: from bytestream, to percent-encoding, to original string.
+    return decodeURIComponent(
+      atob(str)
+        .split("")
+        .map(function(c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+  },
+};
+
 export default {
   components: {
     flightHeader,
@@ -270,9 +289,11 @@ export default {
           success: (res) => {
             if (res.confirm) {
               let data = {
-                pay_type: this.payType === "钱包" ? 1 : "",
+                pay_type: this.payType === "钱包" ? 1 : this.payType === "微信" ? 5 : "",
+                code: this.payType === "微信" ? uni.getStorageSync("userCode") : "",
               };
               let payType = type === "儿童" ? 1 : 0;
+
               ticket
                 .payOrder(
                   uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])),
@@ -280,15 +301,96 @@ export default {
                 )
                 .then((res) => {
                   if (res.errorcode === 10000) {
-                    if (this.payOrder.length > 1) {
-                      // 携带儿童订单
-                      if (payType === 1) {
-                        this.childPayStatus = true;
+                    if (this.payType === "微信") {
+                      let wxData = JSON.parse(res.data.pay_url);
+                      console.log(wxData);
+                      wx.requestPayment({
+                        timeStamp: wxData.timestamp,
+                        nonceStr: wxData.noncestr,
+                        package: wxData.package,
+                        signType: wxData.signType,
+                        paySign: wxData.sign,
+                        success: function(res) {
+                          if (this.payOrder.length > 1) {
+                            // 携带儿童订单
+                            if (payType === 1) {
+                              this.childPayStatus = true;
+                            } else {
+                              this.payPayStatus = false;
+                            }
+                            if (this.childPayStatus && !this.payPayStatus) {
+                              console.log("成人儿童支付成功");
+                              let orderInfo = {
+                                payId: this.payOrder,
+                                payType: this.payType,
+                                price: this.price,
+                                payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                              };
+                              uni.reLaunch({
+                                url:
+                                  "/flightReservation/payResult?orderData=" +
+                                  JSON.stringify(orderInfo),
+                              });
+                            }
+                            uni.showToast({
+                              title: "支付成功",
+                              icon: "none",
+                              mask: true,
+                            });
+                          } else {
+                            // 单个成人订单
+                            this.payPayStatus = false;
+                            let orderInfo = {
+                              payId: this.payOrder,
+                              payType: this.payType,
+                              price: this.price,
+                              payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                            };
+                            uni.reLaunch({
+                              url:
+                                "/flightReservation/payResult?orderData=" +
+                                JSON.stringify(orderInfo),
+                            });
+                          }
+                        },
+                        fail: function(res) {
+                          uni.showToast({
+                            title: "已支付取消",
+                            icon: "none",
+                          });
+                        },
+                        complete: function(res) {},
+                      });
+                    } else {
+                      if (this.payOrder.length > 1) {
+                        // 携带儿童订单
+                        if (payType === 1) {
+                          this.childPayStatus = true;
+                        } else {
+                          this.payPayStatus = false;
+                        }
+                        if (this.childPayStatus && !this.payPayStatus) {
+                          console.log("成人儿童支付成功");
+                          let orderInfo = {
+                            payId: this.payOrder,
+                            payType: this.payType,
+                            price: this.price,
+                            payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+                          };
+                          uni.reLaunch({
+                            url:
+                              "/flightReservation/payResult?orderData=" +
+                              JSON.stringify(orderInfo),
+                          });
+                        }
+                        uni.showToast({
+                          title: "支付成功",
+                          icon: "none",
+                          mask: true,
+                        });
                       } else {
+                        // 单个成人订单
                         this.payPayStatus = false;
-                      }
-                      if (this.childPayStatus && !this.payPayStatus) {
-                        console.log("成人儿童支付成功");
                         let orderInfo = {
                           payId: this.payOrder,
                           payType: this.payType,
@@ -301,25 +403,6 @@ export default {
                             JSON.stringify(orderInfo),
                         });
                       }
-                      uni.showToast({
-                        title: "支付成功",
-                        icon: "none",
-                        mask: true,
-                      });
-                    } else {
-                      // 单个成人订单
-                      this.payPayStatus = false;
-                      let orderInfo = {
-                        payId: this.payOrder,
-                        payType: this.payType,
-                        price: this.price,
-                        payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-                      };
-                      uni.reLaunch({
-                        url:
-                          "/flightReservation/payResult?orderData=" +
-                          JSON.stringify(orderInfo),
-                      });
                     }
                   } else {
                     if (payType === 1) {

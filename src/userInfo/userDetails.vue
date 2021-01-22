@@ -2,7 +2,7 @@
  * @Description: 用户详细信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 15:05:48
- * @LastEditTime: 2020-09-04 08:59:48
+ * @LastEditTime: 2021-01-13 09:38:21
  * @LastEditors: wish.WuJunLong
 --> 
 <template>

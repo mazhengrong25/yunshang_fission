@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2020-12-07 16:25:17
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-01-06 11:32:51
+ * @LastEditors: wish.WuJunLong
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
 -->
@@ -75,7 +75,7 @@
               </view>
               <view class="item_price">
                 <text>&yen;</text>
-                {{ item.ticket_price }}
+                {{ item.change_fee }}
               </view>
             </view>
             <view class="item_info">
