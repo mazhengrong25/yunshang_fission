@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2021-01-22 10:52:50
+ * @LastEditTime: 2021-02-18 10:23:41
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -77,11 +77,11 @@
             </view>
             <radio value="钱包" color="#0070E2" checked="true" />
           </label>
-          <label class="type_group" @click="notPayStatus">
-            <view class="group_title" >
+          <label class="type_group">
+            <view class="group_title">
               <image src="@/static/pay_wx.png" mode="contain" />微信支付
             </view>
-            <radio value="微信" disabled color="#0070E2" />
+            <radio value="微信" color="#0070E2" />
           </label>
         </radio-group>
       </view>
@@ -269,6 +269,8 @@ export default {
     radioChange(val) {
       this.payType = val.detail.value;
       console.log(this.payType);
+      this.payBtnStatus = true;
+      this.payPayStatus = true;
     },
 
     // 易宝支付
@@ -304,6 +306,7 @@ export default {
                     if (this.payType === "微信") {
                       let wxData = JSON.parse(res.data.pay_url);
                       console.log(wxData);
+                      let _that = this;
                       wx.requestPayment({
                         timeStamp: wxData.timestamp,
                         nonceStr: wxData.noncestr,
@@ -311,19 +314,29 @@ export default {
                         signType: wxData.signType,
                         paySign: wxData.sign,
                         success: function(res) {
-                          if (this.payOrder.length > 1) {
+                          wx.login({
+                            success(res) {
+                              if (res.code) {
+                                console.log(res.code);
+                                uni.setStorageSync("userCode", res.code);
+                              } else {
+                                console.log("登录失败！" + res.errMsg);
+                              }
+                            },
+                          });
+                          if (_that.payOrder.length > 1) {
                             // 携带儿童订单
                             if (payType === 1) {
-                              this.childPayStatus = true;
+                              _that.childPayStatus = true;
                             } else {
-                              this.payPayStatus = false;
+                              _that.payPayStatus = false;
                             }
-                            if (this.childPayStatus && !this.payPayStatus) {
+                            if (_that.childPayStatus && !_that.payPayStatus) {
                               console.log("成人儿童支付成功");
                               let orderInfo = {
-                                payId: this.payOrder,
-                                payType: this.payType,
-                                price: this.price,
+                                payId: _that.payOrder,
+                                payType: _that.payType,
+                                price: _that.price,
                                 payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
                               };
                               uni.reLaunch({
@@ -339,11 +352,11 @@ export default {
                             });
                           } else {
                             // 单个成人订单
-                            this.payPayStatus = false;
+                            _that.payPayStatus = false;
                             let orderInfo = {
-                              payId: this.payOrder,
-                              payType: this.payType,
-                              price: this.price,
+                              payId: _that.payOrder,
+                              payType: _that.payType,
+                              price: _that.price,
                               payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
                             };
                             uni.reLaunch({
@@ -412,7 +425,7 @@ export default {
                       this.payBtnStatus = false;
                     }
                     uni.showToast({
-                      title: res.data,
+                      title: res.data.msg,
                       icon: "none",
                       duration: 4000,
                     });

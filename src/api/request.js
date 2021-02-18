@@ -2,8 +2,8 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2020-11-04 13:39:54
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-01-28 18:14:27
+ * @LastEditors: wish.WuJunLong
  */
 
 const request = (config, type) => {
