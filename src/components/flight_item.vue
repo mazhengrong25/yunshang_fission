@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2020-12-07 14:18:35
+ * @LastEditTime: 2021-02-18 14:02:15
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -59,7 +59,7 @@
         <button v-else class="get_price" @click="getPriceBtn">立即获取</button>
         <view
           class="header_right_voteNumber"
-          v-if="flightData.voteNumber !== 'A'"
+          v-if="flightData.voteNumber !== 'A' && Number(flightData.voteNumber) !== 9"
           >{{ flightData.voteNumber }}张</view
         >
       </view>
