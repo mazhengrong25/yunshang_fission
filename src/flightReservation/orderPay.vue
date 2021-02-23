@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2021-02-18 10:23:41
+ * @LastEditTime: 2021-02-18 18:43:07
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -285,28 +285,29 @@ export default {
     // 立即支付按钮
     jumpPay(type) {
       if (this.payBtnStatus) {
+        let _that = this
         uni.showModal({
           title: "提示",
           content: "请确定是否支付当前订单",
           success: (res) => {
             if (res.confirm) {
               let data = {
-                pay_type: this.payType === "钱包" ? 1 : this.payType === "微信" ? 5 : "",
-                code: this.payType === "微信" ? uni.getStorageSync("userCode") : "",
+                pay_type: _that.payType === "钱包" ? 1 : _that.payType === "微信" ? 5 : "",
+                code: _that.payType === "微信" ? uni.getStorageSync("userCode") : "",
               };
               let payType = type === "儿童" ? 1 : 0;
 
               ticket
                 .payOrder(
-                  uni.arrayBufferToBase64(new Buffer(this.payOrder[payType])),
+                  uni.arrayBufferToBase64(new Buffer(_that.payOrder[payType])),
                   data
                 )
                 .then((res) => {
                   if (res.errorcode === 10000) {
-                    if (this.payType === "微信") {
+                    if (_that.payType === "微信") {
+                      console.log(res.data.pay_url)
                       let wxData = JSON.parse(res.data.pay_url);
                       console.log(wxData);
-                      let _that = this;
                       wx.requestPayment({
                         timeStamp: wxData.timestamp,
                         nonceStr: wxData.noncestr,
@@ -315,12 +316,12 @@ export default {
                         paySign: wxData.sign,
                         success: function(res) {
                           wx.login({
-                            success(res) {
-                              if (res.code) {
-                                console.log(res.code);
-                                uni.setStorageSync("userCode", res.code);
+                            success(wxcode) {
+                              if (wxcode.code) {
+                                console.log(wxcode.code);
+                                uni.setStorageSync("userCode", wxcode.code);
                               } else {
-                                console.log("登录失败！" + res.errMsg);
+                                console.log("登录失败！" + wxcode.errMsg);
                               }
                             },
                           });
@@ -375,19 +376,19 @@ export default {
                         complete: function(res) {},
                       });
                     } else {
-                      if (this.payOrder.length > 1) {
+                      if (_that.payOrder.length > 1) {
                         // 携带儿童订单
                         if (payType === 1) {
-                          this.childPayStatus = true;
+                          _that.childPayStatus = true;
                         } else {
-                          this.payPayStatus = false;
+                          _that.payPayStatus = false;
                         }
-                        if (this.childPayStatus && !this.payPayStatus) {
+                        if (_that.childPayStatus && !_that.payPayStatus) {
                           console.log("成人儿童支付成功");
                           let orderInfo = {
-                            payId: this.payOrder,
-                            payType: this.payType,
-                            price: this.price,
+                            payId: _that.payOrder,
+                            payType: _that.payType,
+                            price: _that.price,
                             payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
                           };
                           uni.reLaunch({
@@ -403,11 +404,11 @@ export default {
                         });
                       } else {
                         // 单个成人订单
-                        this.payPayStatus = false;
+                        _that.payPayStatus = false;
                         let orderInfo = {
-                          payId: this.payOrder,
-                          payType: this.payType,
-                          price: this.price,
+                          payId: _that.payOrder,
+                          payType: _that.payType,
+                          price: _that.price,
                           payDate: moment().format("YYYY-MM-DD HH:mm:ss"),
                         };
                         uni.reLaunch({
@@ -419,10 +420,10 @@ export default {
                     }
                   } else {
                     if (payType === 1) {
-                      this.childPayStatus = false;
+                      _that.childPayStatus = false;
                     } else {
-                      this.payPayStatus = false;
-                      this.payBtnStatus = false;
+                      _that.payPayStatus = false;
+                      _that.payBtnStatus = false;
                     }
                     uni.showToast({
                       title: res.data.msg,

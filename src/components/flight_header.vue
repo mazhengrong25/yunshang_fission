@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 头部信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:18:02
- * @LastEditTime: 2020-12-10 18:10:48
+ * @LastEditTime: 2021-02-18 17:32:05
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -167,7 +167,7 @@
                   mode="aspectFill"
                 />
                 {{
-                  item.airline_CN +
+                  item.airline_CN.air_name || item.airline_CN +
                     item[interType ? "flightNumber" : "flight_no"] +
                     " | " +
                     item[interType ? "aircraftCode" : "model"]
@@ -225,7 +225,7 @@
           mode="aspectFill"
         />
         {{
-          flightData.data[0].airline_CN +
+          flightData.data[0].airline_CN.air_name || flightData.data[0].airline_CN +
             flightData.data[0][interType ? "flightNumber" : "flight_no"]
         }}{{
           flightData.data[0][interType ? "aircraftCode" : "model"]
@@ -352,7 +352,7 @@
                   mode="aspectFill"
                 />
                 {{
-                  item.airline_CN +
+                  item.airline_CN.air_name || item.airline_CN +
                     item[interType ? "flightNumber" : "flight_no"] +
                     " | " +
                     item[interType ? "aircraftCode" : "model"]
@@ -413,7 +413,7 @@
         />
 
         {{
-          roundTripFlightData.data[0].airline_CN +
+          roundTripFlightData.data[0].airline_CN.air_name || roundTripFlightData.data[0].airline_CN +
             roundTripFlightData.data[0][interType ? "flightNumber" : "flight_no"]
         }}{{
           roundTripFlightData.data[0][interType ? "aircraftCode" : "model"]

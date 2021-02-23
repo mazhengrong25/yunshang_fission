@@ -69,7 +69,7 @@
                             />
                         </view>
                         <view class="message_list">
-                            {{historyFirst.change_segments[0].airline_CN}}
+                            {{historyFirst.change_segments[0].airline_CN.air_name}}
                         </view>
                         <view class="message_list">{{ historyFirst.change_segments[0].flight_no }}</view>
                             <view class="message_list">{{ historyFirst.change_segments[0].model }}</view>
@@ -205,7 +205,7 @@
                         />
                         </view>
                          <view class="message_list">
-                            {{historyFromer.change_segments[0].airline_CN}}
+                            {{historyFromer.change_segments[0].airline_CN.air_name}}
                         </view>
                         <view class="message_list">{{ historyFromer.change_segments[0].flight_no }}</view>
                         <view class="message_list">{{ historyFromer.change_segments[0].model }}</view>

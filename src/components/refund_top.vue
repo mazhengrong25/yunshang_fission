@@ -122,6 +122,7 @@ export default {
         {
           voluntary: "非自愿",
           value: "否",
+          checked: false,
           key: 2,
         },
       ],
@@ -135,6 +136,7 @@ export default {
         },
         {
           value: "升舱",
+          checked: false,
           key: 4,
         },
       ],

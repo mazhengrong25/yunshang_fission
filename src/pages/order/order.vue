@@ -2,7 +2,7 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2021-01-22 10:53:42
+ * @LastEditTime: 2021-02-23 16:29:20
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -71,11 +71,6 @@ export default {
 
     //跳转到国内改签订单
     goChangeList() {
-      return uni.showToast({
-        title: "当前功能开发中，请等待后续版本更新",
-        duration: 3000,
-        icon: "none",
-      });
       uni.navigateTo({
         url: "/order/changeList",
       });

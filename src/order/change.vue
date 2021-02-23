@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2020-12-09 17:20:35
+ * @LastEditTime: 2021-02-23 16:39:50
  * @LastEditors: wish.WuJunLong
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
@@ -347,9 +347,9 @@ export default {
       this.$refs.changeMessage.close();
       if (this.message_true) {
         console.log("返回上一页");
-        // 返回到订单详情页面
-        uni.navigateBack({
-          delta: 4,
+        // 前往改签列表页
+        uni.reLaunch({
+          url: "/order/changeList",
         });
       }
     },

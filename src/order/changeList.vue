@@ -1,7 +1,7 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 11:51:20
- * @LastEditTime: 2021-01-06 11:32:51
+ * @LastEditTime: 2021-02-23 16:30:26
  * @LastEditors: wish.WuJunLong
  * @Description: 国内改签列表
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\changeList.vue
@@ -243,7 +243,7 @@ export default {
                             : this.headerActive === 3
                             ?3
                             : this.headerActive, // 订单状态
-            created_at:this.changeListFilter.Timestart || moment().subtract(3, "years").format("YYYY-MM-DD"), // 申请开始
+            created_at:this.changeListFilter.Timestart || moment().subtract(3, "days").format("YYYY-MM-DD"), // 申请开始
             created_at_end:this.changeListFilter.Timend || moment().format("YYYY-MM-DD"), // 申请结束
             page:this.orderPageNumber, //   页数 
             order_no:this.changeListFilter.orderNumber || "", //订单号
