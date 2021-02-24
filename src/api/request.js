@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2021-01-28 18:14:27
+ * @LastEditTime: 2021-02-24 18:13:06
  * @LastEditors: wish.WuJunLong
  */
 
@@ -43,16 +43,10 @@ const request = (config, type) => {
     if (currentTime > loginTime) {
       uni.request({
         method: 'POST',
-        url: baseUrl + '/api/login',
-        data: {
-          login_name: loginInfo.account,
-          password: loginInfo.password,
-        },
+        url: baseUrl + '/api/refresh',
         success: (res) => {
           if (res.data.errorcode === 10000) {
             let loginInfo = {
-              account: uni.getStorageSync('loginInfo').account,
-              password: uni.getStorageSync('loginInfo').password,
               token: res.data.data.access_token,
               loginTime: new Date(new Date().getTime() + 3600 * 1000),
             };

@@ -2,12 +2,16 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2020-08-03 15:52:57
+ * @LastEditTime: 2021-02-24 18:22:56
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="login">
-    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="云上航空"></yun-header>
+    <yun-header
+      :showReturn="false"
+      :statusHeight="iStatusBarHeight"
+      centerTitle="云上航空"
+    ></yun-header>
     <view class="login_banner">
       <view class="banner">
         <image class="banner_img" src="@/static/login_banner.png" mode="contain" />
@@ -22,7 +26,11 @@
       <view class="login_form">
         <view class="form_list">
           <view class="form_title">
-            <image class="form_title_icon" src="@/static/login_username.png" mode="contain" />
+            <image
+              class="form_title_icon"
+              src="@/static/login_username.png"
+              mode="contain"
+            />
             <text>用户名</text>
           </view>
           <input
@@ -35,7 +43,11 @@
         </view>
         <view class="form_list">
           <view class="form_title">
-            <image class="form_title_icon" src="@/static/login_password.png" mode="contain" />
+            <image
+              class="form_title_icon"
+              src="@/static/login_password.png"
+              mode="contain"
+            />
             <text>密码</text>
           </view>
           <input
@@ -48,6 +60,11 @@
         </view>
       </view>
       <view class="login_submit" @click="loginBtn">登录</view>
+      <view class="scan_submit" @click="scanCodeBtn">
+        <image class="scan_icon" src="@/static/scan_code_btn.png" mode="contain" />
+
+        扫码登录</view
+      >
     </view>
   </view>
 </template>
@@ -63,8 +80,9 @@ export default {
     };
   },
   methods: {
+    // 登录按钮
     loginBtn() {
-      console.log('点击登录')
+      console.log("点击登录");
       if (this.userName && this.password) {
         let data = {
           login_name: this.userName,
@@ -80,12 +98,10 @@ export default {
             });
 
             let loginInfo = {
-              account: this.userName,
-              password: this.password,
+              // account: this.userName,
+              // password: this.password,
               token: res.data.access_token,
-              loginTime: new Date(
-                new Date().getTime() + (3600 * 1000)
-              ),
+              loginTime: new Date(new Date().getTime() + 3600 * 1000),
             };
 
             uni.setStorageSync("loginInfo", loginInfo);
@@ -112,6 +128,56 @@ export default {
         });
       }
     },
+
+    // 扫码登录
+    scanCodeBtn() {
+      uni.scanCode({
+        onlyFromCamera: false,
+        success: (res) => {
+          wx.showLoading({
+            title: "加载中",
+          });
+
+          console.log(res);
+          let data = {
+            access_token: res.result,
+          };
+          login.scanCodeLogin(data).then((res) => {
+            console.log(res);
+            if (res.errorcode === 10000) {
+              wx.hideLoading();
+              wx.showToast({
+                title: "登录成功",
+                icon: "succes",
+                mask: true,
+              });
+
+              let loginInfo = {
+                // account: this.userName,
+                // password: this.password,
+                token: res.data.access_token,
+                loginTime: new Date(new Date().getTime() + 3600 * 1000),
+              };
+
+              uni.setStorageSync("loginInfo", loginInfo);
+
+              setTimeout(() => {
+                uni.switchTab({
+                  url: "/pages/index/index",
+                });
+              }, 500);
+            } else {
+              wx.showToast({
+                title: "二维码已过期，请重新扫码",
+                icon: "none",
+                duration: 2000,
+                mask: true,
+              });
+            }
+          });
+        },
+      });
+    },
   },
   onLoad() {
     let that = this;
@@ -130,7 +196,8 @@ export default {
 
 <style lang="less" scoped>
 .login {
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   .login_banner {
     position: relative;
@@ -161,7 +228,8 @@ export default {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 20upx;
     margin: 0 20upx;
-    padding: 36upx 30upx 0 45upx;
+    padding: 36upx 30upx 10upx 45upx;
+    overflow: auto;
     .ligin_icon {
       width: 187upx;
       height: 73upx;
@@ -172,11 +240,11 @@ export default {
       font-size: 48upx;
       font-weight: bold;
       color: rgba(51, 51, 51, 1);
-      margin-bottom: 95upx;
+      margin-bottom: 60upx;
       text {
         display: block;
         &:first-child {
-          margin-bottom: 28upx;
+          margin-bottom: 12upx;
         }
         &:last-child {
           font-size: 44upx;
@@ -184,12 +252,12 @@ export default {
       }
     }
     .login_form {
-      margin-bottom: 6vh;
+      margin-bottom: 4vh;
       .form_list {
         padding-bottom: 28upx;
         border-bottom: 2upx solid rgba(241, 243, 245, 1);
         &:not(:last-child) {
-          margin-bottom: 60upx;
+          margin-bottom: 50upx;
         }
         .form_title {
           font-size: 30upx;
@@ -229,6 +297,26 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    .scan_submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 90upx;
+      border: 1px solid #afb9c4;
+      border-radius: 80upx;
+      margin-top: 20upx;
+      text-align: center;
+      margin-top: 32upx;
+      font-size: 32upx;
+      font-weight: 400;
+      color: #333333;
+      .scan_icon {
+        width: 30upx;
+        height: 30upx;
+        object-fit: contain;
+        margin-right: 18upx;
+      }
     }
   }
 }
