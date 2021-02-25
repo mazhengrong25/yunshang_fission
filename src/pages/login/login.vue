@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2021-02-24 18:22:56
+ * @LastEditTime: 2021-02-25 15:30:12
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -129,6 +129,17 @@ export default {
       }
     },
 
+    getCodeToken(val) {
+      let str = val.replace("?", "");
+      let arr = str.split("&");
+      let obj = {};
+      arr.forEach((e) => {
+        let key = e.split("=");
+        obj[key[0]] = key[1];
+      });
+      return obj;
+    },
+
     // 扫码登录
     scanCodeBtn() {
       uni.scanCode({
@@ -138,9 +149,9 @@ export default {
             title: "加载中",
           });
 
-          console.log(res);
+          let obj = this.getCodeToken(res.result)
           let data = {
-            access_token: res.result,
+            access_token: obj[Object.keys(obj)[0]],
           };
           login.scanCodeLogin(data).then((res) => {
             console.log(res);
