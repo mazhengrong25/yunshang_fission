@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2021-02-24 18:13:06
+ * @LastEditTime: 2021-02-25 17:42:20
  * @LastEditors: wish.WuJunLong
  */
 
@@ -42,6 +42,9 @@ const request = (config, type) => {
   let promise = new Promise((resolve, reject) => {
     if (currentTime > loginTime) {
       uni.request({
+        header: {
+          Authorization: 'Bearer ' + (uni.getStorageSync('loginInfo').token ? uni.getStorageSync('loginInfo').token : '')
+        },
         method: 'POST',
         url: baseUrl + '/api/refresh',
         success: (res) => {
