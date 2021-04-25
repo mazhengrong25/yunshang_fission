@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2021-02-18 17:26:22
+ * @LastEditTime: 2021-04-25 10:21:04
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -85,7 +85,7 @@
             <text class="currency" v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">&yen;</text>
             <view v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">{{item.min_price}}</view>
             <view class="sold_out" v-if="item.available_cabin === 0">售罄</view>
-            <view class="sold_out" v-if="item.min_price === 0">手动获取</view>
+            <view class="sold_out" v-else-if="item.min_price === 0">手动获取</view>
             <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
@@ -520,7 +520,7 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      console.log("跳转",data);
+      console.log("跳转舱位",data);
       if (data.available_cabin === 0) {
         return false;
       }

@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2021-02-18 18:43:07
+ * @LastEditTime: 2021-03-19 16:54:03
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -369,7 +369,7 @@ export default {
                         },
                         fail: function(res) {
                           uni.showToast({
-                            title: "已支付取消",
+                            title: "已取消支付",
                             icon: "none",
                           });
                         },

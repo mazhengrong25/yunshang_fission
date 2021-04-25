@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2020-12-10 15:55:06
+ * @LastEditTime: 2021-04-25 10:41:09
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -106,12 +106,18 @@
                 {{ item.segments[0].airline_CN }}{{ item.segments[0].flightNumber }}
               </view>
               <view class="price" v-if="item.available_cabin > 0">
-                <view class="price_mini">&yen;</view>
+                <view v-if="Number(item.min_price) > 0" class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{ item.min_price }}</text>
+                <text v-if="Number(item.min_price) > 0">{{ item.min_price }}</text>
+                <view
+                  class="not_price"
+                  v-else-if="Number(item.min_price) === 0"
+                  style="font-size: 30rpx"
+                  >手动获取</view
+                >
                 <!-- <view class="price_mini">起</view> -->
               </view>
-              <view v-else class="not_price">售罄</view>
+              <view v-else-if="item.available_cabin === 0" class="not_price">售罄</view>
             </view>
           </view>
 
@@ -200,10 +206,15 @@
                 }}{{ item.segments[item.segments.length - 1].flightNumber }}
               </view>
               <view class="price" v-if="item.available_cabin > 0">
-                <view class="price_mini">&yen;</view>
+                <view v-if="Number(item.min_price) > 0" class="price_mini">&yen;</view>
                 <!-- <text>{{item.totalPrice}}</text> -->
-                <text>{{ item.min_price }}</text>
-                <!-- <view class="price_mini">起</view> -->
+                <text v-if="Number(item.min_price) > 0">{{ item.min_price }}</text>
+                <view
+                  class="not_price"
+                  v-else-if="Number(item.min_price) === 0"
+                  style="font-size: 30rpx"
+                  >手动获取</view
+                >
               </view>
               <view v-else class="not_price">售罄</view>
             </view>

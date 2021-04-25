@@ -90,7 +90,7 @@
           "path": "orderDetails",
           "style": {
             "navigationStyle": "custom"
-          } 
+          }
         },
         {
           "path": "orderinterDetails",
@@ -127,12 +127,14 @@
           "style": {
             "navigationStyle": "custom"
           }
-        },{
+        },
+        {
           "path": "sendMessage",
           "style": {
             "navigationStyle": "custom"
           }
-        },{
+        },
+        {
           "path": "addRemark",
           "style": {
             "navigationStyle": "custom"
@@ -151,6 +153,12 @@
         },
         {
           "path": "serviceDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "walletRecharge",
           "style": {
             "navigationStyle": "custom"
           }
@@ -195,13 +203,14 @@
           "style": {
             "navigationStyle": "custom"
           }
-        }, {
+        },
+        {
           "path": "mailAddress",
           "style": {
             "navigationBarTitleText": "报销凭证"
           }
         },
-    
+
         {
           "path": "passengerManage",
           "style": {
@@ -225,7 +234,8 @@
           "style": {
             "navigationStyle": "custom"
           }
-        },{
+        },
+        {
           "path": "webView"
         },
         {
@@ -257,7 +267,6 @@
             "navigationStyle": "custom"
           }
         }
-      
       ]
     }
   ],

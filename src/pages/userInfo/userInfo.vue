@@ -2,23 +2,34 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2021-02-23 16:40:37
+ * @LastEditTime: 2021-03-29 15:47:46
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="user_info">
-    <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="我的"></yun-header>
+    <yun-header
+      :showReturn="false"
+      :statusHeight="iStatusBarHeight"
+      centerTitle="我的"
+    ></yun-header>
     <view class="header">
-      <view class="version_number">v1.1.1</view>
+      <view class="version_number">v1.2.0</view>
       <view class="info_box">
         <view class="info_left">
           <view class="avatar">
-            <image class="avatar_image" v-if="avatarUrl" :src="avatarUrl" mode="contain" />
+            <image
+              class="avatar_image"
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              mode="contain"
+            />
             <image class="avatar_image" v-else src="@/static/avatar.png" mode="contain" />
           </view>
           <view class="left_message">
-            <view class="user_name">{{userInfo.contact || '用户名获取中...'}}</view>
-            <view class="user_type">{{userInfo.company_name || '公司名称获取中...'}}</view>
+            <view class="user_name">{{ userInfo.contact || "用户名获取中..." }}</view>
+            <view class="user_type">{{
+              userInfo.company_name || "公司名称获取中..."
+            }}</view>
           </view>
         </view>
         <view class="info_right">
@@ -33,7 +44,7 @@
             <view class="wallet_title">钱包余额</view>
             <view class="wallet_number">
               <text class="wallet_symbol">&yen;</text>
-              {{walletInfo.storage_money || '0.00'}}
+              {{ walletInfo.storage_money || "0.00" }}
             </view>
           </view>
           <view class="wallet_list">
@@ -41,7 +52,7 @@
               <view class="wallet_title">授信额度</view>
               <view class="wallet_number">
                 <text class="wallet_symbol">&yen;</text>
-                {{walletInfo.credit_money || '0.00'}}
+                {{ walletInfo.credit_money || "0.00" }}
               </view>
             </view>
 
@@ -49,10 +60,16 @@
               <view class="wallet_title">短信余额</view>
               <view class="wallet_number">
                 <text class="wallet_symbol">&yen;</text>
-                {{walletInfo.msg_money || '0.00'}}
-                <text
-                  class="wallet_unit"
-                >({{(Number(walletInfo.msg_money) / Number(walletInfo.msg_price)) > 0? Math.floor(Number(walletInfo.msg_money) / Number(walletInfo.msg_price)): 0 }}条)</text>
+                {{ walletInfo.msg_money || "0.00" }}
+                <text class="wallet_unit"
+                  >({{
+                    Number(walletInfo.msg_money) / Number(walletInfo.msg_price) > 0
+                      ? Math.floor(
+                          Number(walletInfo.msg_money) / Number(walletInfo.msg_price)
+                        )
+                      : 0
+                  }}条)</text
+                >
               </view>
             </view>
 
@@ -72,6 +89,8 @@
               </view>
             </view> -->
           </view>
+
+          <view class="wallet_recharge" @click="jumpWalletRecharge">充值</view>
         </view>
       </view>
 
@@ -145,7 +164,7 @@ export default {
 
     // 获取用户信息
     getUserInfo() {
-      this.userInfo = uni.getStorageSync('userInfo');
+      this.userInfo = uni.getStorageSync("userInfo");
       this.getWallet();
     },
 
@@ -166,10 +185,18 @@ export default {
       });
     },
 
+    // 跳转充值页面
+    jumpWalletRecharge(){
+      uni.navigateTo({
+         url: `/userInfo/walletRecharge?id=${this.userInfo.dis_id}`,
+         
+      });
+    },
+
     // 跳转订单页面
-    jumpOrder(){
+    jumpOrder() {
       uni.switchTab({
-         url: '/pages/order/order'
+        url: "/pages/order/order",
       });
     },
 
@@ -203,9 +230,7 @@ export default {
       });
     },
   },
-  created() {
-    
-  },
+  created() {},
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
   },
@@ -225,7 +250,7 @@ export default {
   .header {
     position: relative;
     padding-top: 26upx;
-    .version_number{
+    .version_number {
       position: absolute;
       right: 25upx;
       top: 0;
@@ -311,13 +336,17 @@ export default {
     overflow-y: auto;
     .header_box {
       box-shadow: none;
-      padding: 40upx 20upx 8upx 60upx;
+      padding: 40upx 50upx 66upx;
       margin: 0 0 30upx;
       border-radius: 0;
 
       .wallet_box {
+        > view {
+          &:not(:last-child) {
+            margin-bottom: 44upx;
+          }
+        }
         .wallet_info {
-          margin-bottom: 44upx;
           .wallet_title {
             font-size: 28upx;
             font-weight: 400;
@@ -344,9 +373,9 @@ export default {
         .wallet_list {
           display: flex;
           flex-wrap: wrap;
+          margin-bottom: 50upx;
           .list_item {
             width: 50%;
-            margin-bottom: 50upx;
             .wallet_number {
               font-size: 40upx;
               font-weight: bold;
@@ -355,6 +384,20 @@ export default {
               }
             }
           }
+        }
+
+        .wallet_recharge {
+          width: 100%;
+          height: 90upx;
+          text-align: center;
+          background: linear-gradient(90deg, #0070e2 0%, #56c5ff 100%);
+          box-shadow: 0px 6upx 12upx rgba(0, 112, 226, 0.3);
+          border-radius: 80upx;
+          font-size: 32upx;
+          font-weight: 400;
+          line-height: 90upx;
+          color: #ffffff;
+          letter-spacing: 10upx;
         }
       }
     }

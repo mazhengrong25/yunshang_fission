@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2020-12-10 17:41:06
+ * @LastEditTime: 2021-04-25 10:20:02
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -367,7 +367,7 @@ export default {
           segments_key: this.roundSegmentsMessage.segments_key,
           departure: this.roundSegmentsMessage.segments[0].depAirport,
           destination: this.roundSegmentsMessage.segments[0].arrAirport,
-          departureTime: moment(this.airMessage.QueryDate).format("YYYY-MM-DD"),
+          departureTime: moment(this.airMessage.fromTime.date).format("YYYY-MM-DD"),
         };
       } else {
         data = {
@@ -376,7 +376,7 @@ export default {
           segments_key: this.segmentsMessage.segments_key,
           departure: this.segmentsMessage.segments[0].depAirport,
           destination: this.segmentsMessage.segments[0].arrAirport,
-          departureTime: moment(this.airMessage.QueryDate).format("YYYY-MM-DD"),
+          departureTime: moment(this.airMessage.toTime.date).format("YYYY-MM-DD"),
         };
       }
 
@@ -436,12 +436,12 @@ export default {
                   });
                 });
 
-                console.log(this.cabinList);
+                console.log('舱位列表',this.cabinList);
               }
             }
           });
-          this.depHeaderDiaplay = this.depCabinHeader.length !== 2;
-          this.headerDiaplay = this.cabinHeader.length !== 2;
+          this.depHeaderDiaplay = this.depCabinHeader.length > 2;
+          this.headerDiaplay = this.cabinHeader.length > 2;
           this.showData = true;
         } else {
           uni.showToast({
@@ -1147,7 +1147,7 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.airMessage = JSON.parse(data.airMessage);
 
-    console.log(this.airMessage);
+    console.log('航班信息',this.airMessage);
 
     if (this.roundTripType) {
       console.log(JSON.parse(data.roundTripData));
@@ -1371,7 +1371,8 @@ export default {
       padding: 0 60upx;
       margin: 0 20upx;
       &.is_display {
-        justify-content: space-between;
+        justify-content: space-around;
+        padding: 0;
         .cabin_header_box {
           &:not(:last-child) {
             margin-right: 0 !important;

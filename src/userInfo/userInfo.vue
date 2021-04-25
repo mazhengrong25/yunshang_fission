@@ -2,14 +2,14 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2020-10-19 15:08:11
+ * @LastEditTime: 2021-04-25 10:41:55
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view class="user_info">
     <yun-header :showReturn="false" :statusHeight="iStatusBarHeight" centerTitle="我的"></yun-header>
     <view class="header">
-      <view class="version_number">v0.0.69</view>
+      <view class="version_number">v1.2.1</view>
       <view class="info_box">
         <view class="info_left">
           <view class="avatar">
