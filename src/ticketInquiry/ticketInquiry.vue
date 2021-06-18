@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2021-04-25 10:21:04
+ * @LastEditTime: 2021-04-28 17:19:45
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -85,7 +85,7 @@
             <text class="currency" v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">&yen;</text>
             <view v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">{{item.min_price}}</view>
             <view class="sold_out" v-if="item.available_cabin === 0">售罄</view>
-            <view class="sold_out" v-else-if="item.min_price === 0">手动获取</view>
+            <view class="sold_out sold_out_t" v-else-if="item.min_price === 0">手动获取</view>
             <!-- <view v-else class="not_price"></view> -->
           </view>
           <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
@@ -835,6 +835,9 @@ export default {
         .sold_out {
           color: rgba(255, 0, 0, 1);
           font-size: 48upx;
+          &.sold_out_t{
+            font-size: 36upx;
+          }
         }
         .not_price {
           height: 40upx;
@@ -846,7 +849,7 @@ export default {
           &::before {
             width: 20upx;
             height: 200%;
-            content: "";
+            content: ""; 
             display: block;
             background-color: #fff;
             position: absolute;

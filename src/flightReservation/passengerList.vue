@@ -2,7 +2,7 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2020-10-10 11:14:40
+ * @LastEditTime: 2021-05-10 09:22:00
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -186,10 +186,13 @@ export default {
      */
     getPassengerData() {
       let data = {
-        group_id: this.groupId,
+        // group_id: this.groupId,
         page: this.page,
         name: this.searchUserName,
       };
+      if(this.groupId){
+        data['group_id'] = this.groupId
+      }
       passenger.getPassenger(data).then((res) => {
         if (res.errorcode === 10000) {
           if (this.passengerListStatus) {

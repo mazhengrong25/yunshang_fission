@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 国内往返
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 16:32:48
- * @LastEditTime: 2021-04-25 10:41:09
+ * @LastEditTime: 2021-06-18 14:35:50
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -390,8 +390,29 @@ export default {
     // 获取去程航班信息
     getTicketData() {
       let data = {
-        departure: this.ticketAddress.to.city_code, // 起飞机场三字码
-        arrival: this.ticketAddress.from.city_code, // 到达机场三字码
+        departure:
+          this.ticketAddress.to_type === "air"
+            ? this.ticketAddress.to.air_port
+            : this.ticketAddress.to_type === "hot" &&
+              this.ticketAddress.to.city_name === "上海"
+            ? this.ticketAddress.to.air_port
+            : this.ticketAddress.to_type === "hot" &&
+              this.ticketAddress.to.city_name === "北京"
+            ? this.ticketAddress.to.air_port
+            : this.ticketAddress.to.city_code, // 起飞机场三字码
+
+        // this.ticketAddress.to.city_code, // 起飞机场三字码
+        arrival:
+          this.ticketAddress.from_type === "air"
+            ? this.ticketAddress.from.air_port
+            : this.ticketAddress.from_type === "hot" &&
+              this.ticketAddress.from.city_name === "上海"
+            ? this.ticketAddress.from.air_port
+            : this.ticketAddress.from_type === "hot" &&
+              this.ticketAddress.from.city_name === "北京"
+            ? this.ticketAddress.from.air_port
+            : this.ticketAddress.from.city_code,
+        // this.ticketAddress.from.city_code, // 到达机场三字码
         departureTime: this.timeData.toTime.date, // 起飞时间
         airline: "", // 航司二字码
         only_segment: 1,
@@ -402,6 +423,14 @@ export default {
           this.flightList = res.data.IBE.list;
           // this.flightList = uni.getStorageSync("flightList");
           this.oldFlightList = JSON.parse(JSON.stringify(this.flightList));
+
+          for (let i = 0; i < this.flightList.length; i++) {
+            if (this.flightList[i].available_cabin > 0) {
+              this.toActive = i;
+              break;
+            }
+          }
+
           this.price += this.flightList[this.toActive].min_price;
           this.dataListApplyType = true;
 
@@ -431,8 +460,28 @@ export default {
     // 获取返程航班信息
     getRoundTicketData() {
       let data = {
-        departure: this.ticketAddress.from.city_code, // 起飞机场三字码
-        arrival: this.ticketAddress.to.city_code, // 到达机场三字码
+        departure:
+          this.ticketAddress.from_type === "air"
+            ? this.ticketAddress.from.air_port
+            : this.ticketAddress.from_type === "hot" &&
+              this.ticketAddress.from.city_name === "上海"
+            ? this.ticketAddress.from.air_port
+            : this.ticketAddress.from_type === "hot" &&
+              this.ticketAddress.from.city_name === "北京"
+            ? this.ticketAddress.from.air_port
+            : this.ticketAddress.from.city_code,
+        // this.ticketAddress.to.city_code, // 起飞机场三字码
+        arrival:
+          this.ticketAddress.to_type === "air"
+            ? this.ticketAddress.to.air_port
+            : this.ticketAddress.to_type === "hot" &&
+              this.ticketAddress.to.city_name === "上海"
+            ? this.ticketAddress.to.air_port
+            : this.ticketAddress.to_type === "hot" &&
+              this.ticketAddress.to.city_name === "北京"
+            ? this.ticketAddress.to.air_port
+            : this.ticketAddress.to.city_code, // 起飞机场三字码
+        // this.ticketAddress.from.city_code, // 到达机场三字码
         departureTime: this.timeData.fromTime.date, // 起飞时间
         airline: "", // 航司二字码
         only_segment: 1,
@@ -443,6 +492,13 @@ export default {
           this.roundFlightList = res.data.IBE.list;
           // this.roundFlightList = uni.getStorageSync("roundFlightList");
           this.oldRoundFlightList = JSON.parse(JSON.stringify(this.roundFlightList));
+
+          for (let i = 0; i < this.roundFlightList.length; i++) {
+            if (this.roundFlightList[i].available_cabin > 0) {
+              this.fromActive = i;
+              break;
+            }
+          }
 
           this.price += this.roundFlightList[this.fromActive].min_price;
           this.dataRoundListApplyType = true;
