@@ -2,7 +2,7 @@
  * @Description: 钱包充值页面
  * @Author: wish.WuJunLong
  * @Date: 2021-03-16 11:36:56
- * @LastEditTime: 2021-03-30 10:39:20
+ * @LastEditTime: 2021-06-23 09:30:18
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -112,7 +112,7 @@ export default {
         if (res.status === "success") {
           _that.orderId = res.order_no ? Base64.decode(res.order_no) : "";
 
-          let data = {
+          let newdata = {
             pay_type: "5",
             code: uni.getStorageSync("userCode"),
           };
@@ -120,17 +120,17 @@ export default {
           
 
           ticket
-            .payOrder(uni.arrayBufferToBase64(new Buffer(_that.orderId)), data)
-            .then((res) => {
+            .payOrder(uni.arrayBufferToBase64(new Buffer(_that.orderId)), newdata)
+            .then((ores) => {
               console.log('开始支付')
-              let wxData = JSON.parse(res.data.pay_url);
+              let wxData = JSON.parse(ores.data.pay_url);
               wx.requestPayment({
                 timeStamp: wxData.timestamp,
                 nonceStr: wxData.noncestr,
                 package: wxData.package,
                 signType: wxData.signType,
                 paySign: wxData.sign,
-                success: function(res) {
+                success: function() {
                   uni.showToast({
                     title: "充值成功",
                     icon: "none",
@@ -139,13 +139,13 @@ export default {
                   _that.getWalletInfo();
                   _that.price = "";
                 },
-                fail: function(res) {
+                fail: function() {
                   uni.showToast({
                     title: "已取消支付",
                     icon: "none",
                   });
                 },
-                complete: function(res) {},
+                complete: function() {},
               });
             });
         }

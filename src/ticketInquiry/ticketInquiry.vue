@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2021-04-28 17:19:45
+ * @LastEditTime: 2021-07-05 16:13:34
  * @LastEditors: wish.WuJunLong
 --> 
 
@@ -520,7 +520,6 @@ export default {
 
     // 跳转航程信息
     jumpFlightInfo(data) {
-      console.log("跳转舱位",data);
       if (data.available_cabin === 0) {
         return false;
       }

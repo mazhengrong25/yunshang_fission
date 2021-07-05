@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2020-12-10 14:57:20
+ * @LastEditTime: 2021-07-05 14:48:56
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -27,7 +27,7 @@
             ? headerAddress.to.city_name + headerAddress.to.air_port_name
             : headerAddress.to_type === "hot" && headerAddress.to.city_name === "北京"
             ? headerAddress.to.city_name + "首都"
-            : headerAddress.to.city_name
+            : headerAddress.to.city_name || '获取中'
         }}
       </view>
       <view class="title_icon" v-if="!statusType"></view>
@@ -40,7 +40,7 @@
             ? headerAddress.from.city_name + headerAddress.from.air_port_name
             : headerAddress.from_type === "hot" && headerAddress.from.city_name === "北京"
             ? headerAddress.from.city_name + "首都"
-            : headerAddress.from.city_name
+            : headerAddress.from.city_name || '获取中'
         }}
       </view>
     </view>

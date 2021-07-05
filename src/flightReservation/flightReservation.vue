@@ -2,9 +2,9 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2020-12-09 17:48:27
+ * @LastEditTime: 2021-07-05 14:57:02
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="flight_reservation">
     <yun-header
@@ -38,16 +38,11 @@
             <text v-if="passengerList.length < 1">乘机人</text>
             <text v-else
               >已选 {{ passengerNumber.adt ? passengerNumber.adt + "成人" : ""
-              }}{{
-                passengerNumber.chd ? "，" + passengerNumber.chd + "儿童" : ""
-              }}{{
-                passengerNumber.inf ? "，" + passengerNumber.inf + "婴儿" : ""
-              }}</text
+              }}{{ passengerNumber.chd ? "，" + passengerNumber.chd + "儿童" : ""
+              }}{{ passengerNumber.inf ? "，" + passengerNumber.inf + "婴儿" : "" }}</text
             >
           </view>
-          <view class="add_passenger_btn" @click="jumpPassengerPage"
-            >添加乘机人</view
-          >
+          <view class="add_passenger_btn" @click="jumpPassengerPage">添加乘机人</view>
         </view>
 
         <!-- <uni-swipe-action class="passenger_main" v-if="passengerList.length > 0">
@@ -56,10 +51,7 @@
           </uni-swipe-action-item>
         </uni-swipe-action>-->
 
-        <uni-swipe-action
-          class="passenger_main"
-          v-if="passengerList.length > 0"
-        >
+        <uni-swipe-action class="passenger_main" v-if="passengerList.length > 0">
           <uni-swipe-action-item
             :class="['main_list', { show: item.show }]"
             v-for="(item, index) in passengerList"
@@ -73,9 +65,7 @@
                   <view class="user_name">{{
                     item.name || item.en_first_name + "/" + item.en_last_name
                   }}</view>
-                  <view class="position">{{
-                    item.group ? item.group : "未分组"
-                  }}</view>
+                  <view class="position">{{ item.group ? item.group : "未分组" }}</view>
                 </view>
                 <view class="edit_btn" @click="flightEdit(item, index)"></view>
               </view>
@@ -184,22 +174,16 @@
             @click="changeInsurance(insuranceList[index])"
           >
             <view class="item_name">
-              {{ item.insure_desc }}(保额{{
-                (Number(item.amount) / 10000).toFixed(0)
-              }}万)
+              {{ item.insure_desc }}(保额{{ (Number(item.amount) / 10000).toFixed(0) }}万)
               <text :class="['item_icon', { true: item.type }]"></text>
             </view>
             <view class="item_check">
               <view class="item_price">
-                <text
-                  >&yen; {{ Number(item.default_dis_price).toFixed(0) }}</text
+                <text>&yen; {{ Number(item.default_dis_price).toFixed(0) }}</text
                 >/份
               </view>
               <view
-                :class="[
-                  'item_icon',
-                  { is_active: insuranceActive.id === item.id },
-                ]"
+                :class="['item_icon', { is_active: insuranceActive.id === item.id }]"
               ></view>
             </view>
           </view>
@@ -214,11 +198,7 @@
 
       <view class="reward_list box-shadow-style">
         <view class="title_text">
-          <image
-            class="title_icon"
-            src="@/static/reward.png"
-            mode="aspectFill"
-          />本单奖励
+          <image class="title_icon" src="@/static/reward.png" mode="aspectFill" />本单奖励
         </view>
         <view class="reward_box">
           <view class="reward_list">
@@ -260,13 +240,11 @@
 
       <view class="disclaimer">
         免责声明：下单表示已阅读并同意遵守退改签规则
-        <text
-          @click="
-            openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')
-          "
+        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')"
           >《关于规范互联网机票销售行为的通知》</text
         >
-        <text v-if="statement.title"
+        <text
+          v-if="statement.title"
           @click="
             openStatementWeb(
               'https://fxxcx.ystrip.cn/air_file/' +
@@ -278,10 +256,7 @@
           "
           >《{{ statement.title }}》</text
         >
-        <text
-          @click="
-            openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')
-          "
+        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')"
           >《锂电池航空运输规范》</text
         >
       </view>
@@ -347,10 +322,7 @@
               <text>×{{ passengerNumber.chd }}人</text>
             </view>
           </view>
-          <view
-            class="info_list"
-            v-if="passengerNumber.chd > 0 && roundTripType"
-          >
+          <view class="info_list" v-if="passengerNumber.chd > 0 && roundTripType">
             <view class="list_tag is_back">返</view>
             <view class="list_title">儿童票价</view>
             <view class="list_message">
@@ -366,10 +338,7 @@
               <text>×{{ passengerNumber.inf }}人</text>
             </view>
           </view>
-          <view
-            class="info_list"
-            v-if="passengerNumber.inf > 0 && roundTripType"
-          >
+          <view class="info_list" v-if="passengerNumber.inf > 0 && roundTripType">
             <view class="list_tag is_back">返</view>
             <view class="list_title">婴儿票价</view>
             <view class="list_message">
@@ -396,22 +365,12 @@
           <view class="info_list" v-if="passengerNumber.ins > 0">
             <view class="list_title">保险</view>
             <view class="list_message" v-if="!roundTripType">
-              <text
-                >&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text
-              >
-              <text
-                >×{{ passengerNumber.ins ? passengerNumber.ins : 0 }}份</text
-              >
+              <text>&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text>
+              <text>×{{ passengerNumber.ins ? passengerNumber.ins : 0 }}份</text>
             </view>
             <view class="list_message" v-else>
-              <text
-                >&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text
-              >
-              <text
-                >×{{
-                  passengerNumber.ins ? passengerNumber.ins * 2 : 0
-                }}份</text
-              >
+              <text>&yen; {{ priceInfo.insPrice ? priceInfo.insPrice : 0 }}</text>
+              <text>×{{ passengerNumber.ins ? passengerNumber.ins * 2 : 0 }}份</text>
             </view>
           </view>
         </view>
@@ -567,20 +526,16 @@ export default {
 
             // 组装航班信息
             let filghtMessage = {
-              time: moment(segmentMessage[0].depTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-              ), // 起飞时间
+              time: moment(segmentMessage[0].depTime).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
               code: segmentMessage[0].flightNumber, // 航班号
               address:
                 segmentMessage[0].depAirport_CN.city_name +
                 " " +
                 segmentMessage[0].depAirport_CN.city_code +
                 " - " +
-                segmentMessage[segmentMessage.length - 1].arrAirport_CN
-                  .city_name +
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_name +
                 " " +
-                segmentMessage[segmentMessage.length - 1].arrAirport_CN
-                  .city_code, // 行程
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_code, // 行程
               cabin: res.data.cabinInfo.cabinDesc, // 舱位
               price: res.data.adtPrice.rulePrice.price, // 票面价
               baggage: res.data.cabinInfo.baggage,
@@ -692,20 +647,16 @@ export default {
 
             // 组装去程航班信息
             let filghtMessage = {
-              time: moment(segmentMessage[0].depTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-              ), // 起飞时间
+              time: moment(segmentMessage[0].depTime).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
               code: segmentMessage[0].flightNumber, // 航班号
               address:
                 segmentMessage[0].depAirport_CN.city_name +
                 " " +
                 segmentMessage[0].depAirport_CN.city_code +
                 " - " +
-                segmentMessage[segmentMessage.length - 1].arrAirport_CN
-                  .city_name +
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_name +
                 " " +
-                segmentMessage[segmentMessage.length - 1].arrAirport_CN
-                  .city_code, // 行程
+                segmentMessage[segmentMessage.length - 1].arrAirport_CN.city_code, // 行程
               cabin: res.data.depCabinInfo.cabinDesc, // 舱位
               price: res.data.depAdtPrice.rulePrice.price, // 票面价
               baggage: res.data.depCabinInfo.baggage,
@@ -721,20 +672,18 @@ export default {
 
             // 组装返程航班信息
             let arrFilghtMessage = {
-              time: moment(segmentRoundMessage[0].depTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-              ), // 起飞时间
+              time: moment(segmentRoundMessage[0].depTime).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
               code: segmentRoundMessage[0].flightNumber, // 航班号
               address:
                 segmentRoundMessage[0].depAirport_CN.city_name +
                 " " +
                 segmentRoundMessage[0].depAirport_CN.city_code +
                 " - " +
-                segmentRoundMessage[segmentRoundMessage.length - 1]
-                  .arrAirport_CN.city_name +
+                segmentRoundMessage[segmentRoundMessage.length - 1].arrAirport_CN
+                  .city_name +
                 " " +
-                segmentRoundMessage[segmentRoundMessage.length - 1]
-                  .arrAirport_CN.city_code, // 行程
+                segmentRoundMessage[segmentRoundMessage.length - 1].arrAirport_CN
+                  .city_code, // 行程
               cabin: res.data.arrCabinInfo.cabinDesc, // 舱位
               price: res.data.arrAdtPrice.rulePrice.price, // 票面价
               baggage: res.data.arrCabinInfo.baggage,
@@ -928,8 +877,7 @@ export default {
 
     // 展开保险列表
     showMoreInsurance() {
-      this.moreInsurance =
-        this.moreInsurance === 4 ? this.insuranceList.length : 4;
+      this.moreInsurance = this.moreInsurance === 4 ? this.insuranceList.length : 4;
     },
 
     // 乘机人保险开关
@@ -989,27 +937,19 @@ export default {
 
     // 计算金额总价
     getTotalPrice() {
-      console.log(
-        "奖励金计算",
-        this.priceInfo.reward,
-        this.passengerNumber.adt
-      );
+      console.log("奖励金计算", this.priceInfo.reward, this.passengerNumber.adt);
       let totalPrice;
       if (this.roundTripType) {
         // 组装往返金额
         totalPrice =
           Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
-          Number(this.passengerNumber.adt) *
-            Number(this.priceInfo.roundBuildPrice) +
+          Number(this.passengerNumber.adt) * Number(this.priceInfo.roundBuildPrice) +
           Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
-          Number(this.passengerNumber.adt) *
-            Number(this.priceInfo.roundAdtPrice) +
+          Number(this.passengerNumber.adt) * Number(this.priceInfo.roundAdtPrice) +
           Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
-          Number(this.passengerNumber.chd) *
-            Number(this.priceInfo.roundChdPrice) +
+          Number(this.passengerNumber.chd) * Number(this.priceInfo.roundChdPrice) +
           Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
-          Number(this.passengerNumber.inf) *
-            Number(this.priceInfo.roundInfPrice) +
+          Number(this.passengerNumber.inf) * Number(this.priceInfo.roundInfPrice) +
           Number(this.passengerNumber.ins || 0) *
             Number(this.priceInfo.insPrice || 0) *
             2;
@@ -1029,15 +969,10 @@ export default {
           Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
           Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
           Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
-          Number(this.passengerNumber.ins || 0) *
-            Number(this.priceInfo.insPrice || 0);
+          Number(this.passengerNumber.ins || 0) * Number(this.priceInfo.insPrice || 0);
         // 计算奖励金额
         if (this.passengerNumber.adt > 0) {
-          this.$set(
-            this.priceInfo,
-            "reward",
-            this.oldReward * this.passengerNumber.adt
-          );
+          this.$set(this.priceInfo, "reward", this.oldReward * this.passengerNumber.adt);
         }
       }
       // 组装金额数据
@@ -1143,7 +1078,7 @@ export default {
           email: this.orderPassenger.email || "",
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
-          adt_ticket_no: ''
+          adt_ticket_no: "",
         };
 
         console.log(data);
@@ -1155,7 +1090,13 @@ export default {
         //   contacts: this.orderPassenger, // 联系人信息
         // };
         ticket
-          .createRoundOrder(this.relatedKey, this.roundRelatedKey, data, this.price, this.roundPrice)
+          .createRoundOrder(
+            this.relatedKey,
+            this.roundRelatedKey,
+            data,
+            this.price,
+            this.roundPrice
+          )
           .then((res) => {
             console.log(res);
             if (res.errorcode === 10000) {
@@ -1196,7 +1137,7 @@ export default {
           })
           .catch((err) => {
             this.trueSubmitOrder = false;
-            console.log('接口报错了');
+            console.log("接口报错了");
             uni.showToast({
               title: "接口数据错误，请联系客服处理",
               duration: 3000,
@@ -1236,16 +1177,16 @@ export default {
           flight_no: this.flightData.data[0].flightNumber,
           IsInsure: isInsure,
         };
-        console.log('人',this.relatedKey, JSON.stringify(data));
+        console.log("人", this.relatedKey, JSON.stringify(data));
         ticket
           .createOrder(this.relatedKey, data, this.price)
           .then((res) => {
-            console.log('确认支付',res)
+            console.log("确认支付", res);
             if (res.errorcode === 10000) {
               let orderId = [];
               let priceList = [];
               let priceNumber = 0;
-              
+
               res.data.forEach((item) => {
                 orderId.push(item.order_no);
                 priceList.push(item.need_pay_amount);
@@ -1293,7 +1234,7 @@ export default {
     // 获取乘客列表
     let passenger = uni.getStorageSync("passengerList");
     if (passenger) {
-      this.passengerList = JSON.parse(passenger)
+      this.passengerList = JSON.parse(passenger);
       // this.passengerList.forEach((item) => (item.show = false));
       this.passengerNumber = {
         adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量
@@ -1323,6 +1264,20 @@ export default {
     console.log(data);
     // this.getPassInsData();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+
+    if (!data.airMessage) {
+      return uni.showModal({
+        title: "错误提示",
+        content: "数据获取失败，请稍后重试",
+        showCancel: false,
+        success: function(res) {
+          if (res.confirm) {
+            uni.navigateBack();
+          }
+        },
+      });
+    }
+
     this.headerAddress = data.airMessage ? JSON.parse(data.airMessage) : {};
 
     console.log("头部信息", this.headerAddress);
@@ -1449,8 +1404,7 @@ export default {
           margin-bottom: 40upx;
         }
         .remove_btn {
-          background: url(@/static/number_remove_btn.png) no-repeat center
-            center;
+          background: url(@/static/number_remove_btn.png) no-repeat center center;
           background-size: contain;
           width: 36upx;
           height: 36upx;
@@ -1645,13 +1599,11 @@ export default {
             display: block;
             width: 47upx;
             height: 33upx;
-            background: url(@/static/insurance_type_1.png) no-repeat center
-              center;
+            background: url(@/static/insurance_type_1.png) no-repeat center center;
             background-size: contain;
             margin-left: 10upx;
             &.true {
-              background: url(@/static/insurance_type_2.png) no-repeat center
-                center;
+              background: url(@/static/insurance_type_2.png) no-repeat center center;
               background-size: contain;
             }
           }
@@ -1842,8 +1794,7 @@ export default {
         &::after {
           content: "";
           display: inline-block;
-          background: url(@/static/flight_checked_btn.png) no-repeat center
-            center;
+          background: url(@/static/flight_checked_btn.png) no-repeat center center;
           background-size: contain;
           width: 16upx;
           height: 12upx;

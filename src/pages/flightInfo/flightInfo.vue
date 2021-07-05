@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2021-04-25 10:20:02
+ * @LastEditTime: 2021-07-05 16:15:55
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -235,7 +235,6 @@
         </view>
       </view>
     </uni-popup>
-
   </scroll-view>
 </template>
 
@@ -436,7 +435,7 @@ export default {
                   });
                 });
 
-                console.log('舱位列表',this.cabinList);
+                console.log("舱位列表", this.cabinList);
               }
             }
           });
@@ -482,17 +481,17 @@ export default {
       console.log("组装", data);
       // 组装航班数据
       let filghtMessage = {
-        time: moment(data.data.routing.segments[0].depTime).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
-        code: data.data.routing.segments[0].flightNumber, // 航班号
+        time: moment(this.segmentsMessage.segments[0].depTime).format("YYYY-MM-DD HH:mm:ss"), // 起飞时间
+        code: this.segmentsMessage.segments[0].flightNumber, // 航班号
         address:
-          data.data.routing.segments[0].depAirport_CN.city_name +
+          this.segmentsMessage.segments[0].depAirport_CN.city_name +
           " " +
-          data.data.routing.segments[0].depAirport_CN.city_code +
+          this.segmentsMessage.segments[0].depAirport_CN.city_code +
           " - " +
-          data.data.routing.segments[data.data.routing.segments.length - 1].arrAirport_CN
+          this.segmentsMessage.segments[this.segmentsMessage.segments.length - 1].arrAirport_CN
             .city_name +
           " " +
-          data.data.routing.segments[data.data.routing.segments.length - 1].arrAirport_CN
+          this.segmentsMessage.segments[this.segmentsMessage.segments.length - 1].arrAirport_CN
             .city_code, // 行程
         cabin: data.cabin, // 舱位
         price: data.data.cabinPrices.ADT.rulePrice.price, // 票面价
@@ -1145,9 +1144,22 @@ export default {
   onLoad(data) {
     this.roundTripType = data.pageType ? JSON.parse(data.pageType) : false;
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.airMessage = JSON.parse(data.airMessage);
+    console.log("航班信息", data.airMessage);
 
-    console.log('航班信息',this.airMessage);
+    if (!data.airMessage) {
+      return uni.showModal({
+        title: "错误提示",
+        content: "数据获取失败，请稍后重试",
+        showCancel: false,
+        success: function(res) {
+          if (res.confirm) {
+            uni.navigateBack();
+          }
+        },
+      });
+    }
+
+    this.airMessage = data.airMessage ? JSON.parse(data.airMessage) : {};
 
     if (this.roundTripType) {
       console.log(JSON.parse(data.roundTripData));
@@ -1665,7 +1677,5 @@ export default {
       }
     }
   }
-
-
 }
 </style>
