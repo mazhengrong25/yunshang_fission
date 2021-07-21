@@ -2,7 +2,7 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2020-12-09 17:54:34
+ * @LastEditTime: 2021-07-15 17:20:45
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -81,11 +81,7 @@
       @scrolltolower="nextPageData()"
     >
       <!-- 国内机票盒子 -->
-      <view
-        class="content_list"
-        v-for="(item, index) in innerList"
-        :key="index"
-      >
+      <view class="content_list" v-for="(item, index) in innerList" :key="index">
         <!--单程  往返  多程 -->
         <view class="list_item_header">
           <view class="list_tyle">{{
@@ -100,9 +96,7 @@
           }}</view>
         </view>
         <view
-          @click.stop="
-            jumpOrderDetails(item.ticket_segments[0], 0, item.is_round_last)
-          "
+          @click.stop="jumpOrderDetails(item.ticket_segments[0], 0, item.is_round_last)"
           class="list_item"
         >
           <view class="item_header">
@@ -112,8 +106,8 @@
 
                 {{ item.ticket_segments[0].departure_CN.city_name }} -
                 {{
-                  item.ticket_segments[item.ticket_segments.length - 1]
-                    .arrive_CN.city_name
+                  item.ticket_segments[item.ticket_segments.length - 1].arrive_CN
+                    .city_name
                 }}</view
               >
             </view>
@@ -131,7 +125,7 @@
                   ? "已出票"
                   : item.status === 5
                   ? "已取消"
-                  : item.status === 1 && item.left_min < 0
+                  : item.status === 1 && item.left_min <= 0
                   ? "已取消"
                   : ""
               }}
@@ -152,7 +146,10 @@
             </view>
             <view class="info_right" v-if="item.segment_type === 1">
               {{
-                  item.status !== 0 && item.status !== 5 && item.pay_status === 1 && item.left_min > 0
+                item.status !== 0 &&
+                item.status !== 5 &&
+                item.pay_status === 1 &&
+                item.left_min > 0
                   ? "已预订"
                   : item.status === 1 && item.pay_status === 2
                   ? "待出票"
@@ -179,16 +176,15 @@
             <view class="" v-if="item.ticket_passenger.length > 4">...</view>
           </view>
 
-          <view class="item_time" v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0">
+          <view
+            class="item_time"
+            v-if="item.pay_status === 1 && item.status === 1 && item.left_min > 0"
+          >
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
             <view class="time_text">剩余支付时间：</view>
-            <view class="time_number">
-              {{
-                item.left_min
-              }}分钟
-            </view>
+            <view class="time_number"> {{ item.left_min }}分钟 </view>
           </view>
           <view
             class="item_btn_box"
@@ -197,9 +193,7 @@
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 0)"
               >取消订单</view
             >
-            <view
-              class="item_btn submit_btn"
-              @click.stop="jumpPayOrder(item, 0)"
+            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item, 0)"
               >去支付</view
             >
           </view>
@@ -210,11 +204,7 @@
         <view
           v-if="item.from_ticket_segments"
           @click.stop="
-            jumpOrderDetails(
-              item.from_ticket_segments[0],
-              1,
-              item.is_round_last
-            )
+            jumpOrderDetails(item.from_ticket_segments[0], 1, item.is_round_last)
           "
           class="list_item"
         >
@@ -225,9 +215,8 @@
 
                 {{ item.from_ticket_segments[0].departure_CN.city_name }} -
                 {{
-                  item.from_ticket_segments[
-                    item.from_ticket_segments.length - 1
-                  ].arrive_CN.city_name
+                  item.from_ticket_segments[item.from_ticket_segments.length - 1]
+                    .arrive_CN.city_name
                 }}</view
               >
             </view>
@@ -255,18 +244,12 @@
             <view class="info_left">
               <text>{{ item.from_ticket_segments[0].flight_no }}</text>
               <text>{{
-                $dateTool(
-                  item.from_ticket_segments[0].departure_time,
-                  "MM月DD日"
-                )
+                $dateTool(item.from_ticket_segments[0].departure_time, "MM月DD日")
               }}</text>
               <!-- HH:mm 24制   hh:mm 12制 -->
               <text
                 >{{
-                  $dateTool(
-                    item.from_ticket_segments[0].departure_time,
-                    "HH:mm"
-                  )
+                  $dateTool(item.from_ticket_segments[0].departure_time, "HH:mm")
                 }}起飞</text
               >
             </view>
@@ -299,10 +282,7 @@
             <view class="" v-if="item.ticket_passenger.length > 4">...</view>
           </view>
 
-          <view
-            class="item_time"
-            v-if="item.from_pay_status === 1 && item.from_status"
-          >
+          <view class="item_time" v-if="item.from_pay_status === 1 && item.from_status">
             <view class="time_icon">
               <image src="@/static/remaining_time.png" mode="aspectFit" />
             </view>
@@ -324,9 +304,7 @@
             <view class="item_btn close_btn" @click.stop="removeOrder(item, 1)"
               >取消订单</view
             >
-            <view
-              class="item_btn submit_btn"
-              @click.stop="jumpPayOrder(item, 1)"
+            <view class="item_btn submit_btn" @click.stop="jumpPayOrder(item, 1)"
               >去支付</view
             >
           </view>
@@ -367,20 +345,14 @@
           </view>
         </view>
         <view
-          :class="[
-            'list_item',
-            { multiple_trips_item: item.routing_type !== 1 },
-          ]"
+          :class="['list_item', { multiple_trips_item: item.routing_type !== 1 }]"
           v-for="(oitem, oindex) in item.routes"
           :key="oindex"
         >
           <view class="item_header">
             <view class="item_title">
               <view
-                :class="[
-                  'title_type',
-                  { return_trip: oitem.direction_type === 2 },
-                ]"
+                :class="['title_type', { return_trip: oitem.direction_type === 2 }]"
                 v-if="item.routes.length > 1"
                 >{{
                   oitem.direction_type === 1
@@ -392,9 +364,7 @@
                     : ""
                 }}</view
               >
-              <view class="title"
-                >{{ oitem.departure }} - {{ oitem.arrive }}</view
-              >
+              <view class="title">{{ oitem.departure }} - {{ oitem.arrive }}</view>
             </view>
             <view class="item_price" v-if="item.routing_type === 1">
               <text>&yen;</text>
@@ -439,11 +409,11 @@
             class="item_time"
             v-if="
               item.pay_status === 1 &&
-              $timeDiff(
-                new Date(item.updated_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) > 0
+                $timeDiff(
+                  new Date(item.updated_at).getTime() + 30 * 60 * 1000,
+                  new Date(),
+                  'minutes'
+                ) > 0
             "
           >
             <view class="time_icon">
@@ -465,11 +435,11 @@
             class="item_btn_box"
             v-if="
               item.pay_status === 1 &&
-              $timeDiff(
-                new Date(item.updated_at).getTime() + 30 * 60 * 1000,
-                new Date(),
-                'minutes'
-              ) > 0
+                $timeDiff(
+                  new Date(item.updated_at).getTime() + 30 * 60 * 1000,
+                  new Date(),
+                  'minutes'
+                ) > 0
             "
           >
             <view class="item_btn close_btn">取消订单</view>
@@ -539,19 +509,12 @@ export default {
       console.log(val);
       let orderId = [index === 0 ? val.order_no : val.from_order_no];
       let flightData = {
-        flightType: val.is_round_last
-          ? index === 0
-            ? "去程"
-            : "返程"
-          : "单程",
+        flightType: val.is_round_last ? (index === 0 ? "去程" : "返程") : "单程",
         data: index === 0 ? val.ticket_segments : val.from_ticket_segments,
         cabinInfo: {},
       };
-      let priceList = [
-        index === 0 ? val.need_pay_amount : val.from_need_pay_amount,
-      ];
-      let priceNumber =
-        index === 0 ? val.need_pay_amount : val.from_need_pay_amount;
+      let priceList = [index === 0 ? val.need_pay_amount : val.from_need_pay_amount];
+      let priceNumber = index === 0 ? val.need_pay_amount : val.from_need_pay_amount;
 
       uni.navigateTo({
         url:
@@ -582,8 +545,6 @@ export default {
     },
     //获取国内外列表
     getOrderList() {
-      
-      
       this.orderPageStatus = true;
       if (this.orderListType === "3") {
         // 国际
@@ -620,22 +581,22 @@ export default {
         // 国内
         let data = {
           status:
-              this.headerActive === 0
+            this.headerActive === 0
               ? "-1"
               : this.headerActive === 1
-              ? 'pay_success'
+              ? "pay_success"
               : this.headerActive === 2
               ? 1
               : this.headerActive === 4
               ? 5
               : this.headerActive,
-          pay_status:
-            this.headerActive === 1 ? 1 : this.headerActive === 2 ? 2 : "",
+          pay_status: this.headerActive === 1 ? 1 : this.headerActive === 2 ? 2 : "",
           created_at:
             this.orderListFilter.Timestart ||
-            moment().subtract(3, "days").format("YYYY-MM-DD"), // 预定日期开始
-          created_at_end:
-            this.orderListFilter.Timend || moment().format("YYYY-MM-DD"), // 预定日期结束
+            moment()
+              .subtract(3, "days")
+              .format("YYYY-MM-DD"), // 预定日期开始
+          created_at_end: this.orderListFilter.Timend || moment().format("YYYY-MM-DD"), // 预定日期结束
           pnr_code: this.orderListFilter.pnr || "", // pnr
           order_no: this.orderListFilter.orderNumber || "", // 订单号
           flight_no: this.orderListFilter.flightNumber || "", // 航班号
@@ -678,10 +639,7 @@ export default {
             this.innerList.forEach((item, index) => {
               if (item.is_round_last) {
                 this.innerList.forEach((oitem, oindex) => {
-                  if (
-                    oitem.is_round_first &&
-                    oitem.relevant_order_no === item.order_no
-                  ) {
+                  if (oitem.is_round_first && oitem.relevant_order_no === item.order_no) {
                     item["from_status"] = oitem.status;
                     item["from_updated_at"] = oitem.updated_at;
                     item["from_pay_status"] = oitem.pay_status;
@@ -693,7 +651,9 @@ export default {
                 });
               }
 
-              item['timeLeft'] = moment(item.updated_at).add(30, 'm').diff(moment(new Date()), 'm')
+              item["timeLeft"] = moment(item.updated_at)
+                .add(30, "m")
+                .diff(moment(new Date()), "m");
             });
 
             //日期条件排序
@@ -767,7 +727,7 @@ export default {
 
     // 预定时间排序
     createSort(t) {
-      console.log(t)
+      console.log(t);
       this.sortType = "create";
       return (m, n) => {
         var a = new Date(m[t]).getTime();
@@ -1124,17 +1084,17 @@ export default {
             align-items: center;
             justify-content: center;
             color: rgba(42, 42, 42, 1);
-            border: 2rpx solid #D9E1EA;
+            border: 2rpx solid #d9e1ea;
             border-radius: 20rpx;
             font-size: 22rpx;
             padding: 0 10upx;
-            height: 30rpx; 
-            color: #6E6E6E;
+            height: 30rpx;
+            color: #6e6e6e;
             min-width: 68upx;
-            &:nth-child(n+5){
+            &:nth-child(n + 5) {
               display: none;
             }
-            &:not(:last-child){
+            &:not(:last-child) {
               margin-right: 10rpx;
             }
           }
