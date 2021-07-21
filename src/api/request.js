@@ -3,7 +3,7 @@
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
  * @LastEditTime: 2021-06-28 15:45:18
- * @LastEditors: wish.WuJunLong
+ * @LastEditors: wish.WuJunLong 
  */
 
 const request = (config, type) => {
