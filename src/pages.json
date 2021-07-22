@@ -1,6 +1,12 @@
 {
   "pages": [
     {
+      "path": "pages/launchPage/launchPage",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
         "navigationStyle": "custom"
