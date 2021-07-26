@@ -2,8 +2,8 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2020-09-29 10:07:21
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-07-26 15:59:01
+ * @LastEditors: mzr
 --> 
 <template>
   <view :class="['ticket_input',{'multi_pass':ticketType === '多程'}]">
@@ -20,7 +20,8 @@
           class="check_toform_btn"
           @click="checkTickedBtn(false,addressForm.to,addressForm.from)"
         >
-          <image class="ticket_image" src="@/static/ticket_btn.png" mode="contain" />
+          <image class="ticket_image" v-if="ticketClassify === 1" src="@/static/ticket_train_btn.png" mode="contain" />
+          <image class="ticket_image" v-else src="@/static/ticket_btn.png" mode="contain" />
         </view>
         <view class="from_input address_input" @click="tocketFromBtn(addressForm.to.city_name)">
           {{addressForm.from_type === 'air'? addressForm.from.air_port_name:
@@ -62,7 +63,8 @@
           class="check_toform_btn"
           @click="checkTickedBtn(true,addressForm.multi_pass_to,addressForm.multi_pass_from)"
         >
-          <image class="ticket_image" src="@/static/ticket_btn.png" mode="contain" />
+          <image class="ticket_image" v-if="ticketClassify === 1" src="@/static/ticket_train_btn.png" mode="contain" />
+          <image class="ticket_image" v-else src="@/static/ticket_btn.png" mode="contain" />
         </view>
         <view
           class="from_input address_input"
@@ -93,10 +95,11 @@
         </view>
       </view>
     </view>
-
+  
     <uni-popup ref="popup" type="message">
       <uni-popup-message type="success" message="成功消息" :duration="0"></uni-popup-message>
     </uni-popup>
+
   </view>
 </template>
 
@@ -113,6 +116,11 @@ export default {
       type: Object,
       default: () => {},
     },
+    ticketClassify: {
+      // 机票 火车票
+      type: Number,
+      default: () => 0
+    }
   },
   data() {
     return {};
@@ -308,5 +316,6 @@ export default {
       }
     }
   }
+
 }
 </style>
