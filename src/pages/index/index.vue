@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-07-26 16:59:08
+ * @LastEditTime: 2021-08-17 11:00:25
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -13,7 +13,7 @@
       centerTitle="云上航空"
     ></yun-header>
     <view class="index_main">
-      <view class="header_type">
+      <!-- <view class="header_type">
         <view
           v-for="(item, index) in headerType"
           :key="index"
@@ -21,7 +21,7 @@
           @click="switchTicketType(index)"
           ><view>{{ item }}</view></view
         >
-      </view>
+      </view> -->
 
       <view class="header" v-show="currentHeader === 0">
         <model-swiper :swiperList="swiperList"></model-swiper>
@@ -526,6 +526,14 @@ export default {
 
     // 提交按钮
     submitTicket() {
+      if (this.currentTab === 2 && !this.airMessage.fromTime.date) {
+        return uni.showToast({
+          title: "请选择返程时间",
+          icon: "none",
+          duration: 1000,
+        });
+      }
+
       console.log("提交", JSON.stringify(this.airMessage));
       this.airMessage["type"] = this.currentTab;
 
