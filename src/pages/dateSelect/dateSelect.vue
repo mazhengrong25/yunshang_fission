@@ -2,8 +2,8 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2020-10-16 14:56:25
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-16 10:02:35
+ * @LastEditors: mzr
 -->
 <template>
   <view class="date_select">
@@ -487,9 +487,13 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.timeStatus = data.type;
 
-    // 组装单程日期更换
+    // 组装单程日期更换 火车票查询日期更换   火车票选择坐席日期更换
     this.ticketData = data.ticketType ? JSON.parse(data.ticketType) : {};
 
+    // 火车票 选择坐席日期
+    // this.ticketData = JSON.parse(data.trainSeat);
+
+    
     this.checkedToTime = data.checkedToTime;
 
     console.log(data.roundDate);

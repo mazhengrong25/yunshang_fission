@@ -2,8 +2,8 @@
  * @Description: 订单列表页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 16:23:02
- * @LastEditTime: 2021-07-15 17:20:45
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-14 11:37:17
+ * @LastEditors: mzr
 -->
 <template>
   <view class="order_list">
@@ -543,6 +543,7 @@ export default {
           JSON.stringify(this.orderListFilter),
       });
     },
+    
     //获取国内外列表
     getOrderList() {
       this.orderPageStatus = true;

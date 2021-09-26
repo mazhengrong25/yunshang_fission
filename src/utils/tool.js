@@ -2,12 +2,13 @@
  * @Description: 全局方法
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 18:27:51
- * @LastEditTime: 2020-09-27 16:32:51
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-18 10:57:48
+ * @LastEditors: mzr
  */
 import Vue from "vue";
 import moment from "moment";
 moment.locale("zh-cn");
+Vue.prototype.$moment = moment
 // 获取出发时间
 Vue.prototype.$dateTool = (data, type) => {
   return moment(data).format(type);
@@ -32,6 +33,16 @@ Vue.prototype.$isEmail = (mail) => {
     return false;
   }
 };
+
+// 电话号码验证
+Vue.prototype.$isPhone = (phone) => {
+  var filter = /^1[3|4|5|7|8][0-9]{9}$/;
+  if(filter.test(phone)) {
+    return true;
+  }else {
+    return false;
+  }
+}
 
 // 乘法计算
 Vue.prototype.$NumberMul = (arg1, arg2) => {

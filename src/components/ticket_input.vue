@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2021-07-26 15:59:01
+ * @LastEditTime: 2021-09-15 15:04:39
  * @LastEditors: mzr
 --> 
 <template>
@@ -47,7 +47,7 @@
             <view class="time">{{addressForm.fromTime.month}}</view>
             <view class="time_day">{{addressForm.fromTime.week}}返回</view>
           </view>
-          <view v-else class="time_false">
+          <view v-else-if="ticketClassify !== 1" class="time_false">
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />
             <text class="time_text">返程日期</text>
           </view>

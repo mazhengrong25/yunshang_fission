@@ -2,8 +2,8 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2021-07-05 16:13:34
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-08-02 14:03:19
+ * @LastEditors: mzr
 --> 
 
 <template>
@@ -440,6 +440,7 @@ export default {
 
     // 航班信息筛选
     ticketFilter(val) {
+      console.log(val)
       if (val.length < 1) {
         this.ticketList = this.oldTicketList;
         return false;

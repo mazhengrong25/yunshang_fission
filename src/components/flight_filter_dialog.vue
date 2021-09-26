@@ -2,8 +2,8 @@
  * @Description: 航班筛选弹窗
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 11:15:27
- * @LastEditTime: 2020-09-16 13:49:24
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2021-08-02 14:00:52
+ * @LastEditors: mzr
 --> 
 <template>
   <uni-popup ref="filterPopup" type="bottom" class="filter_dialog">

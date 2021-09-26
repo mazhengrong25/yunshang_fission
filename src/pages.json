@@ -61,6 +61,12 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/trainInfo/trainInfo",
+      "style": {
+        "navigationStyle": "custom"
+      }
     }
   ],
 
@@ -70,6 +76,12 @@
       "pages": [
         {
           "path": "filter",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainFilter",
           "style": {
             "navigationStyle": "custom"
           }
@@ -142,6 +154,54 @@
         },
         {
           "path": "addRemark",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainOrder",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainOrderDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainRefundList",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainRefundDetails",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainRefund",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainChange",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainChangeList",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "trainChangeDetails",
           "style": {
             "navigationStyle": "custom"
           }
@@ -224,6 +284,12 @@
           }
         },
         {
+          "path": "passengerVerify",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "flightReservation",
           "style": {
             "navigationStyle": "custom"
@@ -253,6 +319,29 @@
       ]
     },
     {
+      "root": "trainReservation",
+      "pages": [
+        {
+          "path": "trainReservation",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "occupySeat",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "orderPay",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        } 
+      ]
+    },
+    {
       "root": "ticketInquiry",
       "pages": [
         {
@@ -269,6 +358,17 @@
         },
         {
           "path": "ticketInquiry",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "trainInquiry",
+      "pages": [
+        {
+          "path": "trainInquiry",
           "style": {
             "navigationStyle": "custom"
           }

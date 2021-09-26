@@ -2,8 +2,8 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2020-11-25 16:16:24
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-08 10:51:51
+ * @LastEditors: mzr
 -->
 
 <template>
@@ -14,7 +14,7 @@
           <view class="close_btn" @click="closeExp"></view>
           <view class="explanation_header">
             <view v-if="typeShow === 'refund'">退票金额参考</view>
-            <view v-else>退票金额明细</view>
+            <view v-else>{{trainSort?'改签':'退票'}}金额明细</view>
           </view>
         </view>
 
@@ -67,13 +67,13 @@
                         >
                       </view>
 
-                      <view class="list_item">
+                      <view class="list_item" v-if="!trainSort">
                         <view class="item_title">机建/燃油</view>
                         <view class="item_message">{{
                           "&yen; " + item.build_total + " / &yen; " + item.fuel_total
                         }}</view>
                       </view>
-
+                      
                       <view class="list_item">
                         <view class="item_title">保险</view>
                         <view class="item_message"
@@ -87,7 +87,7 @@
                           >&yen; {{ item.service_price }}</view
                         >
                       </view>
-                      <view class="list_item">
+                      <view class="list_item" v-if="!trainSort">
                         <view class="item_title">奖励金</view>
                         <view class="item_message"
                           >&yen; {{ item.reward_price }}</view
@@ -217,11 +217,16 @@ export default {
         type: Object,
         default:() => ({})
       },
-      // 区别退票改签有无警告条
+      // 区别退票改签  
       typeShow: {
         type:String,
         default:() => ''
       },
+      // 区别火车票退票费/改签费  改签为true  
+      trainSort: {
+        type:Boolean,
+        default:() => false
+      }
   },
   data() {
     return {

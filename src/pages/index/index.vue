@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-07-26 15:09:06
+ * @LastEditTime: 2021-09-17 11:26:46
  * @LastEditors: mzr
 -->
 <template>
@@ -76,7 +76,7 @@
                     <view class="checkbox_title">只看动车高铁</view>
                 </view>
 
-                <view class="submit_btn">火车票查询</view>
+                <view class="submit_btn" @click="submitTrain">火车票查询</view>
             </view>
 
             <!-- 公告版块 -->
@@ -197,9 +197,9 @@ export default {
             iStatusBarHeight: 0,
 
             headerType: ["机票", "火车票"],
-            currentHeader: 0, // 头部切换默认值
+            currentHeader: 1, // 头部切换默认值
 
-            checkboxStatus: true, // 火车票 选中动车高铁默认值
+            checkboxStatus: false, // 火车票 选中动车高铁默认值
 
             checkTickedType: false, // 切换往返地
 
@@ -289,7 +289,7 @@ export default {
             this.currentHeader = val
         },
 
-        // 选中
+        // 选中 动车高铁
         activeCheckbox() {
             this.checkboxStatus = !this.checkboxStatus
         },
@@ -451,6 +451,16 @@ export default {
             uni.navigateTo({
                 url: jumpUrl + "?data=" + JSON.stringify(this.airMessage),
             });
+        },
+
+        // 火车票跳转
+        submitTrain() {
+            uni.navigateTo({
+                url: "/trainInquiry/trainInquiry?trainData=" + 
+                JSON.stringify(this.airMessage) + 
+                "&checkboxStatus=" + 
+                this.checkboxStatus
+            })
         },
 
         // 获取公告列表

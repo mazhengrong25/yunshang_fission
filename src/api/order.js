@@ -2,8 +2,8 @@
  * @Description: 订单api
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 17:26:37
- * @LastEditTime: 2020-12-01 15:32:37
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-09-08 15:45:26
+ * @LastEditors: mzr
  */
 import request from '@/api/request';
 
@@ -134,6 +134,95 @@ function sendMessageSelect(url) {
 	})
 }
 
+////////////////////////////////////////火车票
+
+// 火车票 订单列表
+function trainOrderList(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/list',
+    data: data
+  })
+};
+
+// 火车票 订单详情
+function trainOrderDetail(key) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/detail/' +key,
+  })
+};
+
+// 火车票  订单详情  取消订单
+function trainOrderCancel(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/cancel',
+		data:data
+  })
+};
+
+// 火车票 退票列表
+function trainRefundList(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/refund/list',
+    data: data
+  })
+};
+
+// 火车票 退票详情
+function trainRefundDetail(key,data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/refund/detail/' +key,
+    data: data
+  })
+};
+
+// 火车票 订单退票
+function trainOrderRefund(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/refund',
+    data: data
+  })
+};
+
+// 火车票 订单改签
+function trainOrderChange(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/change/reserve',
+    data: data
+  })
+};
+
+// 火车票 改签列表
+function trainChangeList(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/change/list',
+    data: data
+  })
+};
+
+// 火车票 改签详情
+function trainChangeDetail(key) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/change/detail/' +key,
+  })
+};
+
+// 火车票 改签详情  取消订单
+function trainChangeCancel(data) {
+  return request({
+    method: 'POST',
+    url: '/api/train/order/change/cancel',
+		data:data
+  })
+};
 export default{
   orderList,
   orderInterList,
@@ -148,6 +237,15 @@ export default{
   sendMessageSelect,
   changeSubmit,
   changeList,
-  mulChangeList
-
+  mulChangeList,
+	trainOrderList,
+	trainOrderDetail,
+	trainOrderCancel,
+	trainRefundList,
+	trainChangeList,
+	trainRefundDetail,
+	trainOrderRefund,
+	trainChangeDetail,
+	trainChangeCancel,
+	trainOrderChange
 }

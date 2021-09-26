@@ -2,8 +2,8 @@
  * @Description: 乘机人数据
  * @Author: wish.WuJunLong
  * @Date: 2020-08-11 11:10:20
- * @LastEditTime: 2020-08-17 09:47:47
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-13 10:33:52
+ * @LastEditors: mzr
  */
 import request from '@/api/request';
 
@@ -65,11 +65,31 @@ function editPassenger(data,id){
   })
 }
 
+// 火车票 乘客核验
+function verifyPassenger(data){
+  return request({
+    method :'POST',
+    url: '/api/train/passenger/check',
+    data:data
+  })
+}
+
+// 火车票  乘客状态刷新
+function verifyRefresh(data){
+  return request({
+    method :'POST',
+    url: '/api/train/passenger/verf',
+    data:data
+  })
+}
+
 export default{
   getPassenger,
   removePassenger,
   getGroup,
   addGroup,
   addPassenger,
-  editPassenger
+  editPassenger,
+  verifyPassenger,
+  verifyRefresh
 }

@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-18 09:42:34
- * @LastEditTime: 2021-02-23 16:39:50
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-10 17:18:40
+ * @LastEditors: mzr
  * @Description: 改签
  * @FilePath: \positiond:\tests\fission\yunshang_fission\src\order\change.vue
 -->
@@ -242,7 +242,7 @@ export default {
     // 跳转备注页面
     openRemark() {
       uni.navigateTo({
-        url: "/order/addRemark?changeRemark=" + this.changeRemark,
+        url: "/order/addRemark?remark=" + this.changeRemark,
       });
     },
 

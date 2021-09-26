@@ -2,8 +2,8 @@
  * @Description: 订单筛选页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-11-26 09:23:39
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-02 15:18:44
+ * @LastEditors: mzr
 -->
 <template>
   <view class="filter">
@@ -212,16 +212,7 @@
         />
       </view>
 
-      <view class="list_item list_input">
-        <view class="item_title">PNR</view>
-        <input
-          type="text"
-          class="item_input"
-          v-model="pnr"
-          placeholder="请填写PNR"
-          placeholder-class="input_placeholder"
-        />
-      </view>
+
       <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">航班号</view>
         <input
@@ -257,6 +248,8 @@
           placeholder-class="input_placeholder"
         />
       </view>
+
+
     </scroll-view>
 
     <!-- 选择日期 -->
@@ -299,7 +292,7 @@ export default {
     return {
       iStatusBarHeight: 0,
 
-      filterType: "", //筛选类型  国内外  国内退票 国内改签  依次为0 1  2
+      filterType: "", //筛选类型  国内外  国内退票 国内改签   依次为0 1  2 
 
       submitBtnStatus: false, // 确认按钮状态
 
@@ -433,6 +426,7 @@ export default {
           active: false,
         },
       ],
+
       timeLimit: {
         // 时间范围
         start: "",

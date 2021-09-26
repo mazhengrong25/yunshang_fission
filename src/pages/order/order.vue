@@ -2,8 +2,8 @@
  * @Description: 订单主页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:22
- * @LastEditTime: 2021-02-23 16:29:20
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-14 11:02:16
+ * @LastEditors: mzr
 -->
 <template>
   <view class="order">
@@ -45,6 +45,20 @@
           >
         </view>
       </view>
+      <view class="order_list">
+        <view class="order_left">
+          <view class="order_icon">
+            <image src="@/static/order_3.png" mode="aspectFit" />
+          </view>
+          <view class="order_title">火车票</view>
+        </view>
+        <view class="order_right">
+          <view class="list_item" @click="jumpTrainList('order')">火车票订单</view>
+          <view class="list_item" @click="jumpTrainList('refund')">火车票退票订单</view>
+          <view class="list_item" @click="jumpTrainList('change')">火车票改签订单</view
+          >
+        </view>
+      </view>
     </scroll-view>
   </view>
 </template>
@@ -76,12 +90,30 @@ export default {
       });
       
     },
+    // 跳转到火车票订单  
+    jumpTrainList(e) {
+      if(e === 'order') {
+        uni.navigateTo({
+          url:"/order/trainOrder"
+        })
+      }else if (e === 'refund') {
+         uni.navigateTo({
+          url:"/order/trainRefundList"
+        })
+      }else {
+        uni.navigateTo({
+          url:"/order/trainChangeList"
+        })
+      }
+    },
+    
   },
   onLoad() {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
   },
   onShow() {
-    uni.removeStorageSync("orderListFilter");
+    uni.removeStorageSync("orderListFilter"); // 飞机票
+    uni.removeStorageSync("trainFilter");  // 火车票
   },
 };
 </script>

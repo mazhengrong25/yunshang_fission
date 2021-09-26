@@ -1,8 +1,8 @@
 <!--
  * @Author: mzr
  * @Date: 2020-11-24 10:36:26
- * @LastEditTime: 2021-01-06 11:40:29
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-14 09:47:50
+ * @LastEditors: mzr
  * @Description: 改签详情
  * @FilePath: \positiond:\tests\Distribution\yunshang_fission\src\order\changeDetails.vue
 -->
@@ -917,7 +917,6 @@ export default {
                   padding-top: 28upx;
                 }
               }
-
               .list_info {
                 display: flex;
                 align-items: center;
