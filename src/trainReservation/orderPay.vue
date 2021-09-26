@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-09-26 11:33:42
+ * @LastEditTime: 2021-09-26 11:48:16
  * @LastEditors: mzr
 -->
 <template>
@@ -284,7 +284,7 @@ export default {
         }
     }
     .journey_image {
-        height: 52upx;
+        height: 54upx;
         background: url("@/static/change_connect.png") no-repeat center center;
         background-size: cover;
         margin: -1upx 15upx;

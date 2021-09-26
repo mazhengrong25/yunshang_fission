@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签订单
  * @Author: mzr
  * @Date: 2021-08-27 10:08:44
- * @LastEditTime: 2021-09-26 10:31:17
+ * @LastEditTime: 2021-09-26 12:07:11
  * @LastEditors: mzr
 -->
 <template>
@@ -238,7 +238,7 @@ export default {
         // 待支付  取消订单
         getCancel(e) {
           uni.navigateTo({
-              url: "/order/trainChangeDetails?orderNo=" + e.change_no,
+              url: "/order/trainChangeDetails?change_no=" + e.change_no,
           });
         },
 

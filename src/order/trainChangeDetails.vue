@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-09-26 10:59:28
+ * @LastEditTime: 2021-09-26 12:07:10
  * @LastEditors: mzr
 -->
 <template>
@@ -58,7 +58,7 @@
         <view class="option_btn" v-if="detailData.status === 2" @click="getCancel()">取消订单</view>
         <view class="option_btn" v-if="detailData.status === 4">退票</view>
         <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay()">去支付</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 4" @click="jumpOrderPay()">预定返程</view>
+        <view class="option_btn important_btn" v-if="detailData.status === 4">预定返程</view>
       </view>
     </view>
 
@@ -329,8 +329,25 @@ export default {
         }
       }
       orderApi.trainChangeCancel(data).then((res) => {
-          
+          if(res.errorcode === 10000) {
+              this.getTrainDetail(data.order.order_no)
+          }else {
+            uni.showToast({
+              title: res.msg,
+              icon: "none",
+            });
+          }
       })
+    },
+
+     // 去支付
+    jumpOrderPay() {
+      uni.navigateTo({
+          url: "/trainReservation/orderPay?orderNo=" + 
+          this.newDetailData.order_no +
+          "&detailItem=" +
+          JSON.stringify(this.newDetailData)
+      });
     },
 
     // 打开改签金额对话框

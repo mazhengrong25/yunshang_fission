@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-09-26 11:36:25
+ * @LastEditTime: 2021-09-26 11:56:42
  * @LastEditors: mzr
 -->
 <template>
@@ -379,7 +379,7 @@ export default {
       orderApi.trainOrderCancel(data).then((res) => {
         console.log('取消订单',res)
         if(res.errorcode === 10000) {
-            getTrainDetail(data.order.order_no)
+            this.getTrainDetail(data.order.order_no)
         }else {
           uni.showToast({
             title: res.msg,
@@ -421,6 +421,7 @@ export default {
           "&detailItem=" +
           JSON.stringify(this.detailData)
       });
+      console.log('详情去支付',this.detailData.order_no)
     },
 
     // 发送短信
