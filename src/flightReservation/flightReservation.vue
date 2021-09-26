@@ -2,8 +2,13 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
+<<<<<<< HEAD
  * @LastEditTime: 2021-08-12 17:51:48
  * @LastEditors: mzr
+=======
+ * @LastEditTime: 2021-09-02 15:12:18
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 -->
 <template>
   <view class="flight_reservation">
@@ -590,6 +595,29 @@ export default {
             this.chdinf_msg = res.data.chdinf_msg; // 航司儿童婴儿携带数量组装
 
             this.showData = true;
+
+            if (JSON.stringify(res.data.check) !== "true") {
+              if (res.data.check.type === "1") {
+                uni.showToast({
+                  title: res.data.check.msg,
+                  icon: "none",
+                  mask: true,
+                  duration: 3000,
+                });
+              } else if (res.data.check.type === "2") {
+                uni.showModal({
+                  title: "警告",
+                  content: res.data.check.msg,
+                  showCancel: false,
+                  confirmText: '返回',
+                  success: function(res) {
+                    if (res.confirm) {
+                      uni.navigateBack();
+                    }
+                  },
+                });
+              }
+            }
           } else {
             uni.showToast({
               title: res.data || "数据获取错误，请稍后再试",
@@ -740,6 +768,29 @@ export default {
             this.round_chdinf_msg = res.data.arrive_chdinf_msg; // 航司儿童婴儿携带数量组装
 
             this.showData = true;
+
+            if (JSON.stringify(res.data.check) !== "true") {
+              if (res.data.check.type === "1") {
+                uni.showToast({
+                  title: res.data.check.msg,
+                  icon: "none",
+                  mask: true,
+                  duration: 3000,
+                });
+              } else if (res.data.check.type === "2") {
+                uni.showModal({
+                  title: "警告",
+                  content: res.data.check.msg,
+                  confirmText: '返回',
+                  showCancel: false,
+                  success: function(res) {
+                    if (res.confirm) {
+                      uni.navigateBack();
+                    }
+                  },
+                });
+              }
+            }
           } else {
             uni.showToast({
               title: res.data || "数据获取错误，请稍后再试",

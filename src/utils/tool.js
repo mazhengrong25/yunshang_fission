@@ -2,13 +2,25 @@
  * @Description: 全局方法
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 18:27:51
+<<<<<<< HEAD
  * @LastEditTime: 2021-09-18 10:57:48
  * @LastEditors: mzr
+=======
+ * @LastEditTime: 2021-07-27 15:48:16
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
  */
 import Vue from "vue";
+
+// 时间处理注册
 import moment from "moment";
 moment.locale("zh-cn");
+<<<<<<< HEAD
 Vue.prototype.$moment = moment
+=======
+Vue.prototype.$moment = moment;
+
+>>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 // 获取出发时间
 Vue.prototype.$dateTool = (data, type) => {
   return moment(data).format(type);
@@ -56,10 +68,7 @@ Vue.prototype.$NumberMul = (arg1, arg2) => {
     m += s2.split(".")[1].length;
   } catch (e) {}
 
-  return (
-    (Number(s1.replace(".", "")) * Number(s2.replace(".", ""))) /
-    Math.pow(10, m)
-  );
+  return (Number(s1.replace(".", "")) * Number(s2.replace(".", ""))) / Math.pow(10, m);
 };
 
 // 除法计算
@@ -79,10 +88,7 @@ Vue.prototype.$NumberDiv = (arg1, arg2, digit) => {
 
   let result = ((r1 / r2) * Math.pow(10, t2 - t1)).toString();
   let result2 = result.split(".")[1];
-  result2 = result2.substring(
-    0,
-    digit > result2.length ? result2.length : digit
-  );
+  result2 = result2.substring(0, digit > result2.length ? result2.length : digit);
 
   return Number(result.split(".")[0] + "." + result2);
 };

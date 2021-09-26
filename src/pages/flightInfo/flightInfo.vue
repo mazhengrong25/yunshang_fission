@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2021-07-05 16:15:55
+ * @LastEditTime: 2021-09-02 15:01:25
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -353,6 +353,9 @@ export default {
 
       checkBuild: "", // 多运价机建费
       roundCheckBuild: "", // 返程机建费
+
+
+      sourceCodeType: '', // 查询数据类型
     };
   },
   methods: {
@@ -383,6 +386,7 @@ export default {
         if (res.errorcode === 10000) {
           // 组装航班列表信息
           let airData = res.data.IBE.list[0];
+          this.sourceCodeType = airData.sourceCode
           let airDataName = Object.keys(airData.ItineraryInfos);
           // 组装经济舱/公务舱数据
           airDataName.forEach((item, index) => {
@@ -579,7 +583,7 @@ export default {
           type: data.type,
         };
         params = {
-          sourceCode: "IBE",
+          sourceCode: this.sourceCodeType,
           file_key: this.fileKey,
           queryDate: this.segmentsMessage.segments[0].depTime,
           departure: this.segmentsMessage.segments[0].depAirport,
@@ -684,7 +688,7 @@ export default {
         };
         data.data.productType = "FD" ? "SD" : data.data.productType;
         params = {
-          sourceCode: "IBE",
+          sourceCode: this.sourceCodeType,
           file_key: this.fileKey,
           queryDate: this.segmentsMessage.queryDate,
           departure: this.segmentsMessage.segments[0].departure,
@@ -704,7 +708,7 @@ export default {
           type: data.type,
         };
         params = {
-          sourceCode: "IBE",
+          sourceCode: this.sourceCodeType,
           file_key: this.roundTripFileKey,
           queryDate: this.roundSegmentsMessage.queryDate,
           departure: this.roundSegmentsMessage.segments[0].departure,

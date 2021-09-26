@@ -2,9 +2,15 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
+<<<<<<< HEAD
  * @LastEditTime: 2021-08-02 14:03:19
  * @LastEditors: mzr
 --> 
+=======
+ * @LastEditTime: 2021-08-17 10:51:47
+ * @LastEditors: wish.WuJunLong
+-->
+>>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 
 <template>
   <view class="ticket_inquiry">
@@ -15,16 +21,24 @@
         <blticket_priceock v-for="(item, index) in ticketTimeList" :key="index">
           <view
             :id="item.id"
-            :class="['ticket_time_btn',{'active': item.date === activeTimeNumber},{'is_before': !item.status}]"
-            @click="clickBtn(item,item.status)"
+            :class="[
+              'ticket_time_btn',
+              { active: item.date === activeTimeNumber },
+              { is_before: !item.status },
+            ]"
+            @click="clickBtn(item, item.status)"
           >
-            <view class="time_day">{{item.day}}</view>
-            <view class="time_number">{{item.number}}</view>
+            <view class="time_day">{{ item.day }}</view>
+            <view class="time_number">{{ item.number }}</view>
           </view>
         </blticket_priceock>
       </scroll-view>
       <view class="calendar_btn" @click="backCalendar">
-        <image class="calendar_btn_icon" src="@/static/flight_time.png" mode="contain" />日历
+        <image
+          class="calendar_btn_icon"
+          src="@/static/flight_time.png"
+          mode="contain"
+        />日历
       </view>
     </view>
 
@@ -45,59 +59,107 @@
         <view class="ticket_left">
           <view class="ticket_message">
             <view class="ticket_start ticket_time">
-              <view class="ticket_date">{{$dateTool(item.segments[0].depTime,'HH:mm')}}</view>
-              <view
-                class="ticket_address"
-              >{{item.segments[0].depAirport_CN.air_port_name}}{{item.segments[0].depTerminal !== '--'? item.segments[0].depTerminal: ''}}</view>
+              <view class="ticket_date">{{
+                $dateTool(item.segments[0].depTime, "HH:mm")
+              }}</view>
+              <view class="ticket_address"
+                >{{ item.segments[0].depAirport_CN.air_port_name
+                }}{{
+                  item.segments[0].depTerminal !== "--"
+                    ? item.segments[0].depTerminal
+                    : ""
+                }}</view
+              >
             </view>
             <view class="ticket_arrow">
               <view>
                 {{ Math.floor(item.segments[0].duration / 60) }}h{{
-                Math.floor(item.segments[0].duration % 60)
+                  Math.floor(item.segments[0].duration % 60)
                 }}m
               </view>
-              <view class="ticket_type" v-if="item.segments.length > 1">转 {{item.segments[0].arrAirport_CN.city_name}}</view>
+              <view class="ticket_type" v-if="item.segments.length > 1"
+                >转 {{ item.segments[0].arrAirport_CN.city_name }}</view
+              >
               <view class="ticket_stop" v-if="item.segments[0].stopCount > 0">经停</view>
             </view>
             <view class="ticket_end ticket_time">
               <view class="ticket_date">
-                {{$dateTool(item.segments[item.segments.length - 1].arrTime,'HH:mm')}}
-                <text class="more_time" v-if="item.moreTime">+{{item.moreTime}}天</text>
+                {{ $dateTool(item.segments[item.segments.length - 1].arrTime, "HH:mm") }}
+                <text class="more_time" v-if="item.moreTime">+{{ item.moreTime }}天</text>
               </view>
-              <view
-                class="ticket_address"
-              >{{item.segments[item.segments.length - 1].arrAirport_CN.air_port_name}}{{item.segments[item.segments.length - 1].arrTerminal !== '--' ?item.segments[item.segments.length - 1].arrTerminal : ''}}</view>
+              <view class="ticket_address"
+                >{{ item.segments[item.segments.length - 1].arrAirport_CN.air_port_name
+                }}{{
+                  item.segments[item.segments.length - 1].arrTerminal !== "--"
+                    ? item.segments[item.segments.length - 1].arrTerminal
+                    : ""
+                }}</view
+              >
             </view>
           </view>
 
           <view class="ticket_details">
             <image
               class="ticket_details_icon"
-              :src="'https://fxxcx.ystrip.cn/assets/airline/'+ item.segments[0].airline +'.png'"
+              :src="
+                'https://fxxcx.ystrip.cn/assets/airline/' +
+                  item.segments[0].airline +
+                  '.png'
+              "
               mode="contain"
             />
-            {{item.segments[0].airline_CN}}{{item.segments[0].flightNumber}} | {{item.segments[0].aircraftCode}}
+            {{ item.segments[0].airline_CN }}{{ item.segments[0].flightNumber }} |
+            {{ item.segments[0].aircraftCode }} |
+            <view class="ticket_details_source">{{ item.sourceCode }}</view>
           </view>
         </view>
 
         <view class="ticket_right">
           <view class="ticket_price">
-            <text class="currency" v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">&yen;</text>
-            <view v-if="item.available_cabin > 0 && item.available_cabin !== 0 && item.min_price > 0">{{item.min_price}}</view>
+            <text
+              class="currency"
+              v-if="
+                item.available_cabin > 0 &&
+                  item.available_cabin !== 0 &&
+                  item.min_price > 0
+              "
+              >&yen;</text
+            >
+            <view
+              v-if="
+                item.available_cabin > 0 &&
+                  item.available_cabin !== 0 &&
+                  item.min_price > 0
+              "
+              >{{ item.min_price }}</view
+            >
             <view class="sold_out" v-if="item.available_cabin === 0">售罄</view>
-            <view class="sold_out sold_out_t" v-else-if="item.min_price === 0">手动获取</view>
+            <view class="sold_out sold_out_t" v-else-if="item.min_price === 0"
+              >手动获取</view
+            >
             <!-- <view v-else class="not_price"></view> -->
           </view>
-          <view class="overseas" v-if="item.overseas">(境外&yen;{{item.overseas}})</view>
+          <view class="overseas" v-if="item.overseas"
+            >(境外&yen;{{ item.overseas }})</view
+          >
           <!-- <view class="ticket_cabin">{{item.ItineraryInfos['经济舱'][0].cabinInfo.cabinDesc}}</view> -->
-          <view class="ticket_cabin" v-if="item.first_cabin.discount">{{item.first_cabin.cabinInfo.cabinDesc}}{{item.first_cabin.discount}}</view>
+          <view class="ticket_cabin" v-if="item.first_cabin.discount"
+            >{{ item.first_cabin.cabinInfo.cabinDesc
+            }}{{ item.first_cabin.discount }}</view
+          >
           <view class="ticket_low_price" v-if="item.lowPrice">最低价</view>
-          <view v-if="item.reward" class="ticket_reward">奖励金 &yen;{{item.reward}}</view>
+          <view v-if="item.reward" class="ticket_reward"
+            >奖励金 &yen;{{ item.reward }}</view
+          >
         </view>
       </view>
 
       <!-- 骨架屏 -->
-      <view class="flight_skeleton" v-for="i in ticketList.length < 1? skeletonNumber :0" :key="i">
+      <view
+        class="flight_skeleton"
+        v-for="i in ticketList.length < 1 ? skeletonNumber : 0"
+        :key="i"
+      >
         <view class="top">
           <text></text>
           <text></text>
@@ -105,7 +167,11 @@
         <text></text>
       </view>
 
-      <default-page v-if="showDefault" @returnBtn="getTicketData()" :defaultType="showDefaultType"></default-page>
+      <default-page
+        v-if="showDefault"
+        @returnBtn="getTicketData()"
+        :defaultType="showDefaultType"
+      ></default-page>
 
       <!-- <view class="next_data" v-if="nextGetData">
         <view class="next_text">加载中</view>
@@ -117,7 +183,11 @@
     </scroll-view>
 
     <view class="footer_box" v-if="!showDefault">
-      <flight-filter ref="flightFilter" @openFilter="openFilter" @filterType="listFilter"></flight-filter>
+      <flight-filter
+        ref="flightFilter"
+        @openFilter="openFilter"
+        @filterType="listFilter"
+      ></flight-filter>
     </view>
 
     <flight-filter-dialog
@@ -160,7 +230,6 @@ export default {
 
       airMessage: {}, // 首页传参
       ticketOrder: {}, // 详情  再次预定  传参
-
 
       skeletonNumber: 6, // 骨架屏数量
       showDefault: false, // 报错页面
@@ -213,74 +282,82 @@ export default {
     // 获取航班信息
     getTicketData() {
       this.backScroll();
-      try{
-        if(this.$refs.flightFilter.filterBtnActive !== 'time'){
+      try {
+        if (this.$refs.flightFilter.filterBtnActive !== "time") {
           this.$refs.flightFilter.filterBtnActive = "time";
         }
-      }catch{}
-      
+      } catch {}
 
       let data = {
         departure:
-        this.ticketData.to_type === "air"
-          ? this.ticketData.to.air_port: 
-          this.ticketData.to_type === "hot" && this.ticketData.to.city_name === "上海" ?
-          this.ticketData.to.air_port:
-          this.ticketData.to_type === "hot" && this.ticketData.to.city_name === "北京" ?
-          this.ticketData.to.air_port
-          : this.ticketData.to.city_code, // 起飞机场三字码
-      arrival:
-        this.ticketData.from_type === "air"
-          ? this.ticketData.from.air_port: 
-          this.ticketData.from_type === "hot" && this.ticketData.from.city_name === "上海" ?
-          this.ticketData.from.air_port: 
-          this.ticketData.from_type === "hot" && this.ticketData.from.city_name === "北京" ?
-          this.ticketData.from.air_port
-          : this.ticketData.from.city_code,
-        departureTime: this.ticketData.toTime.date,  
-        only_segment: 1
-      }
-      
-      ticket.getTicket(data).then((res) => {
-        console.log(res);
-        if (res.errorcode === 10000) {
-          this.showDefaultType = "";
-          this.file_key = res.data.IBE.file_key;
-          this.showDefault = false;
-          this.oldTicketList = res.data.IBE.list;
-          this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
-          this.dataListApplyType = true;
+          this.ticketData.to_type === "air"
+            ? this.ticketData.to.air_port
+            : this.ticketData.to_type === "hot" && this.ticketData.to.city_name === "上海"
+            ? this.ticketData.to.air_port
+            : this.ticketData.to_type === "hot" && this.ticketData.to.city_name === "北京"
+            ? this.ticketData.to.air_port
+            : this.ticketData.to.city_code, // 起飞机场三字码
+        arrival:
+          this.ticketData.from_type === "air"
+            ? this.ticketData.from.air_port
+            : this.ticketData.from_type === "hot" &&
+              this.ticketData.from.city_name === "上海"
+            ? this.ticketData.from.air_port
+            : this.ticketData.from_type === "hot" &&
+              this.ticketData.from.city_name === "北京"
+            ? this.ticketData.from.air_port
+            : this.ticketData.from.city_code,
+        departureTime: this.ticketData.toTime.date,
+        only_segment: 1,
+      };
 
-          let lowPriceList = this.ticketList.map((o) => {return o.min_price}).filter(a => a > 0)
+      ticket
+        .getTicket(data)
+        .then((res) => {
+          console.log(res);
+          if (res.errorcode === 10000) {
+            this.showDefaultType = "";
+            this.file_key = res.data.IBE.file_key;
+            this.showDefault = false;
+            this.oldTicketList = res.data.IBE.list;
+            this.ticketList = JSON.parse(JSON.stringify(this.oldTicketList));
+            this.dataListApplyType = true;
 
-          this.ticketList.forEach(item =>{
-            item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList)
-          })
-          this.oldTicketList.forEach(item =>{
-            item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList)
-          })
-          
-          if (this.ticketList.length < 1) {
+            let lowPriceList = this.ticketList
+              .map((o) => {
+                return o.min_price;
+              })
+              .filter((a) => a > 0);
+
+            this.ticketList.forEach((item) => {
+              item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList);
+            });
+            this.oldTicketList.forEach((item) => {
+              item.lowPrice = item.min_price === Math.min.apply(Math, lowPriceList);
+            });
+
+            if (this.ticketList.length < 1) {
+              this.showDefault = true;
+              this.dataListApplyType = false;
+              this.skeletonNumber = 0;
+            }
+            this.nextGetData = false;
+          } else {
+            this.ticketList = [];
             this.showDefault = true;
             this.dataListApplyType = false;
+            this.showDefaultType = "";
             this.skeletonNumber = 0;
+            this.$forceUpdate();
           }
-          this.nextGetData = false;
-        } else {
-          this.ticketList = [];
-          this.showDefault = true;
-          this.dataListApplyType = false;
-          this.showDefaultType = "";
-          this.skeletonNumber = 0;
-          this.$forceUpdate();
-        }
-      }).catch(() =>{
+        })
+        .catch(() => {
           this.ticketList = [];
           this.showDefault = true;
           this.showDefaultType = "404";
           this.skeletonNumber = 0;
           this.$forceUpdate();
-      });
+        });
     },
 
     // 选择日期
@@ -313,25 +390,40 @@ export default {
       for (let index = 0; index < 14; index++) {
         this.ticketTimeList.push({
           id: "id_" + index,
-          day: moment(day).add(dayNumber, "d").calendar(null, {
-            lastDay: "昨天",
-            sameDay: "今天",
-            nextDay: "明天",
-            nextWeek: "ddd",
-            lastWeek: "ddd",
-            sameElse: "ddd",
-          }),
+          day: moment(day)
+            .add(dayNumber, "d")
+            .calendar(null, {
+              lastDay: "昨天",
+              sameDay: "今天",
+              nextDay: "明天",
+              nextWeek: "ddd",
+              lastWeek: "ddd",
+              sameElse: "ddd",
+            }),
           date: moment(this.ticketData.toTime.date)
             .subtract(7, "days")
             .add(dayNumber, "d")
             .format("YYYY-MM-DD"),
           number:
-            moment(day).add(dayNumber, "d").format("DD") === "01"
-              ? moment(day).add(dayNumber, "d").format("MM") +
+            moment(day)
+              .add(dayNumber, "d")
+              .format("DD") === "01"
+              ? moment(day)
+                  .add(dayNumber, "d")
+                  .format("MM") +
                 "-" +
-                moment(day).add(dayNumber, "d").format("DD")
-              : moment(day).add(dayNumber, "d").format("DD"),
-          status: moment(day).add(dayNumber, "d").format('YYYY-MM-DD') === moment(+moment()).format('YYYY-MM-DD')? true: +moment(day).add(dayNumber, "d") > +moment(),
+                moment(day)
+                  .add(dayNumber, "d")
+                  .format("DD")
+              : moment(day)
+                  .add(dayNumber, "d")
+                  .format("DD"),
+          status:
+            moment(day)
+              .add(dayNumber, "d")
+              .format("YYYY-MM-DD") === moment(+moment()).format("YYYY-MM-DD")
+              ? true
+              : +moment(day).add(dayNumber, "d") > +moment(),
         });
         dayNumber += 1;
       }
@@ -342,7 +434,7 @@ export default {
       this.timeIndex = "";
       this.activeTimeNumber = this.ticketData.toTime.date;
 
-      console.log(this.ticketTimeList)
+      console.log(this.ticketTimeList);
     },
 
     // 返回日历选择
@@ -367,28 +459,25 @@ export default {
     // 国内单程时间排序
     timeSort(t) {
       return (m, n) => {
-        var a = moment(m.segments[0][t]).format('x');
-        var b = moment(n.segments[0][t]).format('x');
+        var a = moment(m.segments[0][t]).format("x");
+        var b = moment(n.segments[0][t]).format("x");
         return a - b;
       };
     },
 
     // 列表筛选
     listFilter(val) {
-
       if (val === "price") {
         this.ticketList.sort(this.priceSort("min_price"));
         let priceList = this.ticketList.filter((item) => item.available_cabin !== 0);
-        let notPriceList = this.ticketList.filter(
-          (item) => item.available_cabin === 0
-        );
+        let notPriceList = this.ticketList.filter((item) => item.available_cabin === 0);
         this.ticketList = [...priceList, ...notPriceList];
-        console.log(val,this.ticketList);
+        console.log(val, this.ticketList);
         this.oldTicketList = JSON.parse(JSON.stringify(this.ticketList));
       } else if (val === "time") {
         this.ticketList = this.ticketList.sort(this.timeSort("depTime"));
-        console.log(val,this.ticketList,this.ticketList.sort(this.timeSort("depTime")))
-        this.$forceUpdate()
+        console.log(val, this.ticketList, this.ticketList.sort(this.timeSort("depTime")));
+        this.$forceUpdate();
       }
       this.backScroll();
     },
@@ -445,41 +534,40 @@ export default {
         this.ticketList = this.oldTicketList;
         return false;
       }
-      if(val[0]){
+      if (val[0]) {
         if (val[0] === "不限") {
-        this.ticketList = this.oldTicketList;
-      }
+          this.ticketList = this.oldTicketList;
+        }
 
-      if (val[0].indexOf("上午") !== -1) {
-        this.ticketList = this.oldTicketList.filter(
-          (item) =>
-            new Date(item.segments[0].depTime).getHours() >= 0 && 
-            new Date(item.segments[0].depTime).getHours() < 12
-        );
+        if (val[0].indexOf("上午") !== -1) {
+          this.ticketList = this.oldTicketList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 0 &&
+              new Date(item.segments[0].depTime).getHours() < 12
+          );
+        }
+        if (val[0].indexOf("中午") !== -1) {
+          this.ticketList = this.oldTicketList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 12 &&
+              new Date(item.segments[0].depTime).getHours() < 14
+          );
+        }
+        if (val[0].indexOf("下午") !== -1) {
+          this.ticketList = this.oldTicketList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 14 &&
+              new Date(item.segments[0].depTime).getHours() < 18
+          );
+        }
+        if (val[0].indexOf("晚上") !== -1) {
+          this.ticketList = this.oldTicketList.filter(
+            (item) =>
+              new Date(item.segments[0].depTime).getHours() >= 18 &&
+              new Date(item.segments[0].depTime).getHours() < 24
+          );
+        }
       }
-      if (val[0].indexOf("中午") !== -1) {
-        this.ticketList = this.oldTicketList.filter(
-          (item) =>
-            new Date(item.segments[0].depTime).getHours() >= 12 &&
-            new Date(item.segments[0].depTime).getHours() < 14
-        );
-      }
-      if (val[0].indexOf("下午") !== -1) {
-        this.ticketList = this.oldTicketList.filter(
-          (item) =>
-            new Date(item.segments[0].depTime).getHours() >= 14 &&
-            new Date(item.segments[0].depTime).getHours() < 18
-        );
-      }
-      if (val[0].indexOf("晚上") !== -1) {
-        this.ticketList = this.oldTicketList.filter(
-          (item) =>
-            new Date(item.segments[0].depTime).getHours() >= 18 &&
-            new Date(item.segments[0].depTime).getHours() < 24
-        );
-      }
-      }
-      
 
       if (val[1]) {
         if (val[1] === "不限") {
@@ -528,7 +616,8 @@ export default {
         url:
           "/pages/flightInfo/flightInfo?airData=" +
           JSON.stringify(data) +
-          "&airMessage=" + JSON.stringify(this.airMessage) +
+          "&airMessage=" +
+          JSON.stringify(this.airMessage) +
           "&fileKey=" +
           this.file_key +
           "&pageType=false",
@@ -548,14 +637,20 @@ export default {
     }
   },
   onLoad(data) {
-    console.log(data)
+    console.log(data);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.ticketData = JSON.parse(data.data);
     console.log("单程查询数据", this.ticketData);
     // 组装数据
     this.ticketAddress = {
-      to: this.ticketData.to_type ==='air'?this.ticketData.to.air_port_name:this.ticketData.to.city_name,
-      from: this.ticketData.from_type ==='air'?this.ticketData.from.air_port_name:this.ticketData.from.city_name,
+      to:
+        this.ticketData.to_type === "air"
+          ? this.ticketData.to.air_port_name
+          : this.ticketData.to.city_name,
+      from:
+        this.ticketData.from_type === "air"
+          ? this.ticketData.from.air_port_name
+          : this.ticketData.from.city_name,
       departure:
         this.ticketData.to_type === "air"
           ? this.ticketData.to.air_port
@@ -600,7 +695,7 @@ export default {
     // }
 
     this.airMessage = JSON.parse(JSON.stringify(this.ticketData));
-    
+
     // 获取时间日期
     if (uni.getStorageSync("time")) {
       let timeData = JSON.parse(uni.getStorageSync("time"));
@@ -611,7 +706,7 @@ export default {
     }
     this.getTicketData();
     this.getDateList(); // 时间处理
-    this.$forceUpdate()
+    this.$forceUpdate();
   },
 };
 </script>
@@ -786,7 +881,7 @@ export default {
             .ticket_type {
               margin-top: 14upx;
             }
-            .ticket_stop{
+            .ticket_stop {
               font-size: 20upx;
               text-align: center;
               margin-top: 14upx;
@@ -814,6 +909,13 @@ export default {
             height: 16upx;
             margin-right: 8upx;
           }
+          .ticket_details_source {
+            display: inline-block;
+            background: rgb(211, 223, 236);
+            color: #fff;
+            padding: 0 8upx;
+            margin-left: 8upx;
+          }
         }
       }
 
@@ -835,7 +937,7 @@ export default {
         .sold_out {
           color: rgba(255, 0, 0, 1);
           font-size: 48upx;
-          &.sold_out_t{
+          &.sold_out_t {
             font-size: 36upx;
           }
         }
@@ -849,7 +951,7 @@ export default {
           &::before {
             width: 20upx;
             height: 200%;
-            content: ""; 
+            content: "";
             display: block;
             background-color: #fff;
             position: absolute;
@@ -878,14 +980,14 @@ export default {
           color: rgba(153, 153, 153, 1);
           margin-bottom: 2upx;
         }
-        .ticket_low_price{
+        .ticket_low_price {
           font-size: 22upx;
-          font-weight: 400;   
+          font-weight: 400;
           color: #ff8800;
           margin-bottom: 2upx;
-          background: rgba(251, 152, 38, .11);
+          background: rgba(251, 152, 38, 0.11);
           padding: 2upx 12upx;
-          border: 2upx solid rgba(251, 152, 38, .24);
+          border: 2upx solid rgba(251, 152, 38, 0.24);
           display: inline-flex;
         }
         .ticket_reward {
