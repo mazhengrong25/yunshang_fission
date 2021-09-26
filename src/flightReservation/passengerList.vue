@@ -2,8 +2,8 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2021-09-17 15:13:55
- * @LastEditors: mzr
+ * @LastEditTime: 2021-09-26 11:18:54
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
     <view class="passenger">
@@ -97,7 +97,7 @@
         </view>
 
         <!-- 核验弹窗 -->
-        <passengerVerify ref="verifyPopup" :passengerName="passengerData" @jumpVerify="jumpVerify"></passengerVerify>
+        <passengerVerify ref="verifyPopup" :passengerData="passengerData" @jumpVerify="jumpVerify"></passengerVerify>
     </view>
 </template>
 
@@ -662,10 +662,15 @@ export default {
             .option_item {
                 display: flex;
                 height: 100%;
+                padding-right: 20upx;
+               
                 .option_box {
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                     &:not(:last-child){
+                    margin-right: 40upx;
+                }
                     .delete_btn {
                         display: flex;
                         align-items: center;

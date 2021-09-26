@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 选择乘车人 (乘车人核验)
  * @Author: mzr
  * @Date: 2021-09-09 10:03:14
- * @LastEditTime: 2021-09-17 16:14:45
- * @LastEditors: mzr
+ * @LastEditTime: 2021-09-26 11:10:25
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <uni-popup ref="verifyDialog" type="dialog">
@@ -11,7 +11,7 @@
       <view class="verify_content">
         <view class="content_title">乘车人核验</view>
         <view class="content_input">
-          乘客<view class="input_inline">【{{passengerName}}】</view>手机号码尚未通过核验。根据有关部门要求，乘客需办理手机号核验后方可购票，请根据步骤完成手机号核验
+          乘客<view class="input_inline">【{{passengerData.passengerName}}】</view>手机号码尚未通过核验。根据有关部门要求，乘客需办理手机号核验后方可购票，请根据步骤完成手机号核验
         </view>
         <view class="content_button">
           <view class="submit_button" @click="colseVerifyPopup()">暂 不 核 验</view>
@@ -26,9 +26,9 @@
 export default {
     props: {
       // 乘客姓名
-      passengerName: {
-        type:String,
-        default:() => "",
+      passengerData: {
+        type:Object,
+        default:() => {},
       }
     },
     methods: {

@@ -2,7 +2,7 @@
  * @Description: 新增乘机人
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 18:32:17
- * @LastEditTime: 2020-10-14 16:51:05
+ * @LastEditTime: 2021-09-26 11:20:41
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -719,6 +719,7 @@ export default {
           nationality: "CN",
           en_first_name: this.passenger.en_first_name || "",
           en_last_name: this.passenger.en_last_name || "",
+          remark :''
         };
         // data.sex = this.baseInfo.sex;
         // data["cert_type"] = item.cert_type;
