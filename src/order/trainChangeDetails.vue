@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-09-15 16:53:13
+ * @LastEditTime: 2021-09-26 10:31:16
  * @LastEditors: mzr
 -->
 <template>
@@ -48,7 +48,7 @@
         <text class="time_text">
           {{detailData.status === 3 ? '订单支付成功，出票中...' : 
               detailData.status === 6 ? '抱歉改签占座失败，若仍需改签请联系客服人员' :
-                detailData.status === 2 ? '剩余支付时间：09：28': 
+                detailData.status === 2 ? `剩余支付时间：${ Math.floor(detailData.overdue_time / 60 % 60)}:${Math.floor(detailData.overdue_time % 60)}分钟`: 
                   detailData.status === 1 ? `预计在${ Math.floor(occupyTime / 60)}：${Math.floor(occupyTime %60)}分前完成占座`:''}}
         </text>
        </view>
