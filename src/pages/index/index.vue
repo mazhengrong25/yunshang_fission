@@ -2,13 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
-<<<<<<< HEAD
- * @LastEditTime: 2021-09-17 11:26:46
- * @LastEditors: mzr
-=======
- * @LastEditTime: 2021-08-17 11:00:25
+ * @LastEditTime: 2021-09-26 10:49:14
  * @LastEditors: wish.WuJunLong
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 -->
 <template>
   <view class="index">
@@ -18,7 +13,7 @@
       centerTitle="云上航空"
     ></yun-header>
     <view class="index_main">
-      <!-- <view class="header_type">
+      <view class="header_type">
         <view
           v-for="(item, index) in headerType"
           :key="index"
@@ -26,7 +21,7 @@
           @click="switchTicketType(index)"
           ><view>{{ item }}</view></view
         >
-      </view> -->
+      </view>
 
       <view class="header" v-show="currentHeader === 0">
         <model-swiper :swiperList="swiperList"></model-swiper>
@@ -128,19 +123,13 @@
           <view class="checkbox_title">只看动车高铁</view>
         </view>
 
-        <view class="submit_btn">火车票查询</view>
+        <view class="submit_btn" @click="submitTrain">火车票查询</view>
       </view>
-
-<<<<<<< HEAD
-                <view class="submit_btn" @click="submitTrain">火车票查询</view>
-            </view>
-=======
       <!-- 公告版块 -->
       <view class="notice">
         <model-notice :modelType="true" :noticeList="noticeList"></model-notice>
       </view>
     </view>
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 
     <!-- 乘客数量选择弹窗 -->
     <uni-popup
@@ -288,114 +277,6 @@ import userInfo from "@/api/getUserInfo.js";
 import moment from "moment";
 moment.locale("zh-cn");
 export default {
-<<<<<<< HEAD
-    components: {
-        modelSwiper,
-        modelNotice,
-        ticketInput,
-        messageDialog,
-    },
-    data() {
-        return {
-            iStatusBarHeight: 0,
-
-            headerType: ["机票", "火车票"],
-            currentHeader: 1, // 头部切换默认值
-
-            checkboxStatus: false, // 火车票 选中动车高铁默认值
-
-            checkTickedType: false, // 切换往返地
-
-            // banner 列表  火车票
-            trainSwiper: [
-                {
-                    path: require("@/static/train_header_swiper.png"),
-                    title: "携手合作，互融互联",
-                    url: "#",
-                    swiper_type: true,
-                },
-                {
-                    path: require("@/static/train_header_swiper.png"),
-                    title: "携手合作，互融互联",
-                    url: "#",
-                    swiper_type: true,
-                },
-            ],
-
-            currentTab: 0, // tab默认值
-            tabsList: ["国内", "国际", "往返", "多程"], // tab切换内容
-            swiperHeight: 0, // tab切换swiper高度
-
-            addressForm: {
-                // 航程信息
-                to: "重庆", // 出发地
-                from: "北京", // 到达地
-                multi_pass_to: "西安", // 多程出发地
-                multi_pass_from: "武汉", // 多程到达地
-                toTime: "", // 出发时间
-                toDay: "明天",
-                toDate: "",
-                fromTime: "", // 到达时间
-                fromDay: "周三", // 到达日期
-                fromDate: "",
-            },
-
-            passengerForm: {
-                adultNumber: 0, // 成年人数量
-                childNumber: 0, // 儿童数量
-                babyNumber: 0, // 婴儿数量
-            },
-
-            passengerFormBack: {}, // 乘客信息
-
-            popupCurrent: 0, // 弹窗轮播下标
-            airMessage: {
-                to: {
-                    city_code: "CKG",
-                    city_name: "重庆",
-                    country_code: "CN",
-                    province: "重庆",
-                },
-                from: {
-                    city_code: "BJS",
-                    city_name: "北京",
-                    country_code: "CN",
-                    province: "北京",
-                },
-                toTime: {
-                    date: moment()
-                        .add(1, "d")
-                        .format("YYYY-MM-DD"),
-                    month: moment()
-                        .add(1, "d")
-                        .format("M月DD日"),
-                    status: "start",
-                    type: "time",
-                    week: moment()
-                        .add(1, "d")
-                        .format("ddd"),
-                },
-                fromTime: {},
-                to_type: "",
-                from_type: "",
-            },
-
-            noticeList: [], // 公告列表
-
-            currentTrue: false, // 是否往返
-        };
-    },
-    methods: {
-
-        // 切换页面显示
-        switchTicketType(val) {
-            this.currentHeader = val
-        },
-
-        // 选中 动车高铁
-        activeCheckbox() {
-            this.checkboxStatus = !this.checkboxStatus
-=======
   components: {
     modelSwiper,
     modelNotice,
@@ -426,7 +307,6 @@ export default {
           title: "携手合作，互融互联",
           url: "#",
           swiper_type: true,
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
         },
       ],
 
@@ -578,32 +458,31 @@ export default {
       this.currentTrue = false;
     },
 
-<<<<<<< HEAD
-        // 火车票跳转
-        submitTrain() {
-            uni.navigateTo({
-                url: "/trainInquiry/trainInquiry?trainData=" + 
-                JSON.stringify(this.airMessage) + 
-                "&checkboxStatus=" + 
-                this.checkboxStatus
-            })
-        },
+    // 火车票跳转
+    submitTrain() {
+      uni.navigateTo({
+        url:
+          "/trainInquiry/trainInquiry?trainData=" +
+          JSON.stringify(this.airMessage) +
+          "&checkboxStatus=" +
+          this.checkboxStatus,
+      });
+    },
 
-        // 获取公告列表
-        getNoticeList() {
-            noticeApi.getNotice().then((res) => {
-                if (res.errorcode === 10000) {
-                    // this.noticeList = res.data.data
-                    res.data.data.forEach((item, index) => {
-                        if (index < 5) {
-                            this.noticeList.push(item);
-                        }
-                    });
-                    console.log("首页", this.noticeList);
-                }
-            });
-        },
-=======
+    // 获取公告列表
+    getNoticeList() {
+      noticeApi.getNotice().then((res) => {
+        if (res.errorcode === 10000) {
+          // this.noticeList = res.data.data
+          res.data.data.forEach((item, index) => {
+            if (index < 5) {
+              this.noticeList.push(item);
+            }
+          });
+          console.log("首页", this.noticeList);
+        }
+      });
+    },
     // 获取当前swiper-item高度
     setSwiperHeight() {
       let query = uni.createSelectorQuery().in(this);
@@ -612,7 +491,6 @@ export default {
         this.swiperHeight = res[0][this.currentTab].height;
       });
     },
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 
     // 儿婴票说明
     openChildMessageBtn() {

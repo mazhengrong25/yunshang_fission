@@ -2,25 +2,16 @@
  * @Description: 全局方法
  * @Author: wish.WuJunLong
  * @Date: 2020-08-04 18:27:51
-<<<<<<< HEAD
- * @LastEditTime: 2021-09-18 10:57:48
- * @LastEditors: mzr
-=======
- * @LastEditTime: 2021-07-27 15:48:16
+ * @LastEditTime: 2021-09-26 10:46:06
  * @LastEditors: wish.WuJunLong
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
  */
 import Vue from "vue";
 
 // 时间处理注册
 import moment from "moment";
 moment.locale("zh-cn");
-<<<<<<< HEAD
-Vue.prototype.$moment = moment
-=======
 Vue.prototype.$moment = moment;
 
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 // 获取出发时间
 Vue.prototype.$dateTool = (data, type) => {
   return moment(data).format(type);
