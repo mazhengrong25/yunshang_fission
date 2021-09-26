@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-09-26 10:11:27
+ * @LastEditTime: 2021-09-26 11:36:25
  * @LastEditors: mzr
 -->
 <template>
@@ -441,7 +441,7 @@ export default {
 
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.order_no = data.orderNO // 订单号
+    this.order_no = data.orderNo // 订单号
     this.getTrainDetail(this.order_no)
   }
 }

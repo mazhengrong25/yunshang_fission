@@ -2,7 +2,7 @@
  * @Description: 火车票订单
  * @Author: mzr
  * @Date: 2021-08-20 09:56:10
- * @LastEditTime: 2021-09-26 09:50:09
+ * @LastEditTime: 2021-09-26 11:36:23
  * @LastEditors: mzr
 -->
 <template>
@@ -252,13 +252,14 @@ export default {
             console.log(data)
             uni.navigateTo({
                 url:
-                    "/order/trainOrderDetails?orderNO=" +
+                    "/order/trainOrderDetails?orderNo=" +
                     data.order_no
             });
         },
 
         // 待支付  取消订单
         getCancel(e) {
+            console.log('取消订单',e.order_no)
           uni.navigateTo({
               url: "/order/trainOrderDetails?orderNo=" + e.order_no,
           });
@@ -266,6 +267,7 @@ export default {
 
         // 待支付  去支付
         jumpOrderPay(val) {
+            console.log('去支付跳转',val)
           uni.navigateTo({
               url: "/trainReservation/orderPay?orderNo=" + 
               val.order_no +

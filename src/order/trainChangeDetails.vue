@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-09-26 10:31:16
+ * @LastEditTime: 2021-09-26 10:59:28
  * @LastEditors: mzr
 -->
 <template>
@@ -474,6 +474,8 @@ export default {
     position: relative;
     flex: 1;
     display: flex;
+    height: 100%;
+    overflow-y: hidden;
     &::after {
       content: "";
       display: block;

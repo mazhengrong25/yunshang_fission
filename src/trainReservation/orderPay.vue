@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-09-23 16:52:36
+ * @LastEditTime: 2021-09-26 11:33:42
  * @LastEditors: mzr
 -->
 <template>
@@ -149,7 +149,7 @@ export default {
     },
     onLoad(data) {
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-        this.getData(data.orderNO);
+        this.getData(data.orderNo);
         // 正常单，改签单传值 
         this.detailData = data.detailItem ? JSON.parse(data.detailItem) : {};
     }

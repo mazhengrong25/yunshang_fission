@@ -2,7 +2,7 @@
  * @Description: 退票单  --- 详情
  * @Author: mzr
  * @Date: 2021-08-30 11:08:34
- * @LastEditTime: 2021-09-15 17:19:58
+ * @LastEditTime: 2021-09-26 10:59:26
  * @LastEditors: mzr
 -->
 <template>
@@ -376,6 +376,8 @@ export default {
     position: relative;
     flex: 1;
     display: flex;
+    height: 100%;
+    overflow-y: hidden;
     &::after {
       content: "";
       display: block;
