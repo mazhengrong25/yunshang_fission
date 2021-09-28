@@ -2,8 +2,8 @@
  * @Description: 车次信息
  * @Author: mzr
  * @Date: 2021-08-06 17:28:11
- * @LastEditTime: 2021-09-23 09:46:25
- * @LastEditors: mzr
+ * @LastEditTime: 2021-09-28 13:49:12
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
     <view class="train_content_journey">
@@ -36,7 +36,6 @@
       ):0}h${trainObject.train?Math.floor(Number(trainObject.train.run_minute) % 60):0}m`}}
                 </view>
                 <view class="bottom_center_stop" @click="openStopStation()">经停站</view>
-                <image class="train_stop_image" src="@/static/train_stop.png" mode="contain" />
                 <view class="bottom_center_item">{{trainObject.train.code}}</view>
             </view>
             <view class="bottom_right">
@@ -246,20 +245,20 @@ export default {
               font-size: 22upx;
               font-weight: 400;
               color: #afb9c4;
-              margin-bottom: 4upx;
               text-align: center;
           }
-          .train_stop_image {
-              width: 202upx;
-              height: 40upx;
-          }
+       
           .bottom_center_stop {
               font-size: 22upx;
               font-weight: 400;
               color: #0070e2;
-              position: absolute;
-              right: 68upx;
-              bottom: 46upx;
+              width: 202upx;
+              height: 40upx;
+              text-align: center;
+              line-height: 40upx;
+              background: url("@/static/train_stop.png") no-repeat center center;
+              background-size: contain;
+              margin: 4upx 0;
           }
       }
       .bottom_right {

@@ -2,8 +2,8 @@
  * @Description: 火车票订单
  * @Author: mzr
  * @Date: 2021-08-20 09:56:10
- * @LastEditTime: 2021-09-27 17:07:44
- * @LastEditors: mzr
+ * @LastEditTime: 2021-09-28 11:53:34
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
     <view class="train_order">
@@ -202,9 +202,9 @@ export default {
                               5:
                               this.headerActive,
                 order_no: this.orderListFilter.orderNumber || "", // 订单号
-                train_date_start: this.orderListFilter.timeStart || this.$moment().subtract(3,"days").format("YYYY-MM-DD"), // 预定开始
+                train_date_start: this.orderListFilter.timeStart || "", // 预定开始
                 // train_date_start:"2021-08-27",
-                train_date_end: this.orderListFilter.timeEnd || this.$moment().format("YYYY-MM-DD"), // 预定结束
+                train_date_end: this.orderListFilter.timeEnd || "", // 预定结束
                 passenger: this.orderListFilter.passengerName || "", // 乘车人
                 ticket_number: this.orderListFilter.ticket_number || "", // 取票号
                 train_number: this.orderListFilter.trainNumber || "", // 车次

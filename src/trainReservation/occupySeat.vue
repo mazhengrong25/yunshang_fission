@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 占座
  * @Author: mzr
  * @Date: 2021-08-17 08:58:59
- * @LastEditTime: 2021-09-27 15:11:58
- * @LastEditors: mzr
+ * @LastEditTime: 2021-09-28 12:06:12
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
     <view class="occupy_seat">
@@ -105,6 +105,8 @@ export default {
 
         // 跳转到车次查询
         jumpTrainInquiry() {
+            clearInterval(getOrderStatus)
+            clearInterval(timer)
             // 组装车次查询信息
             let data = {
                 to : {
@@ -125,6 +127,8 @@ export default {
 
         // 跳转到订单详情
         jumpOrderDetail() {
+            clearInterval(getOrderStatus)
+            clearInterval(timer)
             uni.reLaunch({
                 url:"/order/trainOrderDetails?orderNo=" + 
                 this.orderNo
