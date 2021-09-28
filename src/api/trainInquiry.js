@@ -2,7 +2,7 @@
  * @Description: 获取车次信息
  * @Author: mzr
  * @Date: 2021-07-28 14:03:03
- * @LastEditTime: 2021-09-28 11:48:30
+ * @LastEditTime: 2021-09-28 17:13:58
  * @LastEditors: wish.WuJunLong
  */
 import request from '@/api/request';

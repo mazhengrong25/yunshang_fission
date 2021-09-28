@@ -669,7 +669,7 @@ export default {
                             font-weight: 400;
                             color: #afb9c4;
                             margin-bottom: 18upx;
-                            padding-left: 14upx;
+                            text-align: center;
                         }
                         .left_join_img {
                             width: 112upx;

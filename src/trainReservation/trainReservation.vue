@@ -2,8 +2,8 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-09-27 15:11:57
- * @LastEditors: mzr
+ * @LastEditTime: 2021-09-28 17:20:33
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="train_reservation">
@@ -526,16 +526,27 @@
         </view>
       </view>
     </uni-popup>
+
+    <!-- 核验弹窗 -->
+    <passengerVerify
+      ref="verifyPopup"
+      :passengerData="verifyPassengerData"
+      @jumpVerify="jumpVerify"
+    ></passengerVerify>
   </view>
 </template>
 
 <script>
 import insurance from "@/api/insurance.js";
 import train from "@/api/trainInquiry.js";
+import passenger from "@/api/passenger.js";
 import trainMessageCard from "@/components/train_message_card.vue"; // 车次信息
+
+import passengerVerify from "@/components/passenger_verify.vue"; // 乘客核验提示框
 export default {
   components: {
     trainMessageCard,
+    passengerVerify,
   },
   data() {
     return {
@@ -563,6 +574,8 @@ export default {
       insuranceNumber: 0, // 带有保险的乘客个数
 
       checkedAdtPassenger: {}, // 选中成人乘客
+
+      verifyPassengerData: {}, // 核验乘客信息
 
       // 订单联系人信息
       orderPassenger: {
@@ -644,8 +657,45 @@ export default {
       this.changeSubmitStatus = false;
     },
 
+    // 打开核验弹窗
+    openVerify(val) {
+      this.verifyPassengerData = {
+        passengerName: val.name,
+        phone: val.phone,
+        cert_no: val.cert_no,
+      };
+      this.$refs.verifyPopup.openVerifyPopup();
+    },
+    // 跳转到核验
+    jumpVerify() {
+      if (
+        this.verifyPassengerData.phone === "" ||
+        this.verifyPassengerData.cert_no === ""
+      ) {
+        uni.showToast({
+          title: "乘车人信息不完整",
+          icon: "none",
+          duration: 3000,
+        });
+      } else {
+        uni.navigateTo({
+          url:
+            "/flightReservation/passengerVerify?passengerData=" +
+            JSON.stringify(this.verifyPassengerData),
+        });
+        this.$refs.verifyPopup.colseVerifyPopup();
+      }
+    },
+
     // 下一步
     nextAction() {
+      for (let i = 0; i < this.passengerList.length; i++) {
+        if (this.passengerList[i].verify_status !== 1) {
+          this.openVerify(this.passengerList[i]);
+          return;
+        }
+      }
+
       if (
         (this.trainData.train.type === "G" ||
           this.trainData.train.type === "D" ||
@@ -666,7 +716,7 @@ export default {
       if (this.orderPassenger.phone) {
         if (!this.$isPhone(this.orderPassenger.phone)) {
           return uni.showToast({
-            title: "手机号码格式有误",
+            title: "联系人手机号码格式有误",
             icon: "none",
           });
         }
@@ -894,8 +944,42 @@ export default {
         chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
       };
     },
+
+    // 乘客状态刷新
+    getPassengerNewVerf() {
+      let passengerVerf = [];
+      this.passengerList.forEach((item) => {
+        if (item.verify_status !== 1) {
+          passengerVerf.push({
+            //类型：Object  必有字段  备注：无
+            name: item.name, //类型：String  必有字段  备注：姓名
+            card_no: item.cert_no, //类型：String  必有字段  备注：证件号
+            card_type: 1, //类型：String  必有字段  备注：证件类型
+            card_name: "中国居民身份证", //类型：String  必有字段  备注：证件名字
+            phone: item.phone, //类型：String  必有字段  备注：无
+            ticket_type: 1, //类型：String  必有字段  备注：票类型
+          });
+        }
+      });
+      let data = {
+        channel: "Di", //类型：String  必有字段  备注：渠道
+        source: "YunKu", //类型：String  必有字段  备注：来源
+        passenger: passengerVerf,
+      };
+      passenger.verifyPassenger(data).then((res) => {
+        if (res.errorcode === 10000) {
+          this.passengerList.forEach((item) => {
+            item.verify_status === 1;
+          });
+        }
+      });
+    },
   },
   onShow() {
+    if (this.passengerList.length > 0) {
+      this.getPassengerNewVerf();
+    }
+
     let passenger = uni.getStorageSync("passengerList");
     if (passenger) {
       this.passengerList = JSON.parse(passenger);
@@ -914,11 +998,11 @@ export default {
     this.pageHeaderData = JSON.parse(JSON.stringify(this.pageHeaderData));
     console.log(this.trainData, this.singleData);
 
-    let userInfo = uni.getStorageSync('userInfo')
+    let userInfo = uni.getStorageSync("userInfo");
     this.orderPassenger = {
-        name: userInfo.role_name, // 联系人
-        phone: userInfo.phone, // 手机号
-      }
+      name: userInfo.role_name, // 联系人
+      phone: userInfo.phone, // 手机号
+    };
   },
 };
 </script>
@@ -1603,7 +1687,7 @@ export default {
           color: #afb9c4;
         }
         &.active {
-          border: 2upx solid #0070E2;
+          border: 2upx solid #0070e2;
         }
       }
     }
