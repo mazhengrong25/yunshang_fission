@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-09-26 10:49:14
+ * @LastEditTime: 2021-09-26 11:38:33
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -598,6 +598,7 @@ export default {
       userInfo.getAdvertisement(data).then((res) => {
         if (res.errorcode === 10000) {
           this.swiperList = res.data;
+                    console.log('ad',this.swiperList)
         }
       });
     },
