@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-09-26 12:07:10
+ * @LastEditTime: 2021-09-27 16:40:39
  * @LastEditors: mzr
 -->
 <template>
@@ -54,10 +54,10 @@
        </view>
 
       <view class="order_option">
-        <view class="option_btn" v-if="detailData.status !== 1 || detailData.status !== 3" @click="getSend()">发送短信</view>
-        <view class="option_btn" v-if="detailData.status === 2" @click="getCancel()">取消订单</view>
-        <view class="option_btn" v-if="detailData.status === 4">退票</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay()">去支付</view>
+        <view class="option_btn" v-if="detailData.status !== 1 || detailData.status !== 3" @click="getSend">发送短信</view>
+        <view class="option_btn" v-if="detailData.status === 2" @click="getCancel">取消订单</view>
+        <view class="option_btn" v-if="detailData.status === 4" @click="jumpRefund(detailData)">退票</view>
+        <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay">去支付</view>
         <view class="option_btn important_btn" v-if="detailData.status === 4">预定返程</view>
       </view>
     </view>
@@ -78,7 +78,7 @@
               <view class="list_info" @click="openPassInfo(index)">
                 <view class="info_type">{{item.PassengerType === "ADT" ? '成人':item.PassengerType === "CHD" ? "儿童":""}}票</view>
                 <view class="info_name">{{item.PassengerName}}</view>
-                <view class="is_insurance" v-if="item.is_insurance === 1"></view>
+                <view class="is_insurance" :style="{opacity:item.is_insurance === 1?'':'0'}"></view>
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">{{item.old_ticket_no?'旧':'新'}}座位号</view>
                   <view class="group_number">
@@ -349,6 +349,16 @@ export default {
           JSON.stringify(this.newDetailData)
       });
     },
+
+    // 跳转退票
+    jumpRefund(val) {
+      uni.navigateTo({
+        url:"/order/trainRefund?order_no=" 
+        + val.change_no +
+        "&orderType=change" 
+      })
+    },
+
 
     // 打开改签金额对话框
     openPriceDialog() {

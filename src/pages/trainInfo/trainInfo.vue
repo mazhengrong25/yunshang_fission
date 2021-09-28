@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 坐席
  * @Author: mzr
  * @Date: 2021-08-03 14:12:34
- * @LastEditTime: 2021-09-22 14:19:20
+ * @LastEditTime: 2021-09-27 14:27:45
  * @LastEditors: mzr
 -->
 <template>
@@ -221,7 +221,8 @@ export default {
               .date_point_before {
                 font-size: 24upx;
                 font-weight: 400;
-                color: rgba(255, 255, 255, .7);
+                // color: rgba(255, 255, 255, .7);
+                color: rgba(255, 255, 255,1);
                 margin-left: 26upx;
                 position: relative;
                 &::after {
@@ -231,7 +232,7 @@ export default {
                   width: 8upx;
                   height: 12upx;
                   position: absolute;
-                  background: url("@/static/train_direction_right.png") no-repeat center center;
+                  background: url("@/static/active_train_direction_right.png") no-repeat center center;
                   transform: rotate(180deg);
                   background-size:contain ;
                 }

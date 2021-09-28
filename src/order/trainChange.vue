@@ -2,7 +2,7 @@
  * @Description: 火车票(已出票) =-- 改签
  * @Author: mzr
  * @Date: 2021-09-06 11:13:17
- * @LastEditTime: 2021-09-15 16:33:19
+ * @LastEditTime: 2021-09-28 11:39:14
  * @LastEditors: mzr
 -->
 <template>
@@ -46,7 +46,7 @@
                 <view class="info_name">{{ item.PassengerName }}</view>
                 <view
                   class="is_insurance"
-                  v-if="Number(item.is_insurance) === 1"
+                  :style="{opacity:Number(item.is_insurance) === 1?'':'0'}"
                 ></view>
                 <view class="group_type">座位号</view>
                 <view class="group_number">{{ item.seat_info.replace("厢,0","") }}</view>
@@ -256,7 +256,9 @@ export default {
           },
           ticket:"ADT",
           isChange:true,
-          departure_date: this.changeDate.date
+          toTime: {
+            date: this.changeDate.date
+          }
         }
         
         uni.navigateTo({
@@ -285,12 +287,12 @@ export default {
           icon: "none",
         });
       }
-      // if(this.newTrainData.train === '{}') {
-      //    return uni.showToast({
-      //     title: "请选择改签车次",
-      //     icon: "none",
-      //   });
-      // }
+      if(JSON.stringify(this.newTrainData) === '{}') {
+         return uni.showToast({
+          title: "请选择改签车次",
+          icon: "none",
+        });
+      }
       this.$refs.trainConfirmChange.openPop();
     },
 
@@ -323,9 +325,9 @@ export default {
             code:this.newTrainData.train.train.code,                //类型：String  必有字段  备注：车次
             number:this.newTrainData.cabin.number,                //类型：String  必有字段  备注：列车号
             departure_date:
-              this.moment(this.newTrainData.train.train.departure_date).format('YYYY-MM-DD') + '' + this.newTrainData.train.train.departure,                //类型：String  必有字段  备注：出发日期
+              this.$moment(this.newTrainData.train.train.departure_date).format('YYYY-MM-DD') + '' + this.newTrainData.train.train.departure,                //类型：String  必有字段  备注：出发日期
             arrive_date:
-              this.moment(this.newTrainData.train.train.departure_date).add(this.newTrainData.train.train.days,'d').format('YYYY-MM-DD') + '' + this.newTrainData.train.train.arrive,                //类型：String  必有字段  备注：到达日期
+              this.$moment(this.newTrainData.train.train.departure_date).add(this.newTrainData.train.train.days,'d').format('YYYY-MM-DD') + '' + this.newTrainData.train.train.arrive,                //类型：String  必有字段  备注：到达日期
             seat_number:"mock",                //类型：String  必有字段  备注：无
             travel_time:this.newTrainData.train.train.run_minute,                //类型：Number  必有字段  备注：无
             seat:this.newTrainData.cabin.name,                //类型：String  必有字段  备注：无
@@ -337,22 +339,61 @@ export default {
         price:this.passValueObject.ticket_price,
       }
       orderApi.trainOrderChange(data).then((res) => {
-        console.log(data)
-        // if(res.errorcode === 10000) {
-        //   let refund_no = res.data.refund_no
-        //   this.$refs.trainConfirmChange.closePop();
-        //   uni.redirectTo({
-        //       url: '/order/trainChangeDetails?refund_no=' +
-        //       refund_no
-        //   });
+        console.log(res)
+        if(res.errorcode === 10000) {
+          let refund_no = res.data.refund_no
+          this.$refs.trainConfirmChange.closePop();
+          uni.redirectTo({
+              url: '/order/trainChangeDetails?change_no=' +
+              refund_no
+          });
           
-        // }else {
-        //   uni.showToast({
-        //     title: res.msg,
-        //     icon: "none",
-        //   });
-        // }
+        }else {
+          uni.showToast({
+            title: res.msg,
+            icon: "none",
+          });
+        }
       })
+    },
+
+    // 获取详情
+    getChangeDetail(val) {
+      orderApi.trainOrderDetail(val).then((res) => {
+        if(res.errorcode === 10000) {
+          this.passValueObject = res.data
+          this.getTrainMessage(this.passValueObject)
+        }else {
+          uni.showToast({
+            title:res.msg,
+            icon:"none",
+            duration:3000,
+          })
+        }
+      })
+    },
+
+    // 组装数据
+    getTrainMessage(val) {
+       this.passTrainItem = {
+        train: {
+          departure_date: val.segments[0].departure_time,
+          days: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD')),"days"),
+          departure: this.$moment(val.segments[0].departure_time).format("HH:mm"),
+          arrive: this.$moment(val.segments[0].arrive_time).format("HH:mm"),
+          code: val.segments[0].train_number,
+          number: val.segments[0].train_code,
+          run_minute: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD HH:mm:ss')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD HH:mm:ss')),"minutes")
+        },
+        station: {
+          departure_name: val.segments[0].from_city,
+          arrive_name: val.segments[0].to_city,
+        }
+      }
+      this.passTrainSingle = {
+        code: val.segments[0].seat_level,
+        name: val.segments[0].seat
+      }
     }
   },
 
@@ -382,10 +423,7 @@ export default {
 
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.passValueObject = JSON.parse(data.changeData)
-    this.passTrainItem = JSON.parse(data.trainItem)
-    this.passTrainSingle  = JSON.parse(data.trainSingle)
-    console.log('passValueObject',this.passValueObject,'passTrainItem',this.passTrainItem,'passTrainSingle',this.passTrainSingle)
+    this.getChangeDetail(data.order_no)
   }
 }
 </script>

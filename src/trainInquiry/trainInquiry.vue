@@ -2,7 +2,7 @@
  * @Description: 火车票查询 
  * @Author: mzr
  * @Date: 2021-07-27 10:44:51
- * @LastEditTime: 2021-09-23 09:56:04
+ * @LastEditTime: 2021-09-28 11:14:17
  * @LastEditors: mzr
 -->
 <template>

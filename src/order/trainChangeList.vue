@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签订单
  * @Author: mzr
  * @Date: 2021-08-27 10:08:44
- * @LastEditTime: 2021-09-26 12:07:11
+ * @LastEditTime: 2021-09-26 13:41:03
  * @LastEditors: mzr
 -->
 <template>
@@ -188,9 +188,9 @@ export default {
                                 [5]:
                                 [],
             order_no: this.changeListFilter.order_no || "", // 订单号
-            // train_date_start: this.changeListFilter.train_date_start || this.$moment().subtract(3,"days").format("YYYY-MM-DD"), // 开始时间
-            // train_date_end: this.changeListFilter.train_date_end || this.$moment().format("YYYY-MM-DD"), // 结束时间
-            // PassengerName: this.changeListFilter.PassengerName, // 乘车人
+            train_date_start: this.changeListFilter.train_date_start || this.$moment().subtract(3,"days").format("YYYY-MM-DD"), // 开始时间
+            train_date_end: this.changeListFilter.train_date_end || this.$moment().format("YYYY-MM-DD"), // 结束时间
+            PassengerName: this.changeListFilter.PassengerName, // 乘车人
             ticket_number: this.changeListFilter.ticket_number, // 取票号
 
           }

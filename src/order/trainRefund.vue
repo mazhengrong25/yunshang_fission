@@ -2,7 +2,7 @@
  * @Description: 火车票(已出票) --- 退票 
  * @Author: mzr
  * @Date: 2021-08-30 13:45:01
- * @LastEditTime: 2021-09-10 17:17:25
+ * @LastEditTime: 2021-09-27 16:40:25
  * @LastEditors: mzr
 -->
 <template>
@@ -50,10 +50,10 @@
                 <view class="info_name">{{ item.PassengerName }}</view>
                 <view
                   class="is_insurance"
-                  v-if="Number(item.is_insurance) === 1"
+                  :style="{opacity:Number(item.is_insurance) === 1?'':'0'}"
                 ></view>
                 <view class="group_type">座位号</view>
-                <view class="group_number">{{ item.seat_info.replace("厢,0","") }}</view>
+                <view class="group_number">{{ item.seat_info.replace("厢,","") }}</view>
               </view>
               <view class="list_click"></view>
             </view>
@@ -132,15 +132,15 @@ export default {
       iStatusBarHeight:0,
       orderHeaderTitle:"退票",
 
-      passValueObject:{}, // 订单详情传过来的对象
-      passTrainItem:{}, // 传过来的 组装车次信息
-      passTrainSingle:{}, // 传过来的 组装车次信息 座位
+      passValueObject:{}, //
+      passTrainItem:{}, // 组装车次信息
+      passTrainSingle:{}, // 组装车次信息 座位
 
       checkedPassengerlist: [], // 选中乘客列表
       checkedAllStatus: false, // 全选状态
 
       trainRefundRemark:"", // 备注内容
-      
+      orderType:"", // 区分正常单改签单
 
     }
   },
@@ -255,6 +255,65 @@ export default {
           });
         }
       })
+    },
+
+    // 获取详情 e 区分正常单和改签单
+    getRefundDetail(val,e) {
+      if(e === 'change') {
+
+        orderApi.trainChangeDetail(val).then((res) => {
+          if(res.errorcode === 10000) {
+
+            this.passValueObject = res.data.train_order
+            this.getTrainMessage(this.passValueObject)
+          }else {
+            uni.showToast({
+              title:res.msg,
+              icon:"none",
+              duration:3000,
+            })
+          }
+          
+        })
+      }else {
+        orderApi.trainOrderDetail(val).then((res) => {
+          if(res.errorcode === 10000) {
+
+            this.passValueObject = res.data
+            this.getTrainMessage(this.passValueObject)
+          }else {
+            uni.showToast({
+              title:res.msg,
+              icon:"none",
+              duration:3000,
+            })
+          }
+          
+        })
+      }
+    }, 
+
+    // 组装数据
+    getTrainMessage(val) {
+       this.passTrainItem = {
+        train: {
+          departure_date: val.segments[0].departure_time,
+          days: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD')),"days"),
+          departure: this.$moment(val.segments[0].departure_time).format("HH:mm"),
+          arrive: this.$moment(val.segments[0].arrive_time).format("HH:mm"),
+          code: val.segments[0].train_number,
+          number: val.segments[0].train_code,
+          run_minute: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD HH:mm:ss')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD HH:mm:ss')),"minutes")
+        },
+        station: {
+          departure_name: val.segments[0].from_city,
+          arrive_name: val.segments[0].to_city,
+        }
+      }
+      this.passTrainSingle = {
+        code: val.segments[0].seat_level,
+        name: val.segments[0].seat
+      }
     }
   },
 
@@ -268,9 +327,9 @@ export default {
 
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.passValueObject = JSON.parse(data.refundData)
-    this.passTrainItem = JSON.parse(data.trainItem)
-    this.passTrainSingle  = JSON.parse(data.trainSingle)
+    // orderType 区分正常单 改签单 
+    this.orderType = data.orderType
+    this.getRefundDetail(data.order_no,data.orderType)
   }
 }
 </script>

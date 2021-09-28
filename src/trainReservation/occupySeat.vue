@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 占座
  * @Author: mzr
  * @Date: 2021-08-17 08:58:59
- * @LastEditTime: 2021-09-24 15:01:09
+ * @LastEditTime: 2021-09-27 15:11:58
  * @LastEditors: mzr
 -->
 <template>
@@ -67,7 +67,7 @@ export default {
     },
     data() {
         return {
-            orderNO: "", // 订单号
+            orderNo: "", // 订单号
             trainData: {}, // 车次信息
             singleData: {}, // 座位信息
 
@@ -126,14 +126,14 @@ export default {
         // 跳转到订单详情
         jumpOrderDetail() {
             uni.reLaunch({
-                url:"/order/trainOrderDetails?orderNO=" + 
-                this.orderNO
+                url:"/order/trainOrderDetails?orderNo=" + 
+                this.orderNo
             })
         }
 
     },
     onLoad(data) {
-        this.orderNO = data.orderNO
+        this.orderNo = data.orderNo
         this.trainData = JSON.parse(data.trainInfo)
         this.singleData = JSON.parse(data.seatInfo)
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -145,7 +145,7 @@ export default {
 
 
         getOrderStatus = setInterval(() => {
-            this.getData(this.orderNO, true)
+            this.getData(this.orderNo, true)
             if (this.orderSeatStatus) {
                 clearInterval(getOrderStatus)
                 clearInterval(timer)
@@ -156,8 +156,8 @@ export default {
                 setTimeout(() => {
                   // 跳转确认支付
                   uni.reLaunch({
-                    url:"/trainReservation/orderPay?orderNO=" +
-                    this.orderNO
+                    url:"/trainReservation/orderPay?orderNo=" +
+                    this.orderNo
                   })
                 },1500)
             }

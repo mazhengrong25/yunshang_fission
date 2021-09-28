@@ -2,7 +2,7 @@
  * @Description: 确认退票/改签弹窗
  * @Author: mzr
  * @Date: 2021-09-07 14:04:01
- * @LastEditTime: 2021-09-07 18:10:31
+ * @LastEditTime: 2021-09-26 15:01:01
  * @LastEditors: mzr
 -->
 <template>
@@ -55,7 +55,7 @@
                     </view>
                     <view class="passenger_item">
                         <view>座位号:</view>
-                        <view class="item_value">{{item.seat_info.replace("厢,0","")}}</view>
+                        <view class="item_value">{{item.seat_info.replace("厢,","")}}</view>
                     </view>
                     <view class="passenger_item">
                         <view>票号:</view>

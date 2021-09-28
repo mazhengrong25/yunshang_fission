@@ -2,7 +2,7 @@
  * @Description: 退票单  --- 详情
  * @Author: mzr
  * @Date: 2021-08-30 11:08:34
- * @LastEditTime: 2021-09-26 10:59:26
+ * @LastEditTime: 2021-09-27 16:40:38
  * @LastEditors: mzr
 -->
 <template>
@@ -68,7 +68,7 @@
               <view class="list_info" @click="openPassInfo(index)">
                 <view class="info_type">{{item.PassengerType === "ADT" ? '成人':item.PassengerType === "CHD" ? "儿童":""}}票</view>
                 <view class="info_name">{{item.PassengerName}}</view>
-                <view class="is_insurance" v-if="item.is_insurance === 1"></view>
+                <view class="is_insurance" :style="{opacity:item.is_insurance === 1?'':'0'}"></view>
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">座位号</view>
                   <view class="group_number">

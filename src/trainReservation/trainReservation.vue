@@ -2,8 +2,8 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-09-26 11:30:49
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-27 15:11:57
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_reservation">
@@ -408,7 +408,7 @@
         <button
           v-if="changeSubmitStatus"
           class="right_btn is_background"
-          @click="submitOrder()"
+          @click="submitOrder"
         >
           提交订单
         </button>
@@ -749,11 +749,11 @@ export default {
 
       train.getTrainReserve(data).then((res) => {
         if (res.errorcode === 10000) {
-          let orderNO = res.data.order.order_no;
+          let orderNo = res.data.order.order_no;
           uni.navigateTo({
             url:
-              "/trainReservation/occupySeat?orderNO=" +
-              orderNO +
+              "/trainReservation/occupySeat?orderNo=" +
+              orderNo +
               "&trainInfo=" +
               JSON.stringify(this.trainData) +
               "&seatInfo=" +
@@ -1603,7 +1603,7 @@ export default {
           color: #afb9c4;
         }
         &.active {
-          border: 2upx solid #0070e2;
+          border: 2upx solid #0070E2;
         }
       }
     }

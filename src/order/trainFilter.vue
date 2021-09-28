@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 筛选
  * @Author: mzr
  * @Date: 2021-08-26 10:50:46
- * @LastEditTime: 2021-09-10 18:20:52
+ * @LastEditTime: 2021-09-27 16:56:19
  * @LastEditors: mzr
 -->
 <template>
@@ -181,17 +181,6 @@
       </view>
 
       <view class="list_item list_input" v-if="filterType === '0'">
-        <view class="item_title">票号</view>
-        <input
-          type="text"
-          class="item_input"
-          v-model="ticketNumber"
-          placeholder="请填写票号"
-          placeholder-class="input_placeholder"
-        />
-      </view>
-
-      <view class="list_item list_input" v-if="filterType === '0'">
         <view class="item_title">车次</view>
         <input
           type="text"
@@ -202,7 +191,7 @@
         />
       </view>
 
-      <view class="list_item list_input" v-if="filterType === '1' || filterType === '2'">
+      <view class="list_item list_input">
         <view class="item_title">取票号</view>
         <input
           type="text"
@@ -346,6 +335,12 @@ export default {
         start: "",
         end: "",
       },
+
+      trainMessage: {
+        to: {},
+        from: {},
+        toTime: {},
+      },
       
       // 正常单
       dateStatus: null, //  日期状态
@@ -353,7 +348,6 @@ export default {
 
       passengerName:"", // 乘车人
       orderNumber:"", // 订单号
-      ticketNumber:"", // 票号
       trainNumber:"", // 车次
 
       // 退票
@@ -527,15 +521,14 @@ export default {
         data = {
           passengerName : this.passengerName,
           orderNumber : this.orderNumber,
-          ticketNumber : this.ticketNumber,
           trainNumber : this.trainNumber,
           timeStart : this.timeLimit.start,
           timeEnd : this.timeLimit.end,
           dateStatus : this.dateStatus,
           status : this.orderStatus,
           cityStart : this.citySelect.start,
-          cityEnd : this.citySelect.end
-     
+          cityEnd : this.citySelect.end,
+          ticket_number:this.getTicketNumber, // 取票号
         };
       }else if (this.filterType === "1") {
         data = {
@@ -565,16 +558,16 @@ export default {
     // 重置筛选
     resetBtn() {
       // 正常单
-      this.trainDateFilter.forEach((item) => (item.active = false));
-      this.trainOrderStatus.forEach((item) => (item.active = false));
-      this.passengerName = "",
-      this.orderNumber = "",
-      this.ticketNumber = "",
-      this.trainNumber = "",
-      this.timeLimit.start = "",
-      this.timeLimit.end = "",
-      this.citySelect.start = "",
-      this.citySelect.end = "",
+      // this.trainDateFilter.forEach((item) => (item.active = false));
+      // this.trainOrderStatus.forEach((item) => (item.active = false));
+      // this.passengerName = "",
+      // this.orderNumber = "",
+      // this.ticketNumber = "",
+      // this.trainNumber = "",
+      // this.timeLimit.start = "",
+      // this.timeLimit.end = "",
+      // this.citySelect.start = "",
+      // this.citySelect.end = "",
 
       // 退票
       this.refundOrderStatus.forEach((item) => (item.active = false));
@@ -587,7 +580,8 @@ export default {
       this.changeTime.start = "",
       this.changeTime.end = "",
 
-      // uni.setStorageSync('trainFilter',JSON.stringify(data));
+      uni.removeStorageSync('trainFilter');
+
       uni.navigateBack();
     },
     
@@ -602,15 +596,14 @@ export default {
       let trainData = JSON.parse(data.trainData)
       this.passengerName = trainData.passengerName,
       this.orderNumber = trainData.orderNumber,
-      this.ticketNumber = trainData.ticketNumber,
       this.trainNumber = trainData.trainNumber,
       this.timeLimit.start = trainData.timeStart,
       this.timeLimit.end = trainData.timeEnd,
       this.dateStatus = trainData.dateStatus,
       this.orderStatus = trainData.status,
       this.citySelect.start = trainData.cityStart,
-      this.citySelect.end = trainData.cityEnd
-
+      this.citySelect.end = trainData.cityEnd,
+      this.getTicketNumber = trainData.ticket_number; // 取票号
       // 日期条件
       this.trainDateFilter[0].active = trainData.dateStatus === "reserve";
       this.trainDateFilter[1].active = trainData.dateStatus === "depart";
@@ -640,14 +633,32 @@ export default {
       this.orderNumber = changeData.order_no; // 订单号
       this.changeTime.start = changeData.train_date_start; // 开始时间
       this.changeTime.end = changeData.train_date_end; // 结束时间
-      // this.passengerName = changeData.PassengerName; // 乘车人
+      this.passengerName = changeData.PassengerName; // 乘车人
       this.getTicketNumber = changeData.ticket_number; // 取票号
 
       // 改签状态
       this.changeOrderStatus.forEach((item) =>(item.active = item.id === changeData.status))
 
     }
-  }
+  },
+
+  onShow() {
+    // 获取城市信息
+    if (uni.getStorageSync("city")) {
+      let cityData = JSON.parse(uni.getStorageSync("city"));
+      if (cityData.status === "to") {
+        this.citySelect.start = cityData;
+        this.trainMessage["to"] = cityData.data;
+        this.trainMessage["to_type"] = cityData.type;
+      } else if (cityData.status === "from") {
+        this.citySelect.end = cityData;
+        this.trainMessage["from"] = cityData.data;
+        this.trainMessage["from_type"] = cityData.type;
+      }
+      console.log(this.citySelect);
+      uni.removeStorageSync("city");
+    }
+  },
 }
 </script>
 

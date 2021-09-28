@@ -2,7 +2,7 @@
  * @Description: 火车票订单
  * @Author: mzr
  * @Date: 2021-08-20 09:56:10
- * @LastEditTime: 2021-09-26 11:36:23
+ * @LastEditTime: 2021-09-27 17:07:44
  * @LastEditors: mzr
 -->
 <template>
@@ -123,7 +123,7 @@ export default {
         headerList: ["全部", "待支付", "出票中", "已出票", "已取消"], // 订单列表类别
         headerActive: 0,
 
-        sortType:"",
+        sortType:"", // 时间排序类别
         trainObject: {}, 
         trainList:[], // 数组列表
         orderListFilter: {}, // 筛选条件
@@ -166,7 +166,7 @@ export default {
 
         // 时间排序
         sorTime(val) {
-          console.log(val);
+          console.log('排序类别',val);
 
           if (val === "reserve") {
             this.trainList.sort(this.reserveSort("created_at"));
@@ -193,20 +193,20 @@ export default {
                 status : this.headerActive === 0 ?
                         "":
                         this.headerActive === 1 ?
-                          "2":
+                          2:
                           this.headerActive === 2 ?
-                            "3":
+                            3:
                             this.headerActive === 3 ?
-                              "4": 
+                              4: 
                               this.headerActive === 4 ?
-                              "5":
+                              5:
                               this.headerActive,
                 order_no: this.orderListFilter.orderNumber || "", // 订单号
                 train_date_start: this.orderListFilter.timeStart || this.$moment().subtract(3,"days").format("YYYY-MM-DD"), // 预定开始
                 // train_date_start:"2021-08-27",
                 train_date_end: this.orderListFilter.timeEnd || this.$moment().format("YYYY-MM-DD"), // 预定结束
-                passenger: this.orderListFilter.PassengerName || "", // 乘车人
-                ticket_number: this.orderListFilter.ticketNumber || "", // 票号
+                passenger: this.orderListFilter.passengerName || "", // 乘车人
+                ticket_number: this.orderListFilter.ticket_number || "", // 取票号
                 train_number: this.orderListFilter.trainNumber || "", // 车次
             }
             orderApi.trainOrderList(data).then((res) => {
@@ -228,10 +228,10 @@ export default {
                     })
                     
                     // 筛选条件 日期条件
-                    if(this.orderListFilter.dataStatus !== null) {
-                        this.sorTime(this.orderListFilter.dataStatus)
+                    if(this.orderListFilter.dateStatus !== null) {
+                        this.sorTime(this.orderListFilter.dateStatus)
                     }
-
+                    
                     // 缺省状态
                     this.showDefault = this.trainList.length < 1;
                 
@@ -277,16 +277,16 @@ export default {
         }
     },
     onLoad() {
-        this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-        this.getTrainList()
+        
     },
     onShow() {
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
       this.orderListFilter = uni.getStorageSync("trainFilter")
         ? JSON.parse(uni.getStorageSync("trainFilter"))
         : {};
       if(JSON.stringify(this.orderListFilter) !== "{}") {
         //订单状态筛选
-        if (this.orderListFilter.status !== null) {
+        if (this.orderListFilter.status !== "") {
           this.checkedHeaderActive(Number(this.orderListFilter.status));
         } else {
           this.checkedHeaderActive(0);
@@ -294,8 +294,10 @@ export default {
         console.log('火车票列表筛选',this.orderListFilter)
       }else {
         this.headerActive = 0;
-        this.getTrainList();
+        this.sortType = "";
       }
+        this.getTrainList()
+
     }
 }
 </script>

@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-09-26 11:56:42
+ * @LastEditTime: 2021-09-27 16:40:37
  * @LastEditors: mzr
 -->
 <template>
@@ -58,8 +58,8 @@
         <view class="option_btn" v-if="detailData.status !== 1" @click="getSend()">发送短信</view>
         <view class="option_btn" v-if="detailData.status === 2" @click="getCancel()">取消订单</view>
         <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay()">去支付</view>
-        <view class="option_btn" v-if="detailData.status === 4" @click="getRefund(detailData,trainData,singleData)">退票</view>
-        <view class="option_btn" v-if="detailData.status === 4" @click="getChange(detailData,trainData,singleData)">改签</view>
+        <view class="option_btn" v-if="detailData.status === 4" @click="getRefund(detailData)">退票</view>
+        <view class="option_btn" v-if="detailData.status === 4" @click="getChange(detailData)">改签</view>
         <view class="option_btn important_btn" v-if="detailData.status === 4">预定返程</view>
         <view class="option_btn important_btn" v-if="detailData.status === 5">再次预定</view>
         <view class="option_btn important_btn" v-if="detailData.status === 6 || detailData.status === 7">重选车次</view>
@@ -86,7 +86,7 @@
               <view class="list_info" @click="openPassInfo(index)">
                 <view class="info_type">{{item.PassengerType === "ADT" ? '成人':item.PassengerType === "CHD" ? "儿童":""}}票</view>
                 <view class="info_name">{{item.PassengerName}}</view>
-                <view class="is_insurance" v-if="item.is_insurance === 1"></view>
+                <view class="is_insurance" :style="{opacity:item.is_insurance === 1?'':'0'}"></view>
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">座位号</view>
                   <view class="group_number">
@@ -390,27 +390,18 @@ export default {
     },
 
     // 跳转到退票
-    getRefund(val,e,o) {
+    getRefund(val) {
       
       uni.navigateTo({
-          url:"/order/trainRefund?refundData=" +
-          JSON.stringify(val) + 
-          "&trainItem=" + 
-          JSON.stringify(e) + 
-          "&trainSingle=" +
-          JSON.stringify(o)
+          url:"/order/trainRefund?order_no=" + val.order_no
       })
     },
 
     // 跳转到改签
-    getChange(val,e,o) {
+    getChange(val) {
       uni.navigateTo({
-          url:"/order/trainChange?changeData=" +
-          JSON.stringify(val) + 
-          "&trainItem=" + 
-          JSON.stringify(e) + 
-          "&trainSingle=" +
-          JSON.stringify(o)
+          url:"/order/trainChange?order_no=" + val.order_no
+         
       })
     },
     // 去支付

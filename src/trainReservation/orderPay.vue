@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-09-26 11:48:16
+ * @LastEditTime: 2021-09-27 16:40:24
  * @LastEditors: mzr
 -->
 <template>
@@ -67,10 +67,10 @@
                         </view>
                         <view class="passenger_item">
                             <view class="passenger_name">{{item.PassengerName}}</view>
-                            <view class="insurance_icon" v-if="item.is_insurance === 1"></view>
+                            <view class="insurance_icon" :style="{opacity:item.is_insurance === 1?'':'0'}"></view>
                         </view>
                         <view class="seat_type">{{item.seat}}</view>
-                        <view class="seat_no">{{item.seat_info}}</view>
+                        <view class="seat_no">{{item.seat_info.replace("厢,0","")}}</view>
                     </view>
 
                 </view>
@@ -284,7 +284,7 @@ export default {
         }
     }
     .journey_image {
-        height: 54upx;
+        height: 52upx;
         background: url("@/static/change_connect.png") no-repeat center center;
         background-size: cover;
         margin: -1upx 15upx;
