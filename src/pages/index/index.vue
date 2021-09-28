@@ -2,8 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-09-26 10:49:14
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-28 18:19:55
+ * @LastEditors: mzr
 -->
 <template>
   <view class="index">
@@ -644,6 +644,10 @@ export default {
         this.airMessage["from_type"] = cityData.type;
       }
       uni.removeStorageSync("city");
+    }
+    // 获取火车票城市信息
+    if(uni.getStorageSync("trainCity")) {
+      
     }
     // 获取时间日期
     if (uni.getStorageSync("time")) {

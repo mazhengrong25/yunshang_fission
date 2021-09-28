@@ -32,6 +32,12 @@
       }
     },
     {
+      "path": "pages/trainCitySelect/trainCitySelect",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/userInfo/userInfo",
       "style": {
         "navigationStyle": "custom"
