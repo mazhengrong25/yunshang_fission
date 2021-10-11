@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-10-09 11:52:16
+ * @LastEditTime: 2021-10-11 14:02:50
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -114,7 +114,9 @@
         <view class="option_btn important_btn" v-if="detailData.status === 4"
           >预定返程</view
         >
-        <view class="option_btn important_btn" v-if="detailData.status === 5"
+        <view class="option_btn important_btn" 
+        v-if="detailData.status === 5"
+         @click="againReserve()"
           >再次预定</view
         >
         <view
@@ -540,6 +542,41 @@ export default {
         url: "/order/sendMessage?orderId=" + this.detailData.order_no,
       });
     },
+
+    // 再次预定按钮
+    againReserve(){
+      let data = {
+        to: {
+          city_code: this.detailData.from_station_code,
+          city_name: this.detailData.from_station,
+          country_code: "CN",
+          province: this.detailData.from_station,
+        },
+        from: {
+          city_code: this.detailData.to_station_code,
+          city_name: this.detailData.to_station,
+          country_code: "CN",
+          province: this.detailData.to_station,
+        },
+        toTime: {
+          date: this.$moment(this.detailData.train_date).format("YYYY-MM-DD"),
+          month: this.$moment(this.detailData.train_date).format("M月DD日"),
+          status: "start",
+          type: "time",
+          week: this.$moment(this.detailData.train_date).format("ddd"),
+        },
+        fromTime: {},
+        to_type: "",
+        from_type: "",
+      }
+
+      uni.navigateTo({
+        url: '/trainInquiry/trainInquiry?trainData=' +
+          JSON.stringify(data) +
+          "&checkboxStatus=false"
+      });
+    },
+
   },
 
   onShow() {

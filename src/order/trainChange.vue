@@ -2,8 +2,8 @@
  * @Description: 火车票(已出票) =-- 改签
  * @Author: mzr
  * @Date: 2021-09-06 11:13:17
- * @LastEditTime: 2021-09-28 11:39:14
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-11 10:05:59
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="train_change">
@@ -244,7 +244,7 @@ export default {
 
     // 搜索新车次
     queryTrainData() {
-      if (this.changeDate) {
+      if (this.changeDate && this.changeDate.date) {
         
         // 组装 获取车次信息
         this.trainMessage = {
@@ -264,7 +264,7 @@ export default {
         uni.navigateTo({
           url: "/trainInquiry/trainInquiry?trainData=" + JSON.stringify(this.trainMessage),
         });
-      } else if (!this.changeDate) {
+      } else {
         uni.showToast({
           title: "请先选择改签日期",
           icon: "none",
@@ -325,9 +325,9 @@ export default {
             code:this.newTrainData.train.train.code,                //类型：String  必有字段  备注：车次
             number:this.newTrainData.cabin.number,                //类型：String  必有字段  备注：列车号
             departure_date:
-              this.$moment(this.newTrainData.train.train.departure_date).format('YYYY-MM-DD') + '' + this.newTrainData.train.train.departure,                //类型：String  必有字段  备注：出发日期
+              this.$moment(this.newTrainData.train.train.departure_date).format('YYYY-MM-DD') + ' ' + this.newTrainData.train.train.departure,                //类型：String  必有字段  备注：出发日期
             arrive_date:
-              this.$moment(this.newTrainData.train.train.departure_date).add(this.newTrainData.train.train.days,'d').format('YYYY-MM-DD') + '' + this.newTrainData.train.train.arrive,                //类型：String  必有字段  备注：到达日期
+              this.$moment(this.newTrainData.train.train.departure_date).add(this.newTrainData.train.train.days,'d').format('YYYY-MM-DD') + ' ' + this.newTrainData.train.train.arrive,                //类型：String  必有字段  备注：到达日期
             seat_number:"mock",                //类型：String  必有字段  备注：无
             travel_time:this.newTrainData.train.train.run_minute,                //类型：Number  必有字段  备注：无
             seat:this.newTrainData.cabin.name,                //类型：String  必有字段  备注：无
