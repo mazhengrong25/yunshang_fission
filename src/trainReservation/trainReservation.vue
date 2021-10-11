@@ -2,7 +2,7 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-09-28 17:20:33
+ * @LastEditTime: 2021-10-11 09:43:28
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -1369,7 +1369,6 @@ export default {
         display: inline-flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 60upx;
         .top_title {
           font-size: 28upx;
           font-weight: bold;
@@ -1421,6 +1420,7 @@ export default {
         align-items: flex-start;
         justify-content: space-between;
         margin-bottom: 36upx;
+        margin-top: 60upx;
         .seat_describe {
           border: 2upx solid #d9e1ea;
           border-radius: 10upx;
