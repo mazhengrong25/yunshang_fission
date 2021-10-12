@@ -2,13 +2,8 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
-<<<<<<< HEAD
- * @LastEditTime: 2021-09-29 11:51:06
+ * @LastEditTime: 2021-10-12 10:58:54
  * @LastEditors: mzr
-=======
- * @LastEditTime: 2021-10-11 09:43:28
- * @LastEditors: wish.WuJunLong
->>>>>>> 59ac0a22e9f08fb4339805b31e4428b353ab2cfa
 -->
 <template>
   <view class="train_reservation">

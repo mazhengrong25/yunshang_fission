@@ -41,13 +41,13 @@
             <text class="time_text">出发日期</text>
           </view>
         </view>
-        <view class="ticket_from_time time_box" @click.stop="jumpDate('end',addressForm.toTime.date)">
+        <view class="ticket_from_time time_box"  v-if="ticketClassify !== 1" @click.stop="jumpDate('end',addressForm.toTime.date)">
           <view class="time_true" v-if="JSON.stringify(addressForm.fromTime) !== '{}'">
             <image class="close_from_btn" src="@/static/close.png" @click.stop="closeFromBtn" />
             <view class="time">{{addressForm.fromTime.month}}</view>
             <view class="time_day">{{addressForm.fromTime.week}}返回</view>
           </view>
-          <view class="time_false" v-else-if="ticketClassify !== 1">
+          <view class="time_false" v-else>
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />
             <text class="time_text">返程日期</text>
           </view>
