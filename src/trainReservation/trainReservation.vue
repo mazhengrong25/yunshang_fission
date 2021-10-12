@@ -2,8 +2,13 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
+<<<<<<< HEAD
  * @LastEditTime: 2021-09-29 11:51:06
  * @LastEditors: mzr
+=======
+ * @LastEditTime: 2021-10-11 09:43:28
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 59ac0a22e9f08fb4339805b31e4428b353ab2cfa
 -->
 <template>
   <view class="train_reservation">
@@ -1369,7 +1374,6 @@ export default {
         display: inline-flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 60upx;
         .top_title {
           font-size: 28upx;
           font-weight: bold;
@@ -1421,6 +1425,7 @@ export default {
         align-items: flex-start;
         justify-content: space-between;
         margin-bottom: 36upx;
+        margin-top: 60upx;
         .seat_describe {
           border: 2upx solid #d9e1ea;
           border-radius: 10upx;

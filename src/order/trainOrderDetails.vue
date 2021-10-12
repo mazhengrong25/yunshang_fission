@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-09-27 16:40:37
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-11 14:02:50
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="train_details">
@@ -15,7 +15,7 @@
     <view class="details_header">
       <view class="header_top">
         <view class="order_type">
-         <!-- {{detailData.status === 1 ?
+          <!-- {{detailData.status === 1 ?
                 '占座中':detailData.status === 2 ?
                   '待支付':detailData.status === 3 ?
                     '待出票':detailData.status === 4 ?
@@ -23,46 +23,107 @@
                         '已取消':detailData.status === 6 ? 
                           '占座失败':detailData.status === 7 ?
                             '出票失败':''}} -->
-          {{detailData.status === 1 ?
-          '占座中,请稍后':detailData.status === 2 ?
-            '待支付':detailData.status === 3 ?
-              '出票中，请稍后':detailData.status === 4 &&  detailData.refund_orders.length < 1 && detailData.change_orders.length < 1 && detailData.offline_refund_number > 0 ?
-                '线下退票':detailData.status === 4 &&  detailData.refund_orders.length < 1 && detailData.change_orders.length < 1 ?
-                  '已出票':detailData.status === 4 &&  detailData.refund_orders.length > 0 ? 
-                    '已退票':detailData.status === 4 &&  detailData.change_orders.length > 0 ?
-                      '已改签':detailData.status === 5 ?
-                        '已取消':detailData.status === 6 ?
-                          '占座失败':detailData.status === 7 && detailData.refund_orders.length > 0 ?
-                            '已退票':detailData.status === 7 ?
-                              '出票失败':''}}              
+          {{
+            detailData.status === 1
+              ? "占座中,请稍后"
+              : detailData.status === 2
+              ? "待支付"
+              : detailData.status === 3
+              ? "出票中，请稍后"
+              : detailData.status === 4 &&
+                detailData.refund_orders.length < 1 &&
+                detailData.change_orders.length < 1 &&
+                detailData.offline_refund_number > 0
+              ? "线下退票"
+              : detailData.status === 4 &&
+                detailData.refund_orders.length < 1 &&
+                detailData.change_orders.length < 1
+              ? "已出票"
+              : detailData.status === 4 && detailData.refund_orders.length > 0
+              ? "已退票"
+              : detailData.status === 4 && detailData.change_orders.length > 0
+              ? "已改签"
+              : detailData.status === 5
+              ? "已取消"
+              : detailData.status === 6
+              ? "占座失败"
+              : detailData.status === 7 && detailData.refund_orders.length > 0
+              ? "已退票"
+              : detailData.status === 7
+              ? "出票失败"
+              : ""
+          }}
         </view>
 
         <view class="order_price" @click="openPriceDialog()">
           <text class="price_text">总价</text>
           <text class="price_sign">&yen;</text>
-          <text>{{detailData.total_price || '金额数据错误'}}</text>
+          <text>{{ detailData.total_price || "金额数据错误" }}</text>
         </view>
       </view>
 
       <view class="remaining_time">
-        <image class="time_icon" 
-          v-if="detailData.status === 1 || detailData.status === 2" src="@/static/order_remaining_time.png" mode="aspectFit" />
+        <image
+          class="time_icon"
+          v-if="detailData.status === 1 || detailData.status === 2"
+          src="@/static/order_remaining_time.png"
+          mode="aspectFit"
+        />
         <text class="time_text">
-          {{detailData.status === 1 ? `预计在${ Math.floor(occupyTime / 60)}：${Math.floor(occupyTime % 60)}分前完成占座` : 
-              detailData.status === 2 ? `剩余支付时间：${ Math.floor(detailData.overdue_time / 60 % 60)}:${Math.floor(detailData.overdue_time % 60)}分钟` :
-                detailData.status === 3 ? '订单支付成功，出票中...':''}}
+          {{
+            detailData.status === 1
+              ? `预计在${Math.floor(occupyTime / 60)}：${Math.floor(
+                  occupyTime % 60
+                )}分前完成占座`
+              : detailData.status === 2
+              ? `剩余支付时间：${Math.floor(
+                  (detailData.overdue_time / 60) % 60
+                )}:${Math.floor(detailData.overdue_time % 60)}分钟`
+              : detailData.status === 3
+              ? "订单支付成功，出票中..."
+              : ""
+          }}
         </text>
       </view>
 
       <view class="order_option">
-        <view class="option_btn" v-if="detailData.status !== 1" @click="getSend()">发送短信</view>
-        <view class="option_btn" v-if="detailData.status === 2" @click="getCancel()">取消订单</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay()">去支付</view>
-        <view class="option_btn" v-if="detailData.status === 4" @click="getRefund(detailData)">退票</view>
-        <view class="option_btn" v-if="detailData.status === 4" @click="getChange(detailData)">改签</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 4">预定返程</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 5">再次预定</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 6 || detailData.status === 7">重选车次</view>
+        <view class="option_btn" v-if="detailData.status !== 1" @click="getSend()"
+          >发送短信</view
+        >
+        <view class="option_btn" v-if="detailData.status === 2" @click="getCancel()"
+          >取消订单</view
+        >
+        <view
+          class="option_btn important_btn"
+          v-if="detailData.status === 2"
+          @click="jumpOrderPay()"
+          >去支付</view
+        >
+        <view
+          class="option_btn"
+          v-if="detailData.status === 4"
+          @click="getRefund(detailData)"
+          >退票</view
+        >
+        <view
+          class="option_btn"
+          v-if="detailData.status === 4"
+          @click="getChange(detailData)"
+          >改签</view
+        >
+        <view class="option_btn important_btn" v-if="detailData.status === 4"
+          >预定返程</view
+        >
+        <view class="option_btn important_btn" 
+        v-if="detailData.status === 5"
+         @click="againReserve()"
+          >再次预定</view
+        >
+        <view
+          class="option_btn important_btn"
+          v-if="detailData.status === 6 || detailData.status === 7"
+          >重选车次</view
+        >
       </view>
     </view>
 
@@ -70,27 +131,53 @@
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
         <!-- 车次信息 -->
         <view class="train_class">
-          <trainMessageCard :trainObject="trainData" :isCabin="true" :seatObject="singleData" :isRule="true"></trainMessageCard>  
+          <trainMessageCard
+            :trainObject="trainData"
+            :isCabin="true"
+            :seatObject="singleData"
+            :isRule="true"
+          ></trainMessageCard>
         </view>
         <!-- 出行信息 -->
         <view class="main_list passenger">
-          
-          <view :class="['main_list_title',{'main_list_title_label':detailData.ticket_number}]">出行信息</view>
-          <view class="passenger_right_label" v-if="detailData.ticket_number">取票号{{detailData.ticket_number}}</view>
+          <view class="main_list_title_box">
+            <view
+              :class="[
+                'main_list_title',
+                { main_list_title_label: detailData.ticket_number },
+              ]"
+              >出行信息</view
+            >
+            <view class="passenger_right_label" v-if="detailData.ticket_number"
+              >取票号{{ detailData.ticket_number }}</view
+            >
+          </view>
 
           <view class="passenger_list">
-            <view 
+            <view
               :class="['list_item_title', { active: passInfoChecket === index }]"
-              v-for="(item,index) in detailData.passengers" :key="index">
-
+              v-for="(item, index) in detailData.passengers"
+              :key="index"
+            >
               <view class="list_info" @click="openPassInfo(index)">
-                <view class="info_type">{{item.PassengerType === "ADT" ? '成人':item.PassengerType === "CHD" ? "儿童":""}}票</view>
-                <view class="info_name">{{item.PassengerName}}</view>
-                <view class="is_insurance" :style="{opacity:item.is_insurance === 1?'':'0'}"></view>
+                <view class="info_type"
+                  >{{
+                    item.PassengerType === "ADT"
+                      ? "成人"
+                      : item.PassengerType === "CHD"
+                      ? "儿童"
+                      : ""
+                  }}票</view
+                >
+                <view class="info_name">{{ item.PassengerName }}</view>
+                <view
+                  class="is_insurance"
+                  :style="{ opacity: item.is_insurance === 1 ? '' : '0' }"
+                ></view>
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">座位号</view>
                   <view class="group_number">
-                    {{ item.seat_info.replace("厢,0","") || "" }}
+                    {{ item.seat_info.replace("厢,0", "") || "" }}
                   </view>
                 </view>
                 <view class="price_arrow" v-if="item.ticket_no">
@@ -99,46 +186,53 @@
               </view>
               <!-- 展开内容 -->
               <view class="list_main">
-                
                 <view class="list_item">
-                  
                   <view v-if="item.PassengerType === 'CHD'" class="list_item_add">
                     用
-                    <view v-if="!detailData.ticket_number" style="color: #FB9826">{{item.PassengerName}}</view>
-                    <view v-else style="color:#666;">【{{item.PassengerName}}】</view>
-                       证件取票，身高低于1.5米
+                    <view v-if="!detailData.ticket_number" style="color: #FB9826">{{
+                      item.PassengerName
+                    }}</view>
+                    <view v-else style="color:#666;">【{{ item.PassengerName }}】</view>
+                    证件取票，身高低于1.5米
                   </view>
                   <view v-else class="list_item_add">
                     <view class="item_title">
-                      {{item.Credential === '1'? '身份证':
-                          item.Credential === '2'? '港澳居住证':
-                          item.Credential === 'B'? '护照':
-                          item.Credential === 'C'? '港澳通行证':
-                          item.Credential === 'G'? '台湾通行证':
-                          item.Credential === 'H'? '外国人身份证':''}}
+                      {{
+                        item.Credential === "1"
+                          ? "身份证"
+                          : item.Credential === "2"
+                          ? "港澳居住证"
+                          : item.Credential === "B"
+                          ? "护照"
+                          : item.Credential === "C"
+                          ? "港澳通行证"
+                          : item.Credential === "G"
+                          ? "台湾通行证"
+                          : item.Credential === "H"
+                          ? "外国人身份证"
+                          : ""
+                      }}
                     </view>
-                    <view class="item_message">{{item.CredentialNo}}</view>
+                    <view class="item_message">{{ item.CredentialNo }}</view>
                   </view>
                 </view>
 
                 <view class="list_item" v-if="item.ticket_no">
                   <view class="item_title_old">票号</view>
-                  <view class="item_message_old">{{item.ticket_no}}</view>
+                  <view class="item_message_old">{{ item.ticket_no }}</view>
                 </view>
-
-              </view>  
-
+              </view>
             </view>
           </view>
 
           <view class="contact">
             <view class="contact_list">
               <view class="list_title">联系人</view>
-              <view class="list_message">{{detailData.contact}}</view>
+              <view class="list_message">{{ detailData.contact }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">联系电话</view>
-              <view class="list_message">{{detailData.phone}}</view>
+              <view class="list_message">{{ detailData.phone }}</view>
             </view>
             <view class="contact_list">
               <view class="list_title">已购保险</view>
@@ -152,23 +246,34 @@
           <view class="message_list">
             <view class="list_item">
               <view class="item_title">订单编号</view>
-              <view class="item_message">{{detailData.order_no}}</view>
+              <view class="item_message">{{ detailData.order_no }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">订票员</view>
-              <view class="item_message">{{detailData.book_user_name ? detailData.book_user_name :""}}</view>
+              <view class="item_message">{{
+                detailData.book_user_name ? detailData.book_user_name : ""
+              }}</view>
             </view>
             <view class="list_item">
               <view class="item_title">预定时间</view>
-              <view class="item_message">{{detailData.created_at ? detailData.created_at :''}}</view>	
+              <view class="item_message">{{
+                detailData.created_at ? detailData.created_at : ""
+              }}</view>
             </view>
-            <view class="list_item" v-if="detailData.status === 4 || detailData.status === 7">
+            <view
+              class="list_item"
+              v-if="detailData.status === 4 || detailData.status === 7"
+            >
               <view class="item_title">支付时间</view>
-              <view class="item_message">{{detailData.pay_time ? detailData.pay_time : ""}}</view>	
+              <view class="item_message">{{
+                detailData.pay_time ? detailData.pay_time : ""
+              }}</view>
             </view>
             <view class="list_item" @click="openRemark()">
               <view class="item_title">备注</view>
-              <view v-if="trainOrderRemark" class="item_message">{{trainOrderRemark}}</view>
+              <view v-if="trainOrderRemark" class="item_message">{{
+                trainOrderRemark
+              }}</view>
               <view v-else class="item_message input-right-arrow"></view>
             </view>
           </view>
@@ -209,7 +314,10 @@
               :key="index"
             >
               <view class="list_title" @click="openPriceInfo(index)">
-                <view class="title_name">{{ item.PassengerName }} {{item.PassengerType === 'CHD'?'(儿童)':''}}</view>
+                <view class="title_name"
+                  >{{ item.PassengerName }}
+                  {{ item.PassengerType === "CHD" ? "(儿童)" : "" }}</view
+                >
 
                 <view class="title_price">
                   <view class="title_text">总金额</view>
@@ -220,7 +328,7 @@
                     </view>
                   </view>
                 </view>
-              </view> 
+              </view>
 
               <view class="list_main">
                 <view class="list_item">
@@ -248,33 +356,31 @@
 
 <script>
 import orderApi from "@/api/order.js";
-import trainMessageCard from '@/components/train_message_card.vue' // 车次信息
+import trainMessageCard from "@/components/train_message_card.vue"; // 车次信息
 export default {
   components: {
-      trainMessageCard
+    trainMessageCard,
   },
   data() {
     return {
-      order_no:"", // 订单号
-      iStatusBarHeight:0,
-      orderHeaderTitle:"订单详情",
+      order_no: "", // 订单号
+      iStatusBarHeight: 0,
+      orderHeaderTitle: "订单详情",
 
-      detailData:{}, // 详情数据
+      detailData: {}, // 详情数据
 
       // 组件 车次信息
-      trainData:{},
-      singleData:{},
+      trainData: {},
+      singleData: {},
 
       passInfoChecket: null, // 乘客信息展开值
       priceInfoChecket: null, // 订单总价展开值
-      trainOrderRemark:"", // 备注内容
+      trainOrderRemark: "", // 备注内容
 
-      occupyTime:60, // 占座中 时间
-
-    }
+      occupyTime: 60, // 占座中 时间
+    };
   },
-  methods:{
-
+  methods: {
     // 展开乘车信息详情
     openPassInfo(i) {
       this.passInfoChecket = this.passInfoChecket === i ? null : i;
@@ -287,65 +393,80 @@ export default {
     },
 
     // 获取详情数据
-    getTrainDetail(val) { 
+    getTrainDetail(val) {
       orderApi.trainOrderDetail(val).then((res) => {
-        console.log(res)
-        if(res.errorcode === 10000) {
-          this.detailData = res.data
-          this.getTrainMessage(res.data)
+        console.log(res);
+        if (res.errorcode === 10000) {
+          this.detailData = res.data;
+          this.getTrainMessage(res.data);
           // 占座状态
-          if(this.detailData.status === 1) {
-            this.occupyTime = 60
-             let timer = setInterval(() => {
-              this.occupyTime--
-              if(this.occupyTime < 1){
-                clearInterval(timer)
+          if (this.detailData.status === 1) {
+            this.occupyTime = 60;
+            let timer = setInterval(() => {
+              this.occupyTime--;
+              if (this.occupyTime < 1) {
+                clearInterval(timer);
               }
-            },3000)
+            }, 3000);
             // 跳转到支付页面
             uni.navigateTo({
-              url:"/trainReservation/orderPay?detailItem=" +
-              JSON.stringify(this.detailData)
-            })
+              url:
+                "/trainReservation/orderPay?detailItem=" +
+                JSON.stringify(this.detailData),
+            });
           }
-        }else {
+        } else {
           uni.showToast({
-            title:res.msg,
-            icon:"none",
-            duration:3000,
-          })
+            title: res.msg,
+            icon: "none",
+            duration: 3000,
+          });
         }
-      })
+      });
     },
 
     // 组装车次数据
-    getTrainMessage(val){
-      console.log(val)
+    getTrainMessage(val) {
+      console.log(val);
       this.trainData = {
         train: {
           departure_date: val.segments[0].departure_time,
-          days: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD')),"days"),
+          days: this.$moment(
+            this.$moment(val.segments[0].arrive_time).format("YYYY-MM-DD")
+          ).diff(
+            this.$moment(
+              this.$moment(val.segments[0].departure_time).format("YYYY-MM-DD")
+            ),
+            "days"
+          ),
           departure: this.$moment(val.segments[0].departure_time).format("HH:mm"),
           arrive: this.$moment(val.segments[0].arrive_time).format("HH:mm"),
           code: val.segments[0].train_number,
           number: val.segments[0].train_code,
-          run_minute: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD HH:mm:ss')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD HH:mm:ss')),"minutes")
+          run_minute: this.$moment(
+            this.$moment(val.segments[0].arrive_time).format("YYYY-MM-DD HH:mm:ss")
+          ).diff(
+            this.$moment(
+              this.$moment(val.segments[0].departure_time).format("YYYY-MM-DD HH:mm:ss")
+            ),
+            "minutes"
+          ),
         },
         station: {
           departure_name: val.segments[0].from_city,
           arrive_name: val.segments[0].to_city,
-        }
-      }
+        },
+      };
       this.singleData = {
         code: val.segments[0].seat_level,
-        name: val.segments[0].seat
-      }
+        name: val.segments[0].seat,
+      };
     },
 
     // 跳转备注页面
     openRemark() {
-      if(this.detailData.status === 5) {
-        return false
+      if (this.detailData.status === 5) {
+        return false;
       }
       uni.navigateTo({
         url: "/order/addRemark?remark=" + this.trainOrderRemark,
@@ -354,13 +475,13 @@ export default {
 
     // 打开订单总价
     openPriceDialog() {
-        this.$refs.orderPrice.open();
+      this.$refs.orderPrice.open();
     },
 
     closePriceDialog() {
-        this.$refs.orderPrice.close();
+      this.$refs.orderPrice.close();
     },
-    
+
     // 打开取消订单弹窗
     getCancel() {
       this.$refs.yunConfig.openConfigPopup();
@@ -369,50 +490,50 @@ export default {
     // 取消订单
     getCancelSubmit() {
       let data = {
-        channel:this.detailData.channel,                //类型：Number  必有字段  备注：渠道1 web 2 miniapp 3 wechat
-        source:this.detailData.source,                //类型：String  必有字段  备注：数据源
-        order:  {                //类型：Object  必有字段  备注：无
-            order_no:this.detailData.order_no,                //类型：String  必有字段  备注：订单号
-            out_trade_no:this.detailData.out_trade_no               //类型：String  必有字段  备注：外部订单号
-        }
-      }
+        channel: this.detailData.channel, //类型：Number  必有字段  备注：渠道1 web 2 miniapp 3 wechat
+        source: this.detailData.source, //类型：String  必有字段  备注：数据源
+        order: {
+          //类型：Object  必有字段  备注：无
+          order_no: this.detailData.order_no, //类型：String  必有字段  备注：订单号
+          out_trade_no: this.detailData.out_trade_no, //类型：String  必有字段  备注：外部订单号
+        },
+      };
       orderApi.trainOrderCancel(data).then((res) => {
-        console.log('取消订单',res)
-        if(res.errorcode === 10000) {
-            this.getTrainDetail(data.order.order_no)
-        }else {
+        console.log("取消订单", res);
+        if (res.errorcode === 10000) {
+          this.getTrainDetail(data.order.order_no);
+        } else {
           uni.showToast({
             title: res.msg,
             icon: "none",
           });
         }
-      })
+      });
     },
 
     // 跳转到退票
     getRefund(val) {
-      
       uni.navigateTo({
-          url:"/order/trainRefund?order_no=" + val.order_no
-      })
+        url: "/order/trainRefund?order_no=" + val.order_no,
+      });
     },
 
     // 跳转到改签
     getChange(val) {
       uni.navigateTo({
-          url:"/order/trainChange?order_no=" + val.order_no
-         
-      })
+        url: "/order/trainChange?order_no=" + val.order_no,
+      });
     },
     // 去支付
     jumpOrderPay() {
       uni.navigateTo({
-          url: "/trainReservation/orderPay?orderNo=" + 
+        url:
+          "/trainReservation/orderPay?orderNo=" +
           this.detailData.order_no +
           "&detailItem=" +
-          JSON.stringify(this.detailData)
+          JSON.stringify(this.detailData),
       });
-      console.log('详情去支付',this.detailData.order_no)
+      console.log("详情去支付", this.detailData.order_no);
     },
 
     // 发送短信
@@ -420,7 +541,42 @@ export default {
       uni.navigateTo({
         url: "/order/sendMessage?orderId=" + this.detailData.order_no,
       });
-    }
+    },
+
+    // 再次预定按钮
+    againReserve(){
+      let data = {
+        to: {
+          city_code: this.detailData.from_station_code,
+          city_name: this.detailData.from_station,
+          country_code: "CN",
+          province: this.detailData.from_station,
+        },
+        from: {
+          city_code: this.detailData.to_station_code,
+          city_name: this.detailData.to_station,
+          country_code: "CN",
+          province: this.detailData.to_station,
+        },
+        toTime: {
+          date: this.$moment(this.detailData.train_date).format("YYYY-MM-DD"),
+          month: this.$moment(this.detailData.train_date).format("M月DD日"),
+          status: "start",
+          type: "time",
+          week: this.$moment(this.detailData.train_date).format("ddd"),
+        },
+        fromTime: {},
+        to_type: "",
+        from_type: "",
+      }
+
+      uni.navigateTo({
+        url: '/trainInquiry/trainInquiry?trainData=' +
+          JSON.stringify(data) +
+          "&checkboxStatus=false"
+      });
+    },
+
   },
 
   onShow() {
@@ -433,10 +589,10 @@ export default {
 
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.order_no = data.orderNo // 订单号
-    this.getTrainDetail(this.order_no)
-  }
-}
+    this.order_no = data.orderNo; // 订单号
+    this.getTrainDetail(this.order_no);
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -484,7 +640,6 @@ export default {
           font-size: 24upx;
           font-weight: 400;
         }
-
       }
     }
     .remaining_time {
@@ -563,25 +718,29 @@ export default {
         }
         &.passenger {
           // 取票号
-          .main_list_title_label {
-            font-size: 32upx;
-            font-weight: bold;
-            color: rgba(42, 42, 42, 1);
-            position: absolute;
-          }
-          .passenger_right_label {
-            position: relative;
-            left: 61%;
-            top: -23upx;
-            width: 32%;
+          .main_list_title_box {
             height: 52upx;
-            font-size: 24upx;
-            font-weight: 400;
-            color: #0070e2;
-            background-color: rgba(0, 112, 226, 0.1);
-            border-radius: 0upx 20upx 0upx 20upx;
-            padding: 12upx 26upx 0upx 42upx; 
-          } 
+            width: 100%;
+            position: relative;
+            .main_list_title_label {
+              font-size: 32upx;
+              font-weight: bold;
+              color: rgba(42, 42, 42, 1);
+              position: absolute;
+            }
+            .passenger_right_label {
+              position: absolute;
+              right: -20upx;
+              top: -24upx;
+              padding: 10upx 26upx 10upx 40upx;
+              font-size: 24upx;
+              font-weight: 400;
+              color: #0070e2;
+              background-color: rgba(0, 112, 226, 0.1);
+              border-radius: 0upx 20upx 0upx 20upx;
+            }
+          }
+
           .passenger_list {
             margin-top: 46upx;
             .list_item_title {
@@ -621,8 +780,7 @@ export default {
                   margin-right: 8upx;
                 }
                 .is_insurance {
-                  background: url(@/static/insurance_icon.png) no-repeat center
-                    center;
+                  background: url(@/static/insurance_icon.png) no-repeat center center;
                   background-size: contain;
                   width: 25upx;
                   height: 30upx;
@@ -677,10 +835,9 @@ export default {
                     .item_message {
                       font-size: 28upx;
                       font-weight: bold;
-                      color: #2A2A2A;
+                      color: #2a2a2a;
                       margin-left: 22upx;
                     }
-
                   }
                   .item_title_old {
                     font-size: 28upx;
@@ -691,9 +848,8 @@ export default {
                   .item_message_old {
                     font-size: 28upx;
                     font-weight: bold;
-                    color: #2A2A2A;
+                    color: #2a2a2a;
                     margin-left: 22upx;
-
                   }
                   &:not(:last-child) {
                     margin-bottom: 28upx;
@@ -704,7 +860,7 @@ export default {
           }
           .contact {
             padding-top: 30upx;
-            border-top: 2upx solid #F1F3F5;
+            border-top: 2upx solid #f1f3f5;
             .contact_list {
               display: flex;
               align-items: center;
@@ -724,7 +880,6 @@ export default {
               }
             }
           }
-          
         }
         &.certificate {
           .certificate_message {
@@ -775,7 +930,6 @@ export default {
       }
     }
   }
-   
 }
 // 订单总价
 .price_info {

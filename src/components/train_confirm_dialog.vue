@@ -2,8 +2,8 @@
  * @Description: 确认退票/改签弹窗
  * @Author: mzr
  * @Date: 2021-09-07 14:04:01
- * @LastEditTime: 2021-09-26 15:01:01
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-11 10:11:37
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <uni-popup class="train_pop_modal" ref="trainConfirm" type="bottom">
@@ -54,11 +54,11 @@
                         <view class="passenger_name">{{item.PassengerName}}</view>
                     </view>
                     <view class="passenger_item">
-                        <view>座位号:</view>
+                        <!-- <view>座位号:</view> -->
                         <view class="item_value">{{item.seat_info.replace("厢,","")}}</view>
                     </view>
                     <view class="passenger_item">
-                        <view>票号:</view>
+                        <!-- <view>票号:</view> -->
                         <view class="item_value">{{item.ticket_no}}</view>
                     </view>
                 </view>

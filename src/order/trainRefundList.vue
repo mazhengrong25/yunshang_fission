@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 退票订单
  * @Author: mzr
  * @Date: 2021-08-27 10:07:55
- * @LastEditTime: 2021-09-14 16:31:14
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-09 09:48:59
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
     <view class="train_refund">
@@ -160,7 +160,7 @@ export default {
                               "5":
                               this.headerActive,
             refund_no: this.refundListFilter.refund_no || "", // 订单号
-            start_date: this.refundListFilter.start_date || this.$moment().subtract(3,"days").format("YYYY-MM-DD"), // 开始时间
+            start_date: this.refundListFilter.start_date || '', // 开始时间
             end_date: this.refundListFilter.end_date || this.$moment().format("YYYY-MM-DD"), // 结束时间
             PassengerName: this.refundListFilter.PassengerName, // 乘车人
             ticket_number: this.refundListFilter.ticket_number, // 取票号
