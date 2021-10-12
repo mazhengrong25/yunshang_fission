@@ -2,8 +2,8 @@
  * @Description: 火车票订单
  * @Author: mzr
  * @Date: 2021-08-20 09:56:10
- * @LastEditTime: 2021-09-28 11:53:34
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-30 18:21:29
+ * @LastEditors: mzr
 -->
 <template>
     <view class="train_order">
@@ -209,6 +209,15 @@ export default {
                 ticket_number: this.orderListFilter.ticket_number || "", // 取票号
                 train_number: this.orderListFilter.trainNumber || "", // 车次
             }
+
+            // 筛选 城市选择
+            if(this.orderListFilter.cityStart) {
+                data['from_station'] = this.orderListFilter.cityStart.data.city_name
+            }
+            if(this.orderListFilter.cityEnd) {
+                data['to_station'] = this.orderListFilter.cityEnd.data.city_name
+                
+            }
             orderApi.trainOrderList(data).then((res) => {
                 console.log(res)
                 if (res.code === 0) {
@@ -226,7 +235,7 @@ export default {
                         })
                         item['chdNumber'] = chdNumber
                     })
-                    
+
                     // 筛选条件 日期条件
                     if(this.orderListFilter.dateStatus !== null) {
                         this.sorTime(this.orderListFilter.dateStatus)

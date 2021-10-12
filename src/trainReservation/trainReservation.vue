@@ -2,8 +2,8 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-09-28 17:20:33
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-29 11:51:06
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_reservation">
@@ -1694,6 +1694,15 @@ export default {
   }
   // 订单总价
   .price_modal_box {
+    position: relative;
+     &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
     .modal_box_title {
       background: #ffffff;
       border-radius: 80upx 80upx 0upx 0upx;

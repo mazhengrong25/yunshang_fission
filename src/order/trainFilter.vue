@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 筛选
  * @Author: mzr
  * @Date: 2021-08-26 10:50:46
- * @LastEditTime: 2021-09-27 16:56:19
+ * @LastEditTime: 2021-09-30 15:38:32
  * @LastEditors: mzr
 -->
 <template>
@@ -117,40 +117,14 @@
         <view class="item_content item_dialog">
           <view
             :class="['dialog_view', { input_placeholder: !citySelect.start }]"
-            @click="whereToBtn()"
-            >{{
-              citySelect.start.type === "city"
-                ? citySelect.start.data.city_name
-                : citySelect.start.type === "hot" &&
-                  citySelect.start.data.city_name === "上海"
-                ? citySelect.start.data.city_name +
-                  citySelect.start.data.air_port_name
-                : citySelect.start.type === "hot" &&
-                  citySelect.start.data.city_name === "北京"
-                ? citySelect.start.data.city_name + "首都"
-                : citySelect.start.type === "hot"
-                ? citySelect.start.data.city_name
-                : citySelect.start.data.air_port_name || "出发城市"
-            }}</view
+            @click="whereFromBtn()"
+            >{{citySelect.start.data.city_name || '出发城市'}}</view
           >
           <view class="dialog_line">—</view>
           <view
             :class="['dialog_view', { input_placeholder: !citySelect.end }]"
-            @click="whereFromBtn()"
-            >{{
-              citySelect.end.type === "city"
-                ? citySelect.end.data.city_name
-                : citySelect.end.type === "hot" &&
-                  citySelect.end.data.city_name === "上海"
-                ? citySelect.end.data.city_name +
-                  citySelect.end.data.air_port_name
-                : citySelect.end.type === "hot" &&
-                  citySelect.end.data.city_name === "北京"
-                ? citySelect.end.data.city_name + "首都"
-                : citySelect.end.type === "hot"
-                ? citySelect.end.data.city_name
-                : citySelect.end.data.air_port_name || "到达城市"
-            }}</view
+            @click="whereToBtn()"
+            >{{citySelect.end.data.city_name || '到达城市'}}</view
           >
         </view>
       </view>
@@ -496,19 +470,19 @@ export default {
       
     },
 
-    //城市选择  出发城市
+    //城市选择  到达城市
     whereToBtn() {
       //  跳转到城市选择页面
       uni.navigateTo({
-        url: "/pages/citySelect/citySelect?type=to",
+        url: "/pages/trainCitySelect/trainCitySelect?type=to",
       });
     },
 
-    //城市选择  到达城市
+    //城市选择  出发城市
     whereFromBtn() {
       //  跳转到城市选择页面
       uni.navigateTo({
-        url: "/pages/citySelect/citySelect?type=from",
+        url: "/pages/trainCitySelect/trainCitySelect?type=from",
       });
     },
 
@@ -646,16 +620,16 @@ export default {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
-      if (cityData.status === "to") {
+      console.log('火车筛选城市',JSON.parse(uni.getStorageSync("city")))
+      if (cityData.status === "from") {
         this.citySelect.start = cityData;
-        this.trainMessage["to"] = cityData.data;
-        this.trainMessage["to_type"] = cityData.type;
-      } else if (cityData.status === "from") {
+        // this.trainMessage["to"] = cityData.data;
+        // this.trainMessage["to_type"] = cityData.type;
+      } else if (cityData.status === "to") {
         this.citySelect.end = cityData;
-        this.trainMessage["from"] = cityData.data;
-        this.trainMessage["from_type"] = cityData.type;
+        // this.trainMessage["from"] = cityData.data;
+        // this.trainMessage["from_type"] = cityData.type;
       }
-      console.log(this.citySelect);
       uni.removeStorageSync("city");
     }
   },

@@ -2,8 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-09-26 11:38:33
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-09-29 13:55:39
+ * @LastEditors: mzr
 -->
 <template>
   <view class="index">
@@ -108,7 +108,6 @@
         <view class="train_ticket_input">
           <ticket-input
             :ticketClassify="currentHeader"
-            :ticketType="item"
             :addressForm="airMessage"
             @checkTicked="checkTicked"
             @closeFromBtn="closeFromBtn"
@@ -630,7 +629,7 @@ export default {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
-      console.log(cityData);
+      console.log('首页城市地址',cityData);
       if (cityData.status === "to") {
         this.airMessage.to = cityData.data;
         if (cityData.type === "hot") {
@@ -645,10 +644,6 @@ export default {
         this.airMessage["from_type"] = cityData.type;
       }
       uni.removeStorageSync("city");
-    }
-    // 获取火车票城市信息
-    if(uni.getStorageSync("trainCity")) {
-      
     }
     // 获取时间日期
     if (uni.getStorageSync("time")) {

@@ -2,7 +2,7 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2021-09-15 15:04:39
+ * @LastEditTime: 2021-09-29 12:04:02
  * @LastEditors: mzr
 --> 
 <template>
@@ -10,7 +10,7 @@
     <view class="ticket_item">
       <text class="multi_pass_number">1</text>
       <view class="ticket_address">
-        <view class="to_input address_input" @click="tocketToBtn(addressForm.from.city_name)">
+        <view class="to_input address_input" @click="tocketToBtn(addressForm.from.city_name,ticketClassify)">
           {{addressForm.to_type === 'air'? addressForm.to.air_port_name :
             addressForm.to_type === 'hot' && addressForm.to.city_name === "上海" ? addressForm.to.city_name + addressForm.to.air_port_name :
             addressForm.to_type === 'hot' && addressForm.to.city_name === "北京" ? addressForm.to.city_name + '首都' :
@@ -23,7 +23,7 @@
           <image class="ticket_image" v-if="ticketClassify === 1" src="@/static/ticket_train_btn.png" mode="contain" />
           <image class="ticket_image" v-else src="@/static/ticket_btn.png" mode="contain" />
         </view>
-        <view class="from_input address_input" @click="tocketFromBtn(addressForm.to.city_name)">
+        <view class="from_input address_input" @click="tocketFromBtn(addressForm.to.city_name,ticketClassify)">
           {{addressForm.from_type === 'air'? addressForm.from.air_port_name:
             addressForm.from_type === 'hot' && addressForm.from.city_name === "上海" ? addressForm.from.city_name + addressForm.from.air_port_name :
             addressForm.from_type === 'hot' && addressForm.from.city_name === "北京" ? addressForm.from.city_name + '首都' :
@@ -47,7 +47,7 @@
             <view class="time">{{addressForm.fromTime.month}}</view>
             <view class="time_day">{{addressForm.fromTime.week}}返回</view>
           </view>
-          <view v-else-if="ticketClassify !== 1" class="time_false">
+          <view class="time_false" v-else-if="ticketClassify !== 1">
             <image class="time_icon" src="@/static/from_time.png" mode="contain" />
             <text class="time_text">返程日期</text>
           </view>
@@ -63,8 +63,7 @@
           class="check_toform_btn"
           @click="checkTickedBtn(true,addressForm.multi_pass_to,addressForm.multi_pass_from)"
         >
-          <image class="ticket_image" v-if="ticketClassify === 1" src="@/static/ticket_train_btn.png" mode="contain" />
-          <image class="ticket_image" v-else src="@/static/ticket_btn.png" mode="contain" />
+          <image class="ticket_image" src="@/static/ticket_btn.png" mode="contain" />
         </view>
         <view
           class="from_input address_input"
@@ -95,7 +94,7 @@
         </view>
       </view>
     </view>
-  
+
     <uni-popup ref="popup" type="message">
       <uni-popup-message type="success" message="成功消息" :duration="0"></uni-popup-message>
     </uni-popup>
@@ -127,11 +126,17 @@ export default {
   },
   methods: {
     // 出发按钮
-    tocketToBtn(val) {
+    tocketToBtn(val,e) {
       console.log("选择出发地");
+      let jumpUrl;
+      if(e) {
+        jumpUrl = "/pages/trainCitySelect/trainCitySelect";
+      }else {
+        jumpUrl = "/pages/citySelect/citySelect";
+      }
       uni.navigateTo({
-        url: "/pages/citySelect/citySelect?type=to&address="+val,
-      });
+        url: jumpUrl + "?type=to&address=" + val
+      })
     },
     // 切换出发返程地
     checkTickedBtn(type, to, form) {
@@ -144,11 +149,17 @@ export default {
       console.log("交换出发返程地");
     },
     // 返程按钮
-    tocketFromBtn(val) {
+    tocketFromBtn(val,e) {
       console.log("选择返程地");
+      let jumpUrl;
+      if(e) {
+        jumpUrl = "/pages/trainCitySelect/trainCitySelect";
+      }else {
+        jumpUrl = "/pages/citySelect/citySelect";
+      }
       uni.navigateTo({
-        url: "/pages/citySelect/citySelect?type=from&address="+val,
-      });
+        url: jumpUrl + "?type=from&address=" + val
+      })
     },
     // 清除返程按钮
     closeFromBtn() {
