@@ -2,7 +2,7 @@
  * @Description: 支付结果页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-25 15:35:17
- * @LastEditTime: 2021-10-13 09:50:46
+ * @LastEditTime: 2021-10-13 11:46:29
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -68,7 +68,7 @@ export default {
     jumpOrderDetails() {
       if(this.orderInfo.payFormType && this.orderInfo.payFormType === 'train'){
         uni.reLaunch({
-          url: "/order/trainOrderDetails?orderNo=" + this.orderInfo.payId,
+          url: "/order/trainOrderDetails?orderNo=" + this.orderInfo.payId[0],
         });
       }else {
 

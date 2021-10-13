@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-10-13 09:52:39
+ * @LastEditTime: 2021-10-13 11:46:30
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -240,7 +240,7 @@ export default {
                   // 单个成人订单
                   _that.payPayStatus = false;
                   let orderInfo = {
-                    payId: _that.detailData.order_no,
+                    payId: [_that.detailData.order_no],
                     payType: _that.payType,
                     price: _that.detailData.total_price,
                     payDate: this.$moment().format("YYYY-MM-DD HH:mm:ss"),
@@ -264,7 +264,7 @@ export default {
               //   钱包支付
               _that.payPayStatus = false;
               let orderInfo = {
-                payId: _that.detailData.order_no,
+                payId: [_that.detailData.order_no],
                 payType: _that.payType,
                 price: _that.detailData.total_price,
                 payDate: this.$moment().format("YYYY-MM-DD HH:mm:ss"),
@@ -280,7 +280,7 @@ export default {
             _that.payBtnStatus = false;
 
             uni.showToast({
-              title: res.data.msg,
+              title: res.data,
               icon: "none",
               duration: 4000,
             });
