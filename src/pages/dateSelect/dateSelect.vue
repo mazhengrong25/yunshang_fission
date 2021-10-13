@@ -490,9 +490,6 @@ export default {
     // 组装单程日期更换 火车票查询日期更换   火车票选择坐席日期更换
     this.ticketData = data.ticketType ? JSON.parse(data.ticketType) : {};
 
-    // 火车票 选择坐席日期
-    // this.ticketData = JSON.parse(data.trainSeat);
-
     
     this.checkedToTime = data.checkedToTime;
 
