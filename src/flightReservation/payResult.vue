@@ -2,8 +2,8 @@
  * @Description: 支付结果页
  * @Author: wish.WuJunLong
  * @Date: 2020-08-25 15:35:17
- * @LastEditTime: 2020-09-27 18:05:38
- * @LastEditors: mazhengrong
+ * @LastEditTime: 2021-10-13 09:50:46
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="pay_result">
@@ -66,9 +66,16 @@ export default {
     },
     // 跳转订单详情页
     jumpOrderDetails() {
-      uni.reLaunch({
-        url: "/order/orderinterDetails?orderNo=" + this.orderInfo.payId[0],
-      });
+      if(this.orderInfo.payFormType && this.orderInfo.payFormType === 'train'){
+        uni.reLaunch({
+          url: "/order/trainOrderDetails?orderNo=" + this.orderInfo.payId,
+        });
+      }else {
+
+        uni.reLaunch({
+          url: "/order/orderinterDetails?orderNo=" + this.orderInfo.payId[0],
+        });
+      }
     },
   },
   onLoad(data) {

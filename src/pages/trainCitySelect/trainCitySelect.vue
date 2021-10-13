@@ -2,8 +2,8 @@
  * @Description:火车票 --- 城市选择
  * @Author: mzr
  * @Date: 2021-09-28 11:53:26
- * @LastEditTime: 2021-10-12 09:50:12
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-13 11:37:28
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="city_select">
@@ -25,259 +25,234 @@
       :scroll-into-view="intoindex"
       :scroll-y="true"
       :scroll-top="scrollTop"
+      @scroll="anchorFixed"
       class="city_main"
     >
-      <!-- 定位 -->
-      <view class="city_list" v-if="!searchCity">
+      <view class="show_anchor_info" v-if="showAnchorBox && !searchCity">{{
+        intoindex
+      }}</view>
+
+      <!-- 热门城市 -->
+      <view class="city_list hot_city" v-if="!searchCity" id="top">
         <view class="list_item">
-          <view class="city_province">当前定位</view>
+          <view class="city_province">热门城市</view>
           <view class="city_box">
-            <view class="city_item city_item_icon"
-              @click="gpsGetAddress(Areaaddress.city)"
-            >{{Areaaddress.city || '获取定位中'}}</view>
+            <view
+              class="city_item"
+              v-for="item in hotCity"
+              :key="item"
+              @click="jumpIndex(item)"
+              >{{ item[1] }}</view
+            >
           </view>
         </view>
       </view>
 
-      <!-- 热门城市 -->
       <view class="city_list" v-if="!searchCity">
-        <view class="list_item">
-          <view class="city_province">热门城市</view>
-          <view class="city_box">
-            <view class="city_item" 
-              v-for="item in hotCity" :key="item" 
-              @click="jumpIndex(item)"
-            >{{item.name}}</view>
-          </view>
+        <view :class="['city_anchor', { anchor_fixed: anchorFixedStyle }]">
+          <view class="anchor" @click="jumpAnchor('#')">#</view>
+          <view
+            class="anchor"
+            @click="jumpAnchor(item)"
+            v-for="(item, index) in cityUnitList"
+            :key="index"
+            >{{ item }}</view
+          >
         </view>
-      </view>
-      
-      <view class="city_list" v-if="!searchCity">
-        <view class="list_item" v-for="(item, index) in cityData" :key="index">
-          <view class="city_province">{{item.provice}}</view>
+        <view
+          class="list_item"
+          v-for="(item, index) in cityData"
+          :key="index"
+          :id="item.code"
+        >
+          <view class="city_province">{{ item.code }}</view>
           <view class="city_box">
-            <view class="city_item" 
-              v-for="(oitem,oindex) in item.city" :key="oindex"
+            <view
+              class="city_item"
+              v-for="(oitem, oindex) in item.data"
+              :key="oindex"
               @click="jumpIndex(oitem)"
             >
-              <text>{{ oitem.name}}</text>
+              <text>{{ oitem[1] }}</text>
             </view>
           </view>
         </view>
       </view>
 
       <view class="city_list" v-if="searchCity">
-        <view class="list_item" v-for="(item, index) in searchList" :key="index">
+        <view
+          class="list_item"
+          @click="jumpIndex(item)"
+          v-for="(item, index) in searchList"
+          :key="index"
+        >
           <view class="city_province_train">
-            <view class="city_type">{{item.type}}</view>
-            <view class="city_text">{{item.unit}}</view>
-          </view>
-          <view
-            class="item_city"
-            v-for="(oitem, oindex) in item.city[0]"
-            :key="oindex"
-            @click="jumpIndex(oitem)"
-          >
-            <view class="city_airport">{{oitem.name}}</view>
+            <view class="city_type">{{ item[2] }}</view>
+            <view class="city_text">{{ item[1] }}</view>
           </view>
         </view>
       </view>
-
 
       <view class="not_city" v-if="searchCity && searchList.length < 1">
         <view>抱歉，找不到相关信息</view>
         <view>请确认省份名称是否有误</view>
       </view>
     </scroll-view>
-
-     
-    
   </view>
 </template>
 
 <script>
-import city from "@/tools/cityCode.json";
+import city from "@/utils/cityCode.js";
 export default {
   data() {
     return {
       iStatusBarHeight: 0,
 
-      cityData:[], // 城市
-      hotCity : [
-        {
-          name:"北京市",
-          id: 1,
-        },
-        {
-          name:"上海市",
-          id: 2,
-        },
-        {
-          name:"天津",
-          id: 3,
-        },
-        {
-          name:"重庆市",
-          id: 4,
-        },
-        {
-          name:"上海市",
-          id: 5,
-        },
-        {
-          name:"长沙",
-          id: 6,
-        },
-        {
-          name:"长春",
-          id: 7,
-        },
-        {
-          name:"成都",
-          id: 8,
-        }
+      anchorFixedStyle: false, // 锚点定位样式 true - fixed固定
+
+      HotCityHight: 0, // 热门城市高度
+
+      cityUnitList: [], // 26英文列表
+
+      showAnchorBox: false,
+
+      intoindex: "", // 锚点下标
+
+      cityData: [], // 城市
+      hotCity: [
+        ["", "北京"],
+        ["", "上海"],
+        ["", "天津"],
+        ["", "重庆"],
+        ["", "上海"],
+        ["", "长沙"],
+        ["", "长春"],
+        ["", "成都"],
       ],
-      cityType:"", // 出发  到达
-      cityAddress:"", // 地址
+      cityType: "", // 出发  到达
+      cityAddress: "", // 地址
 
       Areaaddress: {}, // 当前定位地理位置
-      searchCity:"", // 城市搜索
-      searchList:[], // 城市搜索列表
+      searchCity: "", // 城市搜索
+      searchList: [], // 城市搜索列表
     };
   },
   methods: {
-   
     // 获取城市
     getCityCode() {
-      this.cityData = city
+      let cities = city.split("@"); // 拆分城市数据
+
+      let city_name_character = [...Array(26).keys()].map((i) =>
+        String.fromCharCode(i + 65)
+      ); // 生成A-Z数组
+
+      let liarray_cities_array = []; // A-Z城市列表
+
+      for (let i = 0; i < city_name_character.length; i++) {
+        liarray_cities_array.push({
+          code: city_name_character[i],
+          data: [],
+        });
+      }
+
+      for (let i = 0; i < cities.length; i++) {
+        let titem = cities[i];
+        let raha = titem
+          .toString()
+          .charAt(0)
+          .toUpperCase();
+
+        for (let k = 0; k < city_name_character.length; k++) {
+          if (raha === liarray_cities_array[k].code) {
+            liarray_cities_array[k].data.push(titem.split("|"));
+          }
+        }
+      }
+      this.cityUnitList = city_name_character;
+      this.cityData = liarray_cities_array;
     },
-  
+
     // 返回城市
     jumpIndex(val) {
+      console.log(val);
       let data = {
-        data : {
-          city_name: val.name
+        data: {
+          city_name: val[1],
         },
-        status:this.cityType,
-      }
-      uni.setStorageSync('city',JSON.stringify(data))
+        status: this.cityType,
+      };
+      uni.setStorageSync("city", JSON.stringify(data));
       uni.navigateBack();
-    },
-
-    // 获取定位
-    getUserAddress() {
-      let that = this;
-      uni.getLocation({
-        type: "wgs84",
-        success: function (res) {
-          let latitude, longitude;
-          latitude = res.latitude.toString();
-          longitude = res.longitude.toString();
-          uni.request({
-            header: {
-              "Content-Type": "application/text",
-            },
-            url:
-              "http://apis.map.qq.com/ws/geocoder/v1/?location=" +
-              latitude +
-              "," +
-              longitude +
-              "&key=LBEBZ-U6KKX-YYH4Z-T7OLR-7QGH3-DPB4G",
-            success(re) {
-              if (re.statusCode === 200) {
-                that.Areaaddress = re.data.result.ad_info;
-                console.log(that.Areaaddress);
-              } else {
-                console.log("获取信息失败，请重试！");
-              }
-            },
-          });
-        },
-      });
-    },
-
-    // 定位数据查找相同城市
-    gpsGetAddress(val) {
-      if (val) {
-        this.getCityCode(
-          this.cityData.filter(
-            (item) => val.indexOf(item.name) !== -1
-          )[0],
-          "city"
-        );
-      }
     },
 
     // 清空搜索框
     closeSearch() {
       this.searchCity = "";
       this.searchList = [];
-      this.getCityCode();
+    },
+
+    // 首字母锚点定位
+    anchorFixed(event) {
+      this.anchorFixedStyle = event.detail.scrollTop >= this.HotCityHight;
+    },
+
+    // 跳转城市首字母锚点
+    jumpAnchor(val) {
+      if (val === "#") {
+        this.$nextTick(() => {
+          this.intoindex = "top";
+        });
+      } else {
+        this.$nextTick(() => {
+          this.intoindex = val;
+        });
+
+        this.showAnchorBox = true;
+      }
+
+      console.log(this.intoindex);
+
+      setTimeout(() => {
+        this.scrollTop = -1;
+      }, 100);
+      setTimeout(() => {
+        this.showAnchorBox = false;
+      }, 500);
+      this.intoindex = "";
     },
 
     // 输入框状态
     openSearchStauts() {
-      console.log('输入值',this.searchCity)
+      console.log("输入值", this.searchCity);
+      let cities = city.split("@");
       this.searchList = [];
-      this.cityList  = []; // 从原数组分离城市数组
 
-      let provinceList = []; // 省份
-
-      this.cityData.forEach((item) => {
-        provinceList.push(item.provice)
-        this.cityList.push(item.city)
-      })
-     
-      console.log('城市列表',this.cityList)
-      provinceList.forEach((item,index) => {
-       
-        this.searchList.push({
-          unit: item,
-          type:
-            item === "北京"
-              ? "首都"
-              : item === "上海" || item === "天津" || item === "重庆"
-              ? "直辖市"
-              : item === "内蒙古" ||
-                item === "广西" ||
-                item === "西藏" ||
-                item === "宁夏" ||
-                item === "新疆"
-              ? "自治区"
-              : item === "香港" || item === "澳门"
-              ? "特别行政区"
-              : "省份",
-              city:[]
-        });
-        this.cityData.forEach((oitem) => {
-          if(this.searchList[index].unit === oitem.provice) {
-            this.searchList[index].city.push(oitem.city)
-          }
-        })
+      cities.forEach((item) => {
+        if (item.indexOf(this.searchCity) !== -1) {
+          this.searchList.push(item.split("|"));
+        }
       });
 
-      let data = [];
-      this.searchList.forEach((item) => {
-        if(item.unit.indexOf(this.searchCity) !== -1) {
-          data.push(item)
-        }
-      })
-      this.searchList = data
+      console.log("搜索列表", this.searchList);
+    },
+  },
 
-  
-      console.log('搜索列表',this.searchList,'原始数组',this.cityData)
-    } 
-   
+  updated() {
+    if (!this.searchCity) {
+      let view = uni.createSelectorQuery().select(".hot_city");
+      view
+        .boundingClientRect((data) => {
+          this.HotCityHight = data.height;
+        })
+        .exec();
+    }
   },
 
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.cityType = data.type
-    this.cityAddress = data.address
-
+    this.cityType = data.type;
+    this.cityAddress = data.address;
     this.getCityCode();
-    this.getUserAddress();
-    
   },
 };
 </script>
@@ -328,8 +303,58 @@ export default {
     flex: 1;
     overflow-y: auto;
     height: 100%;
+    position: relative;
+    .show_anchor_info {
+      position: fixed;
+      width: 100upx;
+      height: 100upx;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 48upx;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      left: 50%;
+      top: 50%;
+      margin-left: -50upx;
+      margin-top: -50upx;
+      z-index: 3;
+    }
     .city_list {
-      padding: 0 28upx var(--status-bar-height) 32upx;
+      padding: 0 28upx 0 32upx;
+      position: relative;
+      .city_anchor {
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 24upx;
+        font-weight: 300;
+        color: rgba(0, 112, 226, 1);
+        line-height: 36upx;
+        &.anchor_fixed {
+          position: fixed;
+          top: 20vh;
+        }
+        .anchor {
+          width: 85upx;
+          text-align: center;
+          padding-left: 10upx;
+          box-sizing: border-box;
+        }
+      }
+
+      &.gps_city {
+        padding: 0 28upx 0 32upx;
+        .list_item .city_box .city_item {
+          margin-bottom: 0;
+        }
+      }
       .list_item {
         display: block;
         .city_province {
@@ -411,7 +436,6 @@ export default {
             }
           }
         }
-        
       }
     }
     .not_city {
