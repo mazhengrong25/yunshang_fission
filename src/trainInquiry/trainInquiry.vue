@@ -2,7 +2,7 @@
  * @Description: 火车票查询 
  * @Author: mzr
  * @Date: 2021-07-27 10:44:51
- * @LastEditTime: 2021-10-14 11:37:14
+ * @LastEditTime: 2021-10-14 11:38:54
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -623,7 +623,7 @@ export default {
         data: this.trainData.toTime.date,
       };
       uni.navigateTo({
-        url: "/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data),
+        url: "/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data) + '&searchType=1',
       });
     },
 
