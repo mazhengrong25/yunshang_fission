@@ -2,8 +2,8 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2021-09-16 10:02:35
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-14 11:35:36
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="date_select">
@@ -55,7 +55,7 @@
             :class="[
               'item_box',
               { active: oitem.active },
-              { is_before: oitem.status === false },
+              { is_before: !oitem.status || !oitem.is_searchType },
               { checked: oitem.checked },
               { to: oitem.toChecked },
               { from: oitem.fromChecked },
@@ -116,6 +116,8 @@ export default {
       checkedRoundTime: false,
 
       checkedToTime: "", // 已选择出发日期
+
+      searchType: '0', // 查询类型 '0' 机票  '1' 火车票
     };
   },
   methods: {
@@ -146,6 +148,11 @@ export default {
             currentDate === nextDate
               ? i + 1 >= Number(moment().format("D"))
               : true,
+          is_searchType: this.searchType === '1'? 
+            this.$moment(this.$moment().add(this.nextIndex, "M").format("YYYY-MM") +
+            "-" +
+            (i + 1 < 10 ? "0" + (i + 1) : i + 1)).isBefore(this.$moment().add(14,'d'))
+          : true ,
           active:
             currentDate === nextDate
               ? i + 1 === Number(moment().format("D"))
@@ -492,6 +499,9 @@ export default {
 
     
     this.checkedToTime = data.checkedToTime;
+
+    this.searchType = data.searchType
+    console.log('机票火车票日期选择',this.searchType)
 
     console.log(data.roundDate);
     // 组装往返日期

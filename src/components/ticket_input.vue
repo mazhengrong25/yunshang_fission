@@ -2,8 +2,8 @@
  * @Description: 乘机地址选择组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 17:02:50
- * @LastEditTime: 2021-09-29 12:04:02
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-14 11:18:40
+ * @LastEditors: wish.WuJunLong
 --> 
 <template>
   <view :class="['ticket_input',{'multi_pass':ticketType === '多程'}]">
@@ -116,7 +116,7 @@ export default {
       default: () => {},
     },
     ticketClassify: {
-      // 机票 火车票
+      // 机票 0 火车票 1
       type: Number,
       default: () => 0
     }
@@ -168,7 +168,6 @@ export default {
     },
     // 跳转日历
     jumpDate(val,time) {
-      console.log(this.addressForm);
       let data;
       if (val === "start") {
         data = {
@@ -189,7 +188,7 @@ export default {
           val +
           "&ticketType=" +
           JSON.stringify(data) + 
-          "&checkedToTime="+time,
+          "&checkedToTime="+time + '&searchType='+this.ticketClassify,
       });
     },
   },
