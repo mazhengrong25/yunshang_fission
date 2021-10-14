@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-09-29 13:55:39
+ * @LastEditTime: 2021-10-14 14:03:17
  * @LastEditors: mzr
 -->
 <template>
@@ -289,7 +289,7 @@ export default {
       headerType: ["机票", "火车票"],
       currentHeader: 0, // 头部切换默认值
 
-      checkboxStatus: true, // 火车票 选中动车高铁默认值
+      checkboxStatus: false, // 火车票 选中动车高铁默认值
 
       checkTickedType: false, // 切换往返地
 

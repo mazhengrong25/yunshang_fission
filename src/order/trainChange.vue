@@ -2,8 +2,8 @@
  * @Description: 火车票(已出票) =-- 改签
  * @Author: mzr
  * @Date: 2021-09-06 11:13:17
- * @LastEditTime: 2021-10-11 10:05:59
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-14 14:01:30
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_change">
@@ -49,7 +49,7 @@
                   :style="{opacity:Number(item.is_insurance) === 1?'':'0'}"
                 ></view>
                 <view class="group_type">座位号</view>
-                <view class="group_number">{{ item.seat_info.replace("厢,0","") }}</view>
+                <view class="group_number">{{ item.seat_info.replace("厢,","") }}</view>
               </view>
               <view class="list_click"></view>
             </view>
@@ -238,7 +238,7 @@ export default {
     // 跳转到日期选择页面
     openDataSelect() {
       uni.navigateTo({
-        url: "/pages/dateSelect/dateSelect",
+        url: "/pages/dateSelect/dateSelect?searchType=1",
       });
     },
 
@@ -248,10 +248,10 @@ export default {
         
         // 组装 获取车次信息
         this.trainMessage = {
-          to: {
+          from: {
             city_name: this.passValueObject.segments[0].to_city
           },
-          from: {
+          to: {
             city_name:this.passValueObject.segments[0].from_city
           },
           ticket:"ADT",
@@ -340,9 +340,8 @@ export default {
       }
       orderApi.trainOrderChange(data).then((res) => {
         console.log(res)
-        if(res.errorcode === 10000) {
-          let refund_no = res.data.refund_no
-          this.$refs.trainConfirmChange.closePop();
+        if(res.errorcode === 0) {
+          let refund_no = res.data.change_order_no
           uni.redirectTo({
               url: '/order/trainChangeDetails?change_no=' +
               refund_no

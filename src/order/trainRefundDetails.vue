@@ -2,7 +2,7 @@
  * @Description: 退票单  --- 详情
  * @Author: mzr
  * @Date: 2021-08-30 11:08:34
- * @LastEditTime: 2021-09-27 16:40:38
+ * @LastEditTime: 2021-10-14 14:30:25
  * @LastEditors: mzr
 -->
 <template>
@@ -32,7 +32,7 @@
         >
           <text class="price_text">退票金额</text>
           <text class="price_sign">&yen;</text>
-          <text>{{detailData.total_price || 0}}</text>
+          <text>{{detailData.refund_total || 0}}</text>
         </view>
       </view>
 
@@ -46,7 +46,7 @@
 
       <view class="order_option">
         <view class="option_btn" v-if="detailData.status === 2 || detailData.status === 5" @click="getSend()">发送短信</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay()">重新预定</view>
+        <view class="option_btn important_btn" v-if="detailData.status === 2" @click="againReserve">重新预定</view>
       </view>
     </view>
 
@@ -72,7 +72,7 @@
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">座位号</view>
                   <view class="group_number">
-                    {{ item.seat_info.replace("厢,0","") }}
+                    {{ item.seat_info.replace("厢,","") }}
                   </view>
                 </view>
                 <view class="price_arrow">
@@ -140,6 +140,7 @@
     <refundAmount
       ref="trainRefundAmount"
       :refundInfo="trainSingleData"
+      :trainSort="'refund'"
     ></refundAmount>
 
   </view>
@@ -173,6 +174,8 @@ export default {
 
       // 退票金额对话框
       trainSingleData:{}, 
+
+      reserveData:{}, // 装重新预定数据
     }
   },
   methods:{
@@ -195,6 +198,7 @@ export default {
         if(res.errorcode === 10000) {
           this.detailData = res.data
           this.getTrainMessage(this.detailData)
+          this.reserveData = res.data.train_order
         }else {
           uni.showToast({
             title:res.msg,
@@ -241,11 +245,10 @@ export default {
       let passengerList = []
       this.detailData.passengers.forEach(item => {
         passengerList.push({
-            insurance_total:item.insurance_price, // 保险
-            service_price:item.service_price, // 服务费
-            total_price:item.total_price, // 总金额
+            total_price:item.refund_total, // 总金额
             PassengerName:item.PassengerName, // 姓名
-            ticket_price:item.ticket_price, // 销售价 票面价
+            ticket_price:item.total_price, // 结算价
+            refund_price:item.refund_money, // 退票费
         })
       })
       this.trainSingleData = {
@@ -265,10 +268,66 @@ export default {
       uni.navigateTo({
         url: "/order/sendMessage?orderId=" + this.detailData.order_no,
       });
+    },
+
+    // 重新预定
+    againReserve() {
+      if (this.$moment(this.detailData.train_date).isAfter(this.$moment())) {
+        // 当前订单时间 大于今天时间 =》 直接跳转列表
+        let data = {
+          to: {
+              city_code: this.reserveData.from_station_code,
+              city_name: this.reserveData.from_station,
+              country_code: "CN",
+              province: this.reserveData.from_station,
+          },
+          from: {
+              city_code: this.reserveData.to_station_code,
+              city_name: this.reserveData.to_station,
+              country_code: "CN",
+              province: this.reserveData.to_station,
+          },
+          toTime: {
+              date: this.$moment(this.detailData.train_date).format("YYYY-MM-DD"),
+
+          },
+        }
+        uni.navigateTo({
+            url: '/trainInquiry/trainInquiry?trainData=' +
+                JSON.stringify(data) +
+                "&checkboxStatus=false"
+        });
+
+      } else {
+          // 如果当前订单时间小于 当前日期 =》 跳转日期
+          let data = {
+              type: false,
+              data: this.detailData.train_date,
+          };
+          uni.navigateTo({
+              url: "/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data),
+          });
+
+      }
     }
   },
 
   onShow() {
+    // 重新预定
+    if (uni.getStorageSync('time')) {
+      let time = JSON.parse(uni.getStorageSync("time"))
+      let data = {
+          toTime: {
+              date: time.date,
+          }
+      }
+      uni.navigateTo({
+          url: '/trainInquiry/trainInquiry?trainData=' +
+              JSON.stringify(data) +
+              "&checkboxStatus=false"
+      });
+      uni.removeStorageSync('time')
+    }
     // 备注内容
     if (uni.getStorageSync("remark_key")) {
       this.trainRefundDetail = uni.getStorageSync("remark_key");

@@ -2,7 +2,7 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-10-12 10:58:54
+ * @LastEditTime: 2021-10-14 11:58:42
  * @LastEditors: mzr
 -->
 <template>
@@ -690,7 +690,7 @@ export default {
     // 下一步
     nextAction() {
       for (let i = 0; i < this.passengerList.length; i++) {
-        if (this.passengerList[i].verify_status !== 1) {
+        if (this.passengerList[i].type === '成人' && this.passengerList[i].verify_status !== 1) {
           this.openVerify(this.passengerList[i]);
           return;
         }
@@ -982,6 +982,7 @@ export default {
 
     let passenger = uni.getStorageSync("passengerList");
     if (passenger) {
+      
       this.passengerList = JSON.parse(passenger);
       uni.removeStorageSync("passengerList");
     }

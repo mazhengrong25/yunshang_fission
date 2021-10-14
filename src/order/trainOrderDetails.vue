@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-10-13 10:15:55
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-13 15:44:01
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_details">
@@ -72,13 +72,9 @@
         <text class="time_text">
           {{
             detailData.status === 1
-              ? `预计在${Math.floor(occupyTime / 60)}：${Math.floor(
-                  occupyTime % 60
-                )}分前完成占座`
+              ? `预计在${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}分前完成占座`
               : detailData.status === 2
-              ? `剩余支付时间：${Math.floor(
-                  (detailData.overdue_time / 60) % 60
-                )}:${Math.floor(detailData.overdue_time % 60)}分钟`
+              ? `剩余支付时间：${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}`
               : detailData.status === 3
               ? "订单支付成功，出票中..."
               : ""
@@ -198,7 +194,7 @@
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">座位号</view>
                   <view class="group_number">
-                    {{ item.seat_info.replace("厢,0", "") || "" }}
+                    {{ item.seat_info.replace("厢,", "") || "" }}
                   </view>
                 </view>
                 <view class="price_arrow" v-if="item.ticket_no">
@@ -397,8 +393,6 @@ export default {
       passInfoChecket: null, // 乘客信息展开值
       priceInfoChecket: null, // 订单总价展开值
       trainOrderRemark: "", // 备注内容
-
-      occupyTime: 60, // 占座中 时间
 
       getTimeType: "", // 预定返程或重选车次状态
     };
@@ -743,8 +737,8 @@ export default {
       }
       .time_text {
         font-size: 24upx;
-        font-weight: bold;
-        color: rgba(255, 255, 255, 1);
+        font-weight: 400;
+        color: rgba(255, 255, 255, .8);
       }
     }
     .order_option {

@@ -2,7 +2,7 @@
  * @Description: 火车票(已出票) --- 退票 
  * @Author: mzr
  * @Date: 2021-08-30 13:45:01
- * @LastEditTime: 2021-09-27 16:40:25
+ * @LastEditTime: 2021-10-14 10:39:33
  * @LastEditors: mzr
 -->
 <template>
@@ -142,6 +142,8 @@ export default {
       trainRefundRemark:"", // 备注内容
       orderType:"", // 区分正常单改签单
 
+      isChangeOrder: '', // 判断是否为改签退票单
+
     }
   },
   methods:{
@@ -227,9 +229,9 @@ export default {
       let data = {
         channel:"Di",                //类型：String  必有字段  备注：渠道
         source:"YunKu",                //类型：String  必有字段  备注：数据源
-        order_no:this.passValueObject.order_no,                //类型：String  必有字段  备注：订单号
+        order_no:this.passValueObject[this.isChangeOrder?'change_no':'order_no'],                //类型：String  必有字段  备注：订单号
         order: {                //类型：Object  必有字段  备注：订单信息
-            order_no:this.passValueObject.order_no,                //类型：String  必有字段  备注：订单号
+            order_no:this.passValueObject[this.isChangeOrder?'change_no':'order_no'],                //类型：String  必有字段  备注：订单号
             out_trade_no:this.passValueObject.out_trade_no,                //类型：String  必有字段  备注：第三方订单号
             ticket_number:this.passValueObject.ticket_number               //类型：String  必有字段  备注：电子出票号
         },
@@ -260,11 +262,11 @@ export default {
     // 获取详情 e 区分正常单和改签单
     getRefundDetail(val,e) {
       if(e === 'change') {
-
+        this.isChangeOrder = e
         orderApi.trainChangeDetail(val).then((res) => {
           if(res.errorcode === 10000) {
 
-            this.passValueObject = res.data.train_order
+            this.passValueObject = res.data
             this.getTrainMessage(this.passValueObject)
           }else {
             uni.showToast({

@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-10-13 11:46:30
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-14 14:43:03
+ * @LastEditors: mzr
 -->
 <template>
   <view class="order_pay">
@@ -118,7 +118,7 @@
               ></view>
             </view>
             <view class="seat_type">{{ item.seat }}</view>
-            <view class="seat_no">{{ item.seat_info.replace("厢,0", "") }}</view>
+            <view class="seat_no">{{ item.seat_info.replace("厢,", "") }}</view>
           </view>
         </view>
       </view>

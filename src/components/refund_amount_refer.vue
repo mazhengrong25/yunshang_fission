@@ -2,7 +2,7 @@
  * @Description: 退票页面-退票金额参考弹窗
  * @Author: mazhengrong
  * @Date: 2020-09-22 11:10:03
- * @LastEditTime: 2021-09-08 10:51:51
+ * @LastEditTime: 2021-10-14 14:39:14
  * @LastEditors: mzr
 -->
 
@@ -14,7 +14,7 @@
           <view class="close_btn" @click="closeExp"></view>
           <view class="explanation_header">
             <view v-if="typeShow === 'refund'">退票金额参考</view>
-            <view v-else>{{trainSort?'改签':'退票'}}金额明细</view>
+            <view v-else>{{trainSort === 'change'?'改签':'退票'}}金额明细</view>
           </view>
         </view>
 
@@ -29,7 +29,10 @@
               <view class="price_info_box">
                 <view class="total_price_header">
                   <view class="header_left">
-                    <view class="total_price_title">订单总价</view>
+                    <view class="total_price_title">
+                      {{trainSort === 'refund' ? '退票'
+                        :trainSort === 'change' ? '改签':'订单'}}总价
+                    </view>
                     <view class="total_price_message">
                       <text>&yen;</text>{{ refundInfo.checkedTotal }}
                     </view>
@@ -49,7 +52,10 @@
                       <view class="title_name">{{ item.PassengerName }}</view>
 
                       <view class="title_price">
-                        <view class="title_text">总金额</view>
+                        <view class="title_text">
+                           {{trainSort === 'refund' ? '退票'
+                              :trainSort === 'change' ? '改签':'总'}}金额
+                        </view>
                         <view class="peice_style">
                           <text>&yen; {{ item.total_price }}</text>
                           <view class="price_arrow">
@@ -60,8 +66,8 @@
                     </view>
 
                     <view class="list_main">
-                      <view class="list_item">
-                        <view class="item_title">销售价</view>
+                      <view class="list_item" v-if="trainSort === 'refund'">
+                        <view class="item_title">{{trainSort === 'refund' ? '结算':'销售'}}价</view>
                         <view class="item_message"
                           >&yen; {{ item.ticket_price }}</view
                         >
@@ -74,14 +80,14 @@
                         }}</view>
                       </view>
                       
-                      <view class="list_item">
+                      <view class="list_item" v-if="!trainSort">
                         <view class="item_title">保险</view>
                         <view class="item_message"
                           >&yen; {{ item.insurance_total }}</view
                         >
                       </view>
 
-                      <view class="list_item">
+                      <view class="list_item" v-if="!trainSort">
                         <view class="item_title">	{{!typeShow?"服务费":"退费服务"}}</view>
                         <view class="item_message"
                           >&yen; {{ item.service_price }}</view
@@ -91,6 +97,30 @@
                         <view class="item_title">奖励金</view>
                         <view class="item_message"
                           >&yen; {{ item.reward_price }}</view
+                        >
+                      </view>
+                      <view class="list_item" v-if="trainSort === 'change'">
+                        <view class="item_title">原票面价</view>
+                        <view class="item_message"
+                          >&yen; {{ item.old_ticket_price }}</view
+                        >
+                      </view>
+                      <view class="list_item" v-if="trainSort === 'change'">
+                        <view class="item_title">新票面价</view>
+                        <view class="item_message"
+                          >&yen; {{ item.ticket_price }}</view
+                        >
+                      </view>
+                      <view class="list_item" v-if="trainSort === 'change'">
+                        <view class="item_title">改签费</view>
+                        <view class="item_message"
+                          >&yen; {{ item.change_price }}</view
+                        >
+                      </view>
+                      <view class="list_item" v-if="trainSort === 'refund'">
+                        <view class="item_title">退票费</view>
+                        <view class="item_message"
+                          >&yen; {{ item.refund_price }}</view
                         >
                       </view>
                     </view>
@@ -222,10 +252,10 @@ export default {
         type:String,
         default:() => ''
       },
-      // 区别火车票退票费/改签费  改签为true  
+      // 区别火车票退票费/改签费   
       trainSort: {
-        type:Boolean,
-        default:() => false
+        type:String,
+        default:() => ''
       }
   },
   data() {

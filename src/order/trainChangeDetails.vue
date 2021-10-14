@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-09-27 16:40:39
+ * @LastEditTime: 2021-10-14 14:39:16
  * @LastEditors: mzr
 -->
 <template>
@@ -38,7 +38,7 @@
         >
           <text class="price_text">改签费</text>
           <text class="price_sign">&yen;</text>
-          <text>{{detailData.total_price || 0}}</text>
+          <text>{{newDetailData.need_pay_amount || 0}}</text>
         </view>
       </view>
 
@@ -48,17 +48,17 @@
         <text class="time_text">
           {{detailData.status === 3 ? '订单支付成功，出票中...' : 
               detailData.status === 6 ? '抱歉改签占座失败，若仍需改签请联系客服人员' :
-                detailData.status === 2 ? `剩余支付时间：${ Math.floor(detailData.overdue_time / 60 % 60)}:${Math.floor(detailData.overdue_time % 60)}分钟`: 
-                  detailData.status === 1 ? `预计在${ Math.floor(occupyTime / 60)}：${Math.floor(occupyTime %60)}分前完成占座`:''}}
+                detailData.status === 2 ? `剩余支付时间：${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}分钟`: 
+                  detailData.status === 1 ? `预计在${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}分前完成占座`:''}}
         </text>
        </view>
 
       <view class="order_option">
         <view class="option_btn" v-if="detailData.status !== 1 || detailData.status !== 3" @click="getSend">发送短信</view>
         <view class="option_btn" v-if="detailData.status === 2" @click="getCancel">取消订单</view>
-        <view class="option_btn" v-if="detailData.status === 4" @click="jumpRefund(detailData)">退票</view>
+        <view class="option_btn" v-if="detailData.status === 4" @click="jumpRefund(newDetailData)">退票</view>
         <view class="option_btn important_btn" v-if="detailData.status === 2" @click="jumpOrderPay">去支付</view>
-        <view class="option_btn important_btn" v-if="detailData.status === 4">预定返程</view>
+        <view class="option_btn important_btn" v-if="detailData.status === 4" @click="returnReserve">预定返程</view>
       </view>
     </view>
 
@@ -66,9 +66,10 @@
       <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
         <!-- 乘车人 -->
         <view class="main_list passenger">
-         
-          <view :class="['main_list_title',{'main_list_title_label':detailData.ticket_number}]">乘车人</view>
-          <view class="passenger_right_label" v-if="detailData.ticket_number">取票号{{detailData.ticket_number}}</view>
+          <view class="main_list_title_box">
+            <view :class="['main_list_title',{'main_list_title_label':detailData.ticket_number}]">乘车人</view>
+            <view class="passenger_right_label" v-if="detailData.ticket_number">取票号{{detailData.ticket_number}}</view>
+          </view>
 
           <view class="passenger_list">
             <view 
@@ -82,7 +83,7 @@
                 <view class="group_info" v-if="item.seat_info">
                   <view class="group_type">{{item.old_ticket_no?'旧':'新'}}座位号</view>
                   <view class="group_number">
-                    {{ item.seat_info.replace("厢,0","") }}
+                    {{ item.seat_info.replace("厢,","") }}
                   </view>
                 </view>
                 <view class="price_arrow">
@@ -94,7 +95,7 @@
                 <view v-if="item.PassengerType === 'CHD'">
                   <view class="list_item">
                     <view class="item_title_old light_color">旧座位号</view>
-                    <view class="item_message_old light_color">{{item.seat_info.replace("厢,0","")}}</view>
+                    <view class="item_message_old light_color">{{item.seat_info.replace("厢,","")}}</view>
                   </view>
                   <view class="list_item">
                     <view class="item_title_old light_color">旧票号</view>
@@ -144,11 +145,11 @@
             titleType="new"></trainMessageCard>  
         </view>
         <!-- 原车次 -->
-         <view class="train_class" v-if="detailData.train_order.segments.length > 0">
+         <view class="train_class" v-if="detailData.segments.length > 0">
           <trainMessageCard 
-            :trainObject="trainData" 
+            :trainObject="oldTrainData" 
             :isCabin="true" 
-            :seatObject="singleData" 
+            :seatObject="oldSingleData" 
             :isRule="true"
             titleType="old"></trainMessageCard>  
         </view>
@@ -195,7 +196,7 @@
     <changeAmount
       ref="trainChangeAmount"
       :refundInfo="trainSingleData"
-      :trainSort="true"
+      :trainSort="'change'"
     ></changeAmount>
   </view>
 </template>
@@ -218,9 +219,13 @@ export default {
 
       detailData:{}, // 详情数据 原车次
       newDetailData:{}, // 详情  新车次
-      // 组件 车次信息
+      // 组件 车次信息  新车次
       trainData:{},
       singleData:{},
+
+      // 原车次
+      oldTrainData:{}, 
+      oldSingleData:{}, 
 
       passInfoChecket: null, // 乘客信息展开值
       priceInfoChecket: null, // 订单总价展开值
@@ -230,7 +235,7 @@ export default {
       trainSingleData:{}, 
 
       // 改签占座剩余时间
-      occupyTime:0
+      // occupyTime:0
     }
   },
   methods:{
@@ -252,26 +257,26 @@ export default {
         console.log(res)
         if(res.errorcode === 10000) {
           // 原车次
-          this.detailData = res.data
-          this.getTrainMessage(this.detailData)
+          this.detailData = res.data.train_order
+          this.getTrainMessage(this.detailData,true)
           // 新车次
-          this.newDetailData = res.data.train_order
+          this.newDetailData = res.data
           this.getTrainMessage(this.newDetailData)
           // 改签占座中
-          if(this.detailData.status === 1){
-            this.occupyTime = 60
-            let timer = setInterval(() => {
-              this.occupyTime--
-              if(this.occupyTime < 1){
-                clearInterval(timer)
-              }
-            },1000)
-            // 跳转到支付页面
-            uni.navigateTo({
-              url:"/trainReservation/orderPay?detailItem=" +
-              JSON.stringify(this.detailData)
-            })
-          }
+          // if(this.detailData.status === 1){
+          //   this.occupyTime = 60
+          //   let timer = setInterval(() => {
+          //     this.occupyTime--
+          //     if(this.occupyTime < 1){
+          //       clearInterval(timer)
+          //     }
+          //   },1000)
+          //   // 跳转到支付页面
+          //   uni.navigateTo({
+          //     url:"/trainReservation/orderPay?detailItem=" +
+          //     JSON.stringify(this.detailData)
+          //   })
+          // }
         }else {
           uni.showToast({
             title:res.msg,
@@ -283,27 +288,51 @@ export default {
     },
 
     // 组装车次数据
-    getTrainMessage(val){
-      console.log(val)
-      this.trainData = {
-        train: {
-          departure_date: val.segments[0].departure_time,
-          days: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD')),"days"),
-          departure: this.$moment(val.segments[0].departure_time).format("HH:mm"),
-          arrive: this.$moment(val.segments[0].arrive_time).format("HH:mm"),
-          code: val.segments[0].train_number,
-          number: val.segments[0].train_code,
-          run_minute: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD HH:mm:ss')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD HH:mm:ss')),"minutes")
-        },
-        station: {
-          departure_name: val.segments[0].from_city,
-          arrive_name: val.segments[0].to_city,
+    getTrainMessage(val,e){
+      // 区分 新车次 原车次
+      if(e) {
+        this.oldTrainData = {
+          train: {
+            departure_date: val.segments[0].departure_time,
+            days: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD')),"days"),
+            departure: this.$moment(val.segments[0].departure_time).format("HH:mm"),
+            arrive: this.$moment(val.segments[0].arrive_time).format("HH:mm"),
+            code: val.segments[0].train_number,
+            number: val.segments[0].train_code,
+            run_minute: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD HH:mm:ss')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD HH:mm:ss')),"minutes")
+          },
+          station: {
+            departure_name: val.segments[0].from_city,
+            arrive_name: val.segments[0].to_city,
+          }
+        }
+        this.oldSingleData = {
+          code: val.segments[0].seat_level,
+          name: val.segments[0].seat
+        }
+      }else {
+
+        this.trainData = {
+          train: {
+            departure_date: val.segments[0].departure_time,
+            days: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD')),"days"),
+            departure: this.$moment(val.segments[0].departure_time).format("HH:mm"),
+            arrive: this.$moment(val.segments[0].arrive_time).format("HH:mm"),
+            code: val.segments[0].train_number,
+            number: val.segments[0].train_code,
+            run_minute: this.$moment(this.$moment(val.segments[0].arrive_time).format('YYYY-MM-DD HH:mm:ss')).diff(this.$moment(this.$moment(val.segments[0].departure_time).format('YYYY-MM-DD HH:mm:ss')),"minutes")
+          },
+          station: {
+            departure_name: val.segments[0].from_city,
+            arrive_name: val.segments[0].to_city,
+          }
+        }
+        this.singleData = {
+          code: val.segments[0].seat_level,
+          name: val.segments[0].seat
         }
       }
-      this.singleData = {
-        code: val.segments[0].seat_level,
-        name: val.segments[0].seat
-      }
+
     },
 
     // 跳转备注页面
@@ -321,11 +350,11 @@ export default {
     //取消订单提交
     getCancelSubmit() {
       let data = {
-        channel:this.newDetailData.channel,                //类型：String  必有字段  备注：无
-        source:this.newDetailData.source,                //类型：String  必有字段  备注：无
+        channel:this.newDetailData.channel,                // 没有字段
+        source:this.newDetailData.source,                // 没有字段
         order: {                //类型：Object  必有字段  备注：无
-            order_no:this.newDetailData.order_no,                //类型：String  必有字段  备注：改签订单号
-            out_trade_no:this.detailData.out_trade_no                //类型：String  必有字段  备注：正常单第三方订单号
+            order_no:this.newDetailData.change_no,                //类型：String  必有字段  备注：改签订单号
+            out_trade_no:this.newDetailData.out_trade_no                //类型：String  必有字段  备注：正常单第三方订单号
         }
       }
       orderApi.trainChangeCancel(data).then((res) => {
@@ -344,7 +373,7 @@ export default {
     jumpOrderPay() {
       uni.navigateTo({
           url: "/trainReservation/orderPay?orderNo=" + 
-          this.newDetailData.order_no +
+          this.newDetailData.change_no +
           "&detailItem=" +
           JSON.stringify(this.newDetailData)
       });
@@ -363,17 +392,17 @@ export default {
     // 打开改签金额对话框
     openPriceDialog() {
       let passengerList = []
-      this.detailData.passengers.forEach(item => {
+      this.newDetailData.passengers.forEach(item => {
         passengerList.push({
-            insurance_total:item.insurance_price, // 保险
-            service_price:item.service_price, // 服务费
-            total_price:item.total_price, // 总金额
+            total_price:item.need_pay_amount, // 改签金额
             PassengerName:item.PassengerName, // 姓名
-            ticket_price:item.ticket_price, // 销售价 票面价
+            old_ticket_price:item.old_ticket_price, // 原票面价
+            ticket_price:item.ticket_price, // 新票面价
+            change_price:item.change_price, // 改签费
         })
       })
       this.trainSingleData = {
-        checkedTotal:this.detailData.total_price, // 订单总价
+        checkedTotal:this.newDetailData.need_pay_amount, // 订单总价
         passengerList: passengerList,
       }
       this.$refs.trainChangeAmount.openExp();
@@ -387,12 +416,51 @@ export default {
     // 发送短信
     getSend() {
       uni.navigateTo({
-        url: "/order/sendMessage?orderId=" + this.detailData.change_no,
+        url: "/order/sendMessage?orderId=" + this.newDetailData.change_no,
       });
-    }
+    },
+
+    // 预定返程
+    returnReserve() {
+      let data = {
+          type: false,
+          data: this.newDetailData.train_date,
+      };
+      uni.navigateTo({
+          url: "/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data),
+      });
+    },
   },
 
   onShow() {
+    // 预定返程 时间
+    if (uni.getStorageSync('time')) {
+        let time = JSON.parse(uni.getStorageSync("time"))
+        let data = {
+            toTime: {
+                date: time.date,
+            },
+            to: {
+              city_code: this.newDetailData.to_station_code,
+              city_name: this.newDetailData.to_station,
+              country_code: "CN",
+              province: this.newDetailData.to_station,
+            },
+            from: {
+              city_code: this.newDetailData.from_station_code,
+              city_name: this.newDetailData.from_station,
+              country_code: "CN",
+              province: this.newDetailData.from_station,
+            }
+        }
+        
+        uni.navigateTo({
+            url: '/trainInquiry/trainInquiry?trainData=' +
+                JSON.stringify(data) +
+                "&checkboxStatus=false"
+        });
+        uni.removeStorageSync('time')
+    }
     // 备注内容
     if (uni.getStorageSync("remark_key")) {
       this.trainChangeDetail = uni.getStorageSync("remark_key");
@@ -533,25 +601,28 @@ export default {
         }
         &.passenger {
           // 取票号
-          .main_list_title_label {
-            font-size: 32upx;
-            font-weight: bold;
-            color: rgba(42, 42, 42, 1);
-            position: absolute;
-          }
-          .passenger_right_label {
-            position: relative;
-            left: 61%;
-            top: -23upx;
-            width: 32%;
+          .main_list_title_box {
             height: 52upx;
-            font-size: 24upx;
-            font-weight: 400;
-            color: #0070e2;
-            background-color: rgba(0, 112, 226, 0.1);
-            border-radius: 0upx 20upx 0upx 20upx;
-            padding: 12upx 26upx 0upx 42upx; 
-          } 
+            width: 100%;
+            position: relative;
+            .main_list_title_label {
+              font-size: 32upx;
+              font-weight: bold;
+              color: rgba(42, 42, 42, 1);
+              position: absolute;
+            }
+            .passenger_right_label {
+              position: absolute;
+              right: -20upx;
+              top: -24upx;
+              padding: 10upx 26upx 10upx 40upx;
+              font-size: 24upx;
+              font-weight: 400;
+              color: #0070e2;
+              background-color: rgba(0, 112, 226, 0.1);
+              border-radius: 0upx 20upx 0upx 20upx;
+            } 
+          }
           .passenger_list {
             margin-top: 46upx;
             .list_item_title {
