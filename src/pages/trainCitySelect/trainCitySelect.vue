@@ -2,7 +2,7 @@
  * @Description:火车票 --- 城市选择
  * @Author: mzr
  * @Date: 2021-09-28 11:53:26
- * @LastEditTime: 2021-10-13 11:37:28
+ * @LastEditTime: 2021-10-14 10:49:18
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -14,7 +14,7 @@
         class="city_search_input"
         placeholder-style="font-size: 24rpx;font-weight:500;color:rgba(206,206,208,1);"
         v-model="searchCity"
-        placeholder="请输入省份名称"
+        placeholder="支持中文、拼音、简拼、站点三字码搜索"
         v-on:input="openSearchStauts()"
       />
       <view class="close_input" v-if="searchCity !== ''" @click="closeSearch">取消</view>
@@ -140,36 +140,41 @@ export default {
   methods: {
     // 获取城市
     getCityCode() {
-      let cities = city.split("@"); // 拆分城市数据
-
       let city_name_character = [...Array(26).keys()].map((i) =>
         String.fromCharCode(i + 65)
       ); // 生成A-Z数组
 
-      let liarray_cities_array = []; // A-Z城市列表
+      if (uni.getStorageSync("cityList")) {
+        this.cityData = uni.getStorageSync("cityList");
+      } else {
+        let cities = city.split("@"); // 拆分城市数据
+        let liarray_cities_array = []; // A-Z城市列表
 
-      for (let i = 0; i < city_name_character.length; i++) {
-        liarray_cities_array.push({
-          code: city_name_character[i],
-          data: [],
-        });
-      }
+        for (let i = 0; i < city_name_character.length; i++) {
+          liarray_cities_array.push({
+            code: city_name_character[i],
+            data: [],
+          });
+        }
 
-      for (let i = 0; i < cities.length; i++) {
-        let titem = cities[i];
-        let raha = titem
-          .toString()
-          .charAt(0)
-          .toUpperCase();
+        for (let i = 0; i < cities.length; i++) {
+          let titem = cities[i];
+          let raha = titem
+            .toString()
+            .charAt(0)
+            .toUpperCase();
 
-        for (let k = 0; k < city_name_character.length; k++) {
-          if (raha === liarray_cities_array[k].code) {
-            liarray_cities_array[k].data.push(titem.split("|"));
+          for (let k = 0; k < city_name_character.length; k++) {
+            if (raha === liarray_cities_array[k].code) {
+              liarray_cities_array[k].data.push(titem.split("|"));
+            }
           }
         }
+        uni.setStorageSync("cityList", liarray_cities_array);
+        this.cityData = liarray_cities_array;
       }
+
       this.cityUnitList = city_name_character;
-      this.cityData = liarray_cities_array;
     },
 
     // 返回城市
