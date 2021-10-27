@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-10-13 15:44:01
+ * @LastEditTime: 2021-10-19 10:02:51
  * @LastEditors: mzr
 -->
 <template>
@@ -860,6 +860,7 @@ export default {
                   font-size: 28upx;
                   font-weight: bold;
                   color: rgba(42, 42, 42, 1);
+                  min-width: 90upx;
                   margin-right: 8upx;
                 }
                 .is_insurance {
@@ -1199,6 +1200,9 @@ export default {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            &:not(:last-child) {
+              margin-bottom: 30upx;
+            }
             .item_title {
               font-size: 28upx;
               font-weight: 400;

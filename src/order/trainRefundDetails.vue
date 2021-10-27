@@ -522,6 +522,7 @@ export default {
                   font-size: 28upx;
                   font-weight: bold;
                   color: rgba(42, 42, 42, 1);
+                  min-width: 90upx;
                   margin-right: 8upx;
                 }
                 .is_insurance {

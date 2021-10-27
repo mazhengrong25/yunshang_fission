@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 坐席
  * @Author: mzr
  * @Date: 2021-08-03 14:12:34
- * @LastEditTime: 2021-09-27 14:27:45
+ * @LastEditTime: 2021-10-27 10:02:59
  * @LastEditors: mzr
 -->
 <template>
@@ -24,7 +24,11 @@
                 <trainMessageCard :trainObject="trainMessage"></trainMessageCard>
                 <!-- 座位列表 -->
                 <view class="content_list_box">
-                  <view class="train_content_list" v-for="(item,index) in trainMessage.seat" :key="index">
+                  <view :class="['train_content_list',{active: hostInfoChecket === index}]"
+                    v-for="(item,index) in trainMessage.seat" :key="index"
+                  >
+                    <view class="list_total">
+
                       <view class="list_seat_type">{{item.name}}</view>
                       <view class="list_seat_price" @click="openSleeperPrice(item)">
                           <span>&yen;</span>
@@ -35,11 +39,49 @@
                       </view>
                       <view class="train_content_item">
                           <view class="list_price_amount">{{item.number < 1 ? '无票': item.number > 15 ? '有票': item.number + "张"}}</view>
-                          <button @click="submitBtn(item,trainChange)" :class="['list_button',{'disabled_button':item.number < 1}]" :disabled="item.number < 1">预定</button>
+                          <button 
+                            @click="openHostInfo(index,trainChange,item)" 
+                            :class="['list_button',{'disabled_button':item.number < 1},{'pack':hostInfoChecket === index && item.number > 1 && !trainChange}]" 
+                            :disabled="item.number < 1"
+                          >
+                            {{hostInfoChecket === index && item.number >1 && !trainChange ?'收起':'预定'}}
+                            <view class="pack_icon"></view>
+                          </button>
                       </view>
+                    </view>
+                    <!-- 展开部分 -->
+                    <view class="modal_list" v-if="hostInfoChecket === index">
+                        <view class="modal_list_item">
+                          <view class="text_pic_mix">
+                            <view class="item_picture"></view>
+                            <view class="item_text">
+                              <view class="text_top">托管模式</view>
+                              <view class="text_bottom">登录12306账号购票</view>
+                            </view>
+                          </view>
+                          <view class="host_item_button">
+                            <button class="item_button" @click="jumpAccountLogin(item)">预定</button>
+                          </view>
+                        </view>
+                        <view class="modal_list_item">
+                          <view class="text_pic_mix">
+                            <view class="item_picture_purchase"></view>
+                            <view class="item_text">
+                              <view class="text_top">代购模式</view>
+                              <view class="text_bottom">暂不可用</view>
+                            </view>
+                          </view>
+                          <view class="host_item_button">
+                            <button class="item_button disabled">预定</button>
+                          </view>
+                        </view>
+                    </view>
+                    
                   </view>
+                  
                 </view>
                 
+                   
             </view>
         </view>
 
@@ -68,110 +110,142 @@ export default {
 
             trainData:{}, // 查询传参
             trainCode:"", // 查询传参 车次
+
+            hostInfoChecket: null, // 托管座位信息展开
         }
     },
     methods: {
-        // 预定
-        submitBtn(val,e) {
-           
-            // 区别订单改签
-            if(e) {
-              // 存  车次信息和座位信息
-              let data = {
-                train: this.trainMessage,
-                cabin: val
-              }
-              uni.setStorageSync('changeMessage',data)
-              uni.navigateBack({
-                delta: 2,
-              })
-             
-            }else{
 
-              uni.navigateTo({
-                url:
-                "/trainReservation/trainReservation?trainItem=" + 
-                JSON.stringify(this.trainMessage) + 
-                "&singleData=" +
-                JSON.stringify(val) +
-                "&pageHeaderData=" + 
-                JSON.stringify(this.pageHeaderData)
-              })
-            }
-
-        },
-
-        // 打开卧铺价格
-        openSleeperPrice(val) {
-          let data = []
-
-          for (const key in val) {
-            if(typeof val[key] === 'object'){
-              data.push(val[key])
-            }
-          }
-
-          if(data.length < 1){
-            return false
-          }
-
-          this.sleeperList = data
-          this.$refs.trainSleeper.openSleeperModal();
-        },
-
-        // 跳转到日历
-        jumpCalendar() {
+      // 展开托管模式 i 下标  e 区别订单改签 val 车次信息
+      openHostInfo(i,e,val) {
+        this.hostInfoChecket = this.hostInfoChecket === i ? null : i;
+        if(e) {
           let data = {
-            type:false,
-            data: this.trainData.toTime.date
+            train: this.trainMessage,
+            cabin: val
           }
-          uni.navigateTo({
-            url:"/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data)
+          uni.setStorageSync('changeMessage',data)
+          uni.navigateBack({
+            delta: 2,
           })
-        },
-
-        // 获取车次信息
-        getTrainData() {
-            let data = {
-                departure: this.trainData.to.city_name,
-                arrive: this.trainData.from.city_name,
-                ticket: "ADT",
-                departure_date: this.trainData.toTime.date,
-                code: this.trainCode
-            }
-            train.getTrainNumber(data).then((res) => {
-                if (res.errorcode === 10000) {
-                    
-                    
-                    res.data.forEach((item) => {
-                        let newSeat = []
-                        for (const key in item.seat) {
-                            if (item.seat[key].number >= 0) {
-                                newSeat.push(item.seat[key])
-                            }
-                        }
-
-                        item.seat = newSeat
-                        this.trainMessage = item
-
-                    })
-                }else {
-                    uni.showToast({
-                        title: res.msg,
-                        icon: "none",
-                        duration: 3000,
-                    });
-                }
-            })
-        },
-
-        // 日期选择
-        async selectDate(val) {
-          this.trainData.toTime.date = val === 'before' ? this.$moment(this.trainData.toTime.date).subtract(1,'days').format("YYYY-MM-DD")
-                    : val === 'after' ? this.$moment(this.trainData.toTime.date).add(1,'days').format("YYYY-MM-DD")
-                      :this.trainData.toTime.date
-          await this.getTrainData()
         }
+      },
+
+      // 跳转到账号登陆
+      jumpAccountLogin(val) {
+
+        uni.setStorageSync('trainMessage',JSON.stringify(this.trainMessage))
+        uni.setStorageSync('pageHeaderData',JSON.stringify(this.pageHeaderData))
+        uni.setStorageSync('singleData',JSON.stringify(val))
+
+        uni.navigateTo({
+          url:"/trainReservation/accountLogin"
+        })
+
+      },
+
+
+      // 预定
+      // submitBtn(val,e) {
+          
+      //     // 区别订单改签
+      //     if(e) {
+      //       // 存  车次信息和座位信息
+      //       let data = {
+      //         train: this.trainMessage,
+      //         cabin: val
+      //       }
+      //       uni.setStorageSync('changeMessage',data)
+      //       uni.navigateBack({
+      //         delta: 2,
+      //       })
+            
+      //     }else{
+
+      //       uni.navigateTo({
+      //         url:
+      //         "/trainReservation/trainReservation?trainItem=" + 
+      //         JSON.stringify(this.trainMessage) + 
+      //         "&singleData=" +
+      //         JSON.stringify(val) +
+      //         "&pageHeaderData=" + 
+      //         JSON.stringify(this.pageHeaderData)
+      //       })
+      //     }
+
+      // },
+
+      // 打开卧铺价格
+      openSleeperPrice(val) {
+        let data = []
+
+        for (const key in val) {
+          if(typeof val[key] === 'object'){
+            data.push(val[key])
+          }
+        }
+
+        if(data.length < 1){
+          return false
+        }
+
+        this.sleeperList = data
+        this.$refs.trainSleeper.openSleeperModal();
+      },
+
+      // 跳转到日历
+      jumpCalendar() {
+        let data = {
+          type:false,
+          data: this.trainData.toTime.date
+        }
+        uni.navigateTo({
+          url:"/pages/dateSelect/dateSelect?ticketType=" + JSON.stringify(data)
+        })
+      },
+
+      // 获取车次信息
+      getTrainData() {
+          let data = {
+              departure: this.trainData.to.city_name,
+              arrive: this.trainData.from.city_name,
+              ticket: "ADT",
+              departure_date: this.trainData.toTime.date,
+              code: this.trainCode
+          }
+          train.getTrainNumber(data).then((res) => {
+              if (res.errorcode === 10000) {
+                  
+                  
+                  res.data.forEach((item) => {
+                      let newSeat = []
+                      for (const key in item.seat) {
+                          if (item.seat[key].number >= 0) {
+                              newSeat.push(item.seat[key])
+                          }
+                      }
+
+                      item.seat = newSeat
+                      this.trainMessage = item
+
+                  })
+              }else {
+                  uni.showToast({
+                      title: res.msg,
+                      icon: "none",
+                      duration: 3000,
+                  });
+              }
+          })
+      },
+
+      // 日期选择
+      async selectDate(val) {
+        this.trainData.toTime.date = val === 'before' ? this.$moment(this.trainData.toTime.date).subtract(1,'days').format("YYYY-MM-DD")
+                  : val === 'after' ? this.$moment(this.trainData.toTime.date).add(1,'days').format("YYYY-MM-DD")
+                    :this.trainData.toTime.date
+        await this.getTrainData()
+      }
     },
 
     onShow() {
@@ -181,7 +255,6 @@ export default {
         this.trainData.toTime.date = timeData.date;
         uni.removeStorageSync("time");
         
-        this.getTrainData();
       }
     },
     onLoad(data) {
@@ -297,59 +370,146 @@ export default {
               }
             }
             .content_list_box {
-              padding: 0upx 28upx;
+              padding: 0upx 10upx;
               background: #ffffff;
               box-shadow: 0upx 12upx 18upx rgba(0, 0, 0, 0.04);
               border-radius: 20upx;
               margin-top: 20upx;
               .train_content_list {
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  padding: 34upx 0upx 36upx;
-                  .list_seat_type {
-                      font-size: 32upx;
-                      font-weight: bold;
-                      color: #2a2a2a;
+                 
+                  .list_total {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 34upx 20upx 36upx;
+                    .list_seat_type {
+                        font-size: 32upx;
+                        font-weight: bold;
+                        color: #2a2a2a;
+                    }
+                    .list_seat_price {
+                        display: flex;
+                        align-items: flex-start;
+                        justify-content: center;
+                        span {
+                            font-size: 32upx;
+                            font-weight: 400;
+                            color: #2a2a2a;
+                        }
+                        .price_value {
+                            font-size: 32upx;
+                            font-weight: 400;
+                            color: #2a2a2a;
+                            margin: 0upx 12upx 0upx;
+                        }
+                        .seat_price_image {
+                            width: 20upx;
+                            height: 12upx;
+                            img {
+                              width: 100%;
+                              height: 100%;
+                              object-fit: contain;
+                            }
+                        }
+                    }
+                    .train_content_item {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        .list_price_amount {
+                            font-size: 32upx;
+                            font-weight: 400;
+                            color: #2a2a2a;
+                            margin-right: 24upx;
+                        }
+                        .list_button {
+                            width: 160upx;
+                            height: 70upx;
+                            background: linear-gradient(
+                                90deg,
+                                #fb9826 0%,
+                                #ffca61 100%
+                            );
+                            box-shadow: 0upx 6upx 12upx rgba(251, 152, 38, 0.3);
+                            border-radius: 90upx;
+                            color: #fff;
+                            font-size: 32upx;
+                            display: inline-flex;
+                            justify-content: center;
+                            align-items: center;
+                            letter-spacing: 10upx;
+                            // position: relative;
+                            &.disabled_button {
+                                background: #afb9c4;
+                                box-shadow: 0upx 6upx 12upx
+                                    rgba(175, 185, 196, 0.3);
+                            }
+                            &.pack{
+                              border: 1upx solid #AFB9C4;
+                              color: #666666;
+                              background: #fff;
+                              box-shadow: unset;
+                              .pack_icon {
+                                width: 20upx;
+                                height: 12upx;
+                                background: url("@/static/train_seat_pull.png") no-repeat center center;
+                                background-size: contain;
+                                transform: rotate(180deg);
+                              }
+                            }
+                        }
+                    }
                   }
-                  .list_seat_price {
+                  &:not(:last-child) {
+                    border-bottom: 1upx solid #F1F3F5;
+                  }  
+
+                  .modal_list {
+                    overflow: hidden;
+                    background: #F9F9F9;
+                    border-radius: 10upx;
+                    padding: 0upx 15upx 0upx 28upx;
+                    .modal_list_item {
                       display: flex;
-                      align-items: flex-start;
-                      justify-content: center;
-                      span {
-                          font-size: 32upx;
-                          font-weight: 400;
-                          color: #2a2a2a;
-                      }
-                      .price_value {
-                          font-size: 32upx;
-                          font-weight: 400;
-                          color: #2a2a2a;
-                          margin: 0upx 12upx 0upx;
-                      }
-                      .seat_price_image {
-                          width: 20upx;
-                          height: 12upx;
-                          img {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: contain;
-                          }
-                      }
-                  }
-                  .train_content_item {
-                      display: inline-flex;
                       align-items: center;
-                      justify-content: center;
-                      .list_price_amount {
-                          font-size: 32upx;
+                      justify-content: space-between;
+                      padding: 30upx 0upx 26upx;
+                      .text_pic_mix {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        .item_picture {
+                          width: 56upx;
+                          height: 46upx;
+                          background: url("@/static/train_host_modal.png") no-repeat center center;
+                          background-size: contain;
+                          margin-right: 22upx;
+                        }
+                        .item_picture_purchase {
+                            width: 46upx;
+                            height: 44upx;
+                            background: url("@/static/train_purchase_modal.png") no-repeat center center;
+                            background-size: contain;
+                            margin-right: 32upx;
+                        }
+                        .item_text {
                           font-weight: 400;
-                          color: #2a2a2a;
-                          margin-right: 24upx;
+                          .text_top {
+                            font-size: 30upx;
+                            color: #2A2A2A;
+                            margin-bottom: 8upx;
+                          }
+                          .text_bottom {
+                            font-size: 24upx;
+                            color: #95A1AE;
+                          }
+                        }
                       }
-                      .list_button {
-                          width: 80px;
-                          height: 35px;
+                      .host_item_button {
+
+                        .item_button {
+                          width: 160upx;
+                          height: 70upx;
                           background: linear-gradient(
                               90deg,
                               #fb9826 0%,
@@ -363,17 +523,21 @@ export default {
                           justify-content: center;
                           align-items: center;
                           letter-spacing: 10upx;
-                          &.disabled_button {
-                              background: #afb9c4;
-                              box-shadow: 0upx 6upx 12upx
-                                  rgba(175, 185, 196, 0.3);
+                          &.disabled {
+                             background: #afb9c4;
+                             box-shadow: 0upx 6upx 12upx
+                                    rgba(175, 185, 196, 0.3);
                           }
+                        }
                       }
-                  }
-                  &:not(:last-child) {
-                    border-bottom: 1upx solid #F1F3F5;
+                      &:not(:last-child) {
+                        border-bottom: 1upx solid #F1F3F5;
+                      }
+                    }
                   }
               }
+              
+
             }
         }
     }

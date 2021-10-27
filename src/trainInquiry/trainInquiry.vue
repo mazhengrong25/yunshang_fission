@@ -2,8 +2,8 @@
  * @Description: 火车票查询 
  * @Author: mzr
  * @Date: 2021-07-27 10:44:51
- * @LastEditTime: 2021-10-14 11:38:54
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-15 16:34:00
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_inquery">
@@ -76,7 +76,8 @@
           </view>
           <view class="item_right">
             <span>&yen;</span>
-            <view class="right_character">{{ getPriceNumber(item.seat) }}</view>
+            <view class="right_character">{{ Math.min(...getPriceNumber(item.seat)) }}</view>
+
           </view>
         </view>
         <view class="train_bottom">
@@ -297,14 +298,20 @@ export default {
 
     // 获取车票价格
     getPriceNumber(val) {
-      let price = 0;
-      price = val[0].price;
-      for (let i = 0; i < val.length; i++) {
-        if (Number(val[i].number) !== 0) {
-          price = val[i].price;
-          break;
-        }
-      }
+      
+      // let price = 0;
+      // price = val[0].price;
+      let price = [];
+      
+      // for (let i = 0; i < val.length; i++) {
+      //   if (Number(val[i].number) !== 0) {
+      //     price = val[i].price;
+      //     break;
+      //   }
+      // }
+      val.forEach((item) => {
+        price.push(item.price)
+      })
       return price;
     },
 

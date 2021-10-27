@@ -2,7 +2,7 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-10-14 11:58:42
+ * @LastEditTime: 2021-10-26 14:57:28
  * @LastEditors: mzr
 -->
 <template>
@@ -123,7 +123,7 @@
 
             <view
               class="add_child_btn"
-              @click="openAdultDialog()"
+              @click="openAdultDialog(passengerList)"
               v-if="!changeSubmitStatus"
             >
               <image
@@ -423,25 +423,11 @@
           <view class="close_btn" @click="closeChildDialog()"></view>
         </view>
         <view class="modal_box_content">
-          <text
-            >1.
-            每名成年乘客可免费携带一名身高不足1.2米的儿童，该儿童可不用购票及填写相关信息。携带的其他儿童身高不足1.2米也须购儿童票。</text
-          >
-          <text
-            >2.
-            身高不足1.2米的免费儿童需与成人共用一个席位，若想要单独的席位，须购儿童票。</text
-          >
-          <text
-            >3.
-            身高1.2米—1.5米儿童可购儿童票，但须跟成人票一起购买，使用同行成人证件购票并凭此证件取票。</text
-          >
-          <text
-            >4.
-            身高超1.5米的儿童须购全价票。因儿童无有效证件，此类票只能在线下售票窗口购买。</text
-          >
-          <text
-            >备注：请根据儿童实际身高购票，云上航空不承担因儿童身高与所购车票不符而无法进站的责任。</text
-          >
+          <text>1.每名成年乘客可免费携带一名身高不足1.2米的儿童，该儿童可不用购票及填写相关信息。携带的其他儿童身高不足1.2米也须购儿童票。</text>
+          <text>2.身高不足1.2米的免费儿童需与成人共用一个席位，若想要单独的席位，须购儿童票。</text>
+          <text>3.身高1.2米—1.5米儿童可购儿童票，但须跟成人票一起购买，使用同行成人证件购票并凭此证件取票。</text>
+          <text>4.身高超1.5米的儿童须购全价票。因儿童无有效证件，此类票只能在线下售票窗口购买。</text>
+          <text>备注：请根据儿童实际身高购票，云上航空不承担因儿童身高与所购车票不符而无法进站的责任。</text>
         </view>
       </view>
     </uni-popup>
@@ -800,6 +786,11 @@ export default {
       train.getTrainReserve(data).then((res) => {
         if (res.errorcode === 10000) {
           let orderNo = res.data.order.order_no;
+          // 选择坐席 托管模式
+          uni.removeStorageSync("trainMessage")
+          uni.removeStorageSync("pageHeaderData")
+          uni.removeStorageSync("singleData")
+    
           uni.navigateTo({
             url:
               "/trainReservation/occupySeat?orderNo=" +
@@ -893,6 +884,7 @@ export default {
     },
     // 选中成人证件
     checkedCard(val) {
+      console.log('选中成人',val)
       this.checkedAdtPassenger = val;
       let data = {
         cert_no: val.cert_no,
@@ -916,8 +908,23 @@ export default {
     },
 
     // 打开成人证件
-    openAdultDialog() {
-      this.$refs.adultModal.open();
+    openAdultDialog(val) {
+      // 如果成人只有一位 那么选择成人证件弹窗不显示
+      if(this.passengerNumber.adt === 1) {
+        let data = {
+          cert_no: val[0].cert_no,
+          cert_type: val[0].cert_type,
+          name: val[0].name,
+          type: "儿童",
+          phone: val[0].phone,
+          birthday: val[0].birthday,
+        }
+        this.passengerList.push(data)
+      }else {
+        this.$refs.adultModal.open();
+      }
+      this.getPassengerNumber();
+      
     },
 
     closeAdultDialog() {
@@ -976,6 +983,7 @@ export default {
     },
   },
   onShow() {
+    
     if (this.passengerList.length > 0) {
       this.getPassengerNewVerf();
     }
@@ -988,16 +996,27 @@ export default {
     }
     console.log("乘客", this.passengerList);
     this.getPassengerNumber();
+    // 选择坐席 托管模式
+    if(uni.getStorageSync("trainMessage")) {
+      this.trainData = JSON.parse(uni.getStorageSync("trainMessage"))
+    }
+    if(uni.getStorageSync("pageHeaderData")) {
+      this.pageHeaderData = JSON.parse(uni.getStorageSync("pageHeaderData"))
+    }
+    if(uni.getStorageInfoSync("singleData")) {
+      this.singleData = JSON.parse(uni.getStorageSync("singleData"))
+    }
+    
   },
   onLoad(data) {
     this.getInsurance();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.trainData = JSON.parse(data.trainItem);
-    this.singleData = JSON.parse(data.singleData);
-    this.pageHeaderData = JSON.parse(data.pageHeaderData);
+
+    this.trainData = data.trainItem ? JSON.parse(data.trainItem) : {};
+    this.singleData = data.singleData ? JSON.parse(data.singleData) : {};
+    this.pageHeaderData = data.pageHeaderData ? JSON.parse(data.pageHeaderData):{};
 
     this.pageHeaderData = JSON.parse(JSON.stringify(this.pageHeaderData));
-    console.log(this.trainData, this.singleData);
 
     let userInfo = uni.getStorageSync("userInfo");
     this.orderPassenger = {
@@ -1600,6 +1619,15 @@ export default {
   }
   // 儿童票说明
   .child_modal_box {
+    position: relative;
+     &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
     .modal_box_title {
       background: #ffffff;
       border-radius: 80upx 80upx 0upx 0upx;
@@ -1639,6 +1667,15 @@ export default {
   }
   // 成人证件
   .adult_modal_box {
+    position: relative;
+     &::before {
+      content: "";
+      position: absolute;
+      bottom: -120upx;
+      width: 100%;
+      height: 120upx;
+      background-color: #fff;
+    }
     .modal_box_title {
       background: #ffffff;
       border-radius: 80upx 80upx 0upx 0upx;

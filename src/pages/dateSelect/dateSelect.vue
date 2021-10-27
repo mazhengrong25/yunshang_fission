@@ -2,8 +2,8 @@
  * @Description: 日期选择页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-10 17:46:05
- * @LastEditTime: 2021-10-14 11:35:36
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-18 15:35:24
+ * @LastEditors: mzr
 -->
 <template>
   <view class="date_select">
@@ -439,7 +439,7 @@ export default {
                     week: fromNow,
                   };
 
-                  console.log(this.checkedDay, this.ftromCheckedDay);
+                  console.log('日历时间选择',this.checkedDay, this.ftromCheckedDay);
                   uni.setStorageSync("time", JSON.stringify(this.checkedDay));
                   uni.setStorageSync(
                     "roundTime",

@@ -344,7 +344,19 @@
           "style": {
             "navigationStyle": "custom"
           }
-        } 
+        },
+        {
+          "path": "accountLogin",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "addAccount",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }    
       ]
     },
     {

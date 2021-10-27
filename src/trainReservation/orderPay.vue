@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-10-14 14:43:03
+ * @LastEditTime: 2021-10-19 14:20:02
  * @LastEditors: mzr
 -->
 <template>
@@ -24,7 +24,7 @@
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="order_pay_main">
       <!-- 车次信息 -->
       <view>
-        <view class="train_message box-shadow-style">
+        <view class="train_message box-shadow-style" v-if="detailData.segments[0]">
           <view class="journey_card_top">
             <view class="card_top_item">
               <view class="top_item_date">{{
@@ -177,7 +177,9 @@ export default {
   data() {
     return {
       iStatusBarHeight: 0, // 导航栏高度
-      detailData: {}, //
+      detailData: {
+        segments:[],
+      }, //
       payType: "钱包", // 支付方式
       payBtnStatus: true, // 支付按钮
       payPayStatus: true, // 支付状态
@@ -421,15 +423,14 @@ export default {
     }
   }
   .journey_image {
-    height: 52upx;
-    background: url("@/static/change_connect.png") no-repeat center center;
-    background-size: cover;
-    margin: -1upx 15upx;
+    height: 50upx;
+    background: url("@/static/change_connect.png") no-repeat  center top;
+    background-size: 100% 50upx;
+    margin: 0 20upx;
   }
   .passenger_message {
     border-radius: 0upx 0upx 20upx 20upx;
     padding: 24upx;
-    margin-top: -1upx;
     margin-bottom: 20upx;
     .passenger_list {
       display: flex;
@@ -456,6 +457,7 @@ export default {
           font-size: 28upx;
           font-weight: bold;
           color: #2a2a2a;
+          min-width: 90upx;
           margin-right: 6upx;
         }
         .insurance_icon {
