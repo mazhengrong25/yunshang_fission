@@ -844,7 +844,7 @@ export default {
       let data = {
         source: "YunKu", // 数据源
         insurance_id: this.insuranceActive.id || "", // 保险ID
-        account: { id: uni.getStorageSync("userInfo").id },
+        account: { id: this.accountId?this.accountId:uni.getStorageSync("userInfo").id },
         order: {
           standing: this.acceptStatus, //类型：Boolean  必有字段  备注：是否接受站票，默认否
           is_choose_seat: this.checkedCabinList.length > 0, //类型：Boolean  必有字段  备注：是否选座，默认否
