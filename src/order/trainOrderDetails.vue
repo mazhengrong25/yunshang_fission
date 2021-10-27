@@ -3,7 +3,7 @@
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
 <<<<<<< HEAD
- * @LastEditTime: 2021-10-27 17:38:41
+ * @LastEditTime: 2021-10-27 17:41:38
  * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2021-10-27 17:25:34
@@ -77,7 +77,9 @@
         <text class="time_text">
           {{
             detailData.status === 1
-              ? `预计在${($moment(detailData.created_at).add(10,'m')).format('mm:ss')}分前完成占座`
+              ? `预计在${$moment(detailData.created_at)
+                  .add(10, "m")
+                  .format("mm:ss")}分前完成占座`
               : detailData.status === 2
               ? `剩余支付时间：${remainingTime}`
               : detailData.status === 3
@@ -402,7 +404,7 @@ export default {
       getTimeType: "", // 预定返程或重选车次状态
 
       paySecond: 0, // 支付时间
-      remainingTime: '00:00', // 倒计时
+      remainingTime: "00:00", // 倒计时
       _countdown: {}, // 支付倒计时
     };
   },
@@ -424,11 +426,14 @@ export default {
         console.log(res);
         if (res.errorcode === 10000) {
           this.detailData = res.data;
-          let closeTime = this.$moment(this.detailData.created_at).add(10,'m')
-          this.paySecond = closeTime.diff(this.$moment(),'s')
-          this._countdown = setInterval(() => {
+          let closeTime = this.$moment(this.detailData.created_at).add(10, "m");
+          this.paySecond = closeTime.diff(this.$moment(), "s");
+          if (this.paySecond > 0) {
+            this._countdown = setInterval(() => {
               this.orderCountdown();
             }, 1000);
+          }
+
           this.getTrainMessage(res.data);
           // 占座状态
           // if (this.detailData.status === 1) {
@@ -456,7 +461,7 @@ export default {
       });
     },
 
-     // 订单倒计时
+    // 订单倒计时
     orderCountdown() {
       if (this.paySecond > 0) {
         let minutes = Math.floor(this.paySecond / 60);
@@ -469,7 +474,7 @@ export default {
       } else {
         this.remainingTime = "00:00";
         clearInterval(this._countdown);
-        this.getTrainDetail(this.order_no)
+        this.getTrainDetail(this.order_no);
       }
     },
 
@@ -627,7 +632,7 @@ export default {
           fromTime: {},
           to_type: "",
           from_type: "",
-          normalOrder:true
+          normalOrder: true,
         };
         uni.navigateTo({
           url:
@@ -770,7 +775,7 @@ export default {
       .time_text {
         font-size: 24upx;
         font-weight: 400;
-        color: rgba(255, 255, 255, .8);
+        color: rgba(255, 255, 255, 0.8);
       }
     }
     .order_option {
