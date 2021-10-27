@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 占座
  * @Author: mzr
  * @Date: 2021-08-17 08:58:59
- * @LastEditTime: 2021-09-28 12:06:12
+ * @LastEditTime: 2021-10-27 14:28:16
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -94,7 +94,7 @@ export default {
                     }
                     // 占座失败
                     if (res.data.status === 6) {
-                        this.count = 0
+                        this.count = null
                         clearInterval(getOrderStatus)
                         clearInterval(timer)
                         this.failMessage = res.data.status_remark

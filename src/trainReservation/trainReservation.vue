@@ -2,7 +2,7 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-10-27 13:51:05
+ * @LastEditTime: 2021-10-27 14:26:31
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -800,7 +800,7 @@ export default {
               //类型：Object  可有字段  备注：护照信息，如果是护照则必须
               expired: "2030-01-01", //类型：String  必有字段  备注：过期时间
               birthday: item.birthday, //类型：String  必有字段  备注：生日
-              sex: item.sex, //类型：String  必有字段  备注：性别
+              sex: item.sex || '0', //类型：String  必有字段  备注：性别
               country: "CN", //类型：String  必有字段  备注：国家代码
             },
           });
@@ -1011,17 +1011,18 @@ export default {
 
     // 打开成人证件
     openAdultDialog(val) {
+      console.log(1,val)
       // 如果成人只有一位 那么选择成人证件弹窗不显示
       if (this.passengerNumber.adt === 1) {
         let data;
         if (this.accountId) {
           data = {
-            card_no: val.card_no,
+            card_no: val[0].card_no,
             card_type: "1",
-            name: val.name,
+            name: val[0].name,
             type: "儿童",
-            phone: val.phone,
-            birthday: val.birthday,
+            phone: val[0].phone,
+            birthday: val[0].birthday,
             ticket_type: 2,
           };
         } else {
