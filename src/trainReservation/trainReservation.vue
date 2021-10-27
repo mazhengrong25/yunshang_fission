@@ -2,7 +2,7 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-10-27 14:26:31
+ * @LastEditTime: 2021-10-27 16:51:31
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -763,8 +763,8 @@ export default {
           passenger.push({
             name: item.name, //类型：String  必有字段  备注：姓名
             card_no: item.card_no, //类型：String  必有字段  备注：证件号
-            card_name: item.card_type, //类型：String  必有字段  备注：证件名字
-            card_type:
+            card_type: item.card_type, //类型：String  必有字段  备注：证件名字
+            card_name:
               item.card_type === "1"
                 ? "中国居民身份证"
                 : item.card_type === "2"
