@@ -154,7 +154,7 @@ export default {
               if (res.errorcode === 10000) {
                 uni.navigateTo({
                   url:
-                  "/trainReservation/trainReservation" 
+                  "/trainReservation/trainReservation?accountId=" +val.id
                 }) 
               } else {
                 // 账号验证

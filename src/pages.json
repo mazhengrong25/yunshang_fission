@@ -321,7 +321,13 @@
           "style": {
             "navigationStyle": "custom"
           }
-        }
+        },
+        {
+          "path": "accountPassenger",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        } 
       ]
     },
     {

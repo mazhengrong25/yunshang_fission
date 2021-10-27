@@ -2,732 +2,929 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2021-09-26 11:18:54
+ * @LastEditTime: 2021-10-27 13:24:38
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
-    <view class="passenger">
-        <yun-header :statusHeight="iStatusBarHeight" :centerTitle="passengerType ? '旅客管理' : trainType?'选择乘车人':'选择乘机人'"></yun-header>
-        <view class="header_box" v-if="!showDefault">
-            <view class="add_passenger_btn" @click="jumpAddPassenger()">
-                <image class="add_icon" src="@/static/add_passenger_btn.png" mode="contain" />
-                <text>{{ passengerType ? "新增旅客" : trainType?'新增乘车人':'新增乘机人' }}</text>
-            </view>
+  <view class="passenger">
+    <yun-header
+      :statusHeight="iStatusBarHeight"
+      :centerTitle="passengerType ? '旅客管理' : trainType ? '选择乘车人' : '选择乘机人'"
+    ></yun-header>
+    <view class="header_box" v-if="!showDefault">
+      <view class="add_passenger_btn" @click="jumpAddPassenger()">
+        <image class="add_icon" src="@/static/add_passenger_btn.png" mode="contain" />
+        <text>{{
+          passengerType ? "新增旅客" : trainType ? "新增乘车人" : "新增乘机人"
+        }}</text>
+      </view>
+    </view>
+
+    <view class="passenger_main" v-if="!showDefault">
+      <view class="mian_header">
+        <view class="title">{{ trainType ? "常用乘车人" : "常用乘机人" }}</view>
+        <view class="filter" @click="openGroupSelect" v-if="!accountId">
+          <text v-if="searchUserName" class="username_search"
+            >姓名筛选：{{ searchUserName }}</text
+          >
+
+          <text>{{ group.group_name ? group.group_name : "筛选" }}</text>
+          <image class="filter_icon" src="@/static/arrow_bule.png" mode="contain" />
         </view>
+      </view>
 
-        <view class="passenger_main" v-if="!showDefault">
-            <view class="mian_header">
-                <view class="title">{{trainType?'常用乘车人':'常用乘机人'}}</view>
-                <view class="filter" @click="openGroupSelect">
-                    <text v-if="searchUserName" class="username_search">姓名筛选：{{ searchUserName }}</text>
-
-                    <text>{{ group.group_name ? group.group_name : "筛选" }}</text>
-                    <image class="filter_icon" src="@/static/arrow_bule.png" mode="contain" />
-                </view>
-            </view>
-
-            <scroll-view :enable-back-to-top="true" :scroll-y="true" class="mian_list" :scroll-top="scrollTop" @scrolltolower="nextPageData()">
-                <view v-if="notList && !showDefault" class="not_passenger_list">您还没有当前筛选状态的旅客信息</view>
-                <uni-swipe-action :disabled="passengerType">
-                    <uni-swipe-action-item v-for="(item, index) in passengerList" :key="index">
-                        <view class="list_item" @click="checkedPassenger(item, index)">
-                            <view class="checked" v-if="!passengerType">
-                                <radio :checked="item.checked" color="#0070E2" />
-                            </view>
-                            <view class="item_info">
-                                <view class="info_top">
-                                    <view class="type">{{ item.type }}</view>
-                                    <view class="user_name">{{
+      <scroll-view
+        :enable-back-to-top="true"
+        :scroll-y="true"
+        class="mian_list"
+        :scroll-top="scrollTop"
+        @scrolltolower="nextPageData()"
+      >
+        <view v-if="notList && !showDefault" class="not_passenger_list"
+          >您还没有当前筛选状态的旅客信息</view
+        >
+        <uni-swipe-action :disabled="passengerType">
+          <uni-swipe-action-item v-for="(item, index) in passengerList" :key="index">
+            <!-- 代购模式乘客列表 -->
+            <view
+              class="list_item"
+              @click="checkedPassenger(item, index)"
+              v-if="!accountId"
+            >
+              <view class="checked" v-if="!passengerType">
+                <radio :checked="item.checked" color="#0070E2" />
+              </view>
+              <view class="item_info">
+                <view class="info_top">
+                  <view class="type">{{ item.type }}</view>
+                  <view class="user_name">{{
                     item.name || item.en_first_name + "/" + item.en_last_name
                   }}</view>
-                                    <view class="position">{{
-                    item.group ? item.group : "未分组"
+                  <view class="position">{{ item.group ? item.group : "未分组" }}</view>
+                </view>
+                <view class="info_bottom">
+                  <view class="bottom_title">{{ item.cert_type }}</view>
+                  <view class="card">{{ item.cert_no }}</view>
+                </view>
+              </view>
+              <view
+                class="edit_text_btn"
+                v-if="item.verify_status !== 1"
+                @click.stop="openVerify(item)"
+              >
+                {{
+                  item.verify_status === 0
+                    ? "待核验"
+                    : item.verify_status === -3
+                    ? "请报验"
+                    : item.verify_status === -2
+                    ? "冒用"
+                    : item.verify_status === -1
+                    ? "未通过"
+                    : item.verify_status === 2
+                    ? "待核验"
+                    : ""
+                }}
+              </view>
+              <view v-else class="edit_btn" @click.stop="jumpEditUserInfo(item)"></view>
+            </view>
+            <!-- 托管模式乘客列表 -->
+            <view v-else class="list_item" @click="checkedPassenger(item, index)">
+              <view class="checked" v-if="!passengerType">
+                <radio
+                  :disabled="item.check_status === 1 || item.phone_check_status === 1"
+                  :checked="item.checked"
+                  color="#0070E2"
+                />
+              </view>
+              <view class="item_info">
+                <view class="info_top">
+                  <view class="type">{{
+                    item.ticket_type === 1
+                      ? "成人"
+                      : item.ticket_type === 2
+                      ? "儿童"
+                      : item.ticket_type === 3
+                      ? "学生"
+                      : item.ticket_type === 4
+                      ? "残疾军人"
+                      : ""
                   }}</view>
-                                </view>
-                                <view class="info_bottom">
-                                    <view class="bottom_title">{{ item.cert_type }}</view>
-                                    <view class="card">{{ item.cert_no }}</view>
-                                </view>
-                            </view>
-                            <view class="edit_text_btn" 
-                                v-if="item.verify_status !== 1"
-                                @click.stop="openVerify(item)"
-                            >
-                                {{item.verify_status === 0 ? '待核验':
-                                    item.verify_status === -3 ? '请报验':
-                                        item.verify_status === -2 ? '冒用':
-                                            item.verify_status === -1 ? '未通过':
-                                                item.verify_status === 2 ? '待核验':''
-                                }}
-                            </view>
-                            <view v-else class="edit_btn" @click.stop="jumpEditUserInfo(item)"></view>
-
-                        </view>
-                        <template v-slot:right>
-                            <view class="option_item">
-                                <view class="option_box" v-if="item.verify_status === 0">
-                                    <view class="delete_btn edit" @click="jumpEditUserInfo(item)">
-                                        <image class="edit_btn_icon" src="@/static/edit_passenger.png" mode="contain" />
-                                        <text>编辑</text>
-                                    </view>
-                                </view>
-                                <view class="option_box">
-                                    <view class="delete_btn" @click="removePassenger(item, index)">
-                                        <image class="delete_btn_icon" src="@/static/delete_btn.png" mode="contain" />
-                                        <text>删除</text>
-                                    </view>
-                                </view>
-                            </view>
-                        </template>
-                    </uni-swipe-action-item>
-                </uni-swipe-action>
-            </scroll-view>
-        </view>
-
-        <default-page style="flex: 1" v-if="showDefault" showAddPassenger="true" @returnBtn="getTicketData()" :defaultType="showDefaultType" @addPassengerBtn="jumpAddPassenger()"></default-page>
-
-        <!-- 筛选弹窗 -->
-        <yun-selector ref="groupPopup" :dataItem="'group_name'" :dataList="groupList" :userSearch="true" @submitDialog="groupPopupSelecctBtn()" @userSearchBtn="userSearchBtn()"></yun-selector>
-
-        <!-- 姓名筛选弹窗 -->
-        <yun-config ref="yunConfig" :showInput="true" :submitText="{ left: '取消', right: '确认' }" submitIndex="right" title="请输入姓名" @submitConfig="submitConfig"></yun-config>
-
-        <view class="submit_box" v-if="!passengerType && !showDefault">
-            <button class="submit_btn" @click="returnBtn()">确认</button>
-        </view>
-
-        <!-- 核验弹窗 -->
-        <passengerVerify ref="verifyPopup" :passengerData="passengerData" @jumpVerify="jumpVerify"></passengerVerify>
+                  <view class="user_name">{{ item.name }}</view>
+                </view>
+                <view class="info_bottom">
+                  <view class="bottom_title">{{
+                    item.card_type === "1"
+                      ? "中国居民身份证"
+                      : item.card_type === "2"
+                      ? "港澳台居民居住证"
+                      : item.card_type === "B"
+                      ? "护照"
+                      : item.card_type === "C"
+                      ? "港澳居民来往内地通行证"
+                      : item.card_type === "G"
+                      ? "台湾居民来往大陆通行证"
+                      : item.card_type === "H"
+                      ? "外国人永久居留身份证"
+                      : ""
+                  }}</view>
+                  <view class="card">{{ item.card_no }}</view>
+                </view>
+              </view>
+              <view
+                class="edit_text_btn"
+                v-if="item.check_status === 1 || item.phone_check_status === 1"
+                @click.stop="jumpEditUserInfo(item)"
+              >
+                {{
+                  item.check_status === 1
+                    ? "身份核验"
+                    : item.phone_check_status === 1
+                    ? "手机核验"
+                    : ""
+                }}
+              </view>
+              <view v-else class="edit_btn" @click.stop="jumpEditUserInfo(item)"></view>
+            </view>
+            <template v-slot:right>
+              <view class="option_item">
+                <view class="option_box" v-if="item.verify_status === 0">
+                  <view class="delete_btn edit" @click="jumpEditUserInfo(item)">
+                    <image
+                      class="edit_btn_icon"
+                      src="@/static/edit_passenger.png"
+                      mode="contain"
+                    />
+                    <text>编辑</text>
+                  </view>
+                </view>
+                <view class="option_box">
+                  <view class="delete_btn" @click="removePassenger(item, index)">
+                    <image
+                      class="delete_btn_icon"
+                      src="@/static/delete_btn.png"
+                      mode="contain"
+                    />
+                    <text>删除</text>
+                  </view>
+                </view>
+              </view>
+            </template>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
+      </scroll-view>
     </view>
+
+    <default-page
+      style="flex: 1"
+      v-if="showDefault"
+      showAddPassenger="true"
+      @returnBtn="getTicketData()"
+      :defaultType="showDefaultType"
+      @addPassengerBtn="jumpAddPassenger()"
+    ></default-page>
+
+    <!-- 筛选弹窗 -->
+    <yun-selector
+      ref="groupPopup"
+      :dataItem="'group_name'"
+      :dataList="groupList"
+      :userSearch="true"
+      @submitDialog="groupPopupSelecctBtn()"
+      @userSearchBtn="userSearchBtn()"
+    ></yun-selector>
+
+    <!-- 姓名筛选弹窗 -->
+    <yun-config
+      ref="yunConfig"
+      :showInput="true"
+      :submitText="{ left: '取消', right: '确认' }"
+      submitIndex="right"
+      title="请输入姓名"
+      @submitConfig="submitConfig"
+    ></yun-config>
+
+    <view class="submit_box" v-if="!passengerType && !showDefault">
+      <button class="submit_btn" @click="returnBtn()">确认</button>
+    </view>
+
+    <!-- 核验弹窗 -->
+    <passengerVerify
+      ref="verifyPopup"
+      :passengerData="passengerData"
+      @jumpVerify="jumpVerify"
+    ></passengerVerify>
+  </view>
 </template>
 
 <script>
 import passenger from "@/api/passenger.js";
 import moment from "moment";
-import passengerVerify from '@/components/passenger_verify.vue';
+import passengerVerify from "@/components/passenger_verify.vue";
 moment.locale("zh-cn");
 export default {
-    components: { passengerVerify },
-    data() {
-        return {
-            iStatusBarHeight: 0, // 状态栏高度
+  components: { passengerVerify },
+  data() {
+    return {
+      iStatusBarHeight: 0, // 状态栏高度
 
-            showDefault: true, // 缺省页
-            showDefaultType: "not_passenger", // 报错类型
+      showDefault: true, // 缺省页
+      showDefaultType: "not_passenger", // 报错类型
 
-            passengerType: true, // true个人中心跳入 false添加联系人跳入
+      passengerType: true, // true个人中心跳入 false添加联系人跳入
 
-            group: {}, // 分组筛选
-            groupList: ["不限"], // 分组列表
+      group: {}, // 分组筛选
+      groupList: ["不限"], // 分组列表
 
-            passengerList: [], // 乘机人列表
+      passengerList: [], // 乘机人列表
 
-            oldPassgengerList: [], // 备份乘机人列表
+      oldPassgengerList: [], // 备份乘机人列表
 
-            checkePassenger: [], // 已选择乘客列表
+      checkePassenger: [], // 已选择乘客列表
 
-            chdinfNumber: {}, // 航司规定乘客数量
-            flightPassengerList: [], // 预定页面切换乘机人
+      chdinfNumber: {}, // 航司规定乘客数量
+      flightPassengerList: [], // 预定页面切换乘机人
 
-            searchUserName: "", // 用户名筛选
+      searchUserName: "", // 用户名筛选
 
-            notList: false, // 乘客列表为空
+      notList: false, // 乘客列表为空
 
-            page: 1,
-            passengerListStatus: false, // 加载状态
-            groupId: "",
-            scrollTop: 0,
+      page: 1,
+      passengerListStatus: false, // 加载状态
+      groupId: "",
+      scrollTop: 0,
 
-            trainType: '', // 火车票乘客列表 只获取成人乘客  为空时为机票乘客表
-            passengerData: {
+      trainType: "", // 火车票乘客列表 只获取成人乘客  为空时为机票乘客表
+      passengerData: {
+        passengerName: "", // 核验弹窗 乘车人姓名
+        phone: "", // 电话
+        cert_no: "", // 证件号
+      }, // 乘车核验传
 
-                passengerName:"", // 核验弹窗 乘车人姓名
-                phone:"", // 电话
-                cert_no:"", // 证件号
-
-            }, // 乘车核验传
-        };
+      accountId: "", // 12306 乘客ID
+    };
+  },
+  methods: {
+    // 打开核验弹窗
+    openVerify(val) {
+      this.passengerData = {
+        passengerName: val.name,
+        phone: val.phone,
+        cert_no: val.cert_no,
+      };
+      this.$refs.verifyPopup.openVerifyPopup();
     },
-    methods: {
-
-        // 打开核验弹窗
-        openVerify(val) {
-            this.passengerData = {
-
-                passengerName:val.name,
-                phone:val.phone,
-                cert_no:val.cert_no,
-            }
-            this.$refs.verifyPopup.openVerifyPopup();
-        },
-        // 跳转到核验
-        jumpVerify() {
-            if(this.passengerData.phone === '' || this.passengerData.cert_no === '') {
-                uni.showToast({
-                    title:'乘车人信息不完整',
-                    icon:"none",
-                    duration:3000
-                })
-            }else {
-
-                uni.navigateTo({
-                    url:'/flightReservation/passengerVerify?passengerData=' 
-                    + JSON.stringify(this.passengerData)
-                })
-                this.$refs.verifyPopup.colseVerifyPopup();
-            }
-        },
-        // 跳转新增乘机人
-        jumpAddPassenger() {
-            uni.navigateTo({
-                url: "/flightReservation/addPassenger",
-            });
-        },
-
-        nextPageData() {
-            this.page = this.page + 1;
-            this.getPassengerData();
-        },
-
-        compare(property) { },
-
-        /**
-         * @Description: 获取旅客列表信息
-         * @author Wish
-         * @date 2020/8/14
-         */
-        getPassengerData() {
-            let data = {
-                // group_id: this.groupId,
-                page: this.page,
-                name: this.searchUserName,
-                miniType: true
-            };
-            if (this.trainType) {
-                data['passenger_type'] = 'ADT'
-            }
-            if (this.groupId) {
-                data['group_id'] = this.groupId
-            }
-            passenger.getPassenger(data).then((res) => {
-                if (res.errorcode === 10000) {
-                    if (this.passengerListStatus) {
-                        if (res.data.data.length < 1) {
-                            return uni.showToast({
-                                title: "到底了",
-                                icon: "none",
-                                duration: 2000,
-                            });
-                        }
-                        this.passengerList.push.apply(this.passengerList, res.data.data);
-                    } else {
-                        this.passengerListStatus = true;
-                        this.passengerList = res.data.data;
-                        this.$nextTick(() => {
-                            this.scrollTop = 0;
-                        });
-                        this.getGroupList();
-                    }
-
-                    this.passengerList.forEach((item) => {
-                        item.name = item.name ? item.name : null;
-                        item["type"] =
-                            moment().diff(item.birthday, "years") < 12 &&
-                                moment().diff(item.birthday, "years") >= 2
-                                ? "儿童"
-                                : moment().diff(item.birthday, "years") < 2
-                                    ? "婴儿"
-                                    : "成人";
-                    });
-
-                    let reg = /[a-zA-Z0-9]/;
-                    this.passengerList.sort((a, b) => {
-                        return reg.test(a.name) - reg.test(b.name);
-                    });
-
-                    if (this.flightPassengerList.length > 0) {
-                        this.checkePassenger = this.flightPassengerList;
-                        this.flightPassengerList.forEach((item, index) => {
-                            this.passengerList.forEach((oitem, oindex) => {
-                                if (item.id === oitem.id) {
-                                    this.passengerList[oindex].checked = true;
-                                }
-                            });
-                        });
-                    }
-                    this.showDefault = false;
-
-                    this.lockingChecked();
-                }
-            });
-
-            this.$forceUpdate();
-        },
-
-        // 跳转修改乘机人列表
-        jumpEditUserInfo(val) {
-            console.log(val);
-            uni.navigateTo({
-                url:
-                    "/flightReservation/addPassenger?type=edit&data=" +
-                    JSON.stringify(val),
-            });
-        },
-
-        // 删除乘机人
-        removePassenger(val, i) {
-            console.log(val);
-            passenger.removePassenger(val.id).then((res) => {
-                if (res.errorcode === 10000) {
-                    this.passengerList = [];
-                    this.getPassengerData();
-                    uni.showToast({
-                        title: "删除成功",
-                        icon: "success",
-                    });
-                    this.checkePassenger.forEach((item) => {
-                        if (item.id === val.id) {
-                            this.checkePassenger.splice(
-                                this.checkePassenger.findIndex((item) => item.id === val.id),
-                                1
-                            );
-                        }
-                    });
-                } else {
-                    uni.showToast({
-                        title: res.msg,
-                        icon: "none",
-                    });
-                }
-            });
-        },
-
-        // 获取分组列表
-        getGroupList() {
-            passenger.getGroup().then((res) => {
-                if (res.errorcode === 10000) {
-                    this.groupList = res.data.data;
-                    this.groupList.forEach((item) => {
-                        this.passengerList.forEach((oitem) => {
-                            if (oitem.group_id === item.id) {
-                                oitem["group"] = item.group_name;
-                            }
-                        });
-                    });
-                    this.groupList.unshift({ group_name: "不限" });
-                } else {
-                    uni.showToast({
-                        title: "分组列表获取失败，" + res.msg,
-                        icon: "none",
-                    });
-                }
-                this.oldPassgengerList = JSON.parse(JSON.stringify(this.passengerList));
-            });
-        },
-
-        // 打开用户名筛选弹窗
-        userSearchBtn() {
-            console.log("打开弹窗");
-            this.$refs.yunConfig.openConfigPopup();
-        },
-
-        // 用户名筛选
-        submitConfig(val) {
-            console.log(val);
-            this.searchUserName = val;
-            this.page = 1;
-            this.passengerListStatus = false;
-            // if (val) {
-            //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
-            //   let newArr = [];
-            //   this.passengerList.forEach((item, index) => {
-            //     let username = item.name + item.en_first_name + item.en_last_name;
-            //     if (
-            //       JSON.stringify(username)
-            //         .toLowerCase()
-            //         .indexOf(val.toLowerCase()) !== -1
-            //     ) {
-            //       newArr.push(item);
-            //     }
-            //   });
-            //   this.passengerList = newArr;
-            // } else {
-            //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
-            // }
-            this.getPassengerData();
-            this.lockingChecked();
-        },
-
-        // 打开分组弹窗
-        openGroupSelect() {
-            this.$refs.groupPopup.openDialog();
-        },
-        // 确认分组
-        groupPopupSelecctBtn(e) {
-            this.$refs.yunConfig.inputValue = "";
-            console.log(e);
-            this.searchUserName = "";
-            if (e.group_name !== "不限") {
-                this.group = e;
-                this.groupId = e.id;
-                this.passengerListStatus = false;
-                this.getPassengerData();
-                this.page = 1;
-            } else {
-                this.group = {};
-                this.groupId = "";
-                this.passengerListStatus = false;
-                this.getPassengerData();
-            }
-        },
-
-        // 锁定选中乘机人数据
-        lockingChecked() {
-            if (this.checkePassenger.length > 0) {
-                this.checkePassenger.forEach((item) => {
-                    this.passengerList.forEach((oitem) => {
-                        if (item.id === oitem.id) {
-                            oitem.checked = true;
-                        }
-                    });
-                });
-            }
-            this.notList = this.passengerList.length < 1;
-        },
-
-        // 选中乘机人
-        checkedPassenger(data, index) {
-            if (this.trainType && this.passengerList[index].cert_type !== '身份证') {
-                return uni.showModal({
-                    showCancel: false,
-                    title: '提示',
-                    content: '火车票乘客暂不支持其他证件',
-                });
-
-            }
-
-            this.passengerList[index].checked = !this.passengerList[index].checked;
-            if (this.passengerList[index].checked) {
-                let info = this.passengerList[index];
-                this.checkePassenger.push(info);
-            } else {
-                this.checkePassenger.splice(
-                    this.checkePassenger.findIndex((item) => item.id === data.id),
-                    1
-                );
-            }
-        },
-
-        // 确认乘机人
-        returnBtn() {
-            if (this.checkePassenger.length < 1) {
-                return uni.showToast({
-                    title: "请选择乘机人",
-                    icon: "none",
-                    duration: 2000,
-                });
-            }
-
-            let atdNumber = 0;
-            let chdNumber = 0;
-            let infNumber = 0;
-
-            console.log(this.checkePassenger);
-
-            this.checkePassenger.forEach((item) => {
-                item["adtType"] = item.type === "成人";
-                atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
-                chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
-                infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
-            });
-            if (
-                (atdNumber === 0 && chdNumber > 0) ||
-                (atdNumber === 0 && infNumber > 0)
-            ) {
-                return uni.showToast({
-                    title: "请至少选择一个成人",
-                    icon: "none",
-                    duration: 2000,
-                });
-            }
-            if (JSON.stringify(this.chdinfNumber) !== "{}") {
-                if (
-                    chdNumber !== 0 &&
-                    atdNumber * this.chdinfNumber.has_inf_cnn_number < chdNumber
-                ) {
-                    return uni.showToast({
-                        title: "超出航司规定儿童人数",
-                        icon: "none",
-                        duration: 2000,
-                    });
-                }
-                if (
-                    infNumber !== 0 &&
-                    atdNumber * this.chdinfNumber.has_inf_inf_number < infNumber
-                ) {
-                    return uni.showToast({
-                        title: "超出航司规定婴儿人数",
-                        icon: "none",
-                        duration: 2000,
-                    });
-                }
-            }
-
-            this.checkePassenger.sort((a, b) => b.adtType - a.adtType);
-            console.log("乘客类型排序", this.checkePassenger);
-
-            uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
-            uni.navigateBack();
-        },
+    // 跳转到核验
+    jumpVerify() {
+      if (this.passengerData.phone === "" || this.passengerData.cert_no === "") {
+        uni.showToast({
+          title: "乘车人信息不完整",
+          icon: "none",
+          duration: 3000,
+        });
+      } else {
+        uni.navigateTo({
+          url:
+            "/flightReservation/passengerVerify?passengerData=" +
+            JSON.stringify(this.passengerData),
+        });
+        this.$refs.verifyPopup.colseVerifyPopup();
+      }
     },
-    onShow() {
-        if (uni.getStorageSync("addPassenger")) {
-            this.passengerList = [];
-            console.log("新增返回");
-            this.getPassengerData();
-            uni.removeStorageSync("addPassenger");
-        }
+    // 跳转新增乘机人
+    jumpAddPassenger() {
+      if (this.accountId) {
+        uni.navigateTo({
+          url:
+            "/flightReservation/accountPassenger?accountId=" +
+            this.accountId +
+            "&type=新增",
+        });
+      } else {
+        uni.navigateTo({
+          url: "/flightReservation/addPassenger",
+        });
+      }
     },
-    onLoad(data) {
-        this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-        this.passengerType = data.type === "userInfo";
-        this.trainType = data.trainType  // 判断是否火车票页面跳转
-        this.chdinfNumber = data.chdinfNumber ? JSON.parse(data.chdinfNumber) : {};
-        this.flightPassengerList = data.editPassengerList
-            ? JSON.parse(data.editPassengerList)
-            : [];
-        console.log(this.chdinfNumber);
+
+    nextPageData() {
+      if (!this.accountId) {
+        this.page = this.page + 1;
         this.getPassengerData();
+      }
     },
+
+    compare(property) {},
+
+    /**
+     * @Description: 获取旅客列表信息
+     * @author Wish
+     * @date 2020/8/14
+     */
+    getPassengerData() {
+      if (this.accountId) {
+        // 获取托管模式火车票乘客列表
+        let data = {
+          account: {
+            id: this.accountId,
+          },
+        };
+        passenger.accountPassengerList(data).then((res) => {
+          console.log(res);
+          if (res.errorcode === 10000) {
+            this.showDefault = false;
+            this.passengerList = res.data;
+             if (this.flightPassengerList.length > 0) {
+              this.checkePassenger = this.flightPassengerList;
+              this.flightPassengerList.forEach((item, index) => {
+                this.passengerList.forEach((oitem, oindex) => {
+                  if (item.id === oitem.id) {
+                    this.passengerList[oindex].checked = true;
+                  }
+                });
+              });
+            }
+          }
+        });
+      } else {
+        // 获取机票乘客列表
+        let data = {
+          // group_id: this.groupId,
+          page: this.page,
+          name: this.searchUserName,
+          miniType: true,
+        };
+        if (this.groupId) {
+          data["group_id"] = this.groupId;
+        }
+        passenger.getPassenger(data).then((res) => {
+          if (res.errorcode === 10000) {
+            if (this.passengerListStatus) {
+              if (res.data.data.length < 1) {
+                return uni.showToast({
+                  title: "到底了",
+                  icon: "none",
+                  duration: 2000,
+                });
+              }
+              this.passengerList.push.apply(this.passengerList, res.data.data);
+            } else {
+              this.passengerListStatus = true;
+              this.passengerList = res.data.data;
+              this.$nextTick(() => {
+                this.scrollTop = 0;
+              });
+              this.getGroupList();
+            }
+
+            this.passengerList.forEach((item) => {
+              item.name = item.name ? item.name : null;
+              item["type"] =
+                moment().diff(item.birthday, "years") < 12 &&
+                moment().diff(item.birthday, "years") >= 2
+                  ? "儿童"
+                  : moment().diff(item.birthday, "years") < 2
+                  ? "婴儿"
+                  : "成人";
+            });
+
+            let reg = /[a-zA-Z0-9]/;
+            this.passengerList.sort((a, b) => {
+              return reg.test(a.name) - reg.test(b.name);
+            });
+
+            if (this.flightPassengerList.length > 0) {
+              this.checkePassenger = this.flightPassengerList;
+              this.flightPassengerList.forEach((item, index) => {
+                this.passengerList.forEach((oitem, oindex) => {
+                  if (item.id === oitem.id) {
+                    this.passengerList[oindex].checked = true;
+                  }
+                });
+              });
+            }
+            this.showDefault = false;
+
+            this.lockingChecked();
+          }
+        });
+      }
+
+      this.$forceUpdate();
+    },
+
+    // 跳转修改乘机人列表
+    jumpEditUserInfo(val) {
+      if (this.accountId) {
+        uni.navigateTo({
+          url:
+            "/flightReservation/accountPassenger?accountId=" +
+            this.accountId +
+            "&type=编辑&passengerData=" +
+            JSON.stringify(val),
+        });
+      } else {
+        uni.navigateTo({
+          url: "/flightReservation/addPassenger?type=edit&data=" + JSON.stringify(val),
+        });
+      }
+    },
+
+    // 删除乘机人
+    removePassenger(val, i) {
+      console.log(val);
+      if (!this.accountId) {
+        //   删除代购模式乘客
+        passenger.removePassenger(val.id).then((res) => {
+          if (res.errorcode === 10000) {
+            this.passengerList = [];
+            this.getPassengerData();
+            uni.showToast({
+              title: "删除成功",
+              icon: "success",
+            });
+            this.checkePassenger.forEach((item) => {
+              if (item.id === val.id) {
+                this.checkePassenger.splice(
+                  this.checkePassenger.findIndex((item) => item.id === val.id),
+                  1
+                );
+              }
+            });
+          } else {
+            uni.showToast({
+              title: res.msg,
+              icon: "none",
+            });
+          }
+        });
+      } else {
+        //   删除托管乘客
+        let data = {
+          account: {
+            id: this.accountId,
+          },
+          passenger: val,
+        };
+        passenger.removeAccountPassenger(data).then((res) => {
+          if (res.errorcode === 10000) {
+            this.passengerList = [];
+            this.getPassengerData();
+            uni.showToast({
+              title: "删除成功",
+              icon: "success",
+            });
+            this.checkePassenger.forEach((item) => {
+              if (item.id === val.id) {
+                this.checkePassenger.splice(
+                  this.checkePassenger.findIndex((item) => item.id === val.id),
+                  1
+                );
+              }
+            });
+          } else {
+            uni.showToast({
+              title: res.msg,
+              icon: "none",
+            });
+          }
+        });
+      }
+    },
+
+    // 获取分组列表
+    getGroupList() {
+      passenger.getGroup().then((res) => {
+        if (res.errorcode === 10000) {
+          this.groupList = res.data.data;
+          this.groupList.forEach((item) => {
+            this.passengerList.forEach((oitem) => {
+              if (oitem.group_id === item.id) {
+                oitem["group"] = item.group_name;
+              }
+            });
+          });
+          this.groupList.unshift({ group_name: "不限" });
+        } else {
+          uni.showToast({
+            title: "分组列表获取失败，" + res.msg,
+            icon: "none",
+          });
+        }
+        this.oldPassgengerList = JSON.parse(JSON.stringify(this.passengerList));
+      });
+    },
+
+    // 打开用户名筛选弹窗
+    userSearchBtn() {
+      console.log("打开弹窗");
+      this.$refs.yunConfig.openConfigPopup();
+    },
+
+    // 用户名筛选
+    submitConfig(val) {
+      console.log(val);
+      this.searchUserName = val;
+      this.page = 1;
+      this.passengerListStatus = false;
+      // if (val) {
+      //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
+      //   let newArr = [];
+      //   this.passengerList.forEach((item, index) => {
+      //     let username = item.name + item.en_first_name + item.en_last_name;
+      //     if (
+      //       JSON.stringify(username)
+      //         .toLowerCase()
+      //         .indexOf(val.toLowerCase()) !== -1
+      //     ) {
+      //       newArr.push(item);
+      //     }
+      //   });
+      //   this.passengerList = newArr;
+      // } else {
+      //   this.passengerList = JSON.parse(JSON.stringify(this.oldPassgengerList));
+      // }
+      this.getPassengerData();
+      this.lockingChecked();
+    },
+
+    // 打开分组弹窗
+    openGroupSelect() {
+      this.$refs.groupPopup.openDialog();
+    },
+    // 确认分组
+    groupPopupSelecctBtn(e) {
+      this.$refs.yunConfig.inputValue = "";
+      console.log(e);
+      this.searchUserName = "";
+      if (e.group_name !== "不限") {
+        this.group = e;
+        this.groupId = e.id;
+        this.passengerListStatus = false;
+        this.getPassengerData();
+        this.page = 1;
+      } else {
+        this.group = {};
+        this.groupId = "";
+        this.passengerListStatus = false;
+        this.getPassengerData();
+      }
+    },
+
+    // 锁定选中乘机人数据
+    lockingChecked() {
+      if (this.checkePassenger.length > 0) {
+        this.checkePassenger.forEach((item) => {
+          this.passengerList.forEach((oitem) => {
+            if (item.id === oitem.id) {
+              oitem.checked = true;
+            }
+          });
+        });
+      }
+      this.notList = this.passengerList.length < 1;
+    },
+
+    // 选中乘机人
+    checkedPassenger(data, index) {
+      if (!this.accountId) {
+        if (this.trainType && this.passengerList[index].cert_type !== "身份证") {
+          return uni.showModal({
+            showCancel: false,
+            title: "提示",
+            content: "火车票乘客暂不支持其他证件",
+          });
+        }
+      }else {
+          if(data.check_status === 1 || data.phone_check_status === 1){
+              return uni.showModal({
+            showCancel: false,
+            title: "提示",
+            content: `该乘客${data.check_status === 1?'身份':data.phone_check_status === 1?'手机号':'核验未通过'}请修改乘客数据以便重新核验`,
+          });
+          }
+      }
+
+      this.passengerList[index].checked = !this.passengerList[index].checked;
+      if (this.passengerList[index].checked) {
+        let info = this.passengerList[index];
+        this.checkePassenger.push(info);
+      } else {
+        this.checkePassenger.splice(
+          this.checkePassenger.findIndex((item) => item.id === data.id),
+          1
+        );
+      }
+    },
+
+    // 确认乘机人
+    returnBtn() {
+      if (this.checkePassenger.length < 1) {
+        return uni.showToast({
+          title: "请选择乘机人",
+          icon: "none",
+          duration: 2000,
+        });
+      }
+
+      let atdNumber = 0;
+      let chdNumber = 0;
+      let infNumber = 0;
+
+      console.log(this.checkePassenger);
+
+      if (!this.accountId) {
+        this.checkePassenger.forEach((item) => {
+          item["adtType"] = item.type === "成人";
+          atdNumber = item.type === "成人" ? atdNumber + 1 : atdNumber;
+          chdNumber = item.type === "儿童" ? chdNumber + 1 : chdNumber;
+          infNumber = item.type === "婴儿" ? infNumber + 1 : infNumber;
+        });
+        if ((atdNumber === 0 && chdNumber > 0) || (atdNumber === 0 && infNumber > 0)) {
+          return uni.showToast({
+            title: "请至少选择一个成人",
+            icon: "none",
+            duration: 2000,
+          });
+        }
+        if (JSON.stringify(this.chdinfNumber) !== "{}") {
+          if (
+            chdNumber !== 0 &&
+            atdNumber * this.chdinfNumber.has_inf_cnn_number < chdNumber
+          ) {
+            return uni.showToast({
+              title: "超出航司规定儿童人数",
+              icon: "none",
+              duration: 2000,
+            });
+          }
+          if (
+            infNumber !== 0 &&
+            atdNumber * this.chdinfNumber.has_inf_inf_number < infNumber
+          ) {
+            return uni.showToast({
+              title: "超出航司规定婴儿人数",
+              icon: "none",
+              duration: 2000,
+            });
+          }
+        }
+        this.checkePassenger.sort((a, b) => b.adtType - a.adtType);
+      }
+
+      console.log("乘客类型排序", this.checkePassenger);
+
+      uni.setStorageSync("passengerList", JSON.stringify(this.checkePassenger));
+      uni.navigateBack();
+    },
+  },
+  onShow() {
+    if (uni.getStorageSync("addPassenger")) {
+      this.passengerList = [];
+      console.log("新增返回");
+      this.getPassengerData();
+      uni.removeStorageSync("addPassenger");
+    }
+  },
+  onLoad(data) {
+    this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.passengerType = data.type === "userInfo";
+    this.trainType = data.trainType; // 判断是否火车票页面跳转
+    this.accountId = data.accountId;
+    this.chdinfNumber = data.chdinfNumber ? JSON.parse(data.chdinfNumber) : {};
+    this.flightPassengerList = data.editPassengerList
+      ? JSON.parse(data.editPassengerList)
+      : [];
+    this.getPassengerData();
+  },
 };
 </script>
 
 <style lang="less" scoped>
 .passenger {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: rgba(243, 245, 247, 1);
+  .header_box {
+    padding: 27upx 0;
+    background: rgba(0, 112, 226, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .add_passenger_btn {
+      border: 2upx solid rgba(255, 255, 255, 1);
+      width: 710upx;
+      height: 90upx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 90upx;
+      font-size: 26upx;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 1);
+      letter-spacing: 6upx;
+      .add_icon {
+        width: 35upx;
+        height: 35upx;
+        margin-right: 12upx;
+      }
+    }
+  }
+  .passenger_main {
+    flex: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background: rgba(243, 245, 247, 1);
-    .header_box {
-        padding: 27upx 0;
-        background: rgba(0, 112, 226, 1);
+    overflow-y: auto;
+    .mian_header {
+      padding: 0 40upx;
+      margin: 40upx 0 30upx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .title {
+        font-size: 30upx;
+        font-weight: bold;
+        color: rgba(51, 51, 51, 1);
+      }
+      .filter {
+        font-size: 24upx;
+        font-weight: bold;
+        color: rgba(0, 112, 226, 1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: right;
+        .username_search {
+          margin-right: 40upx;
+          width: 30vw;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: inline-block;
+          white-space: nowrap;
+        }
+        .filter_icon {
+          width: 16upx;
+          height: 12upx;
+          object-fit: contain;
+          margin-left: 14upx;
+        }
+      }
+    }
+    .mian_list {
+      overflow-y: auto;
+      height: 100%;
+      flex: 1;
+      .not_passenger_list {
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        .add_passenger_btn {
-            border: 2upx solid rgba(255, 255, 255, 1);
-            width: 710upx;
-            height: 90upx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 90upx;
-            font-size: 26upx;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 1);
-            letter-spacing: 6upx;
-            .add_icon {
-                width: 35upx;
-                height: 35upx;
-                margin-right: 12upx;
-            }
-        }
-    }
-    .passenger_main {
-        flex: 1;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        .mian_header {
-            padding: 0 40upx;
-            margin: 40upx 0 30upx;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            .title {
-                font-size: 30upx;
-                font-weight: bold;
-                color: rgba(51, 51, 51, 1);
-            }
-            .filter {
-                font-size: 24upx;
-                font-weight: bold;
-                color: rgba(0, 112, 226, 1);
-                display: inline-flex;
-                align-items: center;
-                justify-content: right;
-                .username_search {
-                    margin-right: 40upx;
-                    width: 30vw;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    display: inline-block;
-                    white-space: nowrap;
-                }
-                .filter_icon {
-                    width: 16upx;
-                    height: 12upx;
-                    object-fit: contain;
-                    margin-left: 14upx;
-                }
-            }
-        }
-        .mian_list {
-            overflow-y: auto;
-            height: 100%;
-            flex: 1;
-            .not_passenger_list {
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 32upx;
-                font-weight: 400;
-                color: #666666;
-            }
-            .list_item {
-                background: rgba(255, 255, 255, 1);
-                box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
-                border-radius: 20upx;
-                padding: 28upx 40upx 40upx 20upx;
-                margin: 0 20upx 20upx;
-                display: flex;
-                align-items: center;
-                width: 100%;
-
-                .checked {
-                    margin-right: 26upx;
-                    radio {
-                        transform: scale(0.7);
-                    }
-                }
-
-                .item_info {
-                    .info_top {
-                        display: flex;
-                        align-items: center;
-                        margin-bottom: 32upx;
-                        .type {
-                            border: 2upx solid rgba(127, 183, 240, 1);
-                            border-radius: 20upx;
-                            font-size: 20upx;
-                            font-weight: 400;
-                            color: rgba(127, 183, 240, 1);
-                            padding: 2upx 20upx;
-                            margin-right: 16upx;
-                        }
-                        .user_name {
-                            font-size: 28upx;
-                            font-weight: bold;
-                            color: rgba(42, 42, 42, 1);
-                            margin-right: 16upx;
-                        }
-                        .position {
-                            font-size: 22upx;
-                            font-weight: 400;
-                            color: rgba(153, 153, 153, 1);
-                        }
-                    }
-                    .info_bottom {
-                        display: flex;
-                        .bottom_title {
-                            font-size: 26upx;
-                            font-weight: 400;
-                            color: rgba(42, 42, 42, 1);
-                            margin-right: 24upx;
-                        }
-                        .card {
-                            font-size: 26upx;
-                            font-weight: 400;
-                            color: rgba(42, 42, 42, 1);
-                        }
-                    }
-                }
-                .edit_btn {
-                    background: url(@/static/edit_icon.png) no-repeat center
-                        center;
-                    background-size: contain;
-                    width: 30upx;
-                    height: 30upx;
-                    margin-left: auto;
-                }
-                .edit_text_btn {
-                    font-size: 26upx;
-                    font-weight: 400;
-                    color: #FF0000;
-                    margin-left: auto;
-                }
-            }
-            .option_item {
-                display: flex;
-                height: 100%;
-                padding-right: 20upx;
-               
-                .option_box {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                     &:not(:last-child){
-                    margin-right: 40upx;
-                }
-                    .delete_btn {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        flex-direction: column;
-                        font-size: 21upx;
-                        font-weight: 400;
-                        color: rgba(255, 0, 0, 1);
-                        .delete_btn_icon {
-                            width: 35upx;
-                            height: 35upx;
-                            object-fit: contain;
-                            margin-bottom: 8upx;
-                        }
-                        .edit_btn_icon {
-                            width: 35upx;
-                            height: 35upx;
-                            object-fit: contain;
-                            margin-bottom: 8upx;
-                        }
-                        &.edit {
-                            color: #FFBA49;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    .submit_box {
+        font-size: 32upx;
+        font-weight: 400;
+        color: #666666;
+      }
+      .list_item {
         background: rgba(255, 255, 255, 1);
-        height: 100upx;
-        width: 100%;
+        box-shadow: 0 12upx 18upx rgba(0, 0, 0, 0.04);
+        border-radius: 20upx;
+        padding: 28upx 40upx 40upx 20upx;
+        margin: 0 20upx 20upx;
         display: flex;
         align-items: center;
-        justify-content: center;
-        padding-top: 24upx;
-        padding-bottom: var(--status-bar-height);
-        border-top: 2upx solid rgba(229, 229, 229, 1);
-        .submit_btn {
-            flex: 1;
-            height: 90upx;
-            margin: 0 50upx;
-            background: linear-gradient(
-                90deg,
-                rgba(0, 112, 226, 1) 0%,
-                rgba(86, 197, 255, 1) 100%
-            );
-            box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
-            border-radius: 80upx;
+        width: 100%;
+
+        .checked {
+          margin-right: 26upx;
+          radio {
+            transform: scale(0.7);
+          }
+        }
+
+        .item_info {
+          .info_top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32upx;
+            .type {
+              border: 2upx solid rgba(127, 183, 240, 1);
+              border-radius: 20upx;
+              font-size: 20upx;
+              font-weight: 400;
+              color: rgba(127, 183, 240, 1);
+              padding: 2upx 20upx;
+              margin-right: 16upx;
+            }
+            .user_name {
+              font-size: 28upx;
+              font-weight: bold;
+              color: rgba(42, 42, 42, 1);
+              margin-right: 16upx;
+            }
+            .position {
+              font-size: 22upx;
+              font-weight: 400;
+              color: rgba(153, 153, 153, 1);
+            }
+          }
+          .info_bottom {
+            display: flex;
+            .bottom_title {
+              font-size: 26upx;
+              font-weight: 400;
+              color: rgba(42, 42, 42, 1);
+              margin-right: 24upx;
+            }
+            .card {
+              font-size: 26upx;
+              font-weight: 400;
+              color: rgba(42, 42, 42, 1);
+            }
+          }
+        }
+        .edit_btn {
+          background: url(@/static/edit_icon.png) no-repeat center center;
+          background-size: contain;
+          width: 30upx;
+          height: 30upx;
+          margin-left: auto;
+        }
+        .edit_text_btn {
+          font-size: 26upx;
+          font-weight: 400;
+          color: #ff0000;
+          margin-left: auto;
+        }
+      }
+      .option_item {
+        display: flex;
+        height: 100%;
+        padding-right: 20upx;
+
+        .option_box {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          &:not(:last-child) {
+            margin-right: 40upx;
+          }
+          .delete_btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32upx;
+            flex-direction: column;
+            font-size: 21upx;
             font-weight: 400;
-            color: rgba(255, 255, 255, 1);
-            letter-spacing: 10upx;
+            color: rgba(255, 0, 0, 1);
+            .delete_btn_icon {
+              width: 35upx;
+              height: 35upx;
+              object-fit: contain;
+              margin-bottom: 8upx;
+            }
+            .edit_btn_icon {
+              width: 35upx;
+              height: 35upx;
+              object-fit: contain;
+              margin-bottom: 8upx;
+            }
+            &.edit {
+              color: #ffba49;
+            }
+          }
         }
+      }
     }
+  }
+  .submit_box {
+    background: rgba(255, 255, 255, 1);
+    height: 100upx;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 24upx;
+    padding-bottom: var(--status-bar-height);
+    border-top: 2upx solid rgba(229, 229, 229, 1);
+    .submit_btn {
+      flex: 1;
+      height: 90upx;
+      margin: 0 50upx;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 112, 226, 1) 0%,
+        rgba(86, 197, 255, 1) 100%
+      );
+      box-shadow: 0 6upx 12upx rgba(0, 112, 226, 0.3);
+      border-radius: 80upx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32upx;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 1);
+      letter-spacing: 10upx;
+    }
+  }
 }
 </style>

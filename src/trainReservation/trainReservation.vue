@@ -2,8 +2,8 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-10-26 14:57:28
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-27 13:51:05
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="train_reservation">
@@ -65,7 +65,21 @@
                 <view class="message_info_item">
                   <view class="message_info">
                     <view class="info_left">
-                      <view class="type">{{ item.type }}票</view>
+                      <view class="type"
+                        >{{
+                          accountId
+                            ? item.card_type === "1"
+                              ? "成人"
+                              : item.card_type === "2"
+                              ? "儿童"
+                              : item.card_type === "3"
+                              ? "学生"
+                              : item.card_type === "4"
+                              ? "残疾军人"
+                              : ""
+                            : item.type
+                        }}票</view
+                      >
                       <view class="user_name">{{
                         item.name || item.en_first_name + "/" + item.en_last_name
                       }}</view>
@@ -81,7 +95,9 @@
                         <view v-else>{{ item.cert_type }}</view>
                       </view>
                       <view class="card">{{
-                        item.type === "儿童" ? "" : `${item.cert_no}`
+                        item.type === "儿童"
+                          ? ""
+                          : `${accountId ? item.card_no : item.cert_no}`
                       }}</view>
                       <view
                         class="child_explain"
@@ -423,11 +439,21 @@
           <view class="close_btn" @click="closeChildDialog()"></view>
         </view>
         <view class="modal_box_content">
-          <text>1.每名成年乘客可免费携带一名身高不足1.2米的儿童，该儿童可不用购票及填写相关信息。携带的其他儿童身高不足1.2米也须购儿童票。</text>
-          <text>2.身高不足1.2米的免费儿童需与成人共用一个席位，若想要单独的席位，须购儿童票。</text>
-          <text>3.身高1.2米—1.5米儿童可购儿童票，但须跟成人票一起购买，使用同行成人证件购票并凭此证件取票。</text>
-          <text>4.身高超1.5米的儿童须购全价票。因儿童无有效证件，此类票只能在线下售票窗口购买。</text>
-          <text>备注：请根据儿童实际身高购票，云上航空不承担因儿童身高与所购车票不符而无法进站的责任。</text>
+          <text
+            >1.每名成年乘客可免费携带一名身高不足1.2米的儿童，该儿童可不用购票及填写相关信息。携带的其他儿童身高不足1.2米也须购儿童票。</text
+          >
+          <text
+            >2.身高不足1.2米的免费儿童需与成人共用一个席位，若想要单独的席位，须购儿童票。</text
+          >
+          <text
+            >3.身高1.2米—1.5米儿童可购儿童票，但须跟成人票一起购买，使用同行成人证件购票并凭此证件取票。</text
+          >
+          <text
+            >4.身高超1.5米的儿童须购全价票。因儿童无有效证件，此类票只能在线下售票窗口购买。</text
+          >
+          <text
+            >备注：请根据儿童实际身高购票，云上航空不承担因儿童身高与所购车票不符而无法进站的责任。</text
+          >
         </view>
       </view>
     </uni-popup>
@@ -449,8 +475,14 @@
           >
             <view class="box_title">{{ item.name }}</view>
             <view class="box_input"
-              >{{ item.cert_type }}尾号{{
-                item.cert_no ? item.cert_no.slice(-4) : "-"
+              >{{ accountId ? "证件" : item.cert_type }}尾号{{
+                accountId
+                  ? item.card_no
+                    ? item.card_no.slice(-4)
+                    : "-"
+                  : item.cert_no
+                  ? item.cert_no.slice(-4)
+                  : "-"
               }}</view
             >
           </view>
@@ -568,6 +600,8 @@ export default {
         name: "", // 联系人
         phone: "", // 手机号
       },
+
+      accountId: "", // 12306乘客ID
     };
   },
   methods: {
@@ -587,7 +621,8 @@ export default {
           JSON.stringify(this.chdinf_msg) +
           "&editPassengerList=" +
           JSON.stringify(this.passengerList) +
-          "&trainType=train",
+          "&trainType=train&accountId=" +
+          this.accountId,
       });
     },
 
@@ -675,10 +710,15 @@ export default {
 
     // 下一步
     nextAction() {
-      for (let i = 0; i < this.passengerList.length; i++) {
-        if (this.passengerList[i].type === '成人' && this.passengerList[i].verify_status !== 1) {
-          this.openVerify(this.passengerList[i]);
-          return;
+      if (!this.accountId) {
+        for (let i = 0; i < this.passengerList.length; i++) {
+          if (
+            this.passengerList[i].type === "成人" &&
+            this.passengerList[i].verify_status !== 1
+          ) {
+            this.openVerify(this.passengerList[i]);
+            return;
+          }
         }
       }
 
@@ -718,39 +758,88 @@ export default {
     submitOrder() {
       let passenger = [];
 
-      this.passengerList.map((item) => {
-        passenger.push({
-          name: item.name, //类型：String  必有字段  备注：姓名
-          card_no: item.cert_no, //类型：String  必有字段  备注：证件号
-          card_name: item.cert_type, //类型：String  必有字段  备注：证件名字
-          card_type: item.cert_type === "身份证" ? "1" : "", //类型：String  必有字段  备注：证件类型
-          id: item.id || 0, //类型：String  必有字段  备注：乘客ID
-          seat_name: this.singleData.name, //类型：String  必有字段  备注：座位名字
-          seat_code: this.singleData.code, //类型：String  必有字段  备注：座位代码
-          price: this.singleData.price, //类型：String  必有字段  备注：座位价格
-          ticket_type:
-            item.type === "成人" ? "1" : item.type === "儿童" ? "2" : item.type, //类型：String  必有字段  备注：票类型
-          phone: item.phone || "", //类型：String  必有字段  备注：手机号
-          is_insurance: item.is_insure ? true : false, //类型：String  必有字段  备注：是否购买保险
-          school: {
-            //类型：Object  可有字段  备注：学校信息，默认为空。如果是学生票则必须
-            // province_name:"mock",                //类型：String  可有字段  备注：省份，可为空
-            // province_code:"mock",                //类型：String  可有字段  备注：省份代码，可为空
-            // code:"mock",                //类型：String  必有字段  备注：学校代码
-            // name:"mock",                //类型：String  必有字段  备注：学校名字
-            // student_no:"mock",                //类型：String  必有字段  备注：学号
-            // system:"mock",                //类型：String  必有字段  备注：学制
-            // enter_year:"mock"                //类型：String  必有字段  备注：如学年份
-          },
-          passport: {
-            //类型：Object  可有字段  备注：护照信息，如果是护照则必须
-            expired: "2030-01-01", //类型：String  必有字段  备注：过期时间
-            birthday: item.birthday, //类型：String  必有字段  备注：生日
-            sex: item.sex === 2 ? "M" : "F", //类型：String  必有字段  备注：性别
-            country: "CN", //类型：String  必有字段  备注：国家代码
-          },
+      if (this.accountId) {
+        this.passengerList.map((item) => {
+          passenger.push({
+            name: item.name, //类型：String  必有字段  备注：姓名
+            card_no: item.card_no, //类型：String  必有字段  备注：证件号
+            card_name: item.card_type, //类型：String  必有字段  备注：证件名字
+            card_type:
+              item.card_type === "1"
+                ? "中国居民身份证"
+                : item.card_type === "2"
+                ? "港澳台居民居住证"
+                : item.card_type === "B"
+                ? "护照"
+                : item.card_type === "C"
+                ? "港澳居民来往内地通行证"
+                : item.card_type === "G"
+                ? "台湾居民来往大陆通行证"
+                : item.card_type === "H"
+                ? "外国人永久居留身份证"
+                : item.card_type, //类型：String  必有字段  备注：证件类型
+
+            id: item.id || 0, //类型：String  必有字段  备注：乘客ID
+            seat_name: this.singleData.name, //类型：String  必有字段  备注：座位名字
+            seat_code: this.singleData.code, //类型：String  必有字段  备注：座位代码
+            price: this.singleData.price, //类型：String  必有字段  备注：座位价格
+            ticket_type: item.ticket_type, //类型：String  必有字段  备注：票类型
+            phone: item.phone || "", //类型：String  必有字段  备注：手机号
+            is_insurance: item.is_insure ? true : false, //类型：String  必有字段  备注：是否购买保险
+            school: {
+              //类型：Object  可有字段  备注：学校信息，默认为空。如果是学生票则必须
+              // province_name:"mock",                //类型：String  可有字段  备注：省份，可为空
+              // province_code:"mock",                //类型：String  可有字段  备注：省份代码，可为空
+              // code:"mock",                //类型：String  必有字段  备注：学校代码
+              // name:"mock",                //类型：String  必有字段  备注：学校名字
+              // student_no:"mock",                //类型：String  必有字段  备注：学号
+              // system:"mock",                //类型：String  必有字段  备注：学制
+              // enter_year:"mock"                //类型：String  必有字段  备注：如学年份
+            },
+            passport: {
+              //类型：Object  可有字段  备注：护照信息，如果是护照则必须
+              expired: "2030-01-01", //类型：String  必有字段  备注：过期时间
+              birthday: item.birthday, //类型：String  必有字段  备注：生日
+              sex: item.sex, //类型：String  必有字段  备注：性别
+              country: "CN", //类型：String  必有字段  备注：国家代码
+            },
+          });
         });
-      });
+      } else {
+        this.passengerList.map((item) => {
+          passenger.push({
+            name: item.name, //类型：String  必有字段  备注：姓名
+            card_no: item.cert_no, //类型：String  必有字段  备注：证件号
+            card_name: item.cert_type, //类型：String  必有字段  备注：证件名字
+            card_type: item.cert_type === "身份证" ? "1" : "", //类型：String  必有字段  备注：证件类型
+            id: item.id || 0, //类型：String  必有字段  备注：乘客ID
+            seat_name: this.singleData.name, //类型：String  必有字段  备注：座位名字
+            seat_code: this.singleData.code, //类型：String  必有字段  备注：座位代码
+            price: this.singleData.price, //类型：String  必有字段  备注：座位价格
+            ticket_type:
+              item.type === "成人" ? "1" : item.type === "儿童" ? "2" : item.type, //类型：String  必有字段  备注：票类型
+            phone: item.phone || "", //类型：String  必有字段  备注：手机号
+            is_insurance: item.is_insure ? true : false, //类型：String  必有字段  备注：是否购买保险
+            school: {
+              //类型：Object  可有字段  备注：学校信息，默认为空。如果是学生票则必须
+              // province_name:"mock",                //类型：String  可有字段  备注：省份，可为空
+              // province_code:"mock",                //类型：String  可有字段  备注：省份代码，可为空
+              // code:"mock",                //类型：String  必有字段  备注：学校代码
+              // name:"mock",                //类型：String  必有字段  备注：学校名字
+              // student_no:"mock",                //类型：String  必有字段  备注：学号
+              // system:"mock",                //类型：String  必有字段  备注：学制
+              // enter_year:"mock"                //类型：String  必有字段  备注：如学年份
+            },
+            passport: {
+              //类型：Object  可有字段  备注：护照信息，如果是护照则必须
+              expired: "2030-01-01", //类型：String  必有字段  备注：过期时间
+              birthday: item.birthday, //类型：String  必有字段  备注：生日
+              sex: item.sex === 2 ? "M" : "F", //类型：String  必有字段  备注：性别
+              country: "CN", //类型：String  必有字段  备注：国家代码
+            },
+          });
+        });
+      }
 
       let data = {
         source: "YunKu", // 数据源
@@ -787,10 +876,10 @@ export default {
         if (res.errorcode === 10000) {
           let orderNo = res.data.order.order_no;
           // 选择坐席 托管模式
-          uni.removeStorageSync("trainMessage")
-          uni.removeStorageSync("pageHeaderData")
-          uni.removeStorageSync("singleData")
-    
+          uni.removeStorageSync("trainMessage");
+          uni.removeStorageSync("pageHeaderData");
+          uni.removeStorageSync("singleData");
+
           uni.navigateTo({
             url:
               "/trainReservation/occupySeat?orderNo=" +
@@ -802,7 +891,7 @@ export default {
           });
         } else {
           uni.showToast({
-            title: res.msg,
+            title: this.accountId ? res.data : res.msg,
             icon: "none",
             duration: 3000,
           });
@@ -884,16 +973,29 @@ export default {
     },
     // 选中成人证件
     checkedCard(val) {
-      console.log('选中成人',val)
+      console.log("选中成人", val);
       this.checkedAdtPassenger = val;
-      let data = {
-        cert_no: val.cert_no,
-        cert_type: val.cert_type,
-        name: val.name,
-        type: "儿童",
-        phone: val.phone,
-        birthday: val.birthday,
-      };
+      let data;
+      if (this.accountId) {
+        data = {
+          card_no: val.card_no,
+          card_type: "1",
+          name: val.name,
+          type: "儿童",
+          phone: val.phone,
+          birthday: val.birthday,
+          ticket_type: 2,
+        };
+      } else {
+        data = {
+          cert_no: val.cert_no,
+          cert_type: val.cert_type,
+          name: val.name,
+          type: "儿童",
+          phone: val.phone,
+          birthday: val.birthday,
+        };
+      }
       this.passengerList.push(data);
       this.closeAdultDialog();
       this.getPassengerNumber();
@@ -910,21 +1012,33 @@ export default {
     // 打开成人证件
     openAdultDialog(val) {
       // 如果成人只有一位 那么选择成人证件弹窗不显示
-      if(this.passengerNumber.adt === 1) {
-        let data = {
-          cert_no: val[0].cert_no,
-          cert_type: val[0].cert_type,
-          name: val[0].name,
-          type: "儿童",
-          phone: val[0].phone,
-          birthday: val[0].birthday,
+      if (this.passengerNumber.adt === 1) {
+        let data;
+        if (this.accountId) {
+          data = {
+            card_no: val.card_no,
+            card_type: "1",
+            name: val.name,
+            type: "儿童",
+            phone: val.phone,
+            birthday: val.birthday,
+            ticket_type: 2,
+          };
+        } else {
+          data = {
+            cert_no: val.cert_no,
+            cert_type: val.cert_type,
+            name: val.name,
+            type: "儿童",
+            phone: val.phone,
+            birthday: val.birthday,
+          };
         }
-        this.passengerList.push(data)
-      }else {
+        this.passengerList.push(data);
+      } else {
         this.$refs.adultModal.open();
       }
       this.getPassengerNumber();
-      
     },
 
     closeAdultDialog() {
@@ -946,10 +1060,17 @@ export default {
 
     // 计算乘客人数
     getPassengerNumber() {
-      this.passengerNumber = {
-        adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量
-        chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
-      };
+      if (this.accountId) {
+        this.passengerNumber = {
+          adt: this.passengerList.filter((u) => u.ticket_type !== 2).length, // 成人数量
+          chd: this.passengerList.filter((u) => u.ticket_type === 2).length, // 儿童数量
+        };
+      } else {
+        this.passengerNumber = {
+          adt: this.passengerList.filter((u) => u.type === "成人").length, // 成人数量
+          chd: this.passengerList.filter((u) => u.type === "儿童").length, // 儿童数量
+        };
+      }
     },
 
     // 乘客状态刷新
@@ -983,38 +1104,37 @@ export default {
     },
   },
   onShow() {
-    
     if (this.passengerList.length > 0) {
       this.getPassengerNewVerf();
     }
 
     let passenger = uni.getStorageSync("passengerList");
     if (passenger) {
-      
       this.passengerList = JSON.parse(passenger);
       uni.removeStorageSync("passengerList");
     }
     console.log("乘客", this.passengerList);
     this.getPassengerNumber();
     // 选择坐席 托管模式
-    if(uni.getStorageSync("trainMessage")) {
-      this.trainData = JSON.parse(uni.getStorageSync("trainMessage"))
+    if (uni.getStorageSync("trainMessage")) {
+      this.trainData = JSON.parse(uni.getStorageSync("trainMessage"));
     }
-    if(uni.getStorageSync("pageHeaderData")) {
-      this.pageHeaderData = JSON.parse(uni.getStorageSync("pageHeaderData"))
+    if (uni.getStorageSync("pageHeaderData")) {
+      this.pageHeaderData = JSON.parse(uni.getStorageSync("pageHeaderData"));
     }
-    if(uni.getStorageInfoSync("singleData")) {
-      this.singleData = JSON.parse(uni.getStorageSync("singleData"))
+    if (uni.getStorageInfoSync("singleData")) {
+      this.singleData = JSON.parse(uni.getStorageSync("singleData"));
     }
-    
   },
   onLoad(data) {
     this.getInsurance();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 
+    this.accountId = data.accountId ? data.accountId : "";
+
     this.trainData = data.trainItem ? JSON.parse(data.trainItem) : {};
     this.singleData = data.singleData ? JSON.parse(data.singleData) : {};
-    this.pageHeaderData = data.pageHeaderData ? JSON.parse(data.pageHeaderData):{};
+    this.pageHeaderData = data.pageHeaderData ? JSON.parse(data.pageHeaderData) : {};
 
     this.pageHeaderData = JSON.parse(JSON.stringify(this.pageHeaderData));
 
@@ -1620,7 +1740,7 @@ export default {
   // 儿童票说明
   .child_modal_box {
     position: relative;
-     &::before {
+    &::before {
       content: "";
       position: absolute;
       bottom: -120upx;
@@ -1668,7 +1788,7 @@ export default {
   // 成人证件
   .adult_modal_box {
     position: relative;
-     &::before {
+    &::before {
       content: "";
       position: absolute;
       bottom: -120upx;
@@ -1733,7 +1853,7 @@ export default {
   // 订单总价
   .price_modal_box {
     position: relative;
-     &::before {
+    &::before {
       content: "";
       position: absolute;
       bottom: -120upx;
