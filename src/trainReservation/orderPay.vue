@@ -2,8 +2,8 @@
  * @Description: 火车票 --- 确认支付
  * @Author: mzr
  * @Date: 2021-08-18 14:25:36
- * @LastEditTime: 2021-10-19 14:20:02
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-27 17:12:22
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="order_pay">
@@ -156,7 +156,7 @@
     <view class="pay_bottom">
       <view class="bottom_tip">
         您的订单已提交，剩余支付时间
-        <text>14:00</text>
+        <text>{{remainingTime}}</text>
       </view>
       <view class="bottom_submit">
         <button
@@ -183,6 +183,10 @@ export default {
       payType: "钱包", // 支付方式
       payBtnStatus: true, // 支付按钮
       payPayStatus: true, // 支付状态
+
+      paySecond: 0, // 支付时间
+      remainingTime: '00:00', // 倒计时
+      _countdown: {}, // 支付倒计时
     };
   },
   methods: {
@@ -192,6 +196,11 @@ export default {
         console.log("确认支付", res);
         if (res.errorcode === 10000) {
           this.detailData = res.data;
+          let closeTime = this.$moment(this.detailData.created_at).add(10,'m')
+          this.paySecond = closeTime.diff(this.$moment(),'s')
+          this._countdown = setInterval(() => {
+              this.orderCountdown();
+            }, 1000);
         } else {
           uni.showToast({
             title: res.msg,
@@ -200,6 +209,26 @@ export default {
         }
       });
     },
+
+
+    // 订单倒计时
+    orderCountdown() {
+      if (this.paySecond > 0) {
+        let minutes = Math.floor(this.paySecond / 60);
+        let seconds = Math.floor(this.paySecond % 60);
+        this.remainingTime =
+          (minutes < 10 ? "0" + minutes : minutes) +
+          ":" +
+          (seconds < 10 ? "0" + seconds : seconds);
+        --this.paySecond;
+      } else {
+        this.remainingTime = "00:00";
+        clearInterval(this._countdown);
+        this.payPayStatus = false;
+      }
+    },
+
+
     // 选择支付方式
     radioChange(val) {
       this.payType = val.detail.value;
