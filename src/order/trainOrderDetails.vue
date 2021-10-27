@@ -3,8 +3,8 @@
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
 <<<<<<< HEAD
- * @LastEditTime: 2021-10-27 17:26:26
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-27 17:38:41
+ * @LastEditors: wish.WuJunLong
 =======
  * @LastEditTime: 2021-10-27 17:25:34
  * @LastEditors: wish.WuJunLong
@@ -469,7 +469,7 @@ export default {
       } else {
         this.remainingTime = "00:00";
         clearInterval(this._countdown);
-        this.getTrainDetail()
+        this.getTrainDetail(this.order_no)
       }
     },
 
