@@ -2,8 +2,8 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
- * @LastEditTime: 2021-10-27 14:26:31
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-27 16:01:52
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_reservation">
@@ -726,7 +726,8 @@ export default {
         (this.trainData.train.type === "G" ||
           this.trainData.train.type === "D" ||
           this.trainData.train.type === "C") &&
-        this.passengerList.length !== this.checkedCabinList.length
+        this.passengerList.length !== this.checkedCabinList.length && 
+        this.singleData.name !== "无座"
       ) {
         return uni.showToast({
           title: "请为所有乘客选座",

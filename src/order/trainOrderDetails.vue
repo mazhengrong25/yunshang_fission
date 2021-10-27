@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
- * @LastEditTime: 2021-10-19 10:02:51
+ * @LastEditTime: 2021-10-27 17:26:26
  * @LastEditors: mzr
 -->
 <template>
@@ -227,7 +227,7 @@
                           ? "台湾通行证"
                           : item.Credential === "H"
                           ? "外国人身份证"
-                          : ""
+                          : item.Credential
                       }}
                     </view>
                     <view class="item_message">{{ item.CredentialNo }}</view>
@@ -596,6 +596,7 @@ export default {
           fromTime: {},
           to_type: "",
           from_type: "",
+          normalOrder:true
         };
         uni.navigateTo({
           url:
@@ -914,7 +915,7 @@ export default {
                       font-size: 28upx;
                       font-weight: 400;
                       color: #666666;
-                      width: 84upx;
+                      width: 193upx;
                     }
                     .item_message {
                       font-size: 28upx;

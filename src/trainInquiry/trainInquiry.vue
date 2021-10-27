@@ -2,7 +2,7 @@
  * @Description: 火车票查询 
  * @Author: mzr
  * @Date: 2021-07-27 10:44:51
- * @LastEditTime: 2021-10-15 16:34:00
+ * @LastEditTime: 2021-10-27 14:52:56
  * @LastEditors: mzr
 -->
 <template>
@@ -259,6 +259,8 @@ export default {
 
     // 获取车次信息
     getTrainData() {
+      this.saleList = [];
+      this.noSaleList = [];
       let data = {
         departure: this.trainData.to.city_name,
         arrive: this.trainData.from.city_name,
