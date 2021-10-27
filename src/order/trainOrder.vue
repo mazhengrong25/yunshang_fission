@@ -2,7 +2,7 @@
  * @Description: 火车票订单
  * @Author: mzr
  * @Date: 2021-08-20 09:56:10
- * @LastEditTime: 2021-10-13 10:14:50
+ * @LastEditTime: 2021-10-27 17:13:29
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -158,7 +158,7 @@
             </view>
             <view class="time_text">剩余支付时间：</view>
             <view class="time_number"
-              >{{ Math.floor((item.overdue_time / 60) % 60) }}分钟</view
+              >{{ Math.floor(($moment(item.created_at).add(10,'m').diff($moment(),'s') / 60) % 60) }}分钟</view
             >
           </view>
           <view class="item_btn_box" v-if="item.status === 2">

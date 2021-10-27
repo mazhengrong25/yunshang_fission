@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 占座
  * @Author: mzr
  * @Date: 2021-08-17 08:58:59
- * @LastEditTime: 2021-10-27 14:28:16
+ * @LastEditTime: 2021-10-27 17:17:14
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -142,7 +142,7 @@ export default {
         this.singleData = JSON.parse(data.seatInfo)
         this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 
-        let number = Math.floor(Math.random() * 100) + 30
+        let number = Math.floor(Math.random() * 100) + 60
         // let number =  30
 
         this.count = number

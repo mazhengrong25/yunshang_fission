@@ -2,8 +2,13 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
+<<<<<<< HEAD
  * @LastEditTime: 2021-10-27 17:26:26
  * @LastEditors: mzr
+=======
+ * @LastEditTime: 2021-10-27 17:25:34
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 9a06f71996125247085a7c8adbf07e4316b2a733
 -->
 <template>
   <view class="train_details">
@@ -72,9 +77,9 @@
         <text class="time_text">
           {{
             detailData.status === 1
-              ? `预计在${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}分前完成占座`
+              ? `预计在${($moment(detailData.created_at).add(10,'m')).format('mm:ss')}分前完成占座`
               : detailData.status === 2
-              ? `剩余支付时间：${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}`
+              ? `剩余支付时间：${remainingTime}`
               : detailData.status === 3
               ? "订单支付成功，出票中..."
               : ""
@@ -395,6 +400,10 @@ export default {
       trainOrderRemark: "", // 备注内容
 
       getTimeType: "", // 预定返程或重选车次状态
+
+      paySecond: 0, // 支付时间
+      remainingTime: '00:00', // 倒计时
+      _countdown: {}, // 支付倒计时
     };
   },
   methods: {
@@ -415,6 +424,11 @@ export default {
         console.log(res);
         if (res.errorcode === 10000) {
           this.detailData = res.data;
+          let closeTime = this.$moment(this.detailData.created_at).add(10,'m')
+          this.paySecond = closeTime.diff(this.$moment(),'s')
+          this._countdown = setInterval(() => {
+              this.orderCountdown();
+            }, 1000);
           this.getTrainMessage(res.data);
           // 占座状态
           // if (this.detailData.status === 1) {
@@ -440,6 +454,23 @@ export default {
           });
         }
       });
+    },
+
+     // 订单倒计时
+    orderCountdown() {
+      if (this.paySecond > 0) {
+        let minutes = Math.floor(this.paySecond / 60);
+        let seconds = Math.floor(this.paySecond % 60);
+        this.remainingTime =
+          (minutes < 10 ? "0" + minutes : minutes) +
+          ":" +
+          (seconds < 10 ? "0" + seconds : seconds);
+        --this.paySecond;
+      } else {
+        this.remainingTime = "00:00";
+        clearInterval(this._countdown);
+        this.getTrainDetail()
+      }
     },
 
     // 组装车次数据

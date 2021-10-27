@@ -2,8 +2,13 @@
  * @Description: 火车票  --- 预定
  * @Author: mzr
  * @Date: 2021-08-06 16:05:04
+<<<<<<< HEAD
  * @LastEditTime: 2021-10-27 16:01:52
  * @LastEditors: mzr
+=======
+ * @LastEditTime: 2021-10-27 16:51:31
+ * @LastEditors: wish.WuJunLong
+>>>>>>> 9a06f71996125247085a7c8adbf07e4316b2a733
 -->
 <template>
   <view class="train_reservation">
@@ -764,8 +769,8 @@ export default {
           passenger.push({
             name: item.name, //类型：String  必有字段  备注：姓名
             card_no: item.card_no, //类型：String  必有字段  备注：证件号
-            card_name: item.card_type, //类型：String  必有字段  备注：证件名字
-            card_type:
+            card_type: item.card_type, //类型：String  必有字段  备注：证件名字
+            card_name:
               item.card_type === "1"
                 ? "中国居民身份证"
                 : item.card_type === "2"
@@ -845,7 +850,7 @@ export default {
       let data = {
         source: "YunKu", // 数据源
         insurance_id: this.insuranceActive.id || "", // 保险ID
-        account: { id: uni.getStorageSync("userInfo").id },
+        account: { id: this.accountId?this.accountId:uni.getStorageSync("userInfo").id },
         order: {
           standing: this.acceptStatus, //类型：Boolean  必有字段  备注：是否接受站票，默认否
           is_choose_seat: this.checkedCabinList.length > 0, //类型：Boolean  必有字段  备注：是否选座，默认否
