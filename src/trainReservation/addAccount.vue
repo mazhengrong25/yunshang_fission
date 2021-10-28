@@ -2,8 +2,8 @@
  * @Description: 账号登陆 --- 新增账号
  * @Author: mzr
  * @Date: 2021-10-20 15:55:17
- * @LastEditTime: 2021-10-26 17:46:04
- * @LastEditors: mzr
+ * @LastEditTime: 2021-10-28 11:01:28
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="addAccount">
@@ -40,7 +40,7 @@
       </view>
       <view class="content_action">
         <button class="action_button" @click="addAccount()">确认</button>
-        <view class="action_text" @click="goRegister">注册12306账号</view>
+        <!-- <view class="action_text" @click="goRegister">注册12306账号</view> -->
       </view>
       <!-- 账号验证 -->
       <accountVerify
