@@ -2,7 +2,7 @@
  * @Description: 封装uniapp request
  * @Author: wish.WuJunLong
  * @Date: 2020-07-20 18:36:20
- * @LastEditTime: 2021-10-11 15:42:02
+ * @LastEditTime: 2021-10-28 10:38:04
  * @LastEditors: wish.WuJunLong
  */
 
@@ -23,8 +23,8 @@ const request = (config, type) => {
   if (process.env.NODE_ENV === "development") {
     baseUrl = "http://192.168.0.187"; // 开发环境
   } else {
-    baseUrl = "http://222.178.116.98:8090"; // 生产环境  - 穿透测试地址
-    // baseUrl = "https://fxxcx.ystrip.cn"; // 生产环境 - 正式环境地址
+    // baseUrl = "http://222.178.116.98:8090"; // 生产环境  - 穿透测试地址
+    baseUrl = "https://fxxcx.ystrip.cn"; // 生产环境 - 正式环境地址
   }
 
   config.url = baseUrl + config.url;
