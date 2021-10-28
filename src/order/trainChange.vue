@@ -2,7 +2,7 @@
  * @Description: 火车票(已出票) =-- 改签
  * @Author: mzr
  * @Date: 2021-09-06 11:13:17
- * @LastEditTime: 2021-10-14 14:01:30
+ * @LastEditTime: 2021-10-28 09:24:14
  * @LastEditors: mzr
 -->
 <template>
@@ -281,6 +281,7 @@ export default {
     },
     // 提交申请
     submitChange() {
+      console.log('改签乘客',this.checkedPassengerlist)
       if (this.checkedPassengerlist.length < 1) {
         return uni.showToast({
           title: "请选择改签人员",

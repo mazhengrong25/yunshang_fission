@@ -2,7 +2,7 @@
  * @Description: 确认退票/改签弹窗
  * @Author: mzr
  * @Date: 2021-09-07 14:04:01
- * @LastEditTime: 2021-10-15 09:24:53
+ * @LastEditTime: 2021-10-28 09:26:09
  * @LastEditors: mzr
 -->
 <template>
@@ -12,7 +12,7 @@
             <view class="explanation_header">确认{{titleType === "change"?"改签":"退票"}}</view>
             <view class="close_btn" @click="closePop()"></view>
         </view>
-        <view class="refund_content" v-if="trainObject.segments.length !== 0">
+        <view class="refund_content">
             <view class="content_title">
                 {{titleType === "change"?"改签新车次":"退票行程"}}
                  <text v-if="titleType === 'change'">

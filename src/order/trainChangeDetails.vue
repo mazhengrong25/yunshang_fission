@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-10-14 14:39:16
+ * @LastEditTime: 2021-10-28 10:33:42
  * @LastEditors: mzr
 -->
 <template>
@@ -451,7 +451,7 @@ export default {
               city_name: this.newDetailData.from_station,
               country_code: "CN",
               province: this.newDetailData.from_station,
-            }
+            }, 
         }
         
         uni.navigateTo({

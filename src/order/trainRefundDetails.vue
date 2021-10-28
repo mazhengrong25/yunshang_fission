@@ -2,7 +2,7 @@
  * @Description: 退票单  --- 详情
  * @Author: mzr
  * @Date: 2021-08-30 11:08:34
- * @LastEditTime: 2021-10-27 17:10:03
+ * @LastEditTime: 2021-10-28 10:33:40
  * @LastEditors: mzr
 -->
 <template>
@@ -291,7 +291,6 @@ export default {
               date: this.$moment(this.detailData.train_date).format("YYYY-MM-DD"),
 
           },
-          normalOrder:true
         }
         uni.navigateTo({
             url: '/trainInquiry/trainInquiry?trainData=' +

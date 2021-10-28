@@ -2,13 +2,8 @@
  * @Description: 火车票 --- 订单详情
  * @Author: mzr
  * @Date: 2021-08-20 17:07:00
-<<<<<<< HEAD
- * @LastEditTime: 2021-10-27 17:41:38
- * @LastEditors: wish.WuJunLong
-=======
- * @LastEditTime: 2021-10-27 17:25:34
- * @LastEditors: wish.WuJunLong
->>>>>>> 9a06f71996125247085a7c8adbf07e4316b2a733
+ * @LastEditTime: 2021-10-28 10:33:39
+ * @LastEditors: mzr
 -->
 <template>
   <view class="train_details">
@@ -220,7 +215,7 @@
                     证件取票，身高低于1.5米
                   </view>
                   <view v-else class="list_item_add">
-                    <view class="item_title">
+                    <view :class="['item_title',{ modal :item.Credential === '1'}]">
                       {{
                         item.Credential === "1"
                           ? "身份证"
@@ -632,7 +627,6 @@ export default {
           fromTime: {},
           to_type: "",
           from_type: "",
-          normalOrder: true,
         };
         uni.navigateTo({
           url:
@@ -952,6 +946,9 @@ export default {
                       font-weight: 400;
                       color: #666666;
                       width: 193upx;
+                      &.modal {
+                        width: 86upx;
+                      }
                     }
                     .item_message {
                       font-size: 28upx;

@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 坐席
  * @Author: mzr
  * @Date: 2021-08-03 14:12:34
- * @LastEditTime: 2021-10-27 17:25:33
+ * @LastEditTime: 2021-10-28 10:33:27
  * @LastEditors: mzr
 -->
 <template>
@@ -40,11 +40,11 @@
                       <view class="train_content_item">
                           <view class="list_price_amount">{{item.number < 1 ? '无票': item.number > 15 ? '有票': item.number + "张"}}</view>
                           <button 
-                            @click="openHostInfo(index,normalOrder,item)" 
-                            :class="['list_button',{'disabled_button':item.number < 1},{'pack':hostInfoChecket === index && item.number > 1 && !normalOrder}]" 
+                            @click="openHostInfo(index,trainChange,item)" 
+                            :class="['list_button',{'disabled_button':item.number < 1},{'pack':hostInfoChecket === index && item.number > 1 && !trainChange}]" 
                             :disabled="item.number < 1"
                           >
-                            {{hostInfoChecket === index && item.number >1 && !normalOrder ?'收起':'预定'}}
+                            {{hostInfoChecket === index && item.number >1 && !trainChange ?'收起':'预定'}}
                             <view class="pack_icon"></view>
                           </button>
                       </view>
@@ -106,7 +106,8 @@ export default {
 
             trainMessage: {}, // 火车票信息
             sleeperList:[], // 卧铺信息
-            normalOrder:"", // 原账户到预定
+
+            trainChange:false, // 原账户 订单改签
 
             trainData:{}, // 查询传参
             trainCode:"", // 查询传参 车次
@@ -118,9 +119,8 @@ export default {
 
       // 展开托管模式 i 下标  e 区别订单改签 val 车次信息
       openHostInfo(i,e,val) {
-        this.hostInfoChecket = this.hostInfoChecket === i ? null : i;
-        if(e) {
-          let data = {
+        if(e){
+           let data = {
             train: this.trainMessage,
             cabin: val
           }
@@ -129,6 +129,7 @@ export default {
             delta: 2,
           })
         }
+        this.hostInfoChecket = this.hostInfoChecket === i ? null : i;
       },
 
       // 跳转到账号登陆
@@ -234,8 +235,8 @@ export default {
         this.getTrainData();
         // 页头
         this.pageHeaderData = JSON.parse(JSON.stringify(this.trainData))
-        // 退票单 
-        this.normalOrder = this.trainData.normalOrder ? this.trainData.isChange: ""
+        // 订单改签
+        this.trainChange = this.trainData.isChange
     }
 }
 </script>
