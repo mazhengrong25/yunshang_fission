@@ -2,7 +2,7 @@
  * @Description: 火车票查询 
  * @Author: mzr
  * @Date: 2021-07-27 10:44:51
- * @LastEditTime: 2021-10-27 14:52:56
+ * @LastEditTime: 2021-10-28 10:59:33
  * @LastEditors: mzr
 -->
 <template>
@@ -248,6 +248,9 @@ export default {
 
     // 跳转到选择坐席
     jumpTrainInfo(val) {
+      if(!this.seatStatus(val.seat)) {
+        return false
+      }
       uni.navigateTo({
         url:
           "/pages/trainInfo/trainInfo?trainData=" +

@@ -2,8 +2,8 @@
  * @Description: 新增/编辑12306账号乘客
  * @Author: wish.WuJunLong
  * @Date: 2021-10-27 11:11:15
- * @LastEditTime: 2021-10-27 13:36:37
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-29 17:13:23
+ * @LastEditors: mzr
 -->
 
 <template>
@@ -122,12 +122,19 @@
       :dataList="cardStatusList"
       @submitDialog="cardStatusListBtn()"
     ></yun-selector>
+    <!-- 账号验证 -->
+    <!-- <accountVerify
+      ref="trainAccountVerify"
+      :phone="passengerData.phone"
+    ></accountVerify> -->
   </div>
 </template>
 
 <script>
 import passenger from "@/api/passenger.js";
+import accountVerify from '@/components/account_verify.vue';
 export default {
+  components: { accountVerify },
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度

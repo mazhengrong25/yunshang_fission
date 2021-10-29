@@ -2,8 +2,8 @@
  * @Description: 乘机人列表
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 17:09:14
- * @LastEditTime: 2021-10-27 13:24:38
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-10-29 17:37:12
+ * @LastEditors: mzr
 -->
 <template>
   <view class="passenger">
@@ -134,7 +134,7 @@
               <view
                 class="edit_text_btn"
                 v-if="item.check_status === 1 || item.phone_check_status === 1"
-                @click.stop="jumpEditUserInfo(item)"
+                @click.stop="checkedPassenger(item)"
               >
                 {{
                   item.check_status === 1
@@ -214,6 +214,14 @@
       :passengerData="passengerData"
       @jumpVerify="jumpVerify"
     ></passengerVerify>
+
+    <!-- 手机核验 -->
+    <accountVerify
+      ref="trainAccountVerify"
+      :phone="accountData.phone"
+      :code="accountData.code"
+      @openVerify="openVerify"
+    ></accountVerify>
   </view>
 </template>
 
@@ -221,9 +229,10 @@
 import passenger from "@/api/passenger.js";
 import moment from "moment";
 import passengerVerify from "@/components/passenger_verify.vue";
+import accountVerify from '@/components/account_verify.vue';
 moment.locale("zh-cn");
 export default {
-  components: { passengerVerify },
+  components: { passengerVerify,accountVerify},
   data() {
     return {
       iStatusBarHeight: 0, // 状态栏高度
@@ -262,6 +271,13 @@ export default {
       }, // 乘车核验传
 
       accountId: "", // 12306 乘客ID
+
+      accountData: {
+        phone:"", // 手机号
+        code:"", // 验证码
+      },
+
+      checkedPassnegerData:{}, // 核验乘客数据
     };
   },
   methods: {
@@ -415,6 +431,7 @@ export default {
 
     // 跳转修改乘机人列表
     jumpEditUserInfo(val) {
+      console.log('1',val)
       if (this.accountId) {
         uni.navigateTo({
           url:
@@ -585,6 +602,11 @@ export default {
       this.notList = this.passengerList.length < 1;
     },
 
+
+    openVerify(){
+      this.checkedPassenger(this.checkedPassnegerData)
+    },
+
     // 选中乘机人
     checkedPassenger(data, index) {
       if (!this.accountId) {
@@ -596,13 +618,51 @@ export default {
           });
         }
       }else {
-          if(data.check_status === 1 || data.phone_check_status === 1){
-              return uni.showModal({
-            showCancel: false,
-            title: "提示",
-            content: `该乘客${data.check_status === 1?'身份':data.phone_check_status === 1?'手机号':'核验未通过'}请修改乘客数据以便重新核验`,
-          });
+          if(data.phone_check_status === 1){
+            this.checkedPassnegerData = data
+            let newData = {
+                account: {
+                  id: this.accountId,
+                },
+                passenger: data
+            }
+            passenger.accountPassenger(newData, true).then((res) => {
+              if (res.errorcode === 10000) {
+                if(res.data[0].phone_check_status === 0){
+                  this.accountData = {
+                    phone:data.phone,
+                    code: res.data[0].captcha
+                  }
+                  this.$refs.trainAccountVerify.openExp()
+                }else {
+                  this.$refs.trainAccountVerify.closeExp()
+                    uni.showToast({
+                  title: '核验成功',
+                  icon: "none",
+                });
+                  this.getPassengerData();
+
+                }
+
+              } else {
+                uni.showToast({
+                  title: res.msg,
+                  duration: 2000,
+                  icon: "none",
+                });
+                
+                this.$refs.returnSubmitDialog.close();
+              }
+              console.log(res);
+            });
+
+           
           }
+      }
+
+      
+      if(data.check_status === 1 || data.phone_check_status === 1){
+        return false
       }
 
       this.passengerList[index].checked = !this.passengerList[index].checked;

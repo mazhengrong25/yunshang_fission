@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签详情
  * @Author: mzr
  * @Date: 2021-09-03 09:47:50
- * @LastEditTime: 2021-10-28 10:33:42
+ * @LastEditTime: 2021-10-28 11:36:51
  * @LastEditors: mzr
 -->
 <template>
@@ -48,8 +48,8 @@
         <text class="time_text">
           {{detailData.status === 3 ? '订单支付成功，出票中...' : 
               detailData.status === 6 ? '抱歉改签占座失败，若仍需改签请联系客服人员' :
-                detailData.status === 2 ? `剩余支付时间：${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}分钟`: 
-                  detailData.status === 1 ? `预计在${(this.$moment(detailData.created_at).add(30,'m')).format('mm:ss')}分前完成占座`:''}}
+                detailData.status === 2 ? `剩余支付时间：${remainingTime}`: 
+                  detailData.status === 1 ? `预计在${(this.$moment(detailData.created_at).add(10,'m')).format('mm:ss')}分前完成占座`:''}}
         </text>
        </view>
 
@@ -234,8 +234,9 @@ export default {
       // 改签金额对话框
       trainSingleData:{}, 
 
-      // 改签占座剩余时间
-      // occupyTime:0
+      paySecond: 0, // 支付时间
+      remainingTime: "00:00", // 倒计时
+      _countdown: {}, // 支付倒计时
     }
   },
   methods:{
@@ -256,12 +257,21 @@ export default {
       orderApi.trainChangeDetail(val).then((res) => {
         console.log(res)
         if(res.errorcode === 10000) {
+
           // 原车次
           this.detailData = res.data.train_order
           this.getTrainMessage(this.detailData,true)
           // 新车次
           this.newDetailData = res.data
           this.getTrainMessage(this.newDetailData)
+          // 剩余支付时间
+          let closeTime = this.$moment(this.newDetailData.created_at).add(10, "m");
+          this.paySecond = closeTime.diff(this.$moment(), "s");
+          if (this.paySecond > 0) {
+            this._countdown = setInterval(() => {
+              this.orderCountdown();
+            }, 1000);
+          }
           // 改签占座中
           // if(this.detailData.status === 1){
           //   this.occupyTime = 60
@@ -285,6 +295,23 @@ export default {
           })
         }
       })
+    },
+
+     // 订单倒计时
+    orderCountdown() {
+      if (this.paySecond > 0) {
+        let minutes = Math.floor(this.paySecond / 60);
+        let seconds = Math.floor(this.paySecond % 60);
+        this.remainingTime =
+          (minutes < 10 ? "0" + minutes : minutes) +
+          ":" +
+          (seconds < 10 ? "0" + seconds : seconds);
+        --this.paySecond;
+      } else {
+        this.remainingTime = "00:00";
+        clearInterval(this._countdown);
+        this.getTrainDetail(this.order_no);
+      }
     },
 
     // 组装车次数据

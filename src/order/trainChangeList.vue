@@ -2,7 +2,7 @@
  * @Description: 火车票 --- 改签订单
  * @Author: mzr
  * @Date: 2021-08-27 10:08:44
- * @LastEditTime: 2021-10-13 16:27:26
+ * @LastEditTime: 2021-10-28 11:36:54
  * @LastEditors: mzr
 -->
 <template>
@@ -98,7 +98,7 @@
                       <image src="@/static/remaining_time.png" mode="aspectFit" />
                   </view>
                   <view class="time_text">剩余支付时间：</view>
-                  <view class="time_number">{{Math.floor(item.overdue_time / 60 % 60)}}分钟</view>
+                  <view class="time_number">{{ Math.floor(($moment(item.created_at).add(10,'m').diff($moment(),'s') / 60) % 60) }}分钟</view>
               </view>
               <view class="item_btn_box" v-if="item.status === 2">
                   <view class="item_btn close_btn" @click.stop="getCancel(item)">取消订单</view>

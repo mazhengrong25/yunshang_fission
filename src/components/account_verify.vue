@@ -2,7 +2,7 @@
  * @Description: 托管模式 --- 账号验证
  * @Author: mzr
  * @Date: 2021-10-21 11:43:16
- * @LastEditTime: 2021-10-26 14:22:31
+ * @LastEditTime: 2021-10-29 17:28:46
  * @LastEditors: mzr
 -->
 <template>
@@ -18,9 +18,9 @@
           <view class="add_text">
             该账号需进行短信核验，请您用手机尾号为
             <span>{{phone.slice(-4)}}</span>
-            发送短信<span>666</span>至<span>12306</span>
+            发送短信<span>{{code?code:'666'}}</span>至<span>12306</span>
             </view>
-            <view class="receive_input">
+            <view class="receive_input" v-if="!code">
               <input 
                 password="true"
                 placeholder="短信验证码"
@@ -45,10 +45,11 @@ export default {
       type:String,
       default:() => ""
     },
-    // accountMessageCode : {
-    //   type:String,
-    //   default:() => ""
-    // }
+    // 乘车人手机核验验证码
+    code : {
+      type:String,
+      default:() => ""
+    },
   },
   data() {
     return {
@@ -69,7 +70,6 @@ export default {
 
     // 短信验证
     getVerify() {
-      
       this.$emit('openVerify')
     },
 
