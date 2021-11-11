@@ -2,7 +2,7 @@
  * @Description: 确认支付页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-21 14:23:01
- * @LastEditTime: 2021-03-19 16:54:03
+ * @LastEditTime: 2021-11-11 11:38:11
  * @LastEditors: wish.WuJunLong
 -->
 <template>
