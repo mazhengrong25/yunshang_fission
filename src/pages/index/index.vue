@@ -2,7 +2,7 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-11-11 09:37:20
+ * @LastEditTime: 2021-11-11 11:34:56
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -293,6 +293,7 @@ export default {
 
       checkTickedType: false, // 切换往返地
 
+      swiperList: [],
       // banner 列表  火车票
       trainSwiper: [
         {
@@ -371,7 +372,7 @@ export default {
 
       currentTrue: false, // 是否往返
 
-      headerName: ''
+      headerName: "",
     };
   },
   methods: {
@@ -599,7 +600,6 @@ export default {
       userInfo.getAdvertisement(data).then((res) => {
         if (res.errorcode === 10000) {
           this.swiperList = res.data;
-                    console.log('ad',this.swiperList)
         }
       });
     },
@@ -612,15 +612,14 @@ export default {
     },
   },
   onLoad() {
-    this.headerName = this.$globalType
+    this.headerName = this.$globalType;
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.getBannerList(); // 获取banner
     this.setSwiperHeight();
 
     this.getUserInfo();
 
     this.getNoticeList();
-
-    this.getBannerList(); // 获取banner
   },
   onShareAppMessage(res) {
     return {
@@ -632,7 +631,7 @@ export default {
     // 获取城市信息
     if (uni.getStorageSync("city")) {
       let cityData = JSON.parse(uni.getStorageSync("city"));
-      console.log('首页城市地址',cityData);
+      console.log("首页城市地址", cityData);
       if (cityData.status === "to") {
         this.airMessage.to = cityData.data;
         if (cityData.type === "hot") {
