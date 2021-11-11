@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-11-11 09:26:23
+ * @LastEditTime: 2021-11-11 10:04:01
  * @LastEditors: wish.WuJunLong
  */
 import Vue from 'vue'
@@ -37,7 +37,7 @@ Vue.component('yunConfig', yunConfig);
 import DefaultPage from "@/components/default_page.vue"; // 缺省页
 Vue.component('DefaultPage', DefaultPage);
 
-Vue.prototype.$globalType = '坤昌科技', // 全局变量
+Vue.prototype.$globalType = '云上航空', // 全局变量
 
 App.mpType = 'app'
 
