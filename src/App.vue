@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2020-09-21 17:45:54
+ * @LastEditTime: 2021-11-11 09:27:56
  * @LastEditors: wish.WuJunLong
 --> 
 <script>
@@ -34,7 +34,7 @@ export default {
   },
   onLoad() {
     uni.showShareMenu({
-      title: "云上航空机票分销",
+      title: this.$$globalType + "机票分销",
       path: "/pages/index/index",
     });
   },

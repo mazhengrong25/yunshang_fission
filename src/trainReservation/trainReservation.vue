@@ -457,7 +457,7 @@
             >4.身高超1.5米的儿童须购全价票。因儿童无有效证件，此类票只能在线下售票窗口购买。</text
           >
           <text
-            >备注：请根据儿童实际身高购票，云上航空不承担因儿童身高与所购车票不符而无法进站的责任。</text
+            >备注：请根据儿童实际身高购票，{{headerName}}不承担因儿童身高与所购车票不符而无法进站的责任。</text
           >
         </view>
       </view>
@@ -607,6 +607,8 @@ export default {
       },
 
       accountId: "", // 12306乘客ID
+
+      headerName: ''
     };
   },
   methods: {
@@ -1134,6 +1136,7 @@ export default {
     }
   },
   onLoad(data) {
+    this.headerName = this.$globalType
     this.getInsurance();
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 

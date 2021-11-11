@@ -35,7 +35,7 @@
             </view>
             <view class="info_list">
               <view class="list_title">收款方</view>
-              <view class="list_text">重庆云上航空票务股份有限公司</view>
+              <view class="list_text">{{headerName === '坤昌科技'?'重庆坤昌科技有限公司':'重庆云上航空票务股份有限公司'}}</view>
             </view>
           </view>
         </view>
@@ -54,7 +54,9 @@ export default {
   data() {
     return {
 			iStatusBarHeight: 0, // 导航栏高度
-			orderInfo: {}
+			orderInfo: {},
+
+      headerName: ''
     };
   },
   methods: {
@@ -79,6 +81,7 @@ export default {
     },
   },
   onLoad(data) {
+    this.headerName = this.$globalType
 		this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
 		this.orderInfo = JSON.parse(data.orderData)
 		console.log(this.orderInfo)

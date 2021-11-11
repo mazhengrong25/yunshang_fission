@@ -130,7 +130,7 @@
         </view>
         <view class="message_list">
           <view class="list_title">收款方</view>
-          <view class="list_text">重庆云上航空票务股份有限公司</view>
+          <view class="list_text">{{headerName === '坤昌科技'?'重庆坤昌科技有限公司':'重庆云上航空票务股份有限公司'}}</view>
         </view>
       </view>
 
@@ -187,6 +187,8 @@ export default {
       paySecond: 0, // 支付时间
       remainingTime: '00:00', // 倒计时
       _countdown: {}, // 支付倒计时
+
+      headerName: ''
     };
   },
   methods: {
@@ -320,6 +322,7 @@ export default {
     },
   },
   onLoad(data) {
+    this.headerName = this.$globalType
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.getData(data.orderNo);
     // 正常单，改签单传值

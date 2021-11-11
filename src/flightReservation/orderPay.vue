@@ -64,7 +64,7 @@
         </view>
         <view class="message_list">
           <view class="list_title">收款方</view>
-          <view class="list_text">重庆云上航空票务股份有限公司</view>
+          <view class="list_text">{{headerName === '坤昌科技'?'重庆坤昌科技有限公司':'重庆云上航空票务股份有限公司'}}</view>
         </view>
       </view>
 
@@ -194,6 +194,9 @@ export default {
       headerType: true, // 航班信息状态
 
       passengerList: [], //乘客信息
+
+
+      headerName: ''
     };
   },
   methods: {
@@ -439,6 +442,7 @@ export default {
     },
   },
   onLoad(data) {
+    this.headerName = this.$globalType
     console.log(data);
     console.log("确认支付", data);
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;

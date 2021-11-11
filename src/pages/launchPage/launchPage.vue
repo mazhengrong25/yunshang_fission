@@ -2,7 +2,7 @@
  * @Description: 小程序启动页
  * @Author: wish.WuJunLong
  * @Date: 2021-07-21 17:58:21
- * @LastEditTime: 2021-07-22 09:30:16
+ * @LastEditTime: 2021-11-11 09:35:38
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -11,6 +11,13 @@
     <div class="launch_logo">
       <div class="launch_loading"></div>
       <image
+        v-if="headerName === '坤昌科技'"
+        class="launch_loading_img"
+        src="@/static/launch_logo_2_kunchang.png"
+        mode="aspectFit"
+      ></image>
+      <image
+        v-else
         class="launch_loading_img"
         src="@/static/launch_logo_2.png"
         mode="aspectFit"
@@ -19,7 +26,7 @@
 
     <div class="launch_line"></div>
 
-    <div class="launch_name">云上航空</div>
+    <div class="launch_name">{{headerName}}</div>
 
     <div class="launch_message">正在进入分销系统</div>
   </div>
@@ -30,7 +37,10 @@ import userInfo from "@/api/getUserInfo.js";
 
 export default {
   data() {
-    return {};
+    return {
+      headerName: '',
+      logoAddress: ''
+    };
   },
 
   methods: {
@@ -50,6 +60,10 @@ export default {
       this.getUserInfo();
     }, 3000);
   },
+
+  onLoad(){
+    this.headerName = this.$globalType
+  }
 };
 </script>
 

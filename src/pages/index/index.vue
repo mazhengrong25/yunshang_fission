@@ -2,15 +2,15 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-10-14 14:03:17
- * @LastEditors: mzr
+ * @LastEditTime: 2021-11-11 09:37:20
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="index">
     <yun-header
       :showReturn="false"
       :statusHeight="iStatusBarHeight"
-      centerTitle="云上航空"
+      :centerTitle="headerName"
     ></yun-header>
     <view class="index_main">
       <view class="header_type">
@@ -370,6 +370,8 @@ export default {
       noticeList: [], // 公告列表
 
       currentTrue: false, // 是否往返
+
+      headerName: ''
     };
   },
   methods: {
@@ -610,6 +612,7 @@ export default {
     },
   },
   onLoad() {
+    this.headerName = this.$globalType
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.setSwiperHeight();
 
@@ -621,7 +624,7 @@ export default {
   },
   onShareAppMessage(res) {
     return {
-      title: "云上航空机票分销",
+      title: headerName + "机票分销",
       path: "/pages/index/index",
     };
   },

@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2021-02-25 15:30:12
+ * @LastEditTime: 2021-11-11 09:32:02
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -10,7 +10,7 @@
     <yun-header
       :showReturn="false"
       :statusHeight="iStatusBarHeight"
-      centerTitle="云上航空"
+      :centerTitle="headerName"
     ></yun-header>
     <view class="login_banner">
       <view class="banner">
@@ -21,7 +21,7 @@
       <image class="ligin_icon" src="@/static/login_icon.png" mode="contain" />
       <view class="login_message">
         <text>欢迎登录!</text>
-        <text>云上机票分销平台</text>
+        <text>{{headerName}}机票分销平台</text>
       </view>
       <view class="login_form">
         <view class="form_list">
@@ -77,6 +77,8 @@ export default {
       iStatusBarHeight: 0, // 状态栏高度
       userName: "",
       password: "",
+
+      headerName: ''
     };
   },
   methods: {
@@ -191,6 +193,7 @@ export default {
     },
   },
   onLoad() {
+    this.headerName = this.$globalType
     let that = this;
     uni.getStorageSync({
       key: "loginInfo",
