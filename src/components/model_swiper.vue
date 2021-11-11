@@ -2,14 +2,14 @@
  * @Description: 首页轮播图组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:57:57
- * @LastEditTime: 2020-11-18 10:38:18
+ * @LastEditTime: 2021-11-11 11:35:38
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
 	<view class="model_swiper">
 		<swiper autoplay circular class="model_swiper_box" @change="change">
 			<swiper-item v-for="(item, index) in swiperList" :key="index" class="swiper_item">
-				<image :src="(item.swiper_type?'':'https://fxxcx.ystrip.cn')+item.path" class="swiper_image" mode="aspectFit" :title="item.title" />
+				<img :src="(item.swiper_type?'':'https://fxxcx.ystrip.cn')+item.path" class="swiper_image" mode="aspectFit" :title="item.title" />
 			</swiper-item>
 		</swiper>
 
@@ -40,6 +40,9 @@
 				this.current = e.detail.current
 			},
 		},
+		onShow(){
+			console.log('swipt',this.swiperList)
+		}
 	}
 </script>
 
