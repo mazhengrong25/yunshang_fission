@@ -2,8 +2,8 @@
  * @Description: 获取用户信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 10:34:01
- * @LastEditTime: 2021-03-16 15:54:21
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-11-11 14:44:56
+ * @LastEditors: mzr
  */
 
 import request from "@/api/request";
@@ -68,6 +68,8 @@ function getAdvertisement(data) {
     data: data,
   });
 }
+
+
 
 // 订单支付方式 - 国内
 function getOrderPay(data) {

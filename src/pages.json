@@ -402,10 +402,11 @@
   ],
 
   "tabBar": {
-    "color": "#AFB9C4",
+    "color": "#95A1AE",
     "selectedColor": "#0070E2",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
+    "iconWidth": "20px",
     "list": [
       {
         "pagePath": "pages/index/index",

@@ -2,8 +2,8 @@
  * @Description: 航班筛选
  * @Author: wish.WuJunLong
  * @Date: 2020-07-22 10:50:47
- * @LastEditTime: 2020-09-11 18:21:41
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-11-11 15:39:52
+ * @LastEditors: mzr
 --> 
 <template>
   <view :class="['filter_box',{'mini': filterMini}]">
@@ -100,7 +100,7 @@ export default {
     justify-content: center;
     font-size: 20upx;
     font-weight: 400;
-    color: #AFB9C4;
+    color: #95A1AE;
     width: 236upx;
     &.active {
       color: rgba(0, 112, 226, 1);

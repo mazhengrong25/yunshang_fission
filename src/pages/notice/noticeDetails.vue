@@ -2,8 +2,8 @@
  * @Description: 公告详情
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 17:53:13
- * @LastEditTime: 2020-09-21 17:31:35
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-11-12 11:08:41
+ * @LastEditors: mzr
 --> 
 <template>
 	<view class="notice_details">
@@ -32,7 +32,7 @@ import noticeApi from "@/api/notice"; // 公告api
 		methods: {
 			// 获取公告详情
 			getNoticeDetails(id){
-				noticeApi.getNotice(id).then((res) => {
+				noticeApi.getNoticeDetails(id).then((res) => {
         if (res.errorcode === 10000) {
 					let content = res.data.content
 					this.noticeContent = content.indexOf('scr="http') >= 0 ? content:content.replace(/src[^=]*?=[^"]*?"/,'src="https://fxxcx.ystrip.cn')

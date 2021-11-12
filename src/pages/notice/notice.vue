@@ -2,8 +2,8 @@
  * @Description: 公告列表
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 17:21:22
- * @LastEditTime: 2020-09-23 09:44:01
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-11-12 11:04:42
+ * @LastEditors: mzr
 --> 
 <template>
   <view class="notice">
@@ -21,13 +21,14 @@ export default {
   },
   data() {
     return {
-			noticeList: []
+			noticeList: [],
 		};
   },
   methods: {
     // 获取公告列表
-    getNoticeList() {
-      noticeApi.getNotice().then((res) => {
+    getNoticeList(val) {
+     
+      noticeApi.getNotice(val === 0 ? "100":"101").then((res) => {
         if (res.errorcode === 10000) {
           this.noticeList = res.data.data;
           console.log("首页", this.noticeList);
@@ -35,8 +36,8 @@ export default {
       });
     },
   },
-  onLoad() {
-    this.getNoticeList();
+  onLoad(data) {
+    this.getNoticeList(data.switchNotice);
   },
 };
 </script>
