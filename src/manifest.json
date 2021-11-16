@@ -1,5 +1,5 @@
 {
-    "name" : "坤昌科技分销小程序",
+    "name" : "云上航空分销小程序",
     "appid" : "__UNI__EA8B56E",
     "description" : "",
     "versionName" : "1.0.0",
@@ -67,9 +67,9 @@
     /* 小程序特有相关 */
     "mp-weixin" : {
         /* 云上航空appid */
-        // "appid" : "wxfe1f2313e5bf0576", 
+        "appid" : "wxfe1f2313e5bf0576", 
         /* 坤昌科技appid */
-        "appid" : "wx47ec12dadf83d5e9", 
+        // "appid" : "wx47ec12dadf83d5e9", 
         "share": true,
         "setting" : {
             "urlCheck" : false,

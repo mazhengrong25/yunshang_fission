@@ -37,7 +37,7 @@ Vue.component('yunConfig', yunConfig);
 import DefaultPage from "@/components/default_page.vue"; // 缺省页
 Vue.component('DefaultPage', DefaultPage);
 
-Vue.prototype.$globalType = '坤昌科技', // 全局变量
+Vue.prototype.$globalType = '云上航空', // 全局变量
 
 App.mpType = 'app'
 
