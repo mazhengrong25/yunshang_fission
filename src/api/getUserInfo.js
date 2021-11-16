@@ -2,8 +2,8 @@
  * @Description: 获取用户信息
  * @Author: wish.WuJunLong
  * @Date: 2020-08-03 10:34:01
- * @LastEditTime: 2021-11-11 14:44:56
- * @LastEditors: mzr
+ * @LastEditTime: 2021-11-16 17:18:17
+ * @LastEditors: wish.WuJunLong
  */
 
 import request from "@/api/request";
@@ -66,6 +66,7 @@ function getAdvertisement(data) {
     method: "POST",
     url: "/api/ad",
     data: data,
+    status: true
   });
 }
 
