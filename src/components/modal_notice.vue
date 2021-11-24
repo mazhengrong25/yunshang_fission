@@ -2,8 +2,8 @@
  * @Description: 首页公告版块组件
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 18:03:52
- * @LastEditTime: 2020-09-21 17:52:51
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-11-12 11:27:24
+ * @LastEditors: mzr
 --> 
 <template>
   <view class="modal_notice">
@@ -47,6 +47,11 @@ export default {
       type: Array,
       default: () => [],
     },
+    // 0  机票  1 火车票
+    switchNotice: {
+      type: Number,
+      default: () => 0
+    }
   },
   data() {
     return {};
@@ -55,7 +60,7 @@ export default {
     // 跳转更多公告页
     jumpNotice() {
       uni.navigateTo({
-        url: "/pages/notice/notice",
+        url: "/pages/notice/notice?switchNotice="+this.switchNotice,
       });
     },
 

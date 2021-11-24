@@ -2,8 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-11-11 11:34:56
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2021-11-12 11:27:23
+ * @LastEditors: mzr
 -->
 <template>
   <view class="index">
@@ -101,7 +101,7 @@
       </view>
 
       <view class="ticket_train" v-show="currentHeader === 1">
-        <model-swiper :swiperList="trainSwiper"></model-swiper>
+        <model-swiper :swiperList="swiperList"></model-swiper>
 
         <view class="train_space"></view>
 
@@ -126,7 +126,7 @@
       </view>
       <!-- 公告版块 -->
       <view class="notice">
-        <model-notice :modelType="true" :noticeList="noticeList"></model-notice>
+        <model-notice :modelType="true" :noticeList="noticeList"  :switchNotice="currentHeader"></model-notice>
       </view>
     </view>
 
@@ -293,22 +293,7 @@ export default {
 
       checkTickedType: false, // 切换往返地
 
-      swiperList: [],
-      // banner 列表  火车票
-      trainSwiper: [
-        {
-          path: require("@/static/train_header_swiper.png"),
-          title: "携手合作，互融互联",
-          url: "#",
-          swiper_type: true,
-        },
-        {
-          path: require("@/static/train_header_swiper.png"),
-          title: "携手合作，互融互联",
-          url: "#",
-          swiper_type: true,
-        },
-      ],
+      swiperList: [], // banner
 
       currentTab: 0, // tab默认值
       tabsList: ["国内", "国际", "往返", "多程"], // tab切换内容
@@ -378,7 +363,10 @@ export default {
   methods: {
     // 切换页面显示
     switchTicketType(val) {
-      this.currentHeader = val;
+      this.currentHeader = val
+      this.getBannerList(val); // 广告图
+      this.getNoticeList(val); // 公告列表
+      
     },
 
     // 选中
@@ -472,15 +460,15 @@ export default {
     },
 
     // 获取公告列表
-    getNoticeList() {
-      noticeApi.getNotice().then((res) => {
+    getNoticeList(val) {
+      noticeApi.getNotice(val === 0 ? "100":"101").then((res) => {
         if (res.errorcode === 10000) {
-          // this.noticeList = res.data.data
-          res.data.data.forEach((item, index) => {
-            if (index < 5) {
-              this.noticeList.push(item);
-            }
-          });
+          this.noticeList = res.data.data
+          // res.data.data.forEach((item, index) => {
+          //   if (index < 5) {
+          //     this.noticeList.push(item);
+          //   }
+          // });
           console.log("首页", this.noticeList);
         }
       });
@@ -577,25 +565,12 @@ export default {
       });
     },
 
-    // 获取公告列表
-    getNoticeList() {
-      noticeApi.getNotice().then((res) => {
-        if (res.errorcode === 10000) {
-          // this.noticeList = res.data.data
-          res.data.data.forEach((item, index) => {
-            if (index < 5) {
-              this.noticeList.push(item);
-            }
-          });
-          console.log("首页", this.noticeList);
-        }
-      });
-    },
 
-    // 获取banner列表
-    getBannerList() {
+    // 获取banner列表 val 机票 火车票区分
+    getBannerList(val) {
+
       let data = {
-        type: "100",
+        type: val === 0 ? "100" :"101",
       };
       userInfo.getAdvertisement(data).then((res) => {
         if (res.errorcode === 10000) {
@@ -614,12 +589,12 @@ export default {
   onLoad() {
     this.headerName = this.$globalType;
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    this.getBannerList(); // 获取banner
+    this.getBannerList(this.currentHeader); // 获取banner 
     this.setSwiperHeight();
 
     this.getUserInfo();
 
-    this.getNoticeList();
+    this.getNoticeList(this.currentHeader); // 获取公告
   },
   onShareAppMessage(res) {
     return {
@@ -664,6 +639,7 @@ export default {
       console.log("时间返回", timeData);
       uni.removeStorageSync("time");
     }
+    
     wx.login({
       success(res) {
         if (res.code) {
