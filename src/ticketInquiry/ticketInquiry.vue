@@ -2,15 +2,9 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
-<<<<<<< HEAD
- * @LastEditTime: 2021-08-02 14:03:19
- * @LastEditors: mzr
---> 
-=======
- * @LastEditTime: 2021-08-17 10:51:47
+ * @LastEditTime: 2021-12-06 10:47:39
  * @LastEditors: wish.WuJunLong
 -->
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 
 <template>
   <view class="ticket_inquiry">
@@ -109,8 +103,8 @@
               mode="contain"
             />
             {{ item.segments[0].airline_CN }}{{ item.segments[0].flightNumber }} |
-            {{ item.segments[0].aircraftCode }} |
-            <view class="ticket_details_source">{{ item.sourceCode }}</view>
+            {{ item.segments[0].aircraftCode }}
+             <!-- | <view class="ticket_details_source">{{ item.sourceCode }}</view> -->
           </view>
         </view>
 

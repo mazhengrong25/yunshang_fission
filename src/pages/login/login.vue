@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2021-11-11 09:32:02
+ * @LastEditTime: 2021-12-09 14:40:27
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -18,10 +18,10 @@
       </view>
     </view>
     <view class="login_main">
-      <image class="ligin_icon" src="@/static/login_icon.png" mode="contain" />
+      <image class="login_icon" src="@/static/login_icon.png" mode="contain" />
       <view class="login_message">
         <text>欢迎登录!</text>
-        <text>{{headerName}}机票分销平台</text>
+        <text>{{ headerName }}机票分销平台</text>
       </view>
       <view class="login_form">
         <view class="form_list">
@@ -59,6 +59,12 @@
           />
         </view>
       </view>
+      <view class="protocol_checkbox" @click="protocolAgreeBtn()">
+        <view class="protocol_btn_active" v-if="protocolAgree"></view>
+        <view class="protocol_btn" v-else></view>
+        阅读并同意云上的
+        <text class="protocol_link" @click.stop="jumpProtocol()">服务协议及隐私政策</text>
+      </view>
       <view class="login_submit" @click="loginBtn">登录</view>
       <view class="scan_submit" @click="scanCodeBtn">
         <image class="scan_icon" src="@/static/scan_code_btn.png" mode="contain" />
@@ -78,13 +84,30 @@ export default {
       userName: "",
       password: "",
 
-      headerName: ''
+      headerName: "",
+
+      protocolAgree: false,
     };
   },
   methods: {
+    protocolAgreeBtn() {
+      this.protocolAgree = !this.protocolAgree;
+    },
+    jumpProtocol(){
+       uni.navigateTo({
+        url: "/flightReservation/webView?url=https://fxxcx.ystrip.cn/login_protocol.html",
+      });
+    },
     // 登录按钮
     loginBtn() {
       console.log("点击登录");
+      if (!this.protocolAgree) {
+        return wx.showToast({
+          title: "请阅读并同意云上的服务协议及隐私政策才可使用机票分销平台",
+          icon: "none",
+          duration: 3000,
+        });
+      }
       if (this.userName && this.password) {
         let data = {
           login_name: this.userName,
@@ -144,6 +167,13 @@ export default {
 
     // 扫码登录
     scanCodeBtn() {
+      if (!this.protocolAgree) {
+        return wx.showToast({
+          title: "请阅读并同意云上的服务协议及隐私政策才可使用机票分销平台",
+          icon: "none",
+          duration: 3000,
+        });
+      }
       uni.scanCode({
         onlyFromCamera: false,
         success: (res) => {
@@ -151,7 +181,7 @@ export default {
             title: "加载中",
           });
 
-          let obj = this.getCodeToken(res.result)
+          let obj = this.getCodeToken(res.result);
           let data = {
             access_token: obj[Object.keys(obj)[0]],
           };
@@ -193,7 +223,7 @@ export default {
     },
   },
   onLoad() {
-    this.headerName = this.$globalType
+    this.headerName = this.$globalType;
     let that = this;
     uni.getStorageSync({
       key: "loginInfo",
@@ -242,9 +272,9 @@ export default {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 20upx;
     margin: 0 20upx;
-    padding: 36upx 30upx 10upx 45upx;
+    padding: 30upx 30upx 10upx 45upx;
     overflow: auto;
-    .ligin_icon {
+    .login_icon {
       width: 187upx;
       height: 73upx;
       margin-left: auto;
@@ -252,9 +282,9 @@ export default {
     }
     .login_message {
       font-size: 48upx;
-      font-weight: bold;
+      // font-weight: bold;
       color: rgba(51, 51, 51, 1);
-      margin-bottom: 60upx;
+      margin-bottom: 50upx;
       text {
         display: block;
         &:first-child {
@@ -266,12 +296,12 @@ export default {
       }
     }
     .login_form {
-      margin-bottom: 4vh;
+      margin-bottom: 20upx;
       .form_list {
-        padding-bottom: 28upx;
+        padding-bottom: 20upx;
         border-bottom: 2upx solid rgba(241, 243, 245, 1);
         &:not(:last-child) {
-          margin-bottom: 50upx;
+          margin-bottom: 40upx;
         }
         .form_title {
           font-size: 30upx;
@@ -293,6 +323,34 @@ export default {
             color: rgba(175, 185, 196, 1);
           }
         }
+      }
+    }
+    .protocol_checkbox {
+      margin-bottom: 30upx;
+      font-size: 24upx;
+      font-weight: 400;
+      color: #95a1ae;
+      display: flex;
+      align-items: center;
+      .protocol_btn {
+        width: 32upx;
+        height: 32upx;
+        margin-right: 8px;
+        background: url(@/static/protocol_checkbox.png) no-repeat center center;
+        background-size: contain;
+        display: inline-block;
+      }
+      .protocol_btn_active {
+        width: 32upx;
+        height: 32upx;
+        margin-right: 8px;
+        display: inline-block;
+        background: url(@/static/protocol_checkbox_active.png) no-repeat center center;
+        background-size: contain;
+      }
+      .protocol_link {
+        margin-left: 4upx;
+        border-bottom: 2upx dashed #768595;
       }
     }
     .login_submit {

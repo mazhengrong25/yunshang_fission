@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2021-02-18 14:02:15
+ * @LastEditTime: 2021-11-19 10:47:02
  * @LastEditors: wish.WuJunLong
 --> 
 <template>
@@ -25,6 +25,7 @@
           >
             {{
               Number(flightData.data.cabinPrices.ADT.build) +
+              Number(flightData.data.cabinPrices.ADT.tax) +
               Number(flightData.data.cabinPrices.ADT.rulePrice.price)
             }}(含税)
           </text>
