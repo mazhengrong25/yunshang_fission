@@ -118,7 +118,7 @@ export default {
           if (res.errorcode === 10000) {
             wx.showToast({
               title: "登录成功",
-              icon: "succes",
+              icon: "success",
               mask: true,
             });
 

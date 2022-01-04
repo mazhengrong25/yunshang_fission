@@ -2,23 +2,16 @@
  * @Description: 已出票订单退票页面
  * @Author: wish.WuJunLong
  * @Date: 2020-08-17 10:31:20
- * @LastEditTime: 2020-12-09 10:48:03
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-01-04 11:05:31
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="refund">
-    <yun-header
-      :statusHeight="iStatusBarHeight"
-      centerTitle="退票"
-    ></yun-header>
+    <yun-header :statusHeight="iStatusBarHeight" centerTitle="退票"></yun-header>
     <!-- 正文 -->
     <scroll-view :enable-back-to-top="true" :scroll-y="true" class="content">
       <!-- 退票信息 -->
-      <refundTop
-        :dataList="list"
-        @voluntary="volRadio"
-        @reason="reasonSel"
-      ></refundTop>
+      <refundTop :dataList="list" @voluntary="volRadio" @reason="reasonSel"></refundTop>
       <!-- 特别提醒 -->
       <!-- <view class="sep_list">
         <view class="list_icon">
@@ -51,7 +44,11 @@
           <!-- refundList.ticket_passenger.length === checkedPassengerlist.length -->
           <view
             @click="checkedAll()"
-            :class="['checked_all_btn', { active: checkedAllStatus }]"
+            :class="[
+              'checked_all_btn',
+              { active: checkedAllStatus },
+              { disabled: refundList.allRefundStatus },
+            ]"
           >
             <view class="main_content">全选</view>
             <view class="list_click"></view>
@@ -59,7 +56,11 @@
         </view>
         <view class="passenger_list">
           <view
-            :class="['list_item', { active: item.active }]"
+            :class="[
+              'list_item',
+              { active: item.active },
+              { disabled: item.refundStatus },
+            ]"
             v-for="(item, index) in refundList.ticket_passenger"
             :key="index"
             @click="checkedPassenger(item, index)"
@@ -68,7 +69,9 @@
               <view class="info_message">
                 <view class="info_type"
                   >{{
-                    item.PassengerType === "ADT"
+                    item.refundStatus
+                      ? "已退"
+                      : item.PassengerType === "ADT"
                       ? "成人"
                       : item.PassengerType === "CNN"
                       ? "儿童"
@@ -78,10 +81,7 @@
                   }}票</view
                 >
                 <view class="info_name">{{ item.PassengerName }}</view>
-                <view
-                  class="is_insurance"
-                  v-if="Number(item.insurance_total) > 0"
-                ></view>
+                <view class="is_insurance" v-if="Number(item.insurance_total) > 0"></view>
                 <view class="group_type">票号</view>
                 <view class="group_number">{{ item.ticket_no }}</view>
               </view>
@@ -153,9 +153,7 @@
           </view>
           <view class="list_item">
             <view class="item_title">备注</view>
-            <view v-if="remark" class="item_message">{{
-              refundList.remark
-            }}</view>
+            <view v-if="remark" class="item_message">{{ refundList.remark }}</view>
             <view v-else class="item_message">无</view>
           </view>
         </view>
@@ -320,8 +318,7 @@ export default {
         });
       }
       let refundPriceList = []; // 退票金额明细选中乘客列表
-      let refundRate =
-        parseInt(this.refundList.ticket_segments[0].refund_rate) || 100;
+      let refundRate = parseInt(this.refundList.ticket_segments[0].refund_rate) || 100;
       let refundPriceTotal = 0; // 退票金额选中乘客总价
       let refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
       await this.refundList.ticket_passenger.forEach((item) => {
@@ -363,6 +360,9 @@ export default {
 
     // 选择联系人
     checkedPassenger(val, index) {
+      if (val.refundStatus) {
+        return false;
+      }
       console.log(val, index);
       // 判断当前数据是否有active属性，如果有，就赋值为相反状态
       this.$set(this.refundList.ticket_passenger[index], "active", !val.active);
@@ -379,8 +379,7 @@ export default {
         );
       }
       this.checkedAllStatus =
-        this.checkedPassengerlist.length ===
-        this.refundList.ticket_passenger.length;
+        this.checkedPassengerlist.length === this.refundList.ticket_passenger.length;
 
       this.refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
       this.refundList.ticket_passenger.forEach((item) => {
@@ -403,11 +402,17 @@ export default {
 
     // 全选联系人
     checkedAll() {
+      if (this.refundList.allRefundStatus) {
+        return false;
+      }
       // 判断选中的乘客人数是否和数据携带全部人数相同
-      if (
-        this.refundList.ticket_passenger.length ===
-        this.checkedPassengerlist.length
-      ) {
+      let passengerList = []
+      this.refundList.ticket_passenger.forEach(item => {
+        if(!item.refundStatus){
+          passengerList.push(item)
+        }
+      })
+      if (passengerList.length === this.checkedPassengerlist.length) {
         //   如果相同 清空选中列表 并且遍历乘客数组 将状态全部赋值为false
         this.checkedAllStatus = false;
         this.checkedPassengerlist = [];
@@ -418,14 +423,16 @@ export default {
         //   如果不相同 遍历乘客列表 全部赋值为 true ，并将乘客列表数组赋值给选中乘客列表
         this.checkedPassengerlist = [];
         this.refundList.ticket_passenger.forEach((item, index) => {
-          item.active = true;
-          this.checkedPassengerlist.push(item.id);
+          if(!item.refundStatus){
+            item.active = true;
+            this.checkedPassengerlist.push(item.id);
+          }
         });
         this.checkedAllStatus = true;
       }
 
       this.refundPriceAmount = 0; // 退票金额选中乘客 服务费+保险+机建-奖励
-      this.refundList.ticket_passenger.forEach((item) => {
+      passengerList.forEach((item) => {
         this.checkedPassengerlist.forEach((oitem) => {
           if (item.id === oitem) {
             this.refundPriceAmount +=
@@ -450,9 +457,36 @@ export default {
   },
   onLoad(data) {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
-    console.log("退票信息", data);
     this.refundList = JSON.parse(data.refundData);
+
+    // 处理乘客数据是否退票
+    let refundPassenger = this.refundList.ticket_passenger;
+    let thisRefundOrder = this.refundList.refund_orders;
+    let thisRefundOrderPassenger = [];
+    thisRefundOrder.forEach((item) => {
+      item.ticket_refund_passenger.forEach((oitem) => {
+        if (item.status !== 4) {
+          thisRefundOrderPassenger.push(oitem);
+        }
+      });
+    });
+
+    console.log(thisRefundOrderPassenger);
+
+    thisRefundOrderPassenger.forEach((item) => {
+      refundPassenger.forEach((oitem) => {
+        if (item.passenger_name === oitem.PassengerName) {
+          oitem["refundStatus"] = true;
+        }
+      });
+    });
+
+    this.refundList["allRefundStatus"] =
+      thisRefundOrderPassenger.length >= refundPassenger.length;
+    this.refundList.ticket_passenger = refundPassenger;
+
     console.log(this.refundList);
+
 
     // 组装航程信息
     this.flightData = {
@@ -556,6 +590,12 @@ export default {
         &.active {
           .list_click {
             background: url(@/static/selected_active.png) no-repeat;
+            background-size: contain;
+          }
+        }
+        &.disabled {
+          .list_click {
+            background: url(@/static/selected.png) no-repeat #f2f2f2;
             background-size: contain;
           }
         }
@@ -715,6 +755,22 @@ export default {
               }
             }
           }
+          &.disabled {
+            .list_info {
+              .info_message {
+                view {
+                  color: #999;
+                }
+                .info_type {
+                  border-color: #999;
+                }
+              }
+              .list_click {
+                background: url(@/static/selected.png) no-repeat #f2f2f2;
+                background-size: contain;
+              }
+            }
+          }
           &:not(:last-child) {
             margin-bottom: 60upx;
           }
@@ -748,8 +804,7 @@ export default {
                 color: rgba(42, 42, 42, 1);
               }
               .is_insurance {
-                background: url(@/static/insurance_icon.png) no-repeat center
-                  center;
+                background: url(@/static/insurance_icon.png) no-repeat center center;
                 background-size: contain;
                 width: 25upx;
                 height: 30upx;

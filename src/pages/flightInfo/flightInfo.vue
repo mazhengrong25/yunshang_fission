@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2021-09-02 15:01:25
+ * @LastEditTime: 2021-12-23 11:19:55
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -686,7 +686,7 @@ export default {
           price: data.data.cabinPrices.ADT.price,
           type: data.type,
         };
-        data.data.productType = "FD" ? "SD" : data.data.productType;
+        data.data.productType = data.data.productType === "FD" ? "SD" : data.data.productType;
         params = {
           sourceCode: this.sourceCodeType,
           file_key: this.fileKey,
