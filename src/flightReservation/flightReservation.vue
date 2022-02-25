@@ -2,13 +2,8 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
-<<<<<<< HEAD
- * @LastEditTime: 2021-08-12 17:51:48
- * @LastEditors: mzr
-=======
- * @LastEditTime: 2021-09-02 15:12:18
+ * @LastEditTime: 2022-02-16 10:39:59
  * @LastEditors: wish.WuJunLong
->>>>>>> 47979d98edefd9c6cf31d515ce6308bf840db67b
 -->
 <template>
   <view class="flight_reservation">
