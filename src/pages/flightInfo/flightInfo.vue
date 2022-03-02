@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2022-03-02 12:03:36
+ * @LastEditTime: 2022-03-02 14:36:56
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -574,6 +574,7 @@ export default {
           segments: this.roundSegmentsMessage.segments,
           ItineraryInfo: data.data,
           relatedKey: "11",
+          itinerarys: this.roundSegmentsMessage.itinerarys
         };
       } else {
         // 单程验价
@@ -594,8 +595,11 @@ export default {
           segments: this.segmentsMessage.segments,
           ItineraryInfo: data.data,
           relatedKey: "11",
+          itinerarys: this.segmentsMessage.itinerarys
         };
       }
+
+      console.log(params)
 
       ticket
         .checkPrice(params)
@@ -699,6 +703,7 @@ export default {
           segments: this.segmentsMessage.segments,
           ItineraryInfo: data.data,
           relatedKey: "11",
+          itinerarys: this.segmentsMessage.itinerarys
         };
       } else {
         // 返程验价数据组装
@@ -719,6 +724,7 @@ export default {
           segments: this.roundSegmentsMessage.segments,
           ItineraryInfo: data.data,
           relatedKey: "11",
+          itinerarys: this.roundSegmentsMessage.itinerarys
         };
       }
 
