@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: wish.WuJunLong
  * @Date: 2020-06-16 13:42:30
- * @LastEditTime: 2021-12-09 14:37:44
+ * @LastEditTime: 2022-03-02 12:06:42
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -13,7 +13,7 @@
       centerTitle="我的"
     ></yun-header>
     <view class="header">
-      <view class="version_number">v2.0.1</view>
+      <view class="version_number">v2.1.1</view>
       <view class="info_box">
         <view class="info_left">
           <view class="avatar">

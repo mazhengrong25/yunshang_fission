@@ -2,7 +2,7 @@
  * @Description: 自定义状态栏 - 单程往返
  * @Author: wish.WuJunLong
  * @Date: 2020-06-29 10:06:00
- * @LastEditTime: 2021-07-05 14:48:56
+ * @LastEditTime: 2022-03-02 11:00:51
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -24,10 +24,12 @@
           headerAddress.to_type === "air"
             ? headerAddress.to.air_port_name
             : headerAddress.to_type === "hot" && headerAddress.to.city_name === "上海"
-            ? headerAddress.to.city_name + headerAddress.to.air_port_name
+            ? headerAddress.to.air_port_name === "上海市"
+              ? headerAddress.to.air_port_name
+              : headerAddress.to.city_name + headerAddress.to.air_port_name
             : headerAddress.to_type === "hot" && headerAddress.to.city_name === "北京"
             ? headerAddress.to.city_name + "首都"
-            : headerAddress.to.city_name || '获取中'
+            : headerAddress.to.city_name || "获取中"
         }}
       </view>
       <view class="title_icon" v-if="!statusType"></view>
@@ -37,10 +39,12 @@
           headerAddress.from_type === "air"
             ? headerAddress.from.air_port_name
             : headerAddress.from_type === "hot" && headerAddress.from.city_name === "上海"
-            ? headerAddress.from.city_name + headerAddress.from.air_port_name
+            ? headerAddress.from.air_port_name === "上海市"
+              ? headerAddress.from.air_port_name
+              : headerAddress.from.city_name + headerAddress.from.air_port_name
             : headerAddress.from_type === "hot" && headerAddress.from.city_name === "北京"
             ? headerAddress.from.city_name + "首都"
-            : headerAddress.from.city_name || '获取中'
+            : headerAddress.from.city_name || "获取中"
         }}
       </view>
     </view>

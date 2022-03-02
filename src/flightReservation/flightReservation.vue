@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2022-02-16 10:39:59
+ * @LastEditTime: 2022-03-02 12:05:24
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -239,26 +239,41 @@
       -->
 
       <view class="disclaimer">
-        免责声明：下单表示已阅读并同意遵守退改签规则
-        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')"
-          >《关于规范互联网机票销售行为的通知》</text
-        >
-        <text
-          v-if="statement.title"
-          @click="
-            openStatementWeb(
-              'https://fxxcx.ystrip.cn/air_file/' +
-                statement.code +
-                '/' +
-                statement.code +
-                '.html'
-            )
-          "
-          >《{{ statement.title }}》</text
-        >
-        <text @click="openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')"
-          >《锂电池航空运输规范》</text
-        >
+        <text class="text_title">预定须知</text>
+        <!-- 免责声明：下单表示已阅读并同意遵守退改签规则 -->
+        <view class="disclaimer_box" @click="checkDisclaimer()">
+          <view class="protocol_btn_active" v-if="isDisclaimer"></view>
+          <view class="protocol_btn" v-else></view>
+          我已阅读并同意
+          <text
+            class="text_link"
+            @click.stop="
+              openStatementWeb('https://fxxcx.ystrip.cn/show/contentStatement')
+            "
+            >《关于规范互联网机票销售行为的通知》</text
+          >
+          <text
+            class="text_link"
+            v-if="statement.title"
+            @click.stop="
+              openStatementWeb(
+                'https://fxxcx.ystrip.cn/air_file/' +
+                  statement.code +
+                  '/' +
+                  statement.code +
+                  '.html'
+              )
+            "
+            >《{{ statement.title }}》</text
+          >
+          <text
+            class="text_link"
+            @click.stop="
+              openStatementWeb('https://fxxcx.ystrip.cn/show/dccontentStatement')
+            "
+            >《锂电池航空运输规范》</text
+          >
+        </view>
       </view>
     </scroll-view>
 
@@ -273,8 +288,8 @@
         </view>
       </view>
       <button
-        :disabled="!trueSubmitOrder"
-        :class="['right_btn', { is_true: trueSubmitOrder }]"
+        :disabled="!trueSubmitOrder && !isDisclaimer"
+        :class="['right_btn', { is_true: trueSubmitOrder && isDisclaimer }]"
         type="default"
         @click="submitOrder()"
       >
@@ -502,6 +517,8 @@ export default {
       showStatementWeb: false, // 外部链接
 
       chdinf_msg: {}, // 航司儿童婴儿携带数量
+
+      isDisclaimer: false, // 免责声明 必选才可生单
     };
   },
   methods: {
@@ -604,7 +621,7 @@ export default {
                   title: "警告",
                   content: res.data.check.msg,
                   showCancel: false,
-                  confirmText: '返回',
+                  confirmText: "返回",
                   success: function(res) {
                     if (res.confirm) {
                       uni.navigateBack();
@@ -776,7 +793,7 @@ export default {
                 uni.showModal({
                   title: "警告",
                   content: res.data.check.msg,
-                  confirmText: '返回',
+                  confirmText: "返回",
                   showCancel: false,
                   success: function(res) {
                     if (res.confirm) {
@@ -945,6 +962,11 @@ export default {
       console.log(val);
     },
 
+    // 免责声明
+    checkDisclaimer() {
+      this.isDisclaimer = !this.isDisclaimer;
+    },
+
     // 打开免责声明 外部链接
     openStatementWeb(url) {
       console.log(url);
@@ -1056,6 +1078,14 @@ export default {
         return uni.showToast({
           title: "请填写邮箱",
           icon: "none",
+        });
+      }
+
+      if(!this.isDisclaimer){
+        return uni.showToast({
+          title: "请阅读并同意航司规定的行李及运输总条件才可前往支付",
+          icon: "none",
+          duration: 3000,
         });
       }
       // 处理乘客数据
@@ -1801,13 +1831,36 @@ export default {
   }
 
   .disclaimer {
-    margin: 40upx 20upx 20upx;
+    margin: 40upx 20upx 40upx;
     font-size: 24upx;
     font-weight: 400;
     color: rgba(42, 42, 42, 1);
     line-height: 36upx;
-
-    text {
+    .text_title {
+      display: block;
+      font-size: 36upx;
+      font-weight: bold;
+      margin-bottom: 20upx;
+    }
+    .protocol_btn {
+      width: 32upx;
+      height: 32upx;
+      margin-right: 8px;
+      background: url(@/static/protocol_checkbox.png) no-repeat center center;
+      background-size: contain;
+      display: inline-block;
+      vertical-align: text-bottom;
+    }
+    .protocol_btn_active {
+      width: 32upx;
+      height: 32upx;
+      margin-right: 8px;
+      display: inline-block;
+      background: url(@/static/protocol_checkbox_active.png) no-repeat center center;
+      background-size: contain;
+      vertical-align: text-bottom;
+    }
+    .text_link {
       color: #0070e2;
     }
   }

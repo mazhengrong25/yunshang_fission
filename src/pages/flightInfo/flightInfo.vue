@@ -2,7 +2,7 @@
  * @Description: 机票信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-23 10:58:46
- * @LastEditTime: 2021-12-23 11:19:55
+ * @LastEditTime: 2022-03-02 12:03:36
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -650,7 +650,7 @@ export default {
               );
             }
             uni.showToast({
-              title: res.data.Message || res.data.msg || "获取失败，请稍后再试",
+              title: res.data.msg || res.data.Message || "获取失败，请稍后再试",
               icon: "none",
               duration: 3000,
             });
@@ -857,7 +857,7 @@ export default {
           }
         } else {
           uni.showToast({
-            title: res.msg + res.data.Message,
+            title: res.msg?res.msg + res.data.Message:'数据获取错误，请联系管理员处理',
             icon: "none",
             duration: 3000,
           });

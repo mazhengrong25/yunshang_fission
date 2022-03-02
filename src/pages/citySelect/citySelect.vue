@@ -2,9 +2,9 @@
  * @Description: 城市选择
  * @Author: wish.WuJunLong
  * @Date: 2020-06-17 11:05:11
- * @LastEditTime: 2020-09-29 09:57:01
+ * @LastEditTime: 2022-03-02 10:54:56
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="city_select">
     <yun-header :statusHeight="iStatusBarHeight" centerTitle="城市选择"></yun-header>
@@ -33,7 +33,9 @@
       @scroll="anchorFixed"
       class="city_main"
     >
-      <view class="show_anchor_info" v-if="showAnchorBox && !searchCity">{{intoindex}}</view>
+      <view class="show_anchor_info" v-if="showAnchorBox && !searchCity">{{
+        intoindex
+      }}</view>
       <view class="address_list_main" v-if="!searchCity">
         <view class="gps_address address_tag_list" v-if="isCityActive">
           <view class="address_title">当前定位</view>
@@ -41,7 +43,8 @@
             <view
               class="address_tag address_tag_icon"
               @click="gpsGetAddress(Areaaddress.city)"
-            >{{Areaaddress.city || '获取定位中'}}</view>
+              >{{ Areaaddress.city || "获取定位中" }}</view
+            >
           </view>
         </view>
 
@@ -52,35 +55,48 @@
               class="address_tag"
               v-for="(item, index) in hotCity"
               :key="index"
-              @click="getCityData(item,'hot')"
+              @click="getCityData(item, 'hot')"
             >
-              {{item.city_name === '上海'? item.city_name + item.air_port_name:
-              item.city_name === '北京'? item.city_name + '首都':item.city_name}}
+              {{
+                item.city_name === "上海"
+                  ? item.air_port_name === "上海市"
+                    ? item.air_port_name
+                    : item.city_name + item.air_port_name
+                  : item.city_name === "北京"
+                  ? item.city_name + "首都"
+                  : item.city_name
+              }}
             </view>
           </view>
         </view>
       </view>
 
       <view class="city_list" v-if="!searchCity">
-        <view :class="['city_anchor',{'anchor_fixed':anchorFixedStyle}]">
+        <view :class="['city_anchor', { anchor_fixed: anchorFixedStyle }]">
           <view class="anchor" @click="jumpAnchor('#')">#</view>
           <view
             class="anchor"
             @click="jumpAnchor(item)"
             v-for="(item, index) in cityUnitList"
             :key="index"
-          >{{item}}</view>
+            >{{ item }}</view
+          >
         </view>
-        <view class="list_item" v-for="(item, index) in cityList" :key="index" :id="item.unit">
-          <view class="item_unit">{{item.unit}}</view>
+        <view
+          class="list_item"
+          v-for="(item, index) in cityList"
+          :key="index"
+          :id="item.unit"
+        >
+          <view class="item_unit">{{ item.unit }}</view>
           <view
             class="item_city"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
-            @click="getCityData(oitem,'city')"
+            @click="getCityData(oitem, 'city')"
           >
-            <view class="city_info">{{oitem.city_name}}</view>
-            <view class="city_code">{{oitem.city_code}}</view>
+            <view class="city_info">{{ oitem.city_name }}</view>
+            <view class="city_code">{{ oitem.city_code }}</view>
           </view>
         </view>
       </view>
@@ -88,18 +104,18 @@
       <view class="city_list">
         <view class="list_item" v-for="(item, index) in searchList" :key="index">
           <view class="city_province">
-            <view class="city_type">{{item.type}}</view>
-            <view class="city_text">{{item.unit}}</view>
+            <view class="city_type">{{ item.type }}</view>
+            <view class="city_text">{{ item.unit }}</view>
           </view>
           <view
             class="item_city"
-            @click="getCityData(oitem,'air')"
+            @click="getCityData(oitem, 'air')"
             v-for="(oitem, oindex) in item.data"
             :key="oindex"
           >
-            <view class="city_airport">{{oitem.air_port_name}}</view>
-            <view class="city_code">{{oitem.air_port}}</view>
-            <view class="city_name">{{oitem.city_name}}</view>
+            <view class="city_airport">{{ oitem.air_port_name }}</view>
+            <view class="city_code">{{ oitem.air_port }}</view>
+            <view class="city_name">{{ oitem.city_name }}</view>
           </view>
         </view>
       </view>
@@ -143,7 +159,7 @@ export default {
 
       notCity: false, // 未找到相关信息
 
-      checkedCity: '', // 已选择城市
+      checkedCity: "", // 已选择城市
     };
   },
   methods: {
@@ -164,7 +180,7 @@ export default {
       let that = this;
       uni.getLocation({
         type: "wgs84",
-        success: function (res) {
+        success: function(res) {
           let latitude, longitude;
           latitude = res.latitude.toString();
           longitude = res.longitude.toString();
@@ -195,9 +211,7 @@ export default {
     gpsGetAddress(val) {
       if (val) {
         this.getCityData(
-          this.cityAirList.filter(
-            (item) => val.indexOf(item.city_name) !== -1
-          )[0],
+          this.cityAirList.filter((item) => val.indexOf(item.city_name) !== -1)[0],
           "city"
         );
       }
@@ -244,15 +258,14 @@ export default {
           });
 
           var hash = {};
-          this.cityList[index]["data"] = this.cityList[index]["data"].reduce(
-            function (oitem, next) {
-              hash[next.city_name]
-                ? ""
-                : (hash[next.city_name] = true && oitem.push(next));
-              return oitem;
-            },
-            []
-          );
+          this.cityList[index]["data"] = this.cityList[index]["data"].reduce(function(
+            oitem,
+            next
+          ) {
+            hash[next.city_name] ? "" : (hash[next.city_name] = true && oitem.push(next));
+            return oitem;
+          },
+          []);
         });
         console.log(this.cityList);
       });
@@ -289,12 +302,12 @@ export default {
 
     // 获取城市信息 填入地址信息
     getCityData(val, type) {
-      console.log(val)
-      if(val.city_name === this.checkedCity){
+      console.log(val);
+      if (val.city_name === this.checkedCity) {
         return uni.showToast({
-          title: '已选择当前城市，请更换地区',
-          icon: 'none',
-          duration: 3000
+          title: "已选择当前城市，请更换地区",
+          icon: "none",
+          duration: 3000,
         });
       }
       let data = {
@@ -367,13 +380,11 @@ export default {
     this.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.getUserAddress();
 
-    this.cityUnitList = [...Array(26).keys()].map((i) =>
-      String.fromCharCode(i + 65)
-    ); // 生成A-Z数组
+    this.cityUnitList = [...Array(26).keys()].map((i) => String.fromCharCode(i + 65)); // 生成A-Z数组
     this.getAirData();
     this.cityType = data.type;
 
-    this.checkedCity = data.address
+    this.checkedCity = data.address;
   },
 };
 </script>

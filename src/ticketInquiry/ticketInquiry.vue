@@ -2,7 +2,7 @@
  * @Description: 机票查询 - 单程
  * @Author: wish.WuJunLong
  * @Date: 2020-06-18 17:56:32
- * @LastEditTime: 2021-12-06 10:47:39
+ * @LastEditTime: 2022-03-02 10:40:52
  * @LastEditors: wish.WuJunLong
 -->
 
@@ -343,6 +343,12 @@ export default {
             this.showDefaultType = "";
             this.skeletonNumber = 0;
             this.$forceUpdate();
+            uni.showToast({
+              title: res.msg,
+              duration: 1500,
+              icon: "none",
+              mask: false,
+            });
           }
         })
         .catch(() => {
