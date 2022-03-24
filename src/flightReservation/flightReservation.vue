@@ -2,7 +2,7 @@
  * @Description: 机票预订信息
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 17:19:07
- * @LastEditTime: 2022-03-02 12:05:24
+ * @LastEditTime: 2022-03-24 11:46:28
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -363,7 +363,7 @@
           </view>
           <view class="info_list">
             <view class="list_tag" v-if="roundTripType">去</view>
-            <view class="list_title">机建+燃油</view>
+            <view class="list_title">成人机建+燃油</view>
             <view class="list_message">
               <text>&yen; {{ priceInfo.buildPrice }}</text>
               <text>×{{ passengerNumber.adt }}人</text>
@@ -371,10 +371,26 @@
           </view>
           <view class="info_list" v-if="roundTripType">
             <view class="list_tag is_back">返</view>
-            <view class="list_title">机建+燃油</view>
+            <view class="list_title">成人机建+燃油</view>
             <view class="list_message">
               <text>&yen; {{ priceInfo.roundBuildPrice }}</text>
               <text>×{{ passengerNumber.adt }}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.chd > 0">
+            <view class="list_tag" v-if="roundTripType">去</view>
+            <view class="list_title">儿童机建+燃油</view>
+            <view class="list_message">
+              <text>&yen; {{ priceInfo.chdBuildPrice }}</text>
+              <text>×{{ passengerNumber.chd }}人</text>
+            </view>
+          </view>
+          <view class="info_list" v-if="passengerNumber.chd > 0 && roundTripType">
+            <view class="list_tag is_back">返</view>
+            <view class="list_title">儿童机建+燃油</view>
+            <view class="list_message">
+              <text>&yen; {{ priceInfo.roundChdBuildPrice }}</text>
+              <text>×{{ passengerNumber.chd }}人</text>
             </view>
           </view>
           <view class="info_list" v-if="passengerNumber.ins > 0">
@@ -504,9 +520,9 @@ export default {
         adtPrice: 0, // 成人票价
         chdPrice: 0, // 儿童票价
         infPrice: 0, // 婴儿票价
-        buildPrice: 0, // 机建燃油费
         insPrice: 0, // 保险票价
-        buildPrice: 0, // 机建燃油费
+        buildPrice: 0, // 成人机建燃油费
+        chdBuildPrice: 0, // 儿童基建燃油费
         reward: 0, // 奖励金额
       },
 
@@ -591,7 +607,8 @@ export default {
               adtPrice: res.data.adtPrice.settle_price, // 成人票价
               chdPrice: res.data.chdPrice.price, // 儿童票价
               infPrice: res.data.infPrice.price, // 婴儿票价
-              buildPrice: Number(res.data.adtPrice.build), // 机建燃油费
+              buildPrice: Number(res.data.adtPrice.build + res.data.adtPrice.tax), // 机建燃油费
+              chdBuildPrice: Number(res.data.chdPrice.build + res.data.chdPrice.tax), // 儿童机建燃油费
               reward: res.data.adtPrice.rulePrice.reward, // 奖励金额
             };
 
@@ -757,13 +774,15 @@ export default {
               adtPrice: res.data.depAdtPrice.settle_price, // 成人票价
               chdPrice: res.data.depChdPrice.price, // 儿童票价
               infPrice: res.data.depInfPrice.price, // 婴儿票价
-              buildPrice: Number(res.data.depAdtPrice.build), // 机建燃油费
+              buildPrice: Number(res.data.depAdtPrice.build + res.data.depAdtPrice.tax), // 机建燃油费
+              chdBuildPrice: Number(res.data.depChdPrice.build + res.data.depChdPrice.tax), // 儿童机建燃油费
               reward: res.data.depAdtPrice.rulePrice.reward, // 奖励金额
 
               roundAdtPrice: res.data.arrAdtPrice.settle_price, // 返程成人票价
               roundChdPrice: res.data.arrChdPrice.price, // 返程儿童票价
               roundInfPrice: res.data.arrInfPrice.price, // 返程婴儿票价
-              roundBuildPrice: Number(res.data.arrAdtPrice.build), // 返程机建燃油费
+              roundBuildPrice: Number(res.data.arrAdtPrice.build + res.data.arrAdtPrice.tax), // 成人返程机建燃油费
+              roundChdBuildPrice: Number(res.data.arrChdPrice.build + res.data.arrChdPrice.tax), // 儿童返程机建燃油费
               roundReward: res.data.arrAdtPrice.rulePrice.reward, // 返程奖励金额
             };
 
@@ -1015,7 +1034,8 @@ export default {
           Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
           Number(this.passengerNumber.adt) * Number(this.priceInfo.roundAdtPrice) +
           Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
-          Number(this.passengerNumber.chd) * Number(this.priceInfo.roundChdPrice) +
+          Number(this.passengerNumber.chd) * Number(this.priceInfo.chdBuildPrice) +
+          Number(this.passengerNumber.chd) * Number(this.priceInfo.roundChdBuildPrice) +
           Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
           Number(this.passengerNumber.inf) * Number(this.priceInfo.roundInfPrice) +
           Number(this.passengerNumber.ins || 0) *
@@ -1035,6 +1055,7 @@ export default {
         totalPrice =
           Number(this.passengerNumber.adt) * Number(this.priceInfo.buildPrice) +
           Number(this.passengerNumber.adt) * Number(this.priceInfo.adtPrice) +
+          Number(this.passengerNumber.chd) * Number(this.priceInfo.chdBuildPrice) +
           Number(this.passengerNumber.chd) * Number(this.priceInfo.chdPrice) +
           Number(this.passengerNumber.inf) * Number(this.priceInfo.infPrice) +
           Number(this.passengerNumber.ins || 0) * Number(this.priceInfo.insPrice || 0);
