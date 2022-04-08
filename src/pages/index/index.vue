@@ -2,8 +2,8 @@
  * @Description: 首页
  * @Author: wish.WuJunLong
  * @Date: 2020-06-15 13:53:03
- * @LastEditTime: 2021-11-12 11:27:23
- * @LastEditors: mzr
+ * @LastEditTime: 2022-04-07 18:00:11
+ * @LastEditors: wish.WuJunLong
 -->
 <template>
   <view class="index">
@@ -461,7 +461,7 @@ export default {
 
     // 获取公告列表
     getNoticeList(val) {
-      noticeApi.getNotice(val === 0 ? "100":"101").then((res) => {
+      noticeApi.getNotice(val === 0 ? "200":"201").then((res) => {
         if (res.errorcode === 10000) {
           this.noticeList = res.data.data
           // res.data.data.forEach((item, index) => {
@@ -570,7 +570,7 @@ export default {
     getBannerList(val) {
 
       let data = {
-        type: val === 0 ? "100" :"101",
+        type: val === 0 ? "200" :"201",
       };
       userInfo.getAdvertisement(data).then((res) => {
         if (res.errorcode === 10000) {

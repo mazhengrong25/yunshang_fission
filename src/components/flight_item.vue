@@ -2,38 +2,48 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2021-11-19 10:47:02
+ * @LastEditTime: 2022-04-06 11:44:35
  * @LastEditors: wish.WuJunLong
---> 
+-->
 <template>
   <view class="item_box">
     <view class="item_box_header">
       <view class="box_header_left">
         <view class="left_prcie">
-          <text
-            class="unit"
-            v-if="!isNaN(flightData.data.cabinPrices.ADT.rulePrice.price)"
-            >&yen;</text
-          >
-          <text
-            v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0"
-            >{{ flightData.data.cabinPrices.ADT.rulePrice.price }}</text
-          >
-          <text
-            class="total"
-            v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0 && flightData.data.cabinPrices.ADT.rulePrice.price !== '无运价'"
-          >
-            {{
-              Number(flightData.data.cabinPrices.ADT.build) +
+          <text class="price_box">
+            <text
+              class="unit"
+              v-if="!isNaN(flightData.data.cabinPrices.ADT.rulePrice.price)"
+              >&yen;</text
+            >
+            <text v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0">{{
+              flightData.data.cabinPrices.ADT.rulePrice.price
+            }}</text>
+          </text>
+          <text class="left_reward" v-if="flightData.reward > 0">
+            奖励金
+            <text style="font-weight: bold;margin-left: 6upx"
+              >&yen;{{ flightData.reward }}</text
+            >
+          </text>
+        </view>
+        <view
+          class="total"
+          v-if="
+            Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0 &&
+              flightData.data.cabinPrices.ADT.rulePrice.price !== '无运价'
+          "
+        >
+          {{
+            Number(flightData.data.cabinPrices.ADT.build) +
               Number(flightData.data.cabinPrices.ADT.tax) +
               Number(flightData.data.cabinPrices.ADT.rulePrice.price)
-            }}(含税)
-          </text>
-          <text class="not_price" v-else-if="flightData.data.cabinPrices.ADT.rulePrice.price !== '无运价'">待获取</text>
-          <!-- <view class="price_message" v-if="flightData.priceMessage">（含机建燃油）</view> -->
+          }}(含税总价)
         </view>
-        <view class="left_reward" v-if="flightData.reward > 0"
-          >奖励金 &yen;{{ flightData.reward }}</view
+        <text
+          class="not_price"
+          v-else-if="flightData.data.cabinPrices.ADT.rulePrice.price !== '无运价'"
+          >待获取</text
         >
       </view>
       <view class="box_header_right">
@@ -41,7 +51,7 @@
           v-if="Number(flightData.data.cabinPrices.ADT.rulePrice.price) !== 0"
           :disabled="
             flightData.active ||
-            flightData.data.cabinPrices.ADT.rulePrice.price === '无运价'
+              flightData.data.cabinPrices.ADT.rulePrice.price === '无运价'
           "
           :class="[
             'header_right_btn',
@@ -53,9 +63,7 @@
           ]"
           @click="jumpReservation"
         >
-          {{
-            !roundTripType ? "预定" : flightType === 0 ? "选为去程" : "选为返程"
-          }}
+          {{ !roundTripType ? "预定" : flightType === 0 ? "选为去程" : "选为返程" }}
         </button>
         <button v-else class="get_price" @click="getPriceBtn">立即获取</button>
         <view
@@ -68,7 +76,8 @@
 
     <view class="item_box_bottom">
       <view class="bottom_message" @click="openFlightPopop">
-        {{ flightData.cabin}} {{flightData.data.discount? flightData.data.discount: ''}} | 退改签规则
+        {{ flightData.cabin }}
+        {{ flightData.data.discount ? flightData.data.discount : "" }} | 退改签规则
         {{ flightData.baggage ? " | " + flightData.baggage : "" }}
         <view class="message_more_btn"></view>
       </view>
@@ -168,40 +177,43 @@ export default {
     .box_header_left {
       .left_prcie {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         font-size: 48upx;
-        font-weight: bold;
-        color: rgba(255, 0, 0, 1);
+        .price_box {
+          display: flex;
+          align-items: baseline;
+          font-weight: bold;
+          .unit {
+            font-size: 28upx;
+            margin-right: 6upx;
+          }
 
-        .unit {
-          font-size: 28upx;
-          margin-right: 6upx;
+          .price_message {
+            font-size: 20upx;
+            font-weight: 400;
+            color: rgba(153, 153, 153, 1);
+          }
         }
-        .total {
-          font-size: 20upx;
+
+        .left_reward {
+          background: rgba(255, 0, 0, 0.1);
+          font-size: 24upx;
           font-weight: 400;
-          color: #000;
+          color: rgba(255, 0, 0, 1);
+          padding: 7upx 12upx;
+          display: inline;
           margin-left: 15upx;
-        }
-        .not_price {
-          font-size: 40upx;
-        }
-
-        .price_message {
-          font-size: 20upx;
-          font-weight: 400;
-          color: rgba(153, 153, 153, 1);
         }
       }
 
-      .left_reward {
-        background: rgba(255, 0, 0, 0.1);
-        font-size: 18upx;
+      .total {
+        font-size: 22upx;
         font-weight: 400;
-        color: rgba(255, 0, 0, 1);
-        padding: 4upx 12upx;
-        display: inline;
-        border: 2upx solid rgba(255,0,0,.24);
+        color: #000;
+        margin-left: 15upx;
+      }
+      .not_price {
+        font-size: 40upx;
       }
     }
 
