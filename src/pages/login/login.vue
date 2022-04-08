@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2021-12-09 14:40:27
+ * @LastEditTime: 2022-04-08 15:15:33
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -66,11 +66,11 @@
         <text class="protocol_link" @click.stop="jumpProtocol()">服务协议及隐私政策</text>
       </view>
       <view class="login_submit" @click="loginBtn">登录</view>
-      <view class="scan_submit" @click="scanCodeBtn">
+      <!-- <view class="scan_submit" @click="scanCodeBtn">
         <image class="scan_icon" src="@/static/scan_code_btn.png" mode="contain" />
 
         扫码登录</view
-      >
+      > -->
     </view>
   </view>
 </template>
@@ -326,7 +326,7 @@ export default {
       }
     }
     .protocol_checkbox {
-      margin-bottom: 30upx;
+      margin-bottom: 60upx;
       font-size: 24upx;
       font-weight: 400;
       color: #95a1ae;
