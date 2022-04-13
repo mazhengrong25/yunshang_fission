@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2022-04-06 11:44:35
+ * @LastEditTime: 2022-04-13 15:06:57
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -25,6 +25,21 @@
             <text style="font-weight: bold;margin-left: 6upx"
               >&yen;{{ flightData.reward }}</text
             >
+          </text>
+          <text
+            :class="[
+              'left_parent',
+              flightData.data.parent_cabin_price > flightData.data.cabinPrices.ADT.price
+                ? 'parent_cu'
+                : '',
+            ]"
+            v-if="flightData.data.parent_cabin"
+          >
+            <text style="font-weight: bold;margin-left: 6upx">{{
+              flightData.data.parent_cabin_price > flightData.data.cabinPrices.ADT.price
+                ? "促销"
+                : "高反"
+            }}</text>
           </text>
         </view>
         <view
@@ -81,9 +96,18 @@
         {{ flightData.baggage ? " | " + flightData.baggage : "" }}
         <view class="message_more_btn"></view>
       </view>
-      <!-- <view class="bottom_ticket_info">
-				30分钟内出票 | 提供发票
-      </view>-->
+      <view
+        class="bottom_ticket_info"
+        v-if="
+          flightData.data.parent_cabin &&
+            flightData.data.parent_cabin_price > flightData.data.cabinPrices.ADT.price
+        "
+      >
+        {{
+          flightData.data.cabinPrices.ADT.rulePrice.policy_msg.sell_out_remark ||
+            "票面不符,不提供行程单"
+        }}
+      </view>
     </view>
   </view>
 </template>
@@ -204,6 +228,18 @@ export default {
           display: inline;
           margin-left: 15upx;
         }
+        .left_parent {
+          font-size: 24upx;
+          color: #fff;
+          padding: 7upx 12upx;
+          display: inline;
+          margin-left: 15upx;
+
+          background: rgba(#ff0000, 0.8);
+          &.parent_cu {
+            background: rgba(#fb9826, 0.8);
+          }
+        }
       }
 
       .total {
@@ -286,7 +322,7 @@ export default {
     .bottom_ticket_info {
       font-size: 22upx;
       font-weight: 400;
-      color: rgba(175, 185, 196, 1);
+      color: #fb9826;
     }
   }
 }
