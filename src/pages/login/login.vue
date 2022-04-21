@@ -2,7 +2,7 @@
  * @Description: 登录页
  * @Author: wish.WuJunLong
  * @Date: 2020-07-23 14:41:20
- * @LastEditTime: 2022-04-08 15:15:33
+ * @LastEditTime: 2022-04-15 10:17:01
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -93,8 +93,8 @@ export default {
     protocolAgreeBtn() {
       this.protocolAgree = !this.protocolAgree;
     },
-    jumpProtocol(){
-       uni.navigateTo({
+    jumpProtocol() {
+      uni.navigateTo({
         url: "/flightReservation/webView?url=https://fxxcx.ystrip.cn/login_protocol.html",
       });
     },
@@ -181,6 +181,8 @@ export default {
             title: "加载中",
           });
 
+          // console.log(res)
+
           let obj = this.getCodeToken(res.result);
           let data = {
             access_token: obj[Object.keys(obj)[0]],
@@ -191,7 +193,7 @@ export default {
               wx.hideLoading();
               wx.showToast({
                 title: "登录成功",
-                icon: "succes",
+                icon: "success",
                 mask: true,
               });
 
@@ -221,8 +223,51 @@ export default {
         },
       });
     },
+
+    scanCodeLogin(val) {
+      wx.showLoading({
+        title: "加载中",
+      });
+
+      let data = {
+        access_token: val,
+      };
+      login.scanCodeLogin(data).then((res) => {
+        if (res.errorcode === 10000) {
+          wx.hideLoading();
+          wx.showToast({
+            title: "登录成功",
+            icon: "success",
+            mask: true,
+          });
+
+          let loginInfo = {
+            // account: this.userName,
+            // password: this.password,
+            token: res.data.access_token,
+            loginTime: new Date(new Date().getTime() + 3600 * 1000),
+          };
+
+          uni.setStorageSync("loginInfo", loginInfo);
+
+          setTimeout(() => {
+            uni.switchTab({
+              url: "/pages/index/index",
+            });
+          }, 500);
+        } else {
+          wx.showToast({
+            title: "二维码已过期，请重新扫码，或使用账号密码登录",
+            icon: "none",
+            duration: 2000,
+            mask: true,
+          });
+        }
+      });
+    },
   },
-  onLoad() {
+  onLoad(data) {
+    console.log(data);
     this.headerName = this.$globalType;
     let that = this;
     uni.getStorageSync({
@@ -234,6 +279,10 @@ export default {
       },
     });
     that.iStatusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+
+    if (data && data.scene) {
+      that.scanCodeLogin(data.scene);
+    }
   },
 };
 </script>

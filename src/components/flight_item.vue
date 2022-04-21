@@ -2,7 +2,7 @@
  * @Description: 航班信息 - 航班价格
  * @Author: wish.WuJunLong
  * @Date: 2020-06-24 16:32:24
- * @LastEditTime: 2022-04-13 15:06:57
+ * @LastEditTime: 2022-04-21 17:23:16
  * @LastEditors: wish.WuJunLong
 -->
 <template>
@@ -33,11 +33,18 @@
                 ? 'parent_cu'
                 : '',
             ]"
-            v-if="flightData.data.parent_cabin"
+            v-if="
+              flightData.data.parent_cabin ||
+                (flightData.data.cabinInfo.isFavorablePrice &&
+                  flightData.data.cabinInfo.isFavorablePrice === 1)
+            "
           >
             <text style="font-weight: bold;margin-left: 6upx">{{
-              flightData.data.parent_cabin_price > flightData.data.cabinPrices.ADT.price
-                ? "促销"
+              flightData.data.parent_cabin
+                ? flightData.data.parent_cabin_price >
+                  flightData.data.cabinPrices.ADT.price
+                  ? "促销"
+                  : "高反"
                 : "高反"
             }}</text>
           </text>
@@ -96,6 +103,9 @@
         {{ flightData.baggage ? " | " + flightData.baggage : "" }}
         <view class="message_more_btn"></view>
       </view>
+      <!-- 促销仓位提示 -->
+      <!-- flightData.data.parent_cabin 有值为高反 -->
+      <!-- flightData.data.parent_cabin_price > flightData.data.cabinPrices.ADT.price parent_cabin有值切原价格高于售价为促销 -->
       <view
         class="bottom_ticket_info"
         v-if="
@@ -103,10 +113,18 @@
             flightData.data.parent_cabin_price > flightData.data.cabinPrices.ADT.price
         "
       >
-        {{
-          flightData.data.cabinPrices.ADT.rulePrice.policy_msg.sell_out_remark ||
-            "票面不符,不提供行程单"
-        }}
+        {{ flightData.data.cabinPrices.ADT.rulePrice.policy_msg.sell_out_remark }} |
+        票面不符，不提供行程单
+      </view>
+      <!-- 高反仓位提示 -->
+      <view
+        class="bottom_ticket_info"
+        v-else-if="
+          flightData.data.parent_cabin &&
+            flightData.data.cabinPrices.ADT.rulePrice.policy_msg.sell_out_remark
+        "
+      >
+        {{ flightData.data.cabinPrices.ADT.rulePrice.policy_msg.sell_out_remark }}
       </view>
     </view>
   </view>
